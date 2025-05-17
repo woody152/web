@@ -5,6 +5,7 @@ function _tradingUserDefined($strVal = false)
 {
 	global $acct;
     
+	$arLev = $acct->GetLeverageRef();
 	$fund = $acct->GetRef();
 	$est_ref = $fund->GetEstRef();
 
@@ -14,11 +15,22 @@ function _tradingUserDefined($strVal = false)
     	else
     	{
     		$strEst = $fund->GetEstValue($strVal);
-    		return $est_ref->GetPriceDisplay($strEst);
+    		$strLev = '';
+    		foreach ($arLev as $leverage_ref)
+    		{
+   				$fLev = $leverage_ref->EstFromPair(floatval($strEst));
+   				$strLev .= '/'.$leverage_ref->GetPriceDisplay(strval($fLev));
+    		}
+    		return $est_ref->GetPriceDisplay($strEst).$strLev;
     	}
     }
-    
-   	return GetTableColumnStock($est_ref).GetTableColumnPrice();
+
+	$strLev = '';
+	foreach ($arLev as $leverage_ref)
+	{
+		$strLev .= '/'.TableColumnGetStock($leverage_ref);
+	}
+   	return TableColumnGetStock($est_ref).$strLev.TableColumnGetPrice();
 }
 
 function _convertCallback($fRatio, $fFactor)
@@ -86,18 +98,23 @@ class QdiiGroupAccount extends FundGroupAccount
     function EchoCommonParagraphs()
     {
     	$ref = $this->GetRef();
+    	$arLev = $this->GetLeverageRef();
     	
     	EchoFundTradingParagraph($ref, '_tradingUserDefined');    
     	EchoQdiiSmaParagraph($ref);
-    	if (count($this->ar_leverage_ref) > 0)	
+    	if (count($arLev) > 0)	
     	{
-    		EchoFundListParagraph($this->ar_leverage_ref, '_convertCallback');
-    		EchoFundPairSmaParagraphs($ref->GetEstRef(), $this->ar_leverage_ref);
+    		EchoFundListParagraph($arLev, '_convertCallback');
+    		EchoFundPairSmaParagraphs($ref->GetEstRef(), $arLev);
     	}
     	EchoFutureSmaParagraph($ref);
     	EchoFundHistoryParagraph($ref);
     	EchoFundShareParagraph($ref);
     	EchoNvCloseHistoryParagraph($ref->GetEstRef());
+    	foreach ($arLev as $leverage_ref)
+    	{
+    		EchoNvCloseHistoryParagraph($leverage_ref);
+		}
     }
 
     function GetLeverageSymbols($strEstSymbol)

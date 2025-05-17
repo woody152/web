@@ -56,13 +56,6 @@ class IntSql extends ValSql
     }
 }
 
-class FundHedgeValSql extends IntSql
-{
-    public function __construct()
-    {
-        parent::__construct('fundhedgeval');
-    }
-}
 /*
 class StockQuoteSql extends IntSql
 {

@@ -137,7 +137,7 @@ function _callbackQdiiMixTrading($strVal = false)
     	if ($strVal == '0')	return '';
     	else		    	return $us_ref->GetPriceDisplay(strval($ref->EstToPair(floatval($strVal))));
     }
-   	return GetTableColumnStock($us_ref).GetTableColumnPrice();
+   	return TableColumnGetStock($us_ref).TableColumnGetPrice();
 }
 
 function _callbackFundList($fRatio, $fFactor)

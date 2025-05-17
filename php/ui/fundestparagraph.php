@@ -93,7 +93,7 @@ function _echoFundEstParagraph($arColumn, $bFair, $arRef, $str, $bWide = false)
 {
 	if ($str === false)
 	{
-		$str = GetTableColumnEst().'网页链接'; 
+		$str = TableColumnGetEst().'网页链接'; 
 		$iCount = count($arRef);
 		if ($iCount > 2)
 		{
@@ -103,12 +103,12 @@ function _echoFundEstParagraph($arColumn, $bFair, $arRef, $str, $bWide = false)
 				if ($strSort == 'symbol')				
 				{
 					$arRef = RefSortBySymbol($arRef);
-					$str .= _getOrderByDisplay(GetTableColumnSymbol());
+					$str .= _getOrderByDisplay(TableColumnGetSymbol());
 				}
 				else if ($strSort == 'premium')
 				{
 					$arRef = RefSortByNumeric($arRef, '_callbackSortFundEst');
-					$str .= _getOrderByDisplay(STOCK_DISP_OFFICIAL.GetTableColumnPremium());
+					$str .= _getOrderByDisplay(STOCK_DISP_OFFICIAL.TableColumnGetPremium());
 				}
 			}
 			else	$str .= ' '.CopyPhpLink(UrlAddQuery('sort=symbol'), _getOrderByDisplay(STOCK_DISP_SYMBOL)).' '.CopyPhpLink(UrlAddQuery('sort=premium'), _getOrderByDisplay(STOCK_DISP_OFFICIAL.STOCK_DISP_PREMIUM));
@@ -131,7 +131,6 @@ function _getFundPositionStr($ref)
 	$str = '';
 	$fPosition = RefGetPosition($ref);
 	if ($fPosition < 1.0)									$str .= GetFundPositionLink($ref->GetSymbol()).'值使用'.strval($fPosition).'。';
-	if ($iHedge = FundGetHedgeVal($ref->GetStockId()))		$str .= '建议'.GetTableColumnConvert().strval($iHedge).'。';
 	return $str;
 }
 

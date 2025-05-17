@@ -51,7 +51,7 @@ function _echoMergeParagraph($arMerge)
 	EchoTableParagraphBegin(array(new TableColumnSymbol(),
 								   new TableColumnQuantity(),
 								   new TableColumnTest()
-								   ), 'merge', '合并'.GetTableColumnQuantity());
+								   ), 'merge', '合并'.TableColumnGetQuantity());
 
 	foreach ($arMerge as $strSymbol => $trans)
 	{
@@ -66,7 +66,7 @@ function _echoMergeParagraph($arMerge)
 			switch ($strSymbol)
 			{
 			case 'KWEB':
-				$ar[] = strval($iTotal - 00 - 239);
+				$ar[] = strval($iTotal + 400 - 00);
 				break;
 
 			case 'XOP':

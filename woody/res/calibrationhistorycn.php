@@ -9,7 +9,7 @@ function EchoAll()
 	
     if ($ref = $acct->EchoStockGroup())
     {
-   		EchoCalibrationHistoryParagraph($ref, $acct->GetStart(), $acct->GetNum(), $acct->IsAdmin());
+   		EchoCalibrationHistoryParagraph($ref, $acct->GetStart(), $acct->GetNum());
     }
     $acct->EchoLinks();
 }    

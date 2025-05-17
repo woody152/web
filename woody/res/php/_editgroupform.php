@@ -43,7 +43,7 @@ function StockEditGroupForm($acct, $strSubmit)
     $col = new TableColumnGroupName();    
     $strStockGroup = $col->GetDisplay();
     
-	$strSymbolCol = GetTableColumnSymbol();
+	$strSymbolCol = TableColumnGetSymbol();
     $strPassQuery = UrlPassQuery();
     
 	echo <<< END

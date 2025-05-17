@@ -49,7 +49,7 @@ function url_get_contents($strUrl, $arExtraHeaders = false, $strFileName = false
     $timeout = 2;  
     curl_setopt($ch, CURLOPT_URL, $strUrl);
     
-	$arHeaders = array('User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36',
+	$arHeaders = array('User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36',
 //							'x-test: true',
 //							'x-test2: true',
 //							'stream: True'

@@ -117,7 +117,7 @@ function EchoSmaParagraph($ref, $str = false, $cb_ref = false, $callback = false
     	$est_ref = call_user_func($callback, $cb_ref);
     	$str .= _getSmaParagraphWarning($est_ref);
 
-//    	$ar[] = new TableColumnEst(GetTableColumnStock($est_ref));
+//    	$ar[] = new TableColumnEst(TableColumnGetStock($est_ref));
     	$ar[] = new TableColumnStock($est_ref, 90);
     	$ar[] = $next_col;
     	if ($bAfterHour)	$ar[] = $afterhour_col;

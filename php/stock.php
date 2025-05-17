@@ -183,12 +183,11 @@ function StockUpdateEstResult($strStockId, $strNetValue, $strDate)
 	}
 }
 
-// ****************************** StockReference public functions *******************************************************
 function RefGetTableColumnNav($ref)
 {
-	$strStockDisplay = GetTableColumnStock($ref);
+	$strStockDisplay = TableColumnGetStock($ref);
 	if ($ref->CountNav() > 0)		return new TableColumnNav($strStockDisplay);	
-	return 								new TableColumnPrice($strStockDisplay);
+	return 								   new TableColumnPrice($strStockDisplay);
 }
 
 function RefGetPosition($ref)
@@ -198,13 +197,6 @@ function RefGetPosition($ref)
 	return $ref->GetDefaultPosition();  
 }
 
-function FundGetHedgeVal($strStockId)
-{
-	$sql = new FundHedgeValSql();
-   	return $sql->ReadInt($strStockId);
-}
-
-// ****************************** Stock final integration functions *******************************************************
 function StockPrefetchArrayData($arSymbol)
 {
     PrefetchSinaStockData(array_unique($arSymbol));

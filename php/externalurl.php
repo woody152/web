@@ -189,7 +189,7 @@ function _getIsharesXlsUrl($strSymbol)
 	return false;
 }
 
-// https://www.ssga.com/us/en/individual/etfs/funds/spdr-sp-biotech-etf-xbi
+// https://www.ssga.com/us/en/individual/etfs/spdr-sp-500-etf-trust-spy
 function GetSpdrUrl()
 {
 	return 'https://www.ssga.com/';
@@ -202,9 +202,13 @@ function GetSpdrEtfUrl()
 
 function GetSpdrOfficialUrl($strSymbol)
 {
-	$str = GetSpdrEtfUrl().'funds/';
+	$str = GetSpdrEtfUrl();	// .'funds/'
 	switch ($strSymbol)
 	{
+	case 'SPY':
+		$str .= 'spdr-sp-500-etf-trust-spy';
+		break;
+
 	case 'XBI':
 		$str .= 'spdr-sp-biotech-etf-xbi';
 		break;

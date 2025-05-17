@@ -35,12 +35,6 @@ class TableColumnConvert extends TableColumn
 	}
 }
 
-function GetTableColumnConvert()
-{
-	$col = new TableColumnConvert();
-	return $col->GetDisplay();
-}
-
 class TableColumnError extends TableColumn
 {
 	public function __construct()
@@ -57,7 +51,7 @@ class TableColumnEst extends TableColumn
 	}
 }
 
-function GetTableColumnEst()
+function TableColumnGetEst()
 {
 	$col = new TableColumnEst();
 	return $col->GetDisplay();
@@ -119,7 +113,7 @@ class TableColumnNav extends TableColumn
 	}
 }
 
-function GetTableColumnNav()
+function TableColumnGetNav()
 {
 	$col = new TableColumnNav();
 	return $col->GetDisplay();
@@ -149,7 +143,7 @@ class TableColumnPremium extends TableColumn
 	}
 }
 
-function GetTableColumnPremium()
+function TableColumnGetPremium()
 {
 	$col = new TableColumnPremium();
 	return $col->GetDisplay();
@@ -163,7 +157,7 @@ class TableColumnPrice extends TableColumn
 	}
 }
 
-function GetTableColumnPrice()
+function TableColumnGetPrice()
 {
 	$col = new TableColumnPrice();
 	return $col->GetDisplay();
@@ -185,7 +179,7 @@ class TableColumnQuantity extends TableColumn
 	}
 }
 
-function GetTableColumnQuantity()
+function TableColumnGetQuantity()
 {
 	$col = new TableColumnQuantity();
 	return $col->GetDisplay();
@@ -207,7 +201,7 @@ class TableColumnRemark extends TableColumn
 	}
 }
 
-function GetTableColumnRemark()
+function TableColumnGetRemark()
 {
 	$col = new TableColumnRemark();
 	return $col->GetDisplay();
@@ -229,7 +223,7 @@ class TableColumnStock extends TableColumn
 	}
 }
 
-function GetTableColumnStock($sym)
+function TableColumnGetStock($sym)
 {
 	$col = new TableColumnStock($sym);
 	return $col->GetDisplay();
@@ -243,7 +237,7 @@ class TableColumnSymbol extends TableColumn
 	}
 }
 
-function GetTableColumnSymbol()
+function TableColumnGetSymbol()
 {
 	$col = new TableColumnSymbol();
 	return $col->GetDisplay();

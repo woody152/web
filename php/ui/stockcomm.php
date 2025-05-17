@@ -64,8 +64,16 @@ function RefEchoTableColumn($ref, $ar, $bWide = false)
 
 function GetArbitrageRatio($strStockId)
 {
-	if ($iHedge = FundGetHedgeVal($strStockId))		return $iHedge;
-	return 1;
+   	$calibration_sql = GetCalibrationSql();
+   	if ($strCalibration = $calibration_sql->GetCloseNow($strStockId))
+   	{
+   		$pos_sql = new FundPositionSql();
+   		if ($fPosition = $pos_sql->ReadVal($strStockId))
+   		{
+   			return intval(round(floatval($strCalibration) / $fPosition));
+   		}
+   	}
+   	return 1;
 }
 
 function GetArbitrageQuantity($strStockId, $fQuantity)

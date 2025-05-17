@@ -183,9 +183,9 @@ function StockEditTransactionForm($acct, $strSubmit, $strGroupId = false, $strGr
     $strPassQuery = UrlPassQuery();
     $strSymbolsList = HtmlGetOption(SqlGetStockGroupItemSymbolArray($item_sql), SqlGetStockSymbol($item_sql->GetStockId($strGroupItemId)));
 
-    $strColumnPrice = GetTableColumnPrice();
-    $strColumnQuantity = GetTableColumnQuantity();
-    $strColumnRemark = GetTableColumnRemark();
+    $strColumnPrice = TableColumnGetPrice();
+    $strColumnQuantity = TableColumnGetQuantity();
+    $strColumnRemark = TableColumnGetRemark();
     
 	echo <<< END
 	

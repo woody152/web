@@ -119,7 +119,7 @@ END;
 
 function EchoPricePoolParagraph($pool, $strSymbol, $strTradingSymbol = '', $bTranspose = true)
 {
-	$strPremium = GetTableColumnPremium();
+	$strPremium = TableColumnGetPremium();
    	$arColumnEx = array('涨', '不变', '跌');
    	$arRow = array($strPremium, '平价', '折价');
     

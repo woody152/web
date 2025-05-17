@@ -78,7 +78,7 @@ class MyEWrapper(EWrapper):
         self.arTQQQ = {'SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941'}
         self.arXOP = {'SH513350', 'SZ159518'}
         self.arOrder = {}
-        self.arOrder['KWEB'] = GetOrderArray([20.07, 25.45, 26.5, 30.72, 30.94, 31.9, 37.3, 39.07], 200, 4, 6)
+        self.arOrder['KWEB'] = GetOrderArray([20.19, 26.21, 29.99, 32.92, 33.99, 34.74, 35.86, 39.17], 200, 4, 5)
         if IsChinaMarketOpen():
             self.arOrder['IEO'] = GetOrderArray()
             self.arOrder['SPY'] = GetOrderArray()
@@ -88,10 +88,10 @@ class MyEWrapper(EWrapper):
             self.arOrder['XOP'] = GetOrderArray()
         else:
         #if IsMarketOpen():
-            #self.arOrder['TLT'] = GetOrderArray([79.8, 83.57, 84.41, 87.08, 87.31, 88.94, 93.46, 98.66], 100, 2, 5)
-            self.arOrder['XOP'] = GetOrderArray([90.23, 108.73, 110.82, 115.11, 139.99, 152.2, 153.7], 100, 0, 2)
-            self.arOrder['SPX'] = GetOrderArray([4025.59, 4896.82, 5276.13, 5312.69, 5367.2, 5837.59, 6480.7, 6600.62])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0054, 2, 5)
+            #self.arOrder['TLT'] = GetOrderArray([], 100, 2, 5)
+            #self.arOrder['XOP'] = GetOrderArray([100.99, 105.55, 112.37, 114.17, 115.57, 119.18, 126.68, 152.37, 156.91], 100, 1, 6)
+            self.arOrder['SPX'] = GetOrderArray([4215.66, 5087.55, 5159.06, 5607.05, 5750.3, 5885.06, 6055.04, 6414.11, 6545.39])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0034, 3, 5)
             self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0161, -1, -1)
         self.palmmicro = Palmmicro()
         self.client.StartStreaming(orderId)
@@ -305,7 +305,7 @@ class MyEWrapper(EWrapper):
 
 def GetContractExchange():
     iTime = GetExchangeTime()
-    if iTime >= 350 and iTime <= 2000:
+    if iTime >= 350 and iTime < 2000:
         return 'SMART'
     return 'OVERNIGHT'
 

@@ -25,20 +25,22 @@ function _EchoMoneyParagraphBegin()
 
 function _echoMoneyItem($strGroup, $fValue, $fProfit, $fConvertValue, $fConvertProfit)
 {
+	global $acct;
+	
 	$ar = array($strGroup);
 	$ar[] = GetNumberDisplay($fConvertProfit);
 	
-	$strConvertProfit = GetNumberDisplay($fConvertValue);
+	$strConvertValue = GetNumberDisplay($fConvertValue);
 	$strProfit = GetNumberDisplay($fProfit);
     $strValue = GetNumberDisplay($fValue);
     
-    if ($strConvertProfit == '')
+    if ($strConvertValue == '')
     {
     	if ($strProfit != '' || $strValue != '')	$ar[] = ''; 
     }
     else
     {
-    	$ar[] = $strConvertProfit;
+    	$ar[] = $strConvertValue;
     }
     
     if ($strProfit == '')
@@ -50,11 +52,27 @@ function _echoMoneyItem($strGroup, $fValue, $fProfit, $fConvertValue, $fConvertP
     	$ar[] = $strProfit;
     }
     
-    if ($strValue != '')
-    {
+//    if ($strValue != '')
+//    {
     	$ar[] = $strValue;
-        if ($strGroup == DISP_ALL_CN)		$ar[] = GetNumberDisplay($fConvertProfit - 2074742.95);		// woody@palmmicro.com only
-    }
+        if ($strGroup == DISP_ALL_CN)
+        {
+        	if ($strMemberId = $acct->GetMemberId())
+        	{
+				$strEmail = SqlGetEmailById($strMemberId);
+				switch ($strEmail)
+				{
+				case ADMIN_EMAIL:
+					$ar[] = GetNumberDisplay($fConvertProfit - 2074742.95);
+					break;
+				
+				case 'mix@palmmicro.com':
+					$ar[] = GetNumberDisplay($fConvertProfit / 2 - $fProfit);
+					break;
+				}
+			}
+        }
+//    }
    
     EchoTableColumn($ar);
 }

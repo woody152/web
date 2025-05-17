@@ -61,12 +61,6 @@ class TableColumnDate extends TableColumn
 	}
 }
 
-function GetTableColumnDate()
-{
-	$col = new TableColumnDate();
-	return $col->GetDisplay();
-}
-
 class TableColumnIP extends TableColumn
 {
 	public function __construct()
@@ -83,24 +77,27 @@ class TableColumnTime extends TableColumn
 	}
 }
 
-function GetTableColumnTime()
+function TableColumnGetTotalWidth($ar)
 {
-	$col = new TableColumnTime();
-	return $col->GetDisplay();
-}
-
-function EchoTableParagraphBegin($ar, $strId, $str = '')
-{
-    $strColumn = '';
 	$iTotal = 0;
 	foreach ($ar as $col)
 	{
 		$iTotal += $col->GetWidth();
-		$strColumn .= $col->GetHead();
 	}
+	return $iTotal;
+}
+
+function EchoTableParagraphBegin($ar, $strId, $str = '')
+{
+	$iTotal = TableColumnGetTotalWidth($ar);
     $strWidth = strval($iTotal);
 	if (!$_SESSION['mobile'] && $iTotal > LayoutGetDisplayWidth())	trigger_error('Table too wide: '.$strWidth);
-
+	
+    $strColumn = '';
+	foreach ($ar as $col)
+	{
+		$strColumn .= $col->GetHead();
+	}
 	$strColumn = GetTableRow($strColumn);
 	$strColumn = GetHtmlElement($strColumn, 'thead');
     echo <<<END
