@@ -170,17 +170,19 @@ function _errorHandler($errno, $errstr, $errfile, $errline)
  	file_put_contents($strFileName, $errno.','.$strCount);
    	if ($iCount <= 5)
    	{
+   		$strNewLine = GetBreakElement();
+   		
    		$strSubject = ($errno == '1024') ? '调试消息' : "PHP错误: [$errno]";
-   		$str = $errstr.'<br />位于'.$errfile.'第'.$errline.'行';
+   		$str = str_replace(PHP_EOL, $strNewLine, $errstr).$strNewLine.'位于'.$errfile.'第'.$errline.'行';
    		$strDebug = "$strSubject $str ($strCount)";
     
-   		$str .= '<br />'.GetExternalLink(UrlGetServer().UrlGetCur());
-//   		if (isset($_SESSION['SESS_ID']))		$str .= '<br />'.GetMemberLink($_SESSION['SESS_ID']);	// need MySQL successful
+   		$str .= $strNewLine.GetExternalLink(UrlGetServer().UrlGetCur());
+//   		if (isset($_SESSION['SESS_ID']))		$str .= $strNewLine.GetMemberLink($_SESSION['SESS_ID']);	// need MySQL successful
 
 		$strIp = UrlGetIp();
-		$str .= '<br />'.GetVisitorLink($strIp);
+		$str .= $strNewLine.GetVisitorLink($strIp);
    		if (EmailHtml(ADMIN_EMAIL, $strSubject.' '.$strIp, $str) == false)	$strDebug .= ' mail failed too';
-   		DebugString($strDebug);
+   		DebugString(str_replace($strNewLine, PHP_EOL, $strDebug));
    	}
 }
 

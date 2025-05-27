@@ -134,10 +134,16 @@ function GetHoldingsLink($strSymbol, $strDisplay = HOLDINGS_DISPLAY)
 }
 
 define('STOCK_HISTORY_DISPLAY', '历史价格');
-define('STOCK_HISTORY_UPDATE', '更新'.STOCK_HISTORY_DISPLAY);
 function GetStockHistoryLink($strSymbol, $strDisplay = STOCK_HISTORY_DISPLAY)
 {
     return GetStockSymbolLink('stockhistory', $strSymbol, ($strDisplay ? $strDisplay : $strSymbol));
+}
+
+define('STOCK_HISTORY_UPDATE', '更新'.STOCK_HISTORY_DISPLAY);
+function GetUpdateStockHistoryLink($sym, $strDisplay = false)
+{
+	$strSymbol = $sym->GetSymbol();
+	return GetOnClickLink(PATH_STOCK.'submithistory.php?symbol='.$strSymbol, '确认'.$strSymbol.STOCK_HISTORY_UPDATE.'？', ($strDisplay ? $strDisplay : $strSymbol));
 }
 
 define('FUND_HISTORY_DISPLAY', '基金溢价记录');

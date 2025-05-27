@@ -116,13 +116,13 @@ function EchoFundTradingParagraph($fund, $callback = false)
     	if ($strFair = $fund->GetFairNav())
     	{
     		$arColumn[] = new TableColumnPremium(STOCK_DISP_FAIR);
-    		$strEstPrice .= '/'.$ref->GetPriceDisplay($strFair, $strPrev);
+    		$strEstPrice .= '|'.$ref->GetPriceDisplay($strFair, $strPrev);
     	}
 
    		if ($strRealtime = $fund->GetRealtimeNav())
    		{
    			$arColumn[] = new TableColumnPremium(STOCK_DISP_REALTIME);
-   			$strEstPrice .= '/'.$ref->GetPriceDisplay($strRealtime, $strPrev);
+   			$strEstPrice .= '|'.$ref->GetPriceDisplay($strRealtime, $strPrev);
     	}
 
     	$strEst = TableColumnGetEst();

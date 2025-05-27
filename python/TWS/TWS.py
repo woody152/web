@@ -75,23 +75,23 @@ class MyEWrapper(EWrapper):
 
     def nextValidId(self, orderId: int):
         self.arHedge = {'SZ161125', 'SZ161127', 'SZ161130', 'SZ162411', 'SZ162415', 'SZ162719', 'SZ164906'}
-        self.arTQQQ = {'SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941'}
-        self.arXOP = {'SH513350', 'SZ159518'}
+        #self.arQQQ = {'SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941'}
+        #self.arXOP = {'SH513350', 'SZ159518'}
         self.arOrder = {}
-        self.arOrder['KWEB'] = GetOrderArray([20.19, 26.21, 29.99, 32.92, 33.99, 34.74, 35.86, 39.17], 200, 4, 5)
+        self.arOrder['KWEB'] = GetOrderArray([20.19, 26.77, 31.41, 33.6, 34.06, 34.39, 35.8, 39.17], 200, 3, 5)
         if IsChinaMarketOpen():
             self.arOrder['IEO'] = GetOrderArray()
+            self.arOrder['QQQ'] = GetOrderArray()
             self.arOrder['SPY'] = GetOrderArray()
-            self.arOrder['TQQQ'] = GetOrderArray()
             self.arOrder['XBI'] = GetOrderArray()
             self.arOrder['XLY'] = GetOrderArray()
             self.arOrder['XOP'] = GetOrderArray()
         else:
         #if IsMarketOpen():
-            #self.arOrder['TLT'] = GetOrderArray([], 100, 2, 5)
+            #self.arOrder['TLT'] = GetOrderArray([80.42, 83.53, 83.65, 85.44, 85.81, 87.11, 90.57, 92.68, 98.05], 100, 0, 2)
             #self.arOrder['XOP'] = GetOrderArray([100.99, 105.55, 112.37, 114.17, 115.57, 119.18, 126.68, 152.37, 156.91], 100, 1, 6)
-            self.arOrder['SPX'] = GetOrderArray([4215.66, 5087.55, 5159.06, 5607.05, 5750.3, 5885.06, 6055.04, 6414.11, 6545.39])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0034, 3, 5)
+            self.arOrder['SPX'] = GetOrderArray([4215.66, 5087.05, 5406.2, 5750.06, 5897.67, 5898.81, 6093.92, 6416.28, 6545.39])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0029, 3, 4)
             self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0161, -1, -1)
         self.palmmicro = Palmmicro()
         self.client.StartStreaming(orderId)
@@ -292,16 +292,18 @@ class MyEWrapper(EWrapper):
 
     def ProcessPriceAndSize(self, data):
         strSymbol = data['symbol']
-        arAll = self.arHedge | self.arXOP
-        arPalmmicro = self.palmmicro.FetchData(arAll | self.arTQQQ)
+        #arAll = self.arHedge | self.arXOP
+        #arPalmmicro = self.palmmicro.FetchData(arAll | self.arQQQ)
+        arAll = self.arHedge
+        arPalmmicro = self.palmmicro.FetchData(arAll)
         for strHedge in arAll:
             arReply = arPalmmicro[strHedge]
             if 'symbol_hedge' in arReply and arReply['symbol_hedge'] == strSymbol:
                 for strType in ['ask', 'bid']:
                     arResult = self.palmmicro.GetArbitrageResult(strHedge, data, strType)
                     self.DebugPriceAndSize(data, strSymbol, strHedge, arReply, arResult, strType)
-        #for strHedge in self.arTQQQ:
-            #self.palmmicro.SendMsg(strDebug, 'tqqq')
+        #for strHedge in self.arQQQ:
+            #self.palmmicro.SendMsg(strDebug, 'qqq')
 
 def GetContractExchange():
     iTime = GetExchangeTime()

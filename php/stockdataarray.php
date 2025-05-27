@@ -52,7 +52,7 @@ function GetStockDataArray($strSymbols)
 								break;
 							
 							case '^NDX':
-								$strEtf = 'TQQQ';
+								$strEtf = 'QQQ';
 								break;
 							}
 							_addIndexArray($ar, $strIndex, $strEtf);

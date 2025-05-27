@@ -202,7 +202,7 @@ function GetSpdrEtfUrl()
 
 function GetSpdrOfficialUrl($strSymbol)
 {
-	$str = GetSpdrEtfUrl();	// .'funds/'
+	$str = GetSpdrEtfUrl();
 	switch ($strSymbol)
 	{
 	case 'SPY':
@@ -232,15 +232,45 @@ function GetSpdrOfficialUrl($strSymbol)
 }
 
 // https://www.ssga.com/us/en/individual/etfs/library-content/products/fund-data/etfs/us/navhist-us-en-xop.xlsx
+function GetSpdrNavUrl($strSymbol)
+{
+	return GetSpdrEtfUrl().'library-content/products/fund-data/etfs/us/navhist-us-en-'.strtolower($strSymbol).'.xlsx';
+}
+
+// https://www.invesco.com/us/financial-products/etfs/product-detail?audienceType=Investor&productId=ETF-QQQ
+function GetInvescoUrl()
+{
+	return 'https://www.invesco.com/';
+}
+
+function GetInvescoEtfUrl()
+{
+	return GetInvescoUrl().'us/financial-products/etfs/product-detail';
+}
+
+function GetInvescoOfficialUrl($strSymbol)
+{
+	switch ($strSymbol)
+	{
+	case 'QQQ':
+		return GetInvescoEtfUrl().'?audienceType=Investor&productId=ETF-'.$strSymbol;
+	}
+	return false;
+}
+
+// https://www.invesco.com/us/financial-products/etfs/product-detail/main/sidebar/0?audienceType=Investor&action=download&ticker=QQQ
+function GetInvescoNavUrl($strSymbol)
+{
+	return GetInvescoEtfUrl().'/main/sidebar/0?audienceType=Investor&action=download&ticker='.$strSymbol;
+}
+
 function GetEtfNavUrl($strSymbol)
 {
-	if ($strName = SqlGetStockName($strSymbol))
+	if (GetSpdrOfficialUrl($strSymbol))			return GetSpdrNavUrl($strSymbol);
+	else if (GetInvescoOfficialUrl($strSymbol))	return GetInvescoNavUrl($strSymbol);
+	else if ($strName = SqlGetStockName($strSymbol))
 	{
-		if (GetSpdrOfficialUrl($strSymbol))
-		{
-			return GetSpdrEtfUrl().'library-content/products/fund-data/etfs/us/navhist-us-en-'.strtolower($strSymbol).'.xlsx';
-		}
-		else if (stripos($strName, 'ishares') !== false)
+		if (stripos($strName, 'ishares') !== false)
 		{
 			return _getIsharesXlsUrl($strSymbol);
 		}

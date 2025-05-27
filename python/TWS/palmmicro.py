@@ -10,8 +10,8 @@ from _tgprivate import TG_TOKEN
 from _tgprivate import WECHAT_KEY
 from _tgprivate import WECHAT_IEO_KEY
 from _tgprivate import WECHAT_KWEB_KEY
+from _tgprivate import WECHAT_QQQ_KEY
 from _tgprivate import WECHAT_SPY_KEY
-from _tgprivate import WECHAT_TQQQ_KEY
 from _tgprivate import WECHAT_XBI_KEY
 from _tgprivate import WECHAT_XLY_KEY
 from _tgprivate import WECHAT_XOP_KEY
@@ -52,8 +52,8 @@ class Palmmicro:
         self.iTimer = 0
         self.arSendMsg = {'telegram':{'key':WECHAT_KEY, 'count':5, 'timer':0, 'msg':'', 'array_msg':[]},
                           'kweb':{'key':WECHAT_KWEB_KEY, 'count':7, 'timer':0, 'msg':'', 'array_msg':[]},
-                          'spy':{'key':WECHAT_SPY_KEY, 'count':11, 'timer':0, 'msg':'', 'array_msg':[]},
-                          'tqqq':{'key':WECHAT_TQQQ_KEY, 'count':13, 'timer':0, 'msg':'', 'array_msg':[]},
+                          'qqq':{'key':WECHAT_QQQ_KEY, 'count':11, 'timer':0, 'msg':'', 'array_msg':[]},
+                          'spy':{'key':WECHAT_SPY_KEY, 'count':13, 'timer':0, 'msg':'', 'array_msg':[]},
                           'xbi':{'key':WECHAT_XBI_KEY, 'count':17, 'timer':0, 'msg':'', 'array_msg':[]},
                           'xly':{'key':WECHAT_XLY_KEY, 'count':19, 'timer':0, 'msg':'', 'array_msg':[]},
                           'xop':{'key':WECHAT_XOP_KEY, 'count':23, 'timer':0, 'msg':'', 'array_msg':[]},
@@ -232,7 +232,7 @@ class Palmmicro:
                 self.__send_msg(group)
 
     def SendSymbolMsg(self, strMsg, strSymbol):
-        if strSymbol in ['IEO', 'KWEB', 'SPY', 'TQQQ', 'XBI', 'XLY', 'XOP']:
+        if strSymbol in ['IEO', 'KWEB', 'QQQ', 'SPY', 'XBI', 'XLY', 'XOP']:
             self.SendMsg(strMsg.replace(' ' + strSymbol, ''), strSymbol.lower())
 
     def SendOldMsg(self):

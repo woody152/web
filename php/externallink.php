@@ -67,13 +67,11 @@ function GetSpdrOfficialLink($strSymbol)
 	return $strSymbol.' is not SPDR ETF';
 }
 
-/*
 function GetInvescoOfficialLink($strSymbol)
 {
-	$str = 'https://www.invesco.com/us/financial-products/etfs/product-detail?productId='.$strSymbol;
-	return GetOfficialLink($str, $strSymbol);
+	if ($str = GetInvescoOfficialUrl($strSymbol))	return GetOfficialLink($str, $strSymbol);
+	return $strSymbol.' is not Invesco ETF';
 }
-*/
 
 function GetProsharesOfficialLink($strSymbol)
 {

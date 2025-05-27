@@ -75,7 +75,7 @@ class CsvFile
     
     function DebugReport($str)
     {
-    	$this->strReport .= $str.' ';
+    	$this->strReport .= $str.PHP_EOL;
     }
     
     function Read()

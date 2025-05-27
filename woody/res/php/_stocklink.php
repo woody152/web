@@ -1,11 +1,5 @@
 <?php
 
-function GetUpdateStockHistoryLink($sym, $strDisplay = false)
-{
-	$strSymbol = $sym->GetSymbol();
-	return GetOnClickLink(PATH_STOCK.'submithistory.php?symbol='.$strSymbol, '确认'.$strSymbol.STOCK_HISTORY_UPDATE.'？', ($strDisplay ? $strDisplay : $strSymbol));
-}
-
 function GetCategoryArray($strItem)
 {
     $ar = array();

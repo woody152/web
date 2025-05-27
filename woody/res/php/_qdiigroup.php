@@ -19,7 +19,7 @@ function _tradingUserDefined($strVal = false)
     		foreach ($arLev as $leverage_ref)
     		{
    				$fLev = $leverage_ref->EstFromPair(floatval($strEst));
-   				$strLev .= '/'.$leverage_ref->GetPriceDisplay(strval($fLev));
+   				$strLev .= '|'.$leverage_ref->GetPriceDisplay(strval($fLev));
     		}
     		return $est_ref->GetPriceDisplay($strEst).$strLev;
     	}
@@ -28,7 +28,7 @@ function _tradingUserDefined($strVal = false)
 	$strLev = '';
 	foreach ($arLev as $leverage_ref)
 	{
-		$strLev .= '/'.TableColumnGetStock($leverage_ref);
+		$strLev .= '|'.TableColumnGetStock($leverage_ref);
 	}
    	return TableColumnGetStock($est_ref).$strLev.TableColumnGetPrice();
 }
