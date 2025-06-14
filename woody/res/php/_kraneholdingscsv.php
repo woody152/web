@@ -15,11 +15,11 @@ class _KraneHoldingsCsvFile extends _HoldingsCsvFile
     
     public function OnLineArray($arWord)
     {
-    	if (count($arWord) != 7)	return;
+    	if (count($arWord) != 7)	return true;
     	
     	$strName = $arWord[1];
 //    	DebugString($strName);
-    	if (($strName == 'HONG KONG DOLLAR') || ($strName == 'Cash'))	return;
+    	if (($strName == 'HONG KONG DOLLAR') || ($strName == 'Cash'))	return true;
     	
     	$strRatio = $arWord[2];
     	if ($arWord[0] == 'Rank')
@@ -35,6 +35,7 @@ class _KraneHoldingsCsvFile extends _HoldingsCsvFile
     		if ($strHolding == 'YY')		$strHolding = 'JOYY';
     		if ($this->InsertHolding($strHolding, $strName, $strRatio))		$this->AddSum(floatval(str_replace(',', '', $arWord[6])));
     	}
+    	return true;
     }
 }
 

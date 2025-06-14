@@ -40,6 +40,7 @@ class _SseHoldingsFile extends _EtfHoldingsFile
     		}
     		$this->AddHolding($strHolding, GbToUtf8(trim($arWord[1])), floatval(trim($arWord[6])));
     	}
+    	return true;
     }
 }
 

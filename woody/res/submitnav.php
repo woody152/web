@@ -35,13 +35,13 @@ class _InvescoCsvFile extends DebugCsvFile
     // QQQ,513.149999999999977,05/21/2025
     public function OnLineArray($arWord)
     {
-    	if (count($arWord) != 3)				return;
-    	if ($arWord[0] != $this->strSymbol)		return;
+    	if (count($arWord) != 3)				return true;
+    	if ($arWord[0] != $this->strSymbol)		return true;
     	if ($iTick = strtotime($arWord[2]))
 		{
     		$ymd = new TickYMD($iTick);
     		$strDate = $ymd->GetYMD();
-			if ($this->oldest_ymd->IsTooOld($strDate))	return;
+			if ($this->oldest_ymd->IsTooOld($strDate))	return false;
    			if ($this->oldest_ymd->IsInvalid($strDate) === false)
    			{
    				$strNav = mysql_round($arWord[1]);
@@ -55,6 +55,7 @@ class _InvescoCsvFile extends DebugCsvFile
 				}
    			}
 		}
+    	return true;
     }
     
     function GetCount()

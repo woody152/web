@@ -50,14 +50,14 @@ class Palmmicro:
     def __init__(self):
         self.arData = {}
         self.iTimer = 0
-        self.arSendMsg = {'telegram':{'key':WECHAT_KEY, 'count':5, 'timer':0, 'msg':'', 'array_msg':[]},
-                          'kweb':{'key':WECHAT_KWEB_KEY, 'count':7, 'timer':0, 'msg':'', 'array_msg':[]},
-                          'qqq':{'key':WECHAT_QQQ_KEY, 'count':11, 'timer':0, 'msg':'', 'array_msg':[]},
-                          'spy':{'key':WECHAT_SPY_KEY, 'count':13, 'timer':0, 'msg':'', 'array_msg':[]},
+        self.arSendMsg = {'telegram':{'key':WECHAT_KEY, 'count':3, 'timer':0, 'msg':'', 'array_msg':[]},
+                          'kweb':{'key':WECHAT_KWEB_KEY, 'count':5, 'timer':0, 'msg':'', 'array_msg':[]},
+                          'qqq':{'key':WECHAT_QQQ_KEY, 'count':7, 'timer':0, 'msg':'', 'array_msg':[]},
+                          'spy':{'key':WECHAT_SPY_KEY, 'count':11, 'timer':0, 'msg':'', 'array_msg':[]},
                           'xbi':{'key':WECHAT_XBI_KEY, 'count':17, 'timer':0, 'msg':'', 'array_msg':[]},
                           'xly':{'key':WECHAT_XLY_KEY, 'count':19, 'timer':0, 'msg':'', 'array_msg':[]},
-                          'xop':{'key':WECHAT_XOP_KEY, 'count':23, 'timer':0, 'msg':'', 'array_msg':[]},
-                          'ieo':{'key':WECHAT_IEO_KEY, 'count':29, 'timer':0, 'msg':'', 'array_msg':[]}
+                          'xop':{'key':WECHAT_XOP_KEY, 'count':13, 'timer':0, 'msg':'', 'array_msg':[]},
+                          'ieo':{'key':WECHAT_IEO_KEY, 'count':23, 'timer':0, 'msg':'', 'array_msg':[]}
                          }
 
     def GetTelegramChatId(self):

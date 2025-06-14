@@ -103,7 +103,7 @@ function GetCsindexUrl($strSymbol)
 
 function GetSzseUrl()
 {
-	return 'http://www.szse.cn/';
+	return 'https://www.szse.cn/';
 }
 
 function GetSseUrl()

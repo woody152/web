@@ -13,6 +13,7 @@ class _NvCloseCsvFile extends PricePoolCsvFile
     	{
     		$this->pool->OnData(floatval($arWord[1]), floatval($arWord[2]));
     	}
+    	return true;
     }
 }
 

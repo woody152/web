@@ -29,12 +29,12 @@ class _YahooHistoryCsvFile extends CsvFile
     
     public function OnLineArray($arWord)
     {
-    	if (count($arWord) < 7)						return;
+    	if (count($arWord) < 7)						return true;
     	
     	$strDate = SqlCleanString($arWord[0]);
-    	if ($strDate == 'Date')						return;
-   		if ($this->oldest_ymd->IsTooOld($strDate))	return;
-    	if ($strDate == $this->strLastDate)		return;	// future have continue data 23 hours a day
+    	if ($strDate == 'Date')						return true;
+   		if ($this->oldest_ymd->IsTooOld($strDate))	return true;
+    	if ($strDate == $this->strLastDate)			return true;	// future have continue data 23 hours a day
     	$this->strLastDate = $strDate; 
 
     	// Date,Open,High,Low,Close,Adj Close,Volume        		
@@ -46,7 +46,7 @@ class _YahooHistoryCsvFile extends CsvFile
         if ($strClose == '-' || $strClose == 'null')
         {
         	DebugPrint($arWord);	// debug wrong data
-        	return;
+        	return true;
         }
         
         if ($strVolume == '0')
@@ -54,7 +54,7 @@ class _YahooHistoryCsvFile extends CsvFile
         	if (($strClose == $strOpen) && ($strClose == $strHigh) && ($strClose == $strLow))
         	{
         		DebugString('Holiday: '.$strDate.' '.$strClose);
-        		return;
+        		return true;
         	}
         }
         
@@ -68,6 +68,7 @@ class _YahooHistoryCsvFile extends CsvFile
         		$this->iModified ++;
         	}
         }
+    	return true;
 	}
 }
 

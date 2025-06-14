@@ -707,7 +707,7 @@ class StockSymbol
     	return StrHasPrefix($this->strSymbol, SINA_INDEX_PREFIX); 
     }
     
-    // AUO, AG1712
+    // AUO, AG1712, nf_AG0
     function IsSinaFutureCn()
     {
         if ($this->IsSymbolA())                   return false;

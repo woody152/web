@@ -71,6 +71,7 @@ class CsvFile
     public function OnLineArray($arWord)
     {
     	DebugPrint($arWord);
+    	return true;
     }
     
     function DebugReport($str)
@@ -94,7 +95,7 @@ class CsvFile
     				if ($strLine != '')
     				{	// SqlCleanString causes error?
     					$arWord = str_getcsv($strLine, $this->strSeparator);		// 跟explode比，str_getcsv会去掉双引号。
-    					$this->OnLineArray($arWord);
+    					if ($this->OnLineArray($arWord) === false)	break;
     				}
     			}
     		}
@@ -132,6 +133,7 @@ class PageCsvFile extends DebugCsvFile
     			$this->arColumn[$strKey] = floatval($arWord[$this->iColumn]);
     		}
     	}
+    	return true;
     }
     
     function ReadColumn($iColumn)

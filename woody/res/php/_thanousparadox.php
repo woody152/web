@@ -12,6 +12,7 @@ class _ThanousParadoxCsvFile extends PricePoolCsvFile
     	{
     		$this->pool->OnData(floatval($arWord[2]), floatval($arWord[1]));
     	}
+    	return true;
     }
 }
 

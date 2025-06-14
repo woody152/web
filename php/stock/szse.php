@@ -1,6 +1,6 @@
 <?php
 
-/* http://www.szse.cn/api/report/ShowReport/data?SHOWTYPE=JSON&CATALOGID=1945_LOF&txtQueryKeyAndJC=162411
+/* https://www.szse.cn/api/report/ShowReport/data?SHOWTYPE=JSON&CATALOGID=1945_LOF&txtQueryKeyAndJC=162411
 [
 {"metadata":
 	{"catalogid":"1945_LOF",

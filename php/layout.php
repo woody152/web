@@ -75,7 +75,7 @@ function ResizePng($strPathName, $iNewWidth = 300, $iNewHeight = false)
 //	https://ibkr.com/referral/rongrong586
 function GetWechatPay($iType = 0, $bChinese = true)
 {
-	if ($iType == 0)	$iType = rand(1, 5);
+	if ($iType == 0)	$iType = rand(1, 4);
 	switch ($iType)
 	{
 	case 1:
@@ -99,12 +99,12 @@ function GetWechatPay($iType = 0, $bChinese = true)
 		$strRemark = '华宝拖拉机开户群已经超过200人扫码入群限制，扫上面二维码后可以请小瓶子拉进群。';
 		$strImage = GetImgElement(ResizeJpg('/debug/wechat/bec5dabc01d8c812.jpg'), $strRemark);
 		break;
-        	
+/*        	
 	case 5:
 		$strRemark = '香港保诚保险投保微信群二维码';
 		$strImage = GetImgElement(ResizeJpg('/debug/wechat/25e7591ce033c357.jpg'), $strRemark);
 		break;
-/*       	
+       	
 	case 6:
 		$strRemark = '扫描Palmmicro微信插件二维码然后关注，可以直接在微信中接收企业微信义工群的消息。';
 		$strImage = GetImgElement(ResizeJpg('/debug/wechat/a39e5891dad44379.jpg'), $strRemark);

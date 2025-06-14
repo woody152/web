@@ -22,20 +22,24 @@ function _getStockCost($strGroupItemId, $strQuantity, $strPrice)
 	if (empty($strCommission))
 	{	// use default
    		$sym = GetGroupItemSym($strGroupItemId);
-   		if ($sym->IsSymbolA())
+   		if ($sym->IsSinaFuture())
+   		{
+   			$fCommission = 0.62;
+   		}
+		else if ($sym->IsSymbolA())
    		{
    			if ($sym->IsFundA())			$fCommission = $fAmount * 0.0001;
    			else
    			{
    				if ($fQuantity > 0.0)		$fCommission = $fAmount * 0.0002;
    				else						$fCommission = $fAmount * 0.0015;
-   				if ($fCommission < 5.0)	$fCommission = 5.0;
+   				if ($fCommission < 5.0)		$fCommission = 5.0;
    			}
    		}
-   		else if ($sym->IsSymbolH())		$fCommission = $fAmount * 0.002;
+   		else if ($sym->IsSymbolH())			$fCommission = $fAmount * 0.002;
    		else
    		{
-   			if ($fQuantityAbs < 200.0)	$fCommission = 1.0;
+   			if ($fQuantityAbs < 200.0)		$fCommission = 1.0;
    			else							$fCommission = 0.005 * $fQuantityAbs;
    			if ($fQuantity < 0.0)			$fCommission += $fAmount * 0.000028;
    		}

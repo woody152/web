@@ -76,6 +76,7 @@ class _SzseHoldingsFile extends _EtfHoldingsFile
 				}
 			}
     	}
+    	return true;
     }
 }
 
