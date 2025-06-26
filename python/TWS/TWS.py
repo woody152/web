@@ -69,8 +69,8 @@ def GetMktDataArray(strSymbol):
 class MyEWrapper(EWrapper):
     def __init__(self, client):
         self.client = client
-        self.strCurFuture = '202506'
-        self.strNextFuture = '202509'
+        self.strCurFuture = '202509'
+        self.strNextFuture = '202512'
         self.arDebug = {}
 
     def nextValidId(self, orderId: int):
@@ -78,7 +78,7 @@ class MyEWrapper(EWrapper):
         #self.arQQQ = {'SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941'}
         #self.arXOP = {'SH513350', 'SZ159518'}
         self.arOrder = {}
-        self.arOrder['KWEB'] = GetOrderArray([20.53, 28.68, 29.31, 32.48, 34.01, 34.29, 34.56, 35.54, 38.34], 200, 3, 5)
+        self.arOrder['KWEB'] = GetOrderArray([20.53, 28.68, 29.41, 32.56, 34.01, 34.1, 34.23, 35.64, 38.33], 200, 5, 7)
         if IsChinaMarketOpen():
             self.arOrder['IEO'] = GetOrderArray()
             self.arOrder['QQQ'] = GetOrderArray()
@@ -90,9 +90,9 @@ class MyEWrapper(EWrapper):
         #if IsMarketOpen():
             #self.arOrder['TLT'] = GetOrderArray([80.42, 83.53, 83.65, 85.44, 85.81, 87.11, 90.57, 92.68, 98.05], 100, 0, 2)
             #self.arOrder['XOP'] = GetOrderArray([100.99, 105.55, 112.37, 114.17, 115.57, 119.18, 126.68, 152.37, 156.91], 100, 1, 6)
-            self.arOrder['SPX'] = GetOrderArray([4472.35, 5101.68, 5737.27, 5756.08, 5808.42, 5956.92, 5993.42, 6009.58, 6105.41, 6372.85, 6469.53])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0001, -1, -1)
-            self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0093, 5, 7)
+            self.arOrder['SPX'] = GetOrderArray([4472.35, 5105.36, 5734.2, 5832.21, 5866.63, 5984.22, 6014.04, 6016.52, 6101.82, 6363.05, 6469.53])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0088, 7, 8)
+            self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0193, -1, -1)
         self.palmmicro = Palmmicro()
         self.client.StartStreaming(orderId)
         self.data = {}
@@ -109,15 +109,15 @@ class MyEWrapper(EWrapper):
 
     def __get_buy_symbol(self, strSymbol):
         if strSymbol.startswith('MES'):
-            return 'MES' + self.strNextFuture
-            #return 'MES' + self.strCurFuture
+            #return 'MES' + self.strNextFuture
+            return 'MES' + self.strCurFuture
         else:
             return strSymbol
 
     def __get_sell_symbol(self, strSymbol):
         if strSymbol.startswith('MES'):
-            return 'MES' + self.strNextFuture
-            #return 'MES' + self.strCurFuture
+            #return 'MES' + self.strNextFuture
+            return 'MES' + self.strCurFuture
         else:
             return strSymbol
 
