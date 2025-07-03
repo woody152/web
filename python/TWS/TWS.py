@@ -9,13 +9,7 @@ from palmmicro import Palmmicro
 from palmmicro import Calibration
 from nyc_time import GetExchangeTime
 
-def IsTesting():
-    #return True
-    return False
-
 def IsChinaMarketOpen():
-    if IsTesting():
-        return True
     iTime = GetExchangeTime('SZSE')
     if iTime >= 915 and iTime < 1130:
         return True
@@ -78,7 +72,7 @@ class MyEWrapper(EWrapper):
         #self.arQQQ = {'SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941'}
         #self.arXOP = {'SH513350', 'SZ159518'}
         self.arOrder = {}
-        self.arOrder['KWEB'] = GetOrderArray([20.53, 28.68, 29.41, 32.56, 34.01, 34.1, 34.23, 35.64, 38.33], 200, 5, 7)
+        self.arOrder['KWEB'] = GetOrderArray([20.52, 29.09, 29.44, 33.33, 34.16, 34.27, 34.35, 35.37, 38.18], 200, 2, 4)
         if IsChinaMarketOpen():
             self.arOrder['IEO'] = GetOrderArray()
             self.arOrder['QQQ'] = GetOrderArray()
@@ -86,12 +80,12 @@ class MyEWrapper(EWrapper):
             self.arOrder['XBI'] = GetOrderArray()
             self.arOrder['XLY'] = GetOrderArray()
             self.arOrder['XOP'] = GetOrderArray()
-        else:
-        #if IsMarketOpen():
+        #else:
+        if IsMarketOpen():
             #self.arOrder['TLT'] = GetOrderArray([80.42, 83.53, 83.65, 85.44, 85.81, 87.11, 90.57, 92.68, 98.05], 100, 0, 2)
-            #self.arOrder['XOP'] = GetOrderArray([100.99, 105.55, 112.37, 114.17, 115.57, 119.18, 126.68, 152.37, 156.91], 100, 1, 6)
-            self.arOrder['SPX'] = GetOrderArray([4472.35, 5105.36, 5734.2, 5832.21, 5866.63, 5984.22, 6014.04, 6016.52, 6101.82, 6363.05, 6469.53])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0088, 7, 8)
+            self.arOrder['TQQQ'] = GetOrderArray([81.88, 84.88, 90.79], 100, -1, 1)
+            self.arOrder['SPX'] = GetOrderArray([4619.09, 5097.88, 5737.28, 5860.59, 6060.39, 6124.65, 6200.86, 6260.18, 6376.68, 6495.12])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0077, 6, 8)
             self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0193, -1, -1)
         self.palmmicro = Palmmicro()
         self.client.StartStreaming(orderId)
@@ -356,7 +350,7 @@ class MyEClient(EClient):
         order.totalQuantity = iSize
         order.orderType = 'LMT'
         order.lmtPrice = price
-        if strSymbol.startswith('MES') or strSymbol == 'TLT' or strSymbol == 'XOP':
+        if strSymbol.startswith('MES') or strSymbol == 'TLT' or strSymbol == 'TQQQ':
             if IsMarketOpen() == False:
                 return -1
         else:
