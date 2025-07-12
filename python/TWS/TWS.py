@@ -72,20 +72,20 @@ class MyEWrapper(EWrapper):
         #self.arQQQ = {'SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941'}
         #self.arXOP = {'SH513350', 'SZ159518'}
         self.arOrder = {}
-        self.arOrder['KWEB'] = GetOrderArray([20.52, 29.09, 29.44, 33.33, 34.16, 34.27, 34.35, 35.37, 38.18], 200, 2, 4)
+        self.arOrder['KWEB'] = GetOrderArray([20.52, 29.09, 29.57, 33.25, 34.11, 34.13, 34.19, 35.12, 37.74], 200, 5, 7)
         if IsChinaMarketOpen():
+        #if True:
             self.arOrder['IEO'] = GetOrderArray()
             self.arOrder['QQQ'] = GetOrderArray()
             self.arOrder['SPY'] = GetOrderArray()
             self.arOrder['XBI'] = GetOrderArray()
             self.arOrder['XLY'] = GetOrderArray()
             self.arOrder['XOP'] = GetOrderArray()
-        #else:
-        if IsMarketOpen():
+        else:
+        #if IsMarketOpen():
             #self.arOrder['TLT'] = GetOrderArray([80.42, 83.53, 83.65, 85.44, 85.81, 87.11, 90.57, 92.68, 98.05], 100, 0, 2)
-            self.arOrder['TQQQ'] = GetOrderArray([81.88, 84.88, 90.79], 100, -1, 1)
-            self.arOrder['SPX'] = GetOrderArray([4619.09, 5097.88, 5737.28, 5860.59, 6060.39, 6124.65, 6200.86, 6260.18, 6376.68, 6495.12])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0077, 6, 8)
+            self.arOrder['SPX'] = GetOrderArray([4619.09, 5066.52, 5751.29, 5874.65, 6127.33, 6231.34, 6249.8, 6380.02, 6436.06, 6495.12])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0072, 4, 7)
             self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0193, -1, -1)
         self.palmmicro = Palmmicro()
         self.client.StartStreaming(orderId)
@@ -350,7 +350,7 @@ class MyEClient(EClient):
         order.totalQuantity = iSize
         order.orderType = 'LMT'
         order.lmtPrice = price
-        if strSymbol.startswith('MES') or strSymbol == 'TLT' or strSymbol == 'TQQQ':
+        if strSymbol.startswith('MES') or strSymbol == 'TLT':
             if IsMarketOpen() == False:
                 return -1
         else:

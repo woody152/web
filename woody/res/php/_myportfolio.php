@@ -4,7 +4,7 @@ require_once('../../php/stockgroup.php');
 require_once('../../php/stockhis.php');
 require_once('../../php/ui/referenceparagraph.php');
 
-// 70+181-11，6697.43
+// 70+181-11
 
 class _MyPortfolio extends StockGroup
 {
