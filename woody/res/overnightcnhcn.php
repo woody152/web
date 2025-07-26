@@ -1,7 +1,5 @@
 <?php
-require_once('_stock.php');
-require_once('_emptygroup.php');
-require_once('../../php/dateimagefile.php');
+require_once('php/_stock.php');
 require_once('../../php/ui/editinputform.php');
 
 function _echoFundPositionItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue, $strPrevDate, $nav_sql, $strStockId, $est_sql, $strEstId, $strInput, $bAdmin)
@@ -158,49 +156,32 @@ function EchoAll()
 {
 	global $acct;
 	
-    if ($ref = $acct->EchoStockGroup())
-    {
-    	if (isset($_POST['submit']))
-    	{
-    		unset($_POST['submit']);
-    		$strInput = SqlCleanString($_POST[EDIT_INPUT_NAME]);
-    	}
-    	else	$strInput = POSITION_EST_LEVEL;
-    	EchoEditInputForm('进行估算的涨跌阈值', $strInput);
-    	
-   		$fund = false;
-   		$strSymbol = $ref->GetSymbol();
-        if ($fund = StockGetQdiiReference($strSymbol))
-        {
-        	$cny_ref = $fund->GetCnyRef();
-        	$est_ref = $fund->GetEstRef();
-        }
-       else if ($strSymbol == 'SZ164906')
-        {
-        	$fund = $ref;
-        	$cny_ref = new CnyReference('USCNY');
-        	$est_ref = new MyStockReference('KWEB');
-        }
-		if ($fund)		_echoFundPositionParagraph($fund, $cny_ref, $est_ref, $strSymbol, $strInput, $acct->IsAdmin());
+   	if (isset($_POST['submit']))
+   	{
+   		unset($_POST['submit']);
+   		$strInput = SqlCleanString($_POST[EDIT_INPUT_NAME]);
+   	}
+   	else
+   	{
+   		$strInput = $acct->GetQuery();
+   		if ($strInput == false)		$strInput = '100000';
+    	EchoEditInputForm('需要平衡的离岸人民币CNH', $strInput);
     }
     $acct->EchoLinks();
 }
 
 function GetMetaDescription()
 {
-	global $acct;
-	
-  	$str = $acct->GetStockDisplay().FUND_POSITION_DISPLAY;
-    $str .= '。仅用于美股QDII基金，寻找对应美股ETF净值连续几天累计涨跌超过4%的机会测算A股基金的实际持仓仓位。';
+    $str = GetTitle().'。自动计算为了平衡对冲汇率策略下，义工群覆盖的当前各个QDII基金应该买入或者卖出的数量。同时顺便显示对冲值等信息。';
     return CheckMetaDescription($str);
 }
 
 function GetTitle()
 {
-	global $acct;
-	return $acct->GetSymbolDisplay().FUND_POSITION_DISPLAY;
+	return '义工群汇率对冲计算器';
 }
 
-    $acct = new SymbolAccount();
-?>
+	$acct = new StockAccount();
 
+require('../../php/ui/_dispcn.php');
+?>

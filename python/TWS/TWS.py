@@ -72,7 +72,7 @@ class MyEWrapper(EWrapper):
         #self.arQQQ = {'SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941'}
         #self.arXOP = {'SH513350', 'SZ159518'}
         self.arOrder = {}
-        self.arOrder['KWEB'] = GetOrderArray([20.52, 29.09, 29.57, 33.25, 34.11, 34.13, 34.19, 35.12, 37.74], 200, 5, 7)
+        self.arOrder['KWEB'] = GetOrderArray([20.52, 29.09, 29.76, 32.51, 35.06, 36.15, 36.59, 37.62, 37.65], 200, 5, 6)
         if IsChinaMarketOpen():
         #if True:
             self.arOrder['IEO'] = GetOrderArray()
@@ -84,9 +84,9 @@ class MyEWrapper(EWrapper):
         else:
         #if IsMarketOpen():
             #self.arOrder['TLT'] = GetOrderArray([80.42, 83.53, 83.65, 85.44, 85.81, 87.11, 90.57, 92.68, 98.05], 100, 0, 2)
-            self.arOrder['SPX'] = GetOrderArray([4619.09, 5066.52, 5751.29, 5874.65, 6127.33, 6231.34, 6249.8, 6380.02, 6436.06, 6495.12])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0072, 4, 7)
-            self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0193, -1, -1)
+            self.arOrder['SPX'] = GetOrderArray([4619.09, 5005.77, 5834.53, 6139.38, 6158.73, 6277.1, 6314.19, 6355.13, 6395.48, 6663.29])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0054, 7, 8)
+            self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0153, -1, -1)
         self.palmmicro = Palmmicro()
         self.client.StartStreaming(orderId)
         self.data = {}

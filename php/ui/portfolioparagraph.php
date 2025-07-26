@@ -6,7 +6,7 @@ function _getPortfolioTestVal($iShares, $strSymbol)
 	switch ($strSymbol)
     {
     case 'KWEB':
-		$iQuantity = 600;
+		$iQuantity = 200;
 		break;
 		
     case 'SH600104':
@@ -127,7 +127,9 @@ function _echoPortfolioTableItem($trans)
 			
 		case 'fx_susdcnh':
 			$fVal += $fCny;
-			$ar[] = GetNumberDisplay($fVal).' $'.GetNumberDisplay($fVal / floatval($ref->GetPrice()));
+//			$ar[] = GetNumberDisplay($fVal).' $'.GetNumberDisplay($fVal / floatval($ref->GetPrice()));
+			$strPage = 'overnightcnh';
+			$ar[] = GetStockPhpLink($strPage, '$'.strval_round($fVal / floatval($ref->GetPrice()), 0), $strPage.'='.strval_round($fVal, 0));
 			break;
    		}
     }

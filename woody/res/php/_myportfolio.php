@@ -19,7 +19,7 @@ function _transSortBySymbol($arTrans)
     	$ref = $trans->GetRef();
         $strSymbol = $ref->GetSymbol();
         if (isset($ar[$strSymbol]))		array_push($ar[$strSymbol], $trans);
-        else					        	$ar[$strSymbol] = array($trans);
+        else					        $ar[$strSymbol] = array($trans);
     }
     ksort($ar);
     
@@ -68,7 +68,7 @@ function _echoMergeParagraph($arMerge)
 			switch ($strSymbol)
 			{
 			case 'KWEB':
-				$ar[] = strval($iTotal + 00 - 800);
+				$ar[] = strval($iTotal + 00 - 200);
 				break;
 
 			case 'XOP':
