@@ -79,6 +79,9 @@ function EchoAll()
     	if ($strDate = $ref->GetHoldingsDate())
     	{
     		$arHoldingRef = $ref->GetHoldingRefArray();
+    		$str = '持仓和测算示意';
+    		if (count($arHoldingRef) == 2)	$str .= ' '.GetExhaustiveHoldingsLink($strSymbol);
+    		
 		    EchoHoldingsEstParagraph($ref);
     		EchoReferenceParagraph(array_merge(array($ref), RefSort($arHoldingRef)), $acct->IsAdmin());
     		EchoTableParagraphBegin(array(new TableColumnSymbol(),
@@ -88,7 +91,7 @@ function EchoAll()
 										   new TableColumnPercentage('新'),
 										   new TableColumnPercentage('影响'),
 										   new TableColumn('汇率调整', 100)
-										   ), 'holdings', '持仓和测算示意');
+										   ), 'holdings', $str);
 	
 			$his_sql = GetStockHistorySql();
 			$arRatio = $ref->GetHoldingsRatioArray();

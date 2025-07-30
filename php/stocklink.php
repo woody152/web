@@ -226,6 +226,12 @@ function GetFundShareLink($strSymbol)
     return GetStockSymbolLink('fundshare', $strSymbol, FUND_SHARE_DISPLAY);
 }
 
+define('EXHAUSTIVE_HOLDINGS_DISPLAY', '穷举持仓比例');
+function GetExhaustiveHoldingsLink($strSymbol)
+{
+    return GetStockSymbolLink('exhaustiveholdings', $strSymbol, EXHAUSTIVE_HOLDINGS_DISPLAY);
+}
+
 function GetStockOptionArray()
 {
     $ar = array(
