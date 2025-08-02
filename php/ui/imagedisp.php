@@ -141,6 +141,11 @@ function ImgFreeFood($bChinese = true)
 	return ImgAutoQuote(PATH_BLOG_PHOTO.'freefood.jpg', ($bChinese ? '又要到饭了兄弟们' : 'I got free food again!'), $bChinese);
 }
 
+function ImgGoldFinger()
+{
+	return ImgAutoQuote(PATH_BLOG_PHOTO.'goldfinger.jpg', '沙子一袋子，金子一屋子。');
+}
+
 function ImgAlwaysWin()
 {
 	return ImgAutoQuote(PATH_BLOG_PHOTO.'linqingxia.jpg', '东方不败林青霞');
@@ -183,6 +188,9 @@ function ImgStockGroup($strPage)
     	
     case 'chinainternet':
     	return GetWoodyImgQuote('huangrong.jpg', '依稀往梦似曾见，心内波澜现。');
+    	
+    case 'commodity':
+		return ImgGoldFinger();
     	
     case 'hangseng':
     	return ImgAutoQuote(PATH_BLOG_PHOTO.'luody.jpg', '小河弯弯向南流，流到香江去看一看。');

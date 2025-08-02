@@ -2,10 +2,8 @@
 require_once('php/_stock.php');
 require_once('php/_emptygroup.php');
 
-function _echoExhaustiveHoldingsItem($ref, $i, $iTotal, $strStockId1, $strStockId2, $strDate, $strNav)
+function _echoExhaustiveHoldingsItem($ref, $i, $iTotal, $strStockId1, $strStockId2, $strDate, $strNav, $bAdmin)
 {
-	$ar = array();
-	
 	$str1 = strval($iTotal - $i);
 	$ref->arHoldingsRatio[$strStockId1] = $str1;
 	
@@ -13,18 +11,27 @@ function _echoExhaustiveHoldingsItem($ref, $i, $iTotal, $strStockId1, $strStockI
 	$ref->arHoldingsRatio[$strStockId2] = $str2;
 	
 	$fEst = $ref->_estNav($strDate);
-	
-	$ar[] = $str1;
-	$ar[] = $str2;
-	$ar[] = strval_round($fEst, 3);
-	$ar[] = $ref->GetPercentageDisplay($strNav, strval($fEst));
-	EchoTableColumn($ar);
+	$strEst = strval($fEst);
+	if ($bAdmin && $ref->GetPercentageString($strNav, $strEst) == '0')
+	{
+		$strHoldings = SqlGetStockSymbol($strStockId1).'*'.$str1.';'.SqlGetStockSymbol($strStockId2).'*'.$str2;
+		$str1 = GetOnClickLink(PATH_STOCK.'submitholdings.php?symbol='.$ref->GetSymbol().'&date='.$strDate.'&holdings='.$strHoldings, '确认更新持仓：'.$strDate.' '.$strHoldings.'？', $str1);
+	}
+
+	if (abs($ref->GetPercentage($strNav, $strEst)) < 0.2)
+	{
+		$ar = array($str1, $str2);
+		$ar[] = strval_round($fEst, 3);
+		$ar[] = $ref->GetPercentageDisplay($strNav, $strEst);
+		EchoTableColumn($ar);
+	}
 }
 
 function EchoAll()
 {
 	global $acct;
 	
+	$bAdmin = $acct->IsAdmin();
     if ($ref = $acct->EchoStockGroup())
     {
    		$strSymbol = $ref->GetSymbol();
@@ -57,7 +64,7 @@ function EchoAll()
 										   ), 'exhaustiveholdings', $str);
 					for ($i = 1; $i < $iTotal; $i ++)
 					{
-						_echoExhaustiveHoldingsItem($ref, $i, $iTotal, $strStockId1, $strStockId2, $strDate, $strNav);
+						_echoExhaustiveHoldingsItem($ref, $i, $iTotal, $strStockId1, $strStockId2, $strDate, $strNav, $bAdmin);
 					}
 					EchoTableParagraphEnd();
 				}

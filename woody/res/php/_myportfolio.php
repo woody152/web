@@ -4,7 +4,7 @@ require_once('../../php/stockgroup.php');
 require_once('../../php/stockhis.php');
 require_once('../../php/ui/referenceparagraph.php');
 
-// 70+181-11
+// 181-11=17
 
 class _MyPortfolio extends StockGroup
 {
@@ -68,7 +68,7 @@ function _echoMergeParagraph($arMerge)
 			switch ($strSymbol)
 			{
 			case 'KWEB':
-				$ar[] = strval($iTotal + 00 - 200);
+				$ar[] = strval($iTotal + 00 - 600);
 				break;
 
 			case 'XOP':
