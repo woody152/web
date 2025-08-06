@@ -235,18 +235,18 @@ function _updateStockOptionDividend($ref, $strSymbol, $strStockId, $his_sql, $st
 	{
 		DebugString('Dividend updated');
        	$calibration_sql = GetCalibrationSql();
-		$nav_sql = GetNavHistorySql();
-//		$fNav = floatval($nav_sql->GetClose($strStockId, $strDate));
+		$netvalue_sql = GetNetValueHistorySql();
+//		$fNav = floatval($netvalue_sql->GetClose($strStockId, $strDate));
 
-//		$fNewNav = $fNav - floatval($strVal); 
+//		$fNewNetValue = $fNav - floatval($strVal); 
 //  	if ($strClose = $calibration_sql->GetClose($strStockId, $strDate))
   		if ($strClosePrev = $calibration_sql->GetClosePrev($strStockId, $strDate))
   		{	// SPY, TQQQ
   			$strDatePrev = $calibration_sql->GetDatePrev($strStockId, $strDate);
   			DebugString($strSymbol.' Change calibaration on '.$strDatePrev);
-  			$fNav = floatval($nav_sql->GetClose($strStockId, $strDatePrev));
-  			$fNewNav = $fNav - floatval($strVal); 
-  			$fFactor = floatval($strClosePrev) * $fNav / $fNewNav;
+  			$fNav = floatval($netvalue_sql->GetClose($strStockId, $strDatePrev));
+  			$fNewNetValue = $fNav - floatval($strVal); 
+  			$fFactor = floatval($strClosePrev) * $fNav / $fNewNetValue;
   			$calibration_sql->WriteDaily($strStockId, $strDatePrev, strval($fFactor));
   		}
   		else
@@ -280,14 +280,14 @@ function _updateStockOptionDividend($ref, $strSymbol, $strStockId, $his_sql, $st
 				{
 					$strDatePrev = $calibration_sql->GetDatePrev($strQdiiId, $strDate);
 					DebugString(__FUNCTION__.' '.$strQdii.' Change calibaration on '.$strDatePrev);
-					$fNav = floatval($nav_sql->GetClose($strStockId, $strDatePrev));
-					$fNewNav = $fNav - floatval($strVal); 
-					$fFactor = floatval($strClosePrev) * $fNewNav / $fNav;
+					$fNav = floatval($netvalue_sql->GetClose($strStockId, $strDatePrev));
+					$fNewNetValue = $fNav - floatval($strVal); 
+					$fFactor = floatval($strClosePrev) * $fNewNetValue / $fNav;
 					$calibration_sql->WriteDaily($strQdiiId, $strDatePrev, strval($fFactor));
 				}
   			}
   		}
- 		if ($strClosePrev)	$nav_sql->WriteDaily($strStockId, $strDatePrev, strval($fNewNav));
+ 		if ($strClosePrev)	$netvalue_sql->WriteDaily($strStockId, $strDatePrev, strval($fNewNetValue));
 		_updateStockHistoryAdjCloseByDividend($ref, $strSymbol, $strStockId, $his_sql, $strDate, $strVal);
 	}
 }
@@ -297,14 +297,14 @@ function _updateStockOptionCalibration($strSymbol, $strStockId, $strDate, $strVa
 	DebugString($strSymbol.' '.$strDate.' '.$strVal);
 	if (!empty($strVal))
 	{
-		$strNav = SqlGetNavByDate($strStockId, $strDate);
+		$strNav = SqlGetNetValueByDate($strStockId, $strDate);
 //		if ($strNav == false)	return;
 		
 		if ($strSymbol == 'INDA' || $strSymbol == 'ASHR')
 		{
 			$ref = new FundPairReference($strSymbol);
 			YahooGetNetValue($ref);
-			$strVal = strval($ref->CalcFactor($strVal, SqlGetNavByDate($strStockId, $strDate), $strDate));
+			$strVal = strval($ref->CalcFactor($strVal, SqlGetNetValueByDate($strStockId, $strDate), $strDate));
 		}
 		else if ($strSymbol == 'hf_CHA50CFD')
 		{
@@ -314,10 +314,10 @@ function _updateStockOptionCalibration($strSymbol, $strStockId, $strDate, $strVa
 		else
 		{
 			if (in_arrayChinaIndex($strSymbol))									return;
-			else if (in_arrayQdii($strSymbol) || $strSymbol == 'SZ164906')		$strCNY = SqlGetNavByDate(SqlGetStockId('USCNY'), $strDate);
-			else if (in_arrayQdiiHk($strSymbol))									$strCNY = SqlGetNavByDate(SqlGetStockId('HKCNY'), $strDate);
-			else if (in_arrayQdiiJp($strSymbol))									$strCNY = SqlGetNavByDate(SqlGetStockId('JPCNY'), $strDate);
-			else if (in_arrayQdiiEu($strSymbol))									$strCNY = SqlGetNavByDate(SqlGetStockId('EUCNY'), $strDate);
+			else if (in_arrayQdii($strSymbol) || $strSymbol == 'SZ164906')		$strCNY = SqlGetNetValueByDate(SqlGetStockId('USCNY'), $strDate);
+			else if (in_arrayQdiiHk($strSymbol))									$strCNY = SqlGetNetValueByDate(SqlGetStockId('HKCNY'), $strDate);
+			else if (in_arrayQdiiJp($strSymbol))									$strCNY = SqlGetNetValueByDate(SqlGetStockId('JPCNY'), $strDate);
+			else if (in_arrayQdiiEu($strSymbol))									$strCNY = SqlGetNetValueByDate(SqlGetStockId('EUCNY'), $strDate);
 			else 																	return;
 
 			if ($strCNY == false)	return;
@@ -423,10 +423,10 @@ class _SubmitOptionsAccount extends Account
 			}
 			break;
 			
-		case STOCK_OPTION_NAV:
+		case STOCK_OPTION_NETVALUE:
 			if ($bAdmin)
 			{
-				_updateOptionDailySql(GetNavHistorySql(), $strStockId, $strDate, $strVal);
+				_updateOptionDailySql(GetNetValueHistorySql(), $strStockId, $strDate, $strVal);
 				switch ($strSymbol)
 				{
 				case 'KWEB':

@@ -1,6 +1,23 @@
 <?php
 define('EDIT_INPUT_NAME', 'input');
 
+function GetEditInput()
+{
+    if (isset($_POST['clear']))
+	{
+		unset($_POST['clear']);
+		//DebugString(__FUNCTION__.' unset clear');
+		return '';
+	}
+	else if (isset($_POST['submit']) && isset($_POST[EDIT_INPUT_NAME]))
+	{
+		unset($_POST['submit']);
+		//DebugString(__FUNCTION__.' unset submit');
+		return SqlCleanString($_POST[EDIT_INPUT_NAME]);
+	}
+	return false;
+}
+
 function EchoEditInputForm($strPage, $strInput = '', $bChinese = true)
 {
     $strSubmit =  $bChinese ? '提交' : 'Submit';

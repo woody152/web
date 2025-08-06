@@ -20,7 +20,7 @@ function RefSort($arRef)
 	return array_merge(RefSortBySymbol($arA), RefSortBySymbol($arH), RefSortBySymbol($arUS));
 }
 
-function _echoHoldingItem($ref, $arRatio, $strDate, $his_sql, $fNavChange, $fAdjustCny, $fAdjustHkd)
+function _echoHoldingItem($ref, $arRatio, $strDate, $his_sql, $fNetValueChange, $fAdjustCny, $fAdjustHkd)
 {
 	static $fTotalOld = 0.0;
 	static $fTotalNew = 0.0;
@@ -28,7 +28,7 @@ function _echoHoldingItem($ref, $arRatio, $strDate, $his_sql, $fNavChange, $fAdj
 	
 	if ($ref == false)
 	{
-		$ar = array(DISP_ALL_CN, strval_round($fTotalOld, 2), '', strval_round(($fNavChange - 1.0) * 100, 2).'%', strval_round($fTotalNew, 2), strval_round($fTotalChange, 2));
+		$ar = array(DISP_ALL_CN, strval_round($fTotalOld, 2), '', strval_round(($fNetValueChange - 1.0) * 100, 2).'%', strval_round($fTotalNew, 2), strval_round($fTotalChange, 2));
 	    EchoTableColumn($ar);
 	    return;
 	}
@@ -55,7 +55,7 @@ function _echoHoldingItem($ref, $arRatio, $strDate, $his_sql, $fNavChange, $fAdj
     $ar[] = mysql_round($strClose, 2);
     $ar[] = $ref->GetPercentageDisplay($strClose, $strPrice);
     
-    $fNewRatio = $fRatio * $fChange / $fNavChange;
+    $fNewRatio = $fRatio * $fChange / $fNetValueChange;
 	$fTotalNew += $fNewRatio;
     $ar[] = strval_round($fNewRatio, 2);
     
@@ -95,14 +95,14 @@ function EchoAll()
 	
 			$his_sql = GetStockHistorySql();
 			$arRatio = $ref->GetHoldingsRatioArray();
-			$fNavChange = $ref->GetNavChange();
+			$fNetValueChange = $ref->GetNetValueChange();
 			$fAdjustCny = $ref->GetAdjustCny();
 			$fAdjustHkd = $ref->GetAdjustHkd();
 			foreach ($arHoldingRef as $holding_ref)
 			{
-				_echoHoldingItem($holding_ref, $arRatio, $strDate, $his_sql, $fNavChange, $fAdjustCny, $fAdjustHkd);
+				_echoHoldingItem($holding_ref, $arRatio, $strDate, $his_sql, $fNetValueChange, $fAdjustCny, $fAdjustHkd);
 			}
-			_echoHoldingItem(false, $arRatio, $strDate, $his_sql, $fNavChange, $fAdjustCny, $fAdjustHkd);
+			_echoHoldingItem(false, $arRatio, $strDate, $his_sql, $fNetValueChange, $fAdjustCny, $fAdjustHkd);
 			EchoTableParagraphEnd();
 		}
     }

@@ -43,7 +43,7 @@ function EchoAll()
     {
    		$strSymbol = $ref->GetSymbol();
    		$strLinks = GetFundLinks($strSymbol);
-   		$strLinks .= ' '.GetEtfNavLink($strSymbol);
+   		$strLinks .= ' '.GetEtfNetValueLink($strSymbol);
    		if ($bAdmin = $acct->IsAdmin())	$strLinks .= '<br />'.StockGetAllLink($strSymbol).' '.GetOnClickLink(PATH_STOCK.'submitnav.php?symbol='.$strSymbol, '确认更新'.$strSymbol.NETVALUE_HISTORY_DISPLAY.'？', '更新净值');
     		
    		$csv = new PageCsvFile();

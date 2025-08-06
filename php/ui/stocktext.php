@@ -35,7 +35,7 @@ function TextFromStockReference($ref)
     if ($ref->strOpen)			$str .= STOCK_DISP_OPEN.':'.rtrim0($ref->strOpen).BOT_EOL;
     if ($ref->strHigh)			$str .= STOCK_DISP_HIGH.':'.rtrim0($ref->strHigh).BOT_EOL;
     if ($ref->strLow)			$str .= STOCK_DISP_LOW.':'.rtrim0($ref->strLow).BOT_EOL;
-    if ($ref->extended_ref)	$str .= TextFromExtendedTradingReferencce($ref->extended_ref);
+    if ($ref->extended_ref)		$str .= TextFromExtendedTradingReferencce($ref->extended_ref);
     return $str;
 }
 
@@ -68,12 +68,12 @@ function _textEstPremium($ref, $strEst)
     return $str;
 }
 
-function _textEstNav($fund, $ref)
+function _textEstNetValue($fund, $ref)
 {
 	$str = '';
-	if ($strNav = $fund->GetOfficialNav())		$str .= STOCK_DISP_OFFICIAL._textEstPremium($ref, $strNav).' '.$fund->GetOfficialDate().BOT_EOL;
-	if ($strNav = $fund->GetFairNav())			$str .= STOCK_DISP_FAIR._textEstPremium($ref, $strNav).BOT_EOL;
-   	if ($strNav = $fund->GetRealtimeNav())		$str .= STOCK_DISP_REALTIME._textEstPremium($ref, $strNav).BOT_EOL;
+	if ($strNav = $fund->GetOfficialNetValue())		$str .= STOCK_DISP_OFFICIAL._textEstPremium($ref, $strNav).' '.$fund->GetOfficialDate().BOT_EOL;
+	if ($strNav = $fund->GetFairNetValue())			$str .= STOCK_DISP_FAIR._textEstPremium($ref, $strNav).BOT_EOL;
+   	if ($strNav = $fund->GetRealtimeNetValue())		$str .= STOCK_DISP_REALTIME._textEstPremium($ref, $strNav).BOT_EOL;
 	return $str;
 }
 
@@ -93,10 +93,10 @@ function TextFromFundReference($ref)
 	else
 	{
 		$stock_ref = $ref;
-		$nav_ref = $ref->GetNavRef();
-		$strNetValue = $nav_ref->GetPrice();
-		$strDate = $nav_ref->GetDate();
-		$strPercentage = $nav_ref->GetPercentageText();
+		$netvalue_ref = $ref->GetNetValueRef();
+		$strNetValue = $netvalue_ref->GetPrice();
+		$strDate = $netvalue_ref->GetDate();
+		$strPercentage = $netvalue_ref->GetPercentageText();
 	}
 	
     if ($stock_ref)
@@ -111,12 +111,12 @@ function TextFromFundReference($ref)
         $str = $strName;
     }
     
-    $str .= STOCK_DISP_NAV.':'.$strNetValue.' '.$strDate.BOT_EOL;
-    $str .= STOCK_DISP_NAV.STOCK_DISP_CHANGE.':'.$strPercentage.BOT_EOL;
+    $str .= STOCK_DISP_NETVALUE.':'.$strNetValue.' '.$strDate.BOT_EOL;
+    $str .= STOCK_DISP_NETVALUE.STOCK_DISP_CHANGE.':'.$strPercentage.BOT_EOL;
     if ($stock_ref)
     {
     	if ($stock_ref->GetDate() == $strDate)	$str .= _textPremium($stock_ref, $strNetValue).BOT_EOL;
-    	$str .= _textEstNav($ref, $stock_ref);
+    	$str .= _textEstNetValue($ref, $stock_ref);
     }
     return $str;
 }

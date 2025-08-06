@@ -162,7 +162,7 @@ function DeleteOldChinaStock($arSymbolId)
 		{
 			SqlDeleteStockEma($strStockId);
 			SqlDeleteStockHistory($strStockId);
-			SqlDeleteNavHistory($strStockId);
+			SqlDeleteNetValueHistory($strStockId);
 			SqlDeleteStock($strStockId);
 			DebugString($strSymbol.' deleted');
 		}

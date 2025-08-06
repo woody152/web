@@ -9,7 +9,7 @@ class NetValueReference extends MysqlReference
         if ($this->IsFundA())
         {
        		if (StockCompareEstResult($this->GetStockId(), $this->GetPrice(), $this->GetDate(), $this->GetSymbol()))
-       		{	// new NAV
+       		{	// new net value
        		}
         }
     }
@@ -25,7 +25,7 @@ class NetValueReference extends MysqlReference
         }
         else
         {
-        	$this->LoadSqlNavData();
+        	$this->LoadSqlNetValueData();
         }
     }
 }

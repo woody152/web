@@ -25,15 +25,15 @@ function _echoNvCloseItem($csv, $his_sql, $shares_sql, $arHistory, $arFundNav, $
 
 function _echoNvCloseData($his_sql, $ref, $strStockId, $csv, $iStart, $iNum, $bAdmin)
 {
-	$bSameDayNav = UseSameDayNav($ref);
-	$nav_sql = GetNavHistorySql();
+	$bSameDayNav = UseSameDayNetValue($ref);
+	$netvalue_sql = GetNetValueHistorySql();
 	$shares_sql = new SharesHistorySql();
     if ($result = $his_sql->GetAll($strStockId, $iStart, $iNum)) 
     {
         while ($arHistory = mysqli_fetch_assoc($result)) 
         {
        		$strDate = $bSameDayNav ? $arHistory['date'] : $his_sql->GetDatePrev($strStockId, $arHistory['date']);
-        	if ($arFundNav = $nav_sql->GetRecord($strStockId, $strDate))	_echoNvCloseItem($csv, $his_sql, $shares_sql, $arHistory, $arFundNav, $ref, $strStockId, $bAdmin);
+        	if ($arFundNav = $netvalue_sql->GetRecord($strStockId, $strDate))	_echoNvCloseItem($csv, $his_sql, $shares_sql, $arHistory, $arFundNav, $ref, $strStockId, $bAdmin);
         }
         mysqli_free_result($result);
     }
@@ -41,17 +41,17 @@ function _echoNvCloseData($his_sql, $ref, $strStockId, $csv, $iStart, $iNum, $bA
 
 function EchoNvCloseHistoryParagraph($ref, $str = false, $csv = false, $iStart = 0, $iNum = TABLE_COMMON_DISPLAY, $bAdmin = false)
 {
-    if ($ref->CountNav() == 0)	return;
+    if ($ref->CountNetValue() == 0)	return;
 
 	$strStockId = $ref->GetStockId();
     $strSymbol = $ref->GetSymbol();
     $his_sql = GetStockHistorySql();
    	$strMenuLink = IsTableCommonDisplay($iStart, $iNum) ? '' : StockGetMenuLink($strSymbol, $his_sql->Count($strStockId), $iStart, $iNum);
-   	if ($str == false)	$str = GetYahooNavLink($strSymbol).'的'.GetNvCloseHistoryLink($strSymbol);
+   	if ($str == false)	$str = GetYahooNetValueLink($strSymbol).'的'.GetNvCloseHistoryLink($strSymbol);
 
 	EchoTableParagraphBegin(array(new TableColumnDate(),
 								   new TableColumnPrice(),
-								   new TableColumnNav(),
+								   new TableColumnNetValue(),
 								   new TableColumnPremium('y'),
 								   new TableColumnChange('x'),
 								   new TableColumnShare(),

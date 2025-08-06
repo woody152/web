@@ -12,7 +12,7 @@ class MysqlReference extends StockReference
 
     var $fFactor = 1.0;			// 'close' field in calibrationhistory table
     
-    var $iNavCount = 0;
+    var $iNetValueCount = 0;
     
     public function __construct($strSymbol) 
     {
@@ -31,8 +31,8 @@ class MysqlReference extends StockReference
 
     	if ($this->strSqlId)
     	{
-    		$nav_sql = GetNavHistorySql();
-    		$this->iNavCount = $nav_sql->Count($this->strSqlId);
+    		$netvalue_sql = GetNetValueHistorySql();
+    		$this->iNetValueCount = $netvalue_sql->Count($this->strSqlId);
     	}
     }
     
@@ -78,25 +78,25 @@ class MysqlReference extends StockReference
     	return $this->fFactor;
     }
     
-    function LoadSqlNavData()
+    function LoadSqlNetValueData()
     {
-    	$nav_sql = GetNavHistorySql();
-       	if ($record = $nav_sql->GetRecordNow($this->strSqlId))
+    	$netvalue_sql = GetNetValueHistorySql();
+       	if ($record = $netvalue_sql->GetRecordNow($this->strSqlId))
        	{
    			$this->strPrice = $record['close'];
    			$this->strDate = $record['date'];
-   			$this->strPrevPrice = $nav_sql->GetClosePrev($this->strSqlId, $this->strDate);
+   			$this->strPrevPrice = $netvalue_sql->GetClosePrev($this->strSqlId, $this->strDate);
    		}
     }
 
-    function CountNav()
+    function CountNetValue()
     {
-    	return $this->iNavCount;
+    	return $this->iNetValueCount;
     }
     
     function IsFund()
     {
-    	if ($this->CountNav() > 0)	return true;
+    	if ($this->CountNetValue() > 0)	return true;
     	if ($this->IsFundA())			return true;
     	return false;
     }

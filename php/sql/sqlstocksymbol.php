@@ -104,9 +104,7 @@ class StockSql extends KeyNameSql
 	var $fund_est_sql;
     var $his_sql;
 	var $holdings_sql;
-    var $nav_sql;
-//    var $quote_sql;
-//    var $nav_quote_sql;
+    var $netvalue_sql;
     
     public function __construct()
     {
@@ -118,9 +116,7 @@ class StockSql extends KeyNameSql
        	$this->fund_est_sql = new FundEstSql();
        	$this->his_sql = new StockHistorySql();
         $this->holdings_sql = new HoldingsSql();
-       	$this->nav_sql = new DailyCloseSql('netvaluehistory');
-//       	$this->quote_sql = new StockQuoteSql();
-//       	$this->nav_quote_sql = new StockQuoteSql('navquote');
+       	$this->netvalue_sql = new DailyCloseSql('netvaluehistory');
     }
 
     public function Create()
@@ -289,49 +285,49 @@ function SqlDeleteStockEma($strStockId)
 	}
 }
 
-function GetNavHistorySql()
+function GetNetValueHistorySql()
 {
 	global $g_stock_sql;
-   	return $g_stock_sql->nav_sql;
+   	return $g_stock_sql->netvalue_sql;
 }
 
-function SqlDeleteNavHistory($strStockId)
+function SqlDeleteNetValueHistory($strStockId)
 {
-	$nav_sql = GetNavHistorySql();
-	$iTotal = $nav_sql->Count($strStockId);
+	$netvalue_sql = GetNetValueHistorySql();
+	$iTotal = $netvalue_sql->Count($strStockId);
 	if ($iTotal > 0)
 	{
 		DebugVal($iTotal, 'Net value history existed');
-		$nav_sql->DeleteAll($strStockId);
+		$netvalue_sql->DeleteAll($strStockId);
 	}
 }
 
-function SqlSetNav($strStockId, $strDate, $strNav)
+function SqlSetNetValue($strStockId, $strDate, $strNav)
 {
-	$nav_sql = GetNavHistorySql();
-	return $nav_sql->InsertDaily($strStockId, $strDate, $strNav);
+	$netvalue_sql = GetNetValueHistorySql();
+	return $netvalue_sql->InsertDaily($strStockId, $strDate, $strNav);
 }
 
-function SqlGetNavByDate($strStockId, $strDate)
+function SqlGetNetValueByDate($strStockId, $strDate)
 {
-	$nav_sql = GetNavHistorySql();
-	return $nav_sql->GetClose($strStockId, $strDate);
+	$netvalue_sql = GetNetValueHistorySql();
+	return $netvalue_sql->GetClose($strStockId, $strDate);
 }
 
-function SqlGetNav($strStockId)
+function SqlGetNetValue($strStockId)
 {
-	$nav_sql = GetNavHistorySql();
-	return $nav_sql->GetCloseNow($strStockId);
+	$netvalue_sql = GetNetValueHistorySql();
+	return $netvalue_sql->GetCloseNow($strStockId);
 }
 
 function SqlGetUscny()
 {
-	return floatval(SqlGetNav(SqlGetStockId('USCNY')));
+	return floatval(SqlGetNetValue(SqlGetStockId('USCNY')));
 }
 
 function SqlGetHkcny()
 {
-	return floatval(SqlGetNav(SqlGetStockId('HKCNY')));
+	return floatval(SqlGetNetValue(SqlGetStockId('HKCNY')));
 }
 
 function SqlGetUshkd()
@@ -350,18 +346,5 @@ function SqlCountHoldings($strSymbol)
 	$holdings_sql = GetHoldingsSql();
 	return $holdings_sql->Count(SqlGetStockId($strSymbol));
 }
-/*
-function GetStockQuoteSql()
-{
-	global $g_stock_sql;
-   	return $g_stock_sql->quote_sql;
-}
-
-function GetNavQuoteSql()
-{
-	global $g_stock_sql;
-   	return $g_stock_sql->nav_quote_sql;
-}
-*/
 
 ?>

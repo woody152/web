@@ -54,7 +54,7 @@ class FundReference extends MysqlReference
     	return $this->strOfficialDate;
     }
     
-    public function GetOfficialNav()
+    public function GetOfficialNetValue()
     {
     	if ($this->fOfficialNetValue)
     	{
@@ -63,7 +63,7 @@ class FundReference extends MysqlReference
     	return false;
     }
     
-    public function GetFairNav()
+    public function GetFairNetValue()
     {
     	if ($this->fFairNetValue)
     	{
@@ -72,7 +72,7 @@ class FundReference extends MysqlReference
     	return false;
     }
     
-    public function GetRealtimeNav()
+    public function GetRealtimeNetValue()
     {
     	if ($this->fRealtimeNetValue)
     	{
@@ -89,7 +89,7 @@ class FundReference extends MysqlReference
     // Update database
     function UpdateEstNetValue()
     {
-   		StockUpdateEstResult($this->GetStockId(), $this->GetOfficialNav(), $this->GetOfficialDate());
+   		StockUpdateEstResult($this->GetStockId(), $this->GetOfficialNetValue(), $this->GetOfficialDate());
     }
 
     function UpdateOfficialNetValue()
@@ -164,7 +164,7 @@ class FundReference extends MysqlReference
     	$strStockId = $this->GetStockId();
        	$calibration_sql = GetCalibrationSql();
 		$strDate = $calibration_sql->GetDateNow($strStockId);
-		return floatval(SqlGetNavByDate($strStockId, $strDate));
+		return floatval(SqlGetNetValueByDate($strStockId, $strDate));
 //		return floatval($this->GetPrice());
     }
     

@@ -44,6 +44,12 @@ class _QdiiMixAccount extends FundGroupAccount
 
         $arRef = array($this->ref);
         if ($this->us_ref)	$arRef[] = $this->us_ref; 
+        if ($this->ref->UseRealtimeEst())
+        {
+        	$ar_realtime_ref = $this->ref->GetRealtimeRefArray();
+        	$arRef = array_merge($arRef, $ar_realtime_ref);
+        	foreach ($ar_realtime_ref as $ref)	$arRef[] = $ref->GetPairRef();
+        }
 
         GetChinaMoney($this->ref);
         SzseGetLofShares($this->ref);
@@ -54,8 +60,8 @@ class _QdiiMixAccount extends FundGroupAccount
     {
     	$ref = $this->ref;
     	$strStockId = $ref->GetStockId();
-    	$nav_sql = GetNavHistorySql();
-    	$strNavDate = $nav_sql->GetDateNow($strStockId); 
+    	$netvalue_sql = GetNetValueHistorySql();
+    	$strNavDate = $netvalue_sql->GetDateNow($strStockId); 
     	
     	$date_sql = new HoldingsDateSql();
     	$strHoldingsDate = $date_sql->ReadDate($strStockId);
@@ -153,11 +159,13 @@ function EchoAll()
     $us_ref = $acct->GetUsRef();
     $uscny_ref = $ref->GetCnyRef();
     $hkcny_ref = $ref->GetHkcnyRef();
+    $arForex = array($acct->cnh_ref, $uscny_ref);
+    if ($hkcny_ref !== false)	$arForex[] = $hkcny_ref;
     
 	EchoHoldingsEstParagraph($ref);
     EchoReferenceParagraph(array_merge($acct->GetStockRefArray(), 
     									//$ref->GetHoldingRefArray(), 
-    									array($acct->cnh_ref, $uscny_ref, $hkcny_ref)), $acct->IsAdmin());
+    									$arForex), $acct->IsAdmin());
     
 	if ($ref->GetSymbol() == 'SZ164906')
 	{
@@ -171,6 +179,7 @@ function EchoAll()
 	{
 		EchoFundTradingParagraph($ref);
 		if ($us_ref)	EchoSmaParagraph($us_ref);
+        if ($ref->UseRealtimeEst())		EchoFundListParagraph($ref->GetRealtimeRefArray());
 	}
 
     EchoFundHistoryParagraph($ref);

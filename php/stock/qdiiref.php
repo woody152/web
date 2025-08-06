@@ -100,7 +100,7 @@ class _QdiiReference extends FundReference
     function _getEstNav($strDate)
     {
        	$est_ref = $this->GetEstRef();
-		if ($str = SqlGetNavByDate($est_ref->GetStockId(), $strDate))
+		if ($str = SqlGetNetValueByDate($est_ref->GetStockId(), $strDate))
         {
         	return $str;
         }

@@ -11,7 +11,7 @@ define('STOCK_DISP_HIGH', '最高');
 define('STOCK_DISP_HOLDING', '持仓');
 define('STOCK_DISP_HSHARES', 'H股');
 define('STOCK_DISP_LOW', '最低');
-define('STOCK_DISP_NAV', '净值');		// olive
+define('STOCK_DISP_NETVALUE', '净值');	// olive
 define('STOCK_DISP_OFFICIAL', '官方');
 define('STOCK_DISP_OPEN', '开盘');
 define('STOCK_DISP_ORDER', '申购');

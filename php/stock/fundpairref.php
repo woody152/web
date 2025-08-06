@@ -1,10 +1,10 @@
 <?php
 
-function PairNavGetClose($ref, $strDate)
+function PairNetValueGetClose($ref, $strDate)
 {
 	if ($ref->IsFund())
 	{
-		$sql = GetNavHistorySql();
+		$sql = GetNetValueHistorySql();
 	}
 	else
 	{
@@ -63,7 +63,7 @@ class MyPairReference extends MyStockReference
 			$this->fFactor = floatval($record['close']);
 			$sql = new LastCalibrationSql();
 			$this->fLastCalibrationVal = $sql->ReadVal($strStockId); 
-			if ($this->fLastCalibrationVal === false)	$this->fLastCalibrationVal = floatval(SqlGetNavByDate($strStockId, $record['date'])); 
+			if ($this->fLastCalibrationVal === false)	$this->fLastCalibrationVal = floatval(SqlGetNetValueByDate($strStockId, $record['date'])); 
     	}
 		else	$this->fFactor = 1.0 / $this->fRatio; 
     }
@@ -158,7 +158,7 @@ class AhPairReference extends MyPairReference
 
 class FundPairReference extends MyPairReference
 {
-	var $nav_ref = false;
+	var $netvalue_ref = false;
 	var $realtime_callback;
  
     public function __construct($strSymbol, $callback = false) 
@@ -176,10 +176,10 @@ class FundPairReference extends MyPairReference
         	
 			if ($this->IsSinaFuture())
 			{
-				// $this->nav_ref = $this; Can NOT do this in __construct
+				// $this->netvalue_ref = $this; Can NOT do this in __construct
         		if ($this->CheckAdjustFactorTime($this->pair_ref))	$this->AverageCalibraion();
 			}
-			else	$this->nav_ref = new NetValueReference($strSymbol);
+			else	$this->netvalue_ref = new NetValueReference($strSymbol);
         }
     }
 
@@ -201,14 +201,14 @@ class FundPairReference extends MyPairReference
 	function DailyCalibration()
 	{
 		$strStockId = $this->GetStockId();
-		$nav_sql = GetNavHistorySql();
+		$netvalue_sql = GetNetValueHistorySql();
 		$calibration_sql = GetCalibrationSql();
-		$strDate = $nav_sql->GetDateNow($strStockId);
+		$strDate = $netvalue_sql->GetDateNow($strStockId);
 		if ($strDate == $calibration_sql->GetDateNow($strStockId))	return;
 		
-		if ($strNav = $nav_sql->GetCloseNow($strStockId))
+		if ($strNav = $netvalue_sql->GetCloseNow($strStockId))
 		{
-			if ($strPairNav = PairNavGetClose($this->pair_ref, $strDate))	
+			if ($strPairNav = PairNetValueGetClose($this->pair_ref, $strDate))	
 			{
 				$fFactor = $this->CalcFactor($strPairNav, $strNav, $strDate);
 				$calibration_sql->WriteDaily($strStockId, $strDate, strval($fFactor));
@@ -218,9 +218,9 @@ class FundPairReference extends MyPairReference
 		}
    	}
     
-    function GetNavRef()
+    function GetNetValueRef()
     {
-    	return $this->nav_ref ? $this->nav_ref : $this;
+    	return $this->netvalue_ref ? $this->netvalue_ref : $this;
     }
     
  	function CalcFactor($strPairNav, $strNav, $strDate)
@@ -287,11 +287,11 @@ function _adjustByCny($fVal, $fCny, $bSymbolA)
     	return $strOfficialDate;
     }
     
-    public function GetOfficialNav()
+    public function GetOfficialNetValue()
     {
         $strOfficialDate = $this->GetOfficialDate();
         $fCny = $this->cny_ref ? $this->cny_ref->GetVal($strOfficialDate) : false;
-		if (($strEst = PairNavGetClose($this->pair_ref, $strOfficialDate)) == false)
+		if (($strEst = PairNetValueGetClose($this->pair_ref, $strOfficialDate)) == false)
 		{
 			$strEst = $this->pair_ref->GetPrice();
 		}
@@ -301,7 +301,7 @@ function _adjustByCny($fVal, $fCny, $bSymbolA)
         return $strVal;
     }
 
-    public function GetFairNav()
+    public function GetFairNetValue()
     {
         $strOfficialDate = $this->GetOfficialDate();
         if ($this->cny_ref)
@@ -312,7 +312,7 @@ function _adjustByCny($fVal, $fCny, $bSymbolA)
     	return false;
     }
 
-    public function GetRealtimeNav()
+    public function GetRealtimeNetValue()
     {
 		if ($this->realtime_callback)
 		{

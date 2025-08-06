@@ -2,12 +2,12 @@
 
 class HoldingsReference extends MyStockReference
 {
-	var $nav_ref;
+	var $netvalue_ref;
     var $uscny_ref;
-    var $hkcny_ref;
+    var $hkcny_ref = false;
     
     var $ar_holdings_ref = array();
-    var $bRealtime = false;
+    var $ar_realtime_ref = array();
 
     var $strNav;
     var $strHoldingsDate;
@@ -16,30 +16,35 @@ class HoldingsReference extends MyStockReference
     public function __construct($strSymbol) 
     {
         parent::__construct($strSymbol);
-       	$this->nav_ref = new NetValueReference($strSymbol);
-   		$this->hkcny_ref = new CnyReference('HKCNY');
+       	$this->netvalue_ref = new NetValueReference($strSymbol);
    		$this->uscny_ref = new CnyReference('USCNY');
 
         $strStockId = $this->GetStockId();
     	$date_sql = new HoldingsDateSql();
     	if ($this->strHoldingsDate = $date_sql->ReadDate($strStockId))
     	{
-			if ($this->strNav = SqlGetNavByDate($strStockId, $this->strHoldingsDate))
+			if ($this->strNav = SqlGetNetValueByDate($strStockId, $this->strHoldingsDate))
 			{
 				$holdings_sql = GetHoldingsSql();
 				$this->arHoldingsRatio = $holdings_sql->GetHoldingsArray($strStockId);
 				$sql = GetStockSql();
 				foreach ($this->arHoldingsRatio as $strId => $strRatio)
 				{
-					$this->ar_holdings_ref[] = $this->_selectReference($sql->GetStockSymbol($strId));
+					$ref = $this->_selectReference($sql->GetStockSymbol($strId));
+					$this->ar_holdings_ref[] = $ref;
+					if ($ref->IsSymbolH())
+					{
+						if ($this->hkcny_ref === false)		$this->hkcny_ref = new CnyReference('HKCNY');
+					}
+
 				}
 			}
 			else	
 			{
-				DebugString(__CLASS__.'->'.__FUNCTION__.': Missing NAV on '.$this->strHoldingsDate);
-//				$nav_ref = new NetValueReference($strSymbol);
-//				SqlSetNav($strStockId, $this->strHoldingsDate, $nav_ref->GetPrevPrice());
-//				if ($this->strHoldingsDate == $nav_ref->GetDate())		SqlSetNav($strStockId, $this->strHoldingsDate, $nav_ref->GetPrice());
+				DebugString(__CLASS__.'->'.__FUNCTION__.': Missing net value on '.$this->strHoldingsDate);
+//				$netvalue_ref = new NetValueReference($strSymbol);
+//				SqlSetNetValue($strStockId, $this->strHoldingsDate, $netvalue_ref->GetPrevPrice());
+//				if ($this->strHoldingsDate == $netvalue_ref->GetDate())		SqlSetNetValue($strStockId, $this->strHoldingsDate, $netvalue_ref->GetPrice());
 			}
     	}
     }
@@ -48,15 +53,16 @@ class HoldingsReference extends MyStockReference
     {
     	if (SqlGetFundPair($strSymbol))
     	{
-    		$this->bRealtime = true;
-    		return new FundPairReference($strSymbol);
+    		$ref = new FundPairReference($strSymbol);
+    		$this->ar_realtime_ref[] = $ref;
+    		return $ref;
     	}	
     	return new MyStockReference($strSymbol);
     }
     
-    function GetNavRef()
+    function GetNetValueRef()
     {
-    	return $this->nav_ref;
+    	return $this->netvalue_ref;
     }
     
     function GetCnyRef()
@@ -84,8 +90,20 @@ class HoldingsReference extends MyStockReference
     	return $this->ar_holdings_ref;
     }
     
+    function GetRealtimeRefArray()
+    {
+    	return $this->ar_realtime_ref;
+    }
+    
+    function UseRealtimeEst()
+    {
+    	return count($this->ar_realtime_ref) > 0 ? true : false;
+    }
+    
     function GetAdjustHkd($strDate = false)
     {
+    	if ($this->hkcny_ref === false)		return 1.0;
+    	
         if ($strHKDCNY = $this->hkcny_ref->GetClose($this->strHoldingsDate))
         {
         	$fOldUSDHKD = floatval($this->uscny_ref->GetClose($this->strHoldingsDate)) / floatval($strHKDCNY);
@@ -135,7 +153,7 @@ class HoldingsReference extends MyStockReference
 	}
 */					
     // (x - x0) / x0 = sum{ r * (y - y0) / y0} 
-    function _estNav($strDate = false, $bRealtime = false)
+    function _estNetValue($strDate = false, $bRealtime = false)
     {
 //    	$arStrict = GetSecondaryListingArray();    	
     	$fAdjustHkd = $this->GetAdjustHkd($strDate);
@@ -188,14 +206,14 @@ class HoldingsReference extends MyStockReference
 		$fTotalChange -= $fTotalRatio;
 		$fTotalChange *= RefGetPosition($this);
 
-		$fNewNav = floatval($this->strNav) * (1.0 + $fTotalChange);
-		if ($this->IsFundA())		$fNewNav /= $fAdjustCny;
-		return $fNewNav; 
+		$fNewNetValue = floatval($this->strNav) * (1.0 + $fTotalChange);
+		if ($this->IsFundA())		$fNewNetValue /= $fAdjustCny;
+		return $fNewNetValue; 
     }
 
-    function GetNavChange()
+    function GetNetValueChange()
     {
-    	$fNav = $this->_estNav();
+    	$fNav = $this->_estNetValue();
 //    	DebugString(__CLASS__.'->'.__FUNCTION__.': '.strval($fNav).' '.$this->strNav, true);
     	return $fNav / floatval($this->strNav);
     }
@@ -245,27 +263,27 @@ class HoldingsReference extends MyStockReference
     	return $strDate;
     }
     
-    public function GetOfficialNav()
+    public function GetOfficialNetValue()
     {
     	$strDate = $this->GetOfficialDate();
-    	$strNav = strval($this->_estNav($strDate));
+    	$strNav = strval($this->_estNetValue($strDate));
    		StockUpdateEstResult($this->GetStockId(), $strNav, $strDate);
    		return $strNav;
     }
 
-    public function GetFairNav()
+    public function GetFairNetValue()
     {
     	$strDate = $this->GetOfficialDate(); 
 		if (($this->uscny_ref->GetDate() != $strDate) || ($this->_getEstDate() != $strDate))
 		{
-			return strval($this->_estNav());
+			return strval($this->_estNetValue());
 		}
 		return false;
     }
 
-    public function GetRealtimeNav()
+    public function GetRealtimeNetValue()
     {
-    	if ($this->bRealtime)		return strval($this->_estNav(false, true));
+    	if ($this->UseRealtimeEst())		return strval($this->_estNetValue(false, true));
    		return false;
     }
 }

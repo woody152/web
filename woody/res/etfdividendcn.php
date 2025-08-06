@@ -24,7 +24,7 @@ function _echoEtfDividendData($sql, $his_sql, $ref)
 
 function _EchoEtfDividendHistoryParagraph($ref, $bAdmin = false)
 {
-    if ($ref->CountNav() == 0)	return;
+    if ($ref->CountNetValue() == 0)	return;
 
     $strSymbol = $ref->GetSymbol();
    	$str = GetFundLinks($strSymbol).' '.GetStockDividendLink($ref);

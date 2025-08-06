@@ -172,7 +172,7 @@ END;
 					if ($strGroupItemId = SqlGetStockGroupItemId($strGroupId, $strStockId))
 					{
 						$strAmount = $amount_sql->ReadAmount($strGroupItemId);
-						$strQuery = sprintf('groupid=%s&fundid=%s&amount=%s&netvalue=%.3f', $strGroupId, $strStockId, $strAmount, floatval($ref->GetOfficialNav()));
+						$strQuery = sprintf('groupid=%s&fundid=%s&amount=%s&netvalue=%.3f', $strGroupId, $strStockId, $strAmount, floatval($ref->GetOfficialNetValue()));
 						$str = GetOnClickLink(PATH_STOCK.'submittransaction.php?'.$strQuery, '确认添加对冲申购记录?', STOCK_DISP_ORDER).$strSymbol.'人民币'.$strAmount.'元';
 						$str .= ' '.GetStockOptionLink(STOCK_OPTION_AMOUNT, $strSymbol);
 						EchoHtmlElement($str);

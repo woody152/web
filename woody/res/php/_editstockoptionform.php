@@ -23,15 +23,15 @@ function _getStockOptionDate($strSubmit, $ref, $strSymbol)
 	 	return $strYMD;
 
 	case STOCK_OPTION_CALIBRATION:
-	case STOCK_OPTION_NAV:
+	case STOCK_OPTION_NETVALUE:
 		if ($strSymbol == 'KWEB')
 		{
 			if ($strDate = $his_sql->GetDatePrev($strStockId, $ref->GetDate()))		return $strDate;
 		}
 		else
 		{
-			$nav_sql = GetNavHistorySql();
-			if ($strDate = $nav_sql->GetDateNow($strStockId))		return $strDate;
+			$netvalue_sql = GetNetValueHistorySql();
+			if ($strDate = $netvalue_sql->GetDateNow($strStockId))		return $strDate;
 			if ($strDate = $his_sql->GetDateNow($strStockId))		return $strDate;
 		}
 	 	return $strYMD;
@@ -103,13 +103,13 @@ function _getStockOptionHa($strSymbol)
 	return 'A';
 }
 
-function _getStockOptionNav($ref, $strSymbol, $strStockId, $strDate)
+function _getStockOptionNetValue($ref, $strSymbol, $strStockId, $strDate)
 {
 	if ($strSymbol == 'KWEB')
 	{
-		if ($strNav = GetKraneNav($ref))		return $strNav;
+		if ($strNav = GetKraneNetValue($ref))		return $strNav;
 	}
-	return SqlGetNavByDate($strStockId, $strDate);
+	return SqlGetNetValueByDate($strStockId, $strDate);
 }
 
 function _getStockOptionPremium($strStockId, $strDate)
@@ -187,9 +187,9 @@ function _getStockOptionDividend($strStockId, $strDate)
 	return '1.00';
 }
 
-function _getBestEstNav($ref, $strDate)
+function _getBestEstNetValue($ref, $strDate)
 {
-	$strEst = SqlGetNavByDate($ref->GetStockId(), $strDate);
+	$strEst = SqlGetNetValueByDate($ref->GetStockId(), $strDate);
 	if ($strEst == false)
     {
     	$strEst = $ref->GetClose($strDate);
@@ -218,7 +218,7 @@ function _getStockOptionCalibration($strSymbol, $strDate)
 		$est_ref = new MyStockReference('znb_SENSEX');
 	}
 
-	return $est_ref ? _getBestEstNav($est_ref, $strDate) : '对方净值';
+	return $est_ref ? _getBestEstNetValue($est_ref, $strDate) : '对方净值';
 }
 
 function _getStockOptionHoldings($strStockId)
@@ -273,8 +273,8 @@ function _getStockOptionVal($strSubmit, $strLoginId, $ref, $strSymbol, $strDate)
 	case STOCK_OPTION_HOLDINGS:
 		return _getStockOptionHoldings($strStockId);
 
-	case STOCK_OPTION_NAV:
-		return _getStockOptionNav($ref, $strSymbol, $strStockId, $strDate);
+	case STOCK_OPTION_NETVALUE:
+		return _getStockOptionNetValue($ref, $strSymbol, $strStockId, $strDate);
 
 	case STOCK_OPTION_PREMIUM:
 		return _getStockOptionPremium($strStockId, $strDate);
@@ -316,7 +316,7 @@ function _getStockOptionMemo($strSubmit)
 	case STOCK_OPTION_HOLDINGS:
 		return '输入STOCK*0删除对应基金持仓，用;号间隔多个持仓品种。';
 		
-	case STOCK_OPTION_NAV:
+	case STOCK_OPTION_NETVALUE:
 		return '清空输入删除对应日期净值。';
 
 	case STOCK_OPTION_PREMIUM:

@@ -184,10 +184,10 @@ function _yahooStockGetData($strSymbol, $strStockId)
 			return false;
 		}
 		$strNav = $arData['regularMarketPrice'];
-		$nav_sql = GetNavHistorySql();
-		if ($nav_sql->WriteDaily($strStockId, $strDate, $strNav))
+		$netvalue_sql = GetNetValueHistorySql();
+		if ($netvalue_sql->WriteDaily($strStockId, $strDate, $strNav))
 		{
-			DebugString('Update NAV for '.$arData['symbol'].' '.$strDate.' '.$strNav);
+			DebugString('Update net value for '.$arData['symbol'].' '.$strDate.' '.$strNav);
 			return array($strNav, $strDate);
 		}
    	}
@@ -513,15 +513,15 @@ function _yahooStockGetData($strSymbol, $strStockId)
    		$arIndicators = $arResult['indicators'];
 		$arAdjClose = $arIndicators['adjclose'][0]['adjclose'];
 
-		$nav_sql = GetNavHistorySql();
+		$netvalue_sql = GetNetValueHistorySql();
 		for ($i = 0; $i < count($arTimeStamp); $i ++)
 		{
     		$ymd = new TickYMD(intval($arTimeStamp[$i]));
     		$strDate = $ymd->GetYMD();
     		$strNav = mysql_round($arAdjClose[$i]);
-    		if ($nav_sql->WriteDaily($strStockId, $strDate, $strNav))
+    		if ($netvalue_sql->WriteDaily($strStockId, $strDate, $strNav))
     		{
-    			DebugString(__FUNCTION__.' Update NAV for '.$strSymbol.' '.$strDate.' '.$strNav);
+    			DebugString(__FUNCTION__.' Update net value for '.$strSymbol.' '.$strDate.' '.$strNav);
     			return array($strNav, $strDate);
     		}
 		}
@@ -578,10 +578,10 @@ function YahooUpdateNetValue($ref)
 	
 //    date_default_timezone_set('America/New_York');
 	$ref->SetTimeZone();
-	$nav_sql = GetNavHistorySql();
+	$netvalue_sql = GetNetValueHistorySql();
 	$strStockId = $ref->GetStockId();
 	$strDate = $ref->GetDate();
-    if ($nav_sql->GetRecord($strStockId, $strDate))	return;	// already have today's data
+    if ($netvalue_sql->GetRecord($strStockId, $strDate))	return;	// already have today's data
 	
     $now_ymd = GetNowYMD();
     $iHourMinute = $now_ymd->GetHourMinute();

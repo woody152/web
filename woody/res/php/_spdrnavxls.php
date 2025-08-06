@@ -1,7 +1,7 @@
 <?php
 require_once('../../php/class/PHPExcel/IOFactory.php');
 
-function _readXlsFile($bIshares, $strPathName, $nav_sql, $shares_sql, $strStockId)
+function _readXlsFile($bIshares, $strPathName, $netvalue_sql, $shares_sql, $strStockId)
 {
 //	date_default_timezone_set('America/New_York');
 	try 
@@ -53,7 +53,7 @@ function _readXlsFile($bIshares, $strPathName, $nav_sql, $shares_sql, $strStockI
 			if ($oldest_ymd->IsTooOld($strDate))	break;
    			if ($oldest_ymd->IsInvalid($strDate) === false)
    			{
-  				if ($nav_sql->WriteDaily($strStockId, $strDate, $ar[$iNavIndex]))
+  				if ($netvalue_sql->WriteDaily($strStockId, $strDate, $ar[$iNavIndex]))
   				{
   					$iCount ++;
   					if ($calibration_sql->GetClose($strStockId, $strDate))
@@ -72,13 +72,13 @@ function _readXlsFile($bIshares, $strPathName, $nav_sql, $shares_sql, $strStockI
 	return '更新'.strval($iCount).'条净值和'.strval($iSharesCount).'条流通股数';
 }
 
-function GetNavXlsStr($sym, $bAutoCheck = false)
+function GetNetValueXlsStr($sym, $bAutoCheck = false)
 {
 	$strSymbol = $sym->GetSymbol();	
-   	if ($strUrl = GetEtfNavUrl($strSymbol))
+   	if ($strUrl = GetEtfNetValueUrl($strSymbol))
 	{
 		$bIshares = (stripos($strUrl, 'ishares') !== false) ? true : false;
-		$strPathName = DebugGetPathName('NAV_'.$strSymbol.'.xls');
+		$strPathName = DebugGetPathName('netvalue_'.$strSymbol.'.xls');
 		
 		if ($bAutoCheck)	
 		{
@@ -91,9 +91,9 @@ function GetNavXlsStr($sym, $bAutoCheck = false)
 			file_put_contents($strPathName, $str);
 			$sym->SetTimeZone();
 			$strStockId = SqlGetStockId($strSymbol);
-			$nav_sql = GetNavHistorySql();
+			$netvalue_sql = GetNetValueHistorySql();
 			$shares_sql = new SharesHistorySql();
-			return _readXlsFile($bIshares, $strPathName, $nav_sql, $shares_sql, $strStockId);
+			return _readXlsFile($bIshares, $strPathName, $netvalue_sql, $shares_sql, $strStockId);
 		}
 		else
 		{
@@ -103,9 +103,9 @@ function GetNavXlsStr($sym, $bAutoCheck = false)
 	return $strSymbol.'不是SPDR或者ISHARES的ETF';
 }
 
-function DebugNavXlsStr($sym, $bAutoCheck = false)
+function DebugNetValueXlsStr($sym, $bAutoCheck = false)
 {
-	$str = GetNavXlsStr($sym, $bAutoCheck);
+	$str = GetNetValueXlsStr($sym, $bAutoCheck);
     DebugString($str);
 }
 

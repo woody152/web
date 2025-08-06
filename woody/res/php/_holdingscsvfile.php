@@ -29,7 +29,7 @@ class _HoldingsCsvFile extends DebugCsvFile
     		$his_sql = GetStockHistorySql();
     		if ($his_sql->GetRecord($strStockId, $this->strDate) == false)
     		{
-    			$this->DebugReport($strSymbol.' missing data on '.$this->strDate);
+    			$this->DebugReport(GetMyStockLink($strSymbol).' missing data on '.$this->strDate);
 //    			UpdateYahooHistoryChart(new MyStockReference($strSymbol));
     		}
         
@@ -73,13 +73,13 @@ class _HoldingsCsvFile extends DebugCsvFile
     	$sql = GetStockSql();
         $strUscnyId = $sql->GetId('USCNY');
         $strHkcnyId = $sql->GetId('HKCNY');
-        $nav_sql = GetNavHistorySql();
+        $netvalue_sql = GetNetValueHistorySql();
         
-        $str = ($strUSDCNY = $nav_sql->GetClose($strUscnyId, $strDate)) ? $strUSDCNY : $nav_sql->GetCloseNow($strUscnyId);
+        $str = ($strUSDCNY = $netvalue_sql->GetClose($strUscnyId, $strDate)) ? $strUSDCNY : $netvalue_sql->GetCloseNow($strUscnyId);
         $this->fUSDCNY = floatval($str);
         $strDebug .= ' '.$str;
         
-        $str = ($strHKDCNY = $nav_sql->GetClose($strHkcnyId, $strDate)) ? $strHKDCNY : $nav_sql->GetCloseNow($strHkcnyId);
+        $str = ($strHKDCNY = $netvalue_sql->GetClose($strHkcnyId, $strDate)) ? $strHKDCNY : $netvalue_sql->GetCloseNow($strHkcnyId);
         $this->fHKDCNY = floatval($str);
         $strDebug .= ' '.$str;
         

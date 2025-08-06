@@ -232,7 +232,7 @@ function GetSpdrOfficialUrl($strSymbol)
 }
 
 // https://www.ssga.com/us/en/individual/etfs/library-content/products/fund-data/etfs/us/navhist-us-en-xop.xlsx
-function GetSpdrNavUrl($strSymbol)
+function GetSpdrNetValueUrl($strSymbol)
 {
 	return GetSpdrEtfUrl().'library-content/products/fund-data/etfs/us/navhist-us-en-'.strtolower($strSymbol).'.xlsx';
 }
@@ -259,15 +259,15 @@ function GetInvescoOfficialUrl($strSymbol)
 }
 
 // https://www.invesco.com/us/financial-products/etfs/product-detail/main/sidebar/0?audienceType=Investor&action=download&ticker=QQQ
-function GetInvescoNavUrl($strSymbol)
+function GetInvescoNetValueUrl($strSymbol)
 {
 	return GetInvescoEtfUrl().'/main/sidebar/0?audienceType=Investor&action=download&ticker='.$strSymbol;
 }
 
-function GetEtfNavUrl($strSymbol)
+function GetEtfNetValueUrl($strSymbol)
 {
-	if (GetSpdrOfficialUrl($strSymbol))			return GetSpdrNavUrl($strSymbol);
-	else if (GetInvescoOfficialUrl($strSymbol))	return GetInvescoNavUrl($strSymbol);
+	if (GetSpdrOfficialUrl($strSymbol))			return GetSpdrNetValueUrl($strSymbol);
+	else if (GetInvescoOfficialUrl($strSymbol))	return GetInvescoNetValueUrl($strSymbol);
 	else if ($strName = SqlGetStockName($strSymbol))
 	{
 		if (stripos($strName, 'ishares') !== false)

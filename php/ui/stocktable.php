@@ -105,17 +105,17 @@ class TableColumnGroupName extends TableColumnName
 	}
 }
 
-class TableColumnNav extends TableColumn
+class TableColumnNetValue extends TableColumn
 {
 	public function __construct($strPrefix = false)
 	{
-        parent::__construct(STOCK_DISP_NAV, 90, 'olive', $strPrefix);
+        parent::__construct(STOCK_DISP_NETVALUE, 90, 'olive', $strPrefix);
 	}
 }
 
-function TableColumnGetNav()
+function TableColumnGetNetValue()
 {
-	$col = new TableColumnNav();
+	$col = new TableColumnNetValue();
 	return $col->GetDisplay();
 }
 

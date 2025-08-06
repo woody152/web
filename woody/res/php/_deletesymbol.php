@@ -99,7 +99,7 @@ function _deleteStockSymbol($ref)
 	{
 		SqlDeleteStockEma($strStockId);
 		SqlDeleteStockHistory($strStockId);
-		SqlDeleteNavHistory($strStockId);
+		SqlDeleteNetValueHistory($strStockId);
 		SqlDeleteStock($strStockId);
 		DebugString('已删除');
 		SwitchRemoveFromSess('symbol='.$strSymbol);

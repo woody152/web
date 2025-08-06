@@ -15,12 +15,12 @@ function _echoFundEstTableItem($ref, $bFair, $bWide = false)
     	$ar = array_merge($ar, GetStockReferenceArray($stock_ref));
     }
     
-    $strOfficialPrice = $ref->GetOfficialNav();
+    $strOfficialPrice = $ref->GetOfficialNetValue();
     $ar[] = $ref->GetPriceDisplay($strOfficialPrice);
     $ar[] = $ref->GetOfficialDate();
 	$ar[] = $ref->GetPercentageDisplay($strOfficialPrice);
     
-    if ($strFairPrice = $ref->GetFairNav())
+    if ($strFairPrice = $ref->GetFairNetValue())
     {
     	$ar[] = $ref->GetPriceDisplay($strFairPrice);
     	$ar[] = $ref->GetPercentageDisplay($strFairPrice);
@@ -31,7 +31,7 @@ function _echoFundEstTableItem($ref, $bFair, $bWide = false)
     	$ar[] = '';
     }
     
-   	if ($strRealtimePrice = $ref->GetRealtimeNav())
+   	if ($strRealtimePrice = $ref->GetRealtimeNetValue())
    	{
    		$ar[] = $ref->GetPriceDisplay($strRealtimePrice);
    		$ar[] = $ref->GetPercentageDisplay($strRealtimePrice);
@@ -42,7 +42,7 @@ function _echoFundEstTableItem($ref, $bFair, $bWide = false)
 
 function _callbackSortFundEst($ref)
 {
-	$strNav = $ref->GetOfficialNav();
+	$strNav = $ref->GetOfficialNetValue();
 	if (method_exists($ref, 'GetStockRef'))
 	{
     	$stock_ref = $ref->GetStockRef();
@@ -63,7 +63,7 @@ function _getFundEstTableColumn($arRef, &$bFair, $bWide = false)
 	$bFair = false;
     foreach ($arRef as $ref)
     {
-        if ($ref->GetFairNav())
+        if ($ref->GetFairNetValue())
         {
         	$bFair = true;
         	$ar[] = new TableColumnFairEst();
@@ -74,7 +74,7 @@ function _getFundEstTableColumn($arRef, &$bFair, $bWide = false)
 	
     foreach ($arRef as $ref)
     {
-   		if ($ref->GetRealtimeNav())
+   		if ($ref->GetRealtimeNetValue())
    		{
    			$ar[] = new TableColumnRealtimeEst();
    			$ar[] = $premium_col;
@@ -140,7 +140,7 @@ function EchoFundEstParagraph($ref)
 	$arColumn = _getFundEstTableColumn($arRef, $bFair);
 	
 	$str = _getFundPositionStr($ref);
-    if ($ref->GetRealtimeNav())
+    if ($ref->GetRealtimeNetValue())
     {
     	$col = $bFair ? $arColumn[6] : $arColumn[4]; 
     	$est_ref = $ref->GetEstRef();

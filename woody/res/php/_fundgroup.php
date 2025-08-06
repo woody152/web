@@ -13,7 +13,7 @@ require_once('../../php/ui/nvclosehistoryparagraph.php');
 function GetTitle()
 {
     global $acct;
-	return $acct->GetStockDisplay().STOCK_DISP_NAV;
+	return $acct->GetStockDisplay().STOCK_DISP_NETVALUE;
 }
 
 class FundGroupAccount extends GroupAccount 
@@ -24,15 +24,15 @@ class FundGroupAccount extends GroupAccount
     	if (method_exists($ref, 'GetStockRef'))
     	{
     		$stock_ref = $ref->GetStockRef();
-    		$nav_ref = $ref;
+    		$netvalue_ref = $ref;
     	}
     	else
     	{
     		$stock_ref = $ref;
-    		$nav_ref = $ref->GetNavRef();
+    		$netvalue_ref = $ref->GetNetValueRef();
     	}
 
-    	$str = $nav_ref->GetChineseName();
+    	$str = $netvalue_ref->GetChineseName();
     	$str = str_replace('(人民币份额)', '', $str);
     	$str = str_replace('(人民币)', '', $str);
 //    	return RefGetStockDisplay($stock_ref).$str;

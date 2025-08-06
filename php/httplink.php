@@ -70,13 +70,16 @@ function GetSinaDebugLink($strSina)
 
 function GetFileDebugLink($strPathName)
 {
-    clearstatcache(true, $strPathName);
-    if (file_exists($strPathName))
-    {
-		$strLink = GetFileLink($strPathName, true);
-		$strDelete = GetOnClickLink('/php/_submitdelete.php?file='.$strPathName, '确认删除调试文件'.$strPathName.'？', DebugFormat_date('m-d H:i:s', filemtime($strPathName)));
-		return "$strLink($strDelete)";
-    }
+	if ($strPathName)
+	{
+		clearstatcache(true, $strPathName);
+		if (file_exists($strPathName))
+		{
+			$strLink = GetFileLink($strPathName, true);
+			$strDelete = GetOnClickLink('/php/_submitdelete.php?file='.$strPathName, '确认删除调试文件'.$strPathName.'？', DebugFormat_date('m-d H:i:s', filemtime($strPathName)));
+			return "$strLink($strDelete)";
+		}
+	}
     return '';
 }
 

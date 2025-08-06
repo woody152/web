@@ -33,9 +33,9 @@ function _echoFundHistoryTableItem($csv, $strNav, $arHistory, $arFundEst, $ref, 
 
 function _echoHistoryTableData($his_sql, $fund_est_sql, $csv, $ref, $strStockId, $est_ref, $iStart, $iNum, $bAdmin)
 {
-	$bSameDayNav = UseSameDayNav($ref);
-	$nav_sql = GetNavHistorySql();
-	if ($est_ref)		$est_sql = ($est_ref->CountNav() > 0) ? $nav_sql : $his_sql;
+	$bSameDayNav = UseSameDayNetValue($ref);
+	$netvalue_sql = GetNetValueHistorySql();
+	if ($est_ref)		$est_sql = ($est_ref->CountNetValue() > 0) ? $netvalue_sql : $his_sql;
 	else				$est_sql = false;
 	
     if ($result = $his_sql->GetAll($strStockId, $iStart, $iNum)) 
@@ -43,7 +43,7 @@ function _echoHistoryTableData($his_sql, $fund_est_sql, $csv, $ref, $strStockId,
         while ($arHistory = mysqli_fetch_assoc($result)) 
         {
        		$strDate = $bSameDayNav ? $arHistory['date'] : $his_sql->GetDatePrev($strStockId, $arHistory['date']);
-        	if ($strNav = $nav_sql->GetClose($strStockId, $strDate))
+        	if ($strNav = $netvalue_sql->GetClose($strStockId, $strDate))
         	{
    				$arFundEst = $fund_est_sql ? $fund_est_sql->GetRecord($strStockId, $strDate) : false;
         		_echoFundHistoryTableItem($csv, $strNav, $arHistory, $arFundEst, $ref, $est_ref, $est_sql, $bAdmin);
@@ -56,7 +56,7 @@ function _echoHistoryTableData($his_sql, $fund_est_sql, $csv, $ref, $strStockId,
 function _echoFundHistoryParagraph($ref, $est_ref, $csv, $iStart, $iNum, $bAdmin)
 {
 	$close_col = new TableColumnPrice();
-	$nav_col = new TableColumnNav();
+	$nav_col = new TableColumnNetValue();
 	$premium_col = new TableColumnPremium();
 	
     $str = $ref->IsFundA() ? GetEastMoneyFundLink($ref) : GetXueqiuLink($ref);
@@ -79,7 +79,7 @@ function _echoFundHistoryParagraph($ref, $est_ref, $csv, $iStart, $iNum, $bAdmin
 		$ar[] = new TableColumnOfficalEst();
 		$ar[] = new TableColumnTime();
 		$ar[] = new TableColumnError();
-		if ($est_ref)		$ar[] = RefGetTableColumnNav($est_ref);
+		if ($est_ref)		$ar[] = RefGetTableColumnNetValue($est_ref);
 	}
 	else	$fund_est_sql = false;
 	

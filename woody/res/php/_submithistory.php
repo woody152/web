@@ -14,8 +14,8 @@ class _AdminHistoryAccount extends SymbolAccount
 			UpdateYahooHistoryChart($ref);
 	        
 	        // do some extra work together
-//	        if ($ref->GetSymbol() == '^GSPC')		DebugNavXlsStr(new StockSymbol('SPY'));
-//	        else									DebugNavXlsStr($ref);
+//	        if ($ref->GetSymbol() == '^GSPC')		DebugNetValueXlsStr(new StockSymbol('SPY'));
+//	        else									DebugNetValueXlsStr($ref);
 	    }
 	}
 }

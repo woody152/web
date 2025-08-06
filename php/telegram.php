@@ -4,7 +4,7 @@ require_once('stockbot.php');
 require_once('stockdataarray.php');
 
 // 电报公共模板, 返回输入信息
-define('TG_DEBUG_VER', '版本032');		
+define('TG_DEBUG_VER', '版本033');		
 
 define('BOT_EOL', "\r\n");
 define('MAX_BOT_MSG_LEN', 2048);

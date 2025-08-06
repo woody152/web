@@ -56,7 +56,7 @@ function _echoMyStockTransactions($acct, $ref, $strStockId)
 
 function _getFundOptionLinks($strSymbol)
 {
-	return ' '.GetStockOptionLink(STOCK_OPTION_NAV, $strSymbol).' '.GetStockOptionLink(STOCK_OPTION_CALIBRATION, $strSymbol).' '.GetStockOptionLink(STOCK_OPTION_HOLDINGS, $strSymbol);
+	return ' '.GetStockOptionLink(STOCK_OPTION_NETVALUE, $strSymbol).' '.GetStockOptionLink(STOCK_OPTION_CALIBRATION, $strSymbol).' '.GetStockOptionLink(STOCK_OPTION_HOLDINGS, $strSymbol);
 }
 
 function _getMyStockLinks($sym, $bAdmin)
@@ -113,7 +113,7 @@ function _echoMyStockData($ref, $strStockId, $bAdmin)
     if ($ref->IsFundA())
     {
 		$fund = StockGetFundReference($strSymbol);
-		if ($fund->GetOfficialNav())		
+		if ($fund->GetOfficialNetValue())		
 		{
 			EchoFundArrayEstParagraph(array($fund));
 			EchoFundTradingParagraph($fund);
@@ -173,8 +173,8 @@ function _echoMyStockData($ref, $strStockId, $bAdmin)
    			$str .= $strNewLine.'id='.$strStockId.' '.$ref->DebugLink();
    			if ($ref->IsFundA())
    			{
-   				$nav_ref = new NetValueReference($strSymbol);
-   				$str .= $strNewLine.'基金:'.$nav_ref->DebugLink(); 
+   				$netvalue_ref = new NetValueReference($strSymbol);
+   				$str .= $strNewLine.'基金:'.$netvalue_ref->DebugLink(); 
    			}
    			$str .= $strNewLine.'均线:'.$ref->DebugConfigLink();
     	}
@@ -199,8 +199,8 @@ function GetMyStockLinks($ref)
 				}
 			}
 			
-			$nav_ref = new NetValueReference($strSymbol);
-			$strName = $nav_ref->GetChineseName();
+			$netvalue_ref = new NetValueReference($strSymbol);
+			$strName = $netvalue_ref->GetChineseName();
 			if (stripos($strName, '博时') !== false)		$str .= GetBoShiSoftwareLinks($strDigitA);
 			else if (stripos($strName, '易方达') !== false)	$str .= GetEFundSoftwareLinks($strDigitA);
 			else if (stripos($strName, '招商') !== false)		$str .= GetCmfSoftwareLinks($strDigitA);

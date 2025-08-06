@@ -39,7 +39,7 @@ function _echoStockGroupArray($arStock, $bWide)
         if ($ref->IsFundA())
         {
        		$fund = StockGetFundReference($strSymbol);
-       		if ($fund->GetOfficialNav())
+       		if ($fund->GetOfficialNetValue())
        		{
        			$arFund[] = $fund;
        			$bIncluded = true;

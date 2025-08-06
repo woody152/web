@@ -34,7 +34,7 @@ define('STOCK_OPTION_EMA', '修改200/50日EMA');
 define('STOCK_OPTION_FUND', '修改对应配对代码');
 define('STOCK_OPTION_HA', '修改H股对应A股代码');
 define('STOCK_OPTION_HOLDINGS', '修改基金持仓');
-define('STOCK_OPTION_NAV', '修改净值');
+define('STOCK_OPTION_NETVALUE', '修改净值');
 define('STOCK_OPTION_PREMIUM', '期货升水');
 define('STOCK_OPTION_SHARE_DIFF', '场内新增(万)');
 define('STOCK_OPTION_SPLIT', '拆股或合股');
@@ -237,7 +237,7 @@ function GetStockOptionArray()
     $ar = array(
                   'editcalibration' => STOCK_OPTION_CALIBRATION,
                   'editfund' => STOCK_OPTION_FUND,
-                  'editnetvalue' => STOCK_OPTION_NAV,
+                  'editnetvalue' => STOCK_OPTION_NETVALUE,
                   'editpremium' => STOCK_OPTION_PREMIUM,
                   'editsharesdiff' => STOCK_OPTION_SHARE_DIFF,
     			  'editstock' => STOCK_OPTION_EDIT,

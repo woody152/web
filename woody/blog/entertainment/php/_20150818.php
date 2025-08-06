@@ -319,7 +319,7 @@ function EchoPage20160818($strPage)
 {
 	$strHead = GetHeadElement(_getStockMenuTag($strPage).'中考虑当日CL交易情况后的T+1估值');
 	$strJisilu = GetJisiluQdiiLink();
-	$strNav = TableColumnGetNav();
+	$strNav = TableColumnGetNetValue();
 	
 	$offical_col = new TableColumnOfficalEst();
 	$strOfficalEst = $offical_col->GetDisplay();

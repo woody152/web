@@ -4,12 +4,12 @@ require_once('php/_emptygroup.php');
 require_once('../../php/dateimagefile.php');
 require_once('../../php/ui/editinputform.php');
 
-function _echoFundPositionItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue, $strPrevDate, $nav_sql, $strStockId, $est_sql, $strEstId, $strInput, $bAdmin)
+function _echoFundPositionItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue, $strPrevDate, $netvalue_sql, $strStockId, $est_sql, $strEstId, $strInput, $bAdmin)
 {
 	$bWritten = false;
 	$ar = array($strDate, $strNetValue);
 	
-   	$strPrev = $nav_sql->GetClose($strStockId, $strPrevDate);
+   	$strPrev = $netvalue_sql->GetClose($strStockId, $strPrevDate);
 	$ar[] = $ref->GetPercentageDisplay($strPrev, $strNetValue);
 
 	$strCny = $cny_ref->GetClose($strDate);
@@ -37,11 +37,11 @@ function _echoFundPositionItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNet
 	EchoTableColumn($ar);
 }
 
-function _getSwitchDateArray($nav_sql, $strStockId, $est_sql, $strEstId)
+function _getSwitchDateArray($netvalue_sql, $strStockId, $est_sql, $strEstId)
 {
 	$arDate = array();
 	$bFirst = true;
-    if ($result = $nav_sql->GetAll($strStockId)) 
+    if ($result = $netvalue_sql->GetAll($strStockId)) 
     {
         while ($record = mysqli_fetch_assoc($result)) 
         {
@@ -95,14 +95,14 @@ function _echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $strInput, $bAdmi
 {
    	$strStockId = $ref->GetStockId();
 	$strEstId = $est_ref->GetStockId();
-	$nav_sql = GetNavHistorySql();
-	$est_sql = ($est_ref->CountNav() > 0) ? $nav_sql : GetStockHistorySql(); 
+	$netvalue_sql = GetNetValueHistorySql();
+	$est_sql = ($est_ref->CountNetValue() > 0) ? $netvalue_sql : GetStockHistorySql(); 
 
-	$arDate = _getSwitchDateArray($nav_sql, $strStockId, $est_sql, $strEstId);
+	$arDate = _getSwitchDateArray($netvalue_sql, $strStockId, $est_sql, $strEstId);
 	if (count($arDate) == 0)		return;
  
  	$iIndex = 0;
-    if ($result = $nav_sql->GetAll($strStockId)) 
+    if ($result = $netvalue_sql->GetAll($strStockId)) 
     {
         while ($record = mysqli_fetch_assoc($result)) 
         {
@@ -111,7 +111,7 @@ function _echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $strInput, $bAdmi
        		if ($strDate == $arDate[$iIndex])
        		{
    				$iIndex ++;
-   				if (isset($arDate[$iIndex]))	_echoFundPositionItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue, $arDate[$iIndex], $nav_sql, $strStockId, $est_sql, $strEstId, $strInput, $bAdmin);
+   				if (isset($arDate[$iIndex]))	_echoFundPositionItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue, $arDate[$iIndex], $netvalue_sql, $strStockId, $est_sql, $strEstId, $strInput, $bAdmin);
    				else
    				{
    					$csv->Write($strDate, $strNetValue);
@@ -130,11 +130,11 @@ function _echoFundPositionParagraph($ref, $cny_ref, $est_ref, $strSymbol, $strIn
 	$change_col = new TableColumnChange();
 	$position_col = new TableColumnPosition();
 	EchoTableParagraphBegin(array(new TableColumnDate(),
-								   new TableColumnNav(),
+								   new TableColumnNetValue(),
 								   $change_col,
 								   new TableColumnStock($cny_ref),
 								   $change_col,
-								   RefGetTableColumnNav($est_ref),
+								   RefGetTableColumnNetValue($est_ref),
 								   $change_col,
 								   $position_col
 								   ), 'fundposition', $str);
@@ -160,28 +160,25 @@ function EchoAll()
 	
     if ($ref = $acct->EchoStockGroup())
     {
-    	if (isset($_POST['submit']))
-    	{
-    		unset($_POST['submit']);
-    		$strInput = SqlCleanString($_POST[EDIT_INPUT_NAME]);
-    	}
-    	else	$strInput = POSITION_EST_LEVEL;
+    	if (($strInput = GetEditInput()) === false)		$strInput = POSITION_EST_LEVEL;
     	EchoEditInputForm('进行估算的涨跌阈值', $strInput);
-    	
-   		$fund = false;
-   		$strSymbol = $ref->GetSymbol();
-        if ($fund = StockGetQdiiReference($strSymbol))
-        {
-        	$cny_ref = $fund->GetCnyRef();
-        	$est_ref = $fund->GetEstRef();
-        }
-       else if ($strSymbol == 'SZ164906')
-        {
-        	$fund = $ref;
-        	$cny_ref = new CnyReference('USCNY');
-        	$est_ref = new MyStockReference('KWEB');
-        }
-		if ($fund)		_echoFundPositionParagraph($fund, $cny_ref, $est_ref, $strSymbol, $strInput, $acct->IsAdmin());
+    	if ($strInput != '')
+    	{
+    		$fund = false;
+    		$strSymbol = $ref->GetSymbol();
+    		if ($fund = StockGetQdiiReference($strSymbol))
+    		{
+    			$cny_ref = $fund->GetCnyRef();
+    			$est_ref = $fund->GetEstRef();
+    		}
+    		else if ($strSymbol == 'SZ164906')
+    		{
+    			$fund = $ref;
+    			$cny_ref = new CnyReference('USCNY');
+    			$est_ref = new MyStockReference('KWEB');
+    		}
+    		if ($fund)		_echoFundPositionParagraph($fund, $cny_ref, $est_ref, $strSymbol, $strInput, $acct->IsAdmin());
+    	}
     }
     $acct->EchoLinks();
 }

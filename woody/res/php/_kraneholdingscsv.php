@@ -42,7 +42,7 @@ class _KraneHoldingsCsvFile extends _HoldingsCsvFile
 function CopyHoldings($date_sql, $strStockId, $strDstId)
 {
 	$strDate = $date_sql->ReadDate($strStockId);
-	if (SqlGetNavByDate($strDstId, $strDate) === false)	return false;
+	if (SqlGetNetValueByDate($strDstId, $strDate) === false)	return false;
 	$date_sql->WriteDate($strDstId, $strDate);
 	
     $holdings_sql = GetHoldingsSql();

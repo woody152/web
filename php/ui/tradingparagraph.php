@@ -107,19 +107,19 @@ function EchoFundTradingParagraph($fund, $callback = false)
     $arColumn = _getTradingTableColumn();
     $strPrice = _getTradingParagraphStr($ref, $arColumn);
 	$strRealtime = false;
-    if ($strOfficial = $fund->GetOfficialNav())
+    if ($strOfficial = $fund->GetOfficialNetValue())
     {
     	$arColumn[] = new TableColumnPremium(STOCK_DISP_OFFICIAL);
     	$strPrev = $ref->GetPrevPrice();
     	$strEstPrice = $ref->GetPriceDisplay($strOfficial, $strPrev);
 
-    	if ($strFair = $fund->GetFairNav())
+    	if ($strFair = $fund->GetFairNetValue())
     	{
     		$arColumn[] = new TableColumnPremium(STOCK_DISP_FAIR);
     		$strEstPrice .= '|'.$ref->GetPriceDisplay($strFair, $strPrev);
     	}
 
-   		if ($strRealtime = $fund->GetRealtimeNav())
+   		if ($strRealtime = $fund->GetRealtimeNetValue())
    		{
    			$arColumn[] = new TableColumnPremium(STOCK_DISP_REALTIME);
    			$strEstPrice .= '|'.$ref->GetPriceDisplay($strRealtime, $strPrev);
@@ -159,7 +159,7 @@ function EchoFundPairTradingParagraph($ref)
     $strPrice = _getTradingParagraphStr($ref, $arColumn);
     $str = "{$strPrice}相对于{$strPairSymbol}的{$strPremium}";
         
-    _echoTradingParagraph($str, $arColumn, $ref, $ref->GetOfficialNav()); 
+    _echoTradingParagraph($str, $arColumn, $ref, $ref->GetOfficialNetValue()); 
 }
 
 function EchoTradingParagraph($ref, $ah_ref = false, $adr_ref = false)

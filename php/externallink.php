@@ -184,7 +184,7 @@ function GetYahooStockLink($sym)
     return GetExternalLink($strHttp, $sym->GetDisplay());
 }
 
-function GetYahooNavLink($strSymbol)
+function GetYahooNetValueLink($strSymbol)
 {
     $strHttp = GetYahooStockUrl(GetYahooNetValueSymbol($strSymbol));
     return GetExternalLink($strHttp, $strSymbol);
@@ -343,9 +343,9 @@ function GetJisiluQdiiLink($bAsia = false)
 	return GetExternalLink($strUrl, '集思录');
 }
 
-function GetEtfNavLink($strSymbol)
+function GetEtfNetValueLink($strSymbol)
 {
-	if ($strUrl = GetEtfNavUrl($strSymbol))
+	if ($strUrl = GetEtfNetValueUrl($strSymbol))
 	{
 		return GetExternalLink($strUrl, '净值文件');
 	}

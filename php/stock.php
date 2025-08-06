@@ -154,8 +154,8 @@ function StockGetPercentage($strDivisor, $strDividend)
 
 function StockCompareEstResult($strStockId, $strNetValue, $strDate, $strSymbol)
 {
-	$nav_sql = GetNavHistorySql();
-    if ($nav_sql->InsertDaily($strStockId, $strDate, $strNetValue))
+	$netvalue_sql = GetNetValueHistorySql();
+    if ($netvalue_sql->InsertDaily($strStockId, $strDate, $strNetValue))
     {
     	$fund_est_sql = GetFundEstSql();
        	if ($strEstValue = $fund_est_sql->GetClose($strStockId, $strDate))
@@ -175,18 +175,18 @@ function StockCompareEstResult($strStockId, $strNetValue, $strDate, $strSymbol)
 
 function StockUpdateEstResult($strStockId, $strNetValue, $strDate)
 {
-	$nav_sql = GetNavHistorySql();
-	if ($nav_sql->GetRecord($strStockId, $strDate) == false)
+	$netvalue_sql = GetNetValueHistorySql();
+	if ($netvalue_sql->GetRecord($strStockId, $strDate) == false)
     {   // Only update when net value is NOT ready
     	$fund_est_sql = GetFundEstSql();
 		$fund_est_sql->WriteDaily($strStockId, $strDate, $strNetValue);
 	}
 }
 
-function RefGetTableColumnNav($ref)
+function RefGetTableColumnNetValue($ref)
 {
 	$strStockDisplay = TableColumnGetStock($ref);
-	if ($ref->CountNav() > 0)		return new TableColumnNav($strStockDisplay);	
+	if ($ref->CountNetValue() > 0)		return new TableColumnNetValue($strStockDisplay);	
 	return 								   new TableColumnPrice($strStockDisplay);
 }
 
@@ -398,7 +398,7 @@ function StockGetPairReferences($strSymbol)
     return array($ab_ref, $ah_ref, $adr_ref);
 }
 
-function UseSameDayNav($sym)
+function UseSameDayNetValue($sym)
 {
 	$strSymbol = $sym->GetSymbol();
 	if (in_arrayQdii($strSymbol))				return false;

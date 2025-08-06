@@ -56,33 +56,4 @@ class IntSql extends ValSql
     }
 }
 
-/*
-class StockQuoteSql extends IntSql
-{
-	var $strQuoteName = 'quote';
-
-    public function __construct($strTableName = 'stockquote')
-    {
-        parent::__construct($strTableName, 'tick');
-    }
-
-    public function Create()
-    {
-    	return $this->CreateIntTable(','.$this->ComposeVarcharStr($this->strQuoteName));
-    }
-    
-    function WriteQuote($strId, $iTick, $strQuote)
-    {
-    	$strTick = strval($iTick);
-    	$ar = array($this->strValName => $strTick, $this->strQuoteName => $strQuote);
-   		if ($record = $this->GetRecordById($strId))
-   		{
-   			if ($strQuote == $record[$this->strQuoteName])	unset($ar[$this->strQuoteName]);
-   			if ($strTick == $record[$this->strValName])		return false;
-   			return $this->UpdateById($ar, $strId);
-   		}
-    	return $this->InsertArray(array('id' => $strId) + $ar);
-    }
-}                                                                                                                                              
-*/
 ?>

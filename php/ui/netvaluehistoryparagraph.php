@@ -1,11 +1,11 @@
 <?php
 require_once('stocktable.php');
 
-function _echoNetValueItem($csv, $nav_sql, $strStockId, $est_sql, $strEstId, $strNetValue, $strDate, $ref, $est_ref, $cny_ref)
+function _echoNetValueItem($csv, $netvalue_sql, $strStockId, $est_sql, $strEstId, $strNetValue, $strDate, $ref, $est_ref, $cny_ref)
 {
 	$bWritten = false;
 	$ar = array($strDate, $strNetValue);
-	if ($record = $nav_sql->GetRecordPrev($strStockId, $strDate))
+	if ($record = $netvalue_sql->GetRecordPrev($strStockId, $strDate))
     {
     	$strPrevDate = $record['date'];
     	$strPrev = rtrim0($record['close']);
@@ -50,11 +50,11 @@ function _echoNetValueItem($csv, $nav_sql, $strStockId, $est_sql, $strEstId, $st
 
 function _echoNetValueData($csv, $ref, $est_ref, $cny_ref, $iStart, $iNum)
 {
-	$nav_sql = GetNavHistorySql();
+	$netvalue_sql = GetNetValueHistorySql();
 	if ($est_ref)
 	{
 		$strEstId = $est_ref->GetStockId();
-		$est_sql = $nav_sql;
+		$est_sql = $netvalue_sql;
 		if ($est_sql->Count($strEstId) == 0 || $est_ref->IsIndex())
 		{
 			$est_sql = GetStockHistorySql();
@@ -67,11 +67,11 @@ function _echoNetValueData($csv, $ref, $est_ref, $cny_ref, $iStart, $iNum)
 	}
 
 	$strStockId = $ref->GetStockId();
-    if ($result = $nav_sql->GetAll($strStockId, $iStart, $iNum)) 
+    if ($result = $netvalue_sql->GetAll($strStockId, $iStart, $iNum)) 
     {
         while ($record = mysqli_fetch_assoc($result)) 
         {
-			_echoNetValueItem($csv, $nav_sql, $strStockId, $est_sql, $strEstId, rtrim0($record['close']), $record['date'], $ref, $est_ref, $cny_ref);
+			_echoNetValueItem($csv, $netvalue_sql, $strStockId, $est_sql, $strEstId, rtrim0($record['close']), $record['date'], $ref, $est_ref, $cny_ref);
         }
         mysqli_free_result($result);
     }
@@ -79,7 +79,7 @@ function _echoNetValueData($csv, $ref, $est_ref, $cny_ref, $iStart, $iNum)
 
 function EchoNetValueHistoryParagraph($ref, $csv = false, $iStart = 0, $iNum = TABLE_COMMON_DISPLAY, $bAdmin = false)
 {
-	if (($iTotal = $ref->CountNav()) == 0)	return;
+	if (($iTotal = $ref->CountNetValue()) == 0)	return;
 	
 	$strSymbol = $ref->GetSymbol();
 	if (IsTableCommonDisplay($iStart, $iNum))
@@ -112,12 +112,12 @@ function EchoNetValueHistoryParagraph($ref, $csv = false, $iStart = 0, $iNum = T
     }
     
 	$change_col = new TableColumnChange();
-	$ar = array(new TableColumnDate(), new TableColumnNav(), $change_col);
+	$ar = array(new TableColumnDate(), new TableColumnNetValue(), $change_col);
 	if ($est_ref)
 	{
 		$ar[] = new TableColumnStock($cny_ref);
 		$ar[] = $change_col;
-		$ar[] = RefGetTableColumnNav($est_ref);
+		$ar[] = RefGetTableColumnNetValue($est_ref);
 		$ar[] = $change_col;
 		$ar[] = new TableColumnPosition();
 	}

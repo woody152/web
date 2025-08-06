@@ -212,8 +212,8 @@ function _getLinearRegressionStockArrays(&$arX, &$arY, $strInput, $strSeparator,
 
 //	$bSameDayX = true;
 //	$bSameDayY = true;
-	$bSameDayX = UseSameDayNav($x_ref);
-	$bSameDayY = UseSameDayNav($y_ref);
+	$bSameDayX = UseSameDayNetValue($x_ref);
+	$bSameDayY = UseSameDayNetValue($y_ref);
 	$iStart = ($bSameDayX && $bSameDayY) ? 0 : 1;
 	for ($i = $iStart; $i < $iCount - $iGap + $iStart - 1; $i += $iGap)
 	{
@@ -581,7 +581,7 @@ function _getDefaultInput($strPage)
    		break;
     		
    	case 'commonphrase':
-   		$str = '';
+   		$str = 'Hello, world!';
     	break;
     		
     case 'cramersrule':
@@ -617,26 +617,12 @@ function EchoAll($bChinese = true)
 	global $acct;
 	
 	$strPage = $acct->GetPage();
-    if (isset($_POST['clear']))
+	if (($strInput = GetEditInput()) === false)
 	{
-		unset($_POST['clear']);
-		$strInput = '';
-	}
-	else if (isset($_POST['submit']) && isset($_POST[EDIT_INPUT_NAME]))
-	{
-		unset($_POST['submit']);
-		$strInput = SqlCleanString($_POST[EDIT_INPUT_NAME]);
-	}
-	else if ($strInput = $acct->GetQuery())	
-	{
-	}
-    else
-    {
-    	$strInput = _getDefaultInput($strPage);
+		if (($strInput = $acct->GetQuery()) === false)		$strInput = _getDefaultInput($strPage);
     }
-    
     EchoEditInputForm(GetAccountToolStr($strPage, $bChinese), $strInput, $bChinese);
-    _echoInputResult($acct, $strPage, $strInput, $bChinese);
+    if ($strInput != '')	_echoInputResult($acct, $strPage, $strInput, $bChinese);
     _echoInputRelated($strPage, $bChinese);
 
 	$str = GetAccountToolLinks($bChinese);

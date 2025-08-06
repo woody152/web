@@ -11,13 +11,13 @@ Array
 )
 */
 
-function GetKraneNav($ref)
+function GetKraneNetValue($ref)
 {
 	$strStockId = $ref->GetStockId();
 	$strDate = $ref->GetDate();
-	$nav_sql = GetNavHistorySql();
- 	$strNavDate = $nav_sql->GetDateNow($strStockId);	
-	if ($strNavDate == $strDate)	return false;		// already have current NAV
+	$netvalue_sql = GetNetValueHistorySql();
+ 	$strNavDate = $netvalue_sql->GetDateNow($strStockId);	
+	if ($strNavDate == $strDate)	return false;		// already have current net value
 	$his_sql = GetStockHistorySql();
 	$strPrevDate = $his_sql->GetDatePrev($strStockId, $strDate);
 	if ($strNavDate == $strPrevDate)	return false;		// already up to date
@@ -25,7 +25,7 @@ function GetKraneNav($ref)
 //	$ref->SetTimeZone();
 	date_default_timezone_set('Europe/London');
 	$strSymbol = $ref->GetSymbol();
-	$strFileName = DebugGetPathName('NAV_'.$strSymbol.'.txt');
+	$strFileName = DebugGetPathName('netvalue_'.$strSymbol.'.txt');
 	if (StockNeedFile($strFileName) == false)	return false; 	// updates on every minute
 
 	$strUrl = GetKraneUrl()."product-json/?pid=477&type=premium-discount&start=$strPrevDate&end=$strPrevDate";
