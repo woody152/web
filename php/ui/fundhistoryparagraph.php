@@ -33,7 +33,7 @@ function _echoFundHistoryTableItem($csv, $strNav, $arHistory, $arFundEst, $ref, 
 
 function _echoHistoryTableData($his_sql, $fund_est_sql, $csv, $ref, $strStockId, $est_ref, $iStart, $iNum, $bAdmin)
 {
-	$bSameDayNav = UseSameDayNetValue($ref);
+	$bSameDay = UseSameDayNetValue($ref);
 	$netvalue_sql = GetNetValueHistorySql();
 	if ($est_ref)		$est_sql = ($est_ref->CountNetValue() > 0) ? $netvalue_sql : $his_sql;
 	else				$est_sql = false;
@@ -42,7 +42,7 @@ function _echoHistoryTableData($his_sql, $fund_est_sql, $csv, $ref, $strStockId,
     {
         while ($arHistory = mysqli_fetch_assoc($result)) 
         {
-       		$strDate = $bSameDayNav ? $arHistory['date'] : $his_sql->GetDatePrev($strStockId, $arHistory['date']);
+       		$strDate = $bSameDay ? $arHistory['date'] : $his_sql->GetDatePrev($strStockId, $arHistory['date']);
         	if ($strNav = $netvalue_sql->GetClose($strStockId, $strDate))
         	{
    				$arFundEst = $fund_est_sql ? $fund_est_sql->GetRecord($strStockId, $strDate) : false;

@@ -206,11 +206,11 @@ class FundPairReference extends MyPairReference
 		$strDate = $netvalue_sql->GetDateNow($strStockId);
 		if ($strDate == $calibration_sql->GetDateNow($strStockId))	return;
 		
-		if ($strNav = $netvalue_sql->GetCloseNow($strStockId))
+		if ($strNetValue = $netvalue_sql->GetCloseNow($strStockId))
 		{
-			if ($strPairNav = PairNetValueGetClose($this->pair_ref, $strDate))	
+			if ($strPairNetValue = PairNetValueGetClose($this->pair_ref, $strDate))	
 			{
-				$fFactor = $this->CalcFactor($strPairNav, $strNav, $strDate);
+				$fFactor = $this->CalcFactor($strPairNetValue, $strNetValue, $strDate);
 				$calibration_sql->WriteDaily($strStockId, $strDate, strval($fFactor));
         	
 				$this->LoadCalibration();
@@ -223,10 +223,10 @@ class FundPairReference extends MyPairReference
     	return $this->netvalue_ref ? $this->netvalue_ref : $this;
     }
     
- 	function CalcFactor($strPairNav, $strNav, $strDate)
+ 	function CalcFactor($strPairNetValue, $strNetValue, $strDate)
  	{
- 		$fPairNav = floatval($strPairNav); 
- 		$fNav = floatval($strNav); 
+ 		$fPairNav = floatval($strPairNetValue); 
+ 		$fNav = floatval($strNetValue); 
  		if ($this->cny_ref)
  		{
  			$fCny = $this->cny_ref->GetVal($strDate);
@@ -262,14 +262,14 @@ function _adjustByCny($fVal, $fCny, $bSymbolA)
     function EstFromPair($strEst = false, $fCny = false)
     {
 //		DebugVal($this->fFactor, __FUNCTION__, true); 
-    	$fVal = (floatval($strEst) - floatval($this->strPairNav)) * $this->fRatio / $this->fFactor + floatval($this->strNav);
+    	$fVal = (floatval($strEst) - floatval($this->strPairNetValue)) * $this->fRatio / $this->fFactor + floatval($this->strNetValue);
     	return $this->_adjustByCny($fVal, $fCny, ($this->IsSymbolA() ? false : true));
     }
 
     // (x - fPairNetValue)/(fEsts - fNetValue) = fFactor / fRatio;
     function EstToPair($fEst = false, $fCny = false)
     {
-    	$fVal = ($fEst - floatval($this->strNav)) * $this->fFactor / $this->fRatio + floatval($this->strPairNav);
+    	$fVal = ($fEst - floatval($this->strNetValue)) * $this->fFactor / $this->fRatio + floatval($this->strPairNetValue);
     	return $this->_adjustByCny($fVal, $fCny, $this->IsSymbolA());
     }
 */

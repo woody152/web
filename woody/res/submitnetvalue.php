@@ -1,8 +1,8 @@
 <?php
 require_once('php/_stock.php');
 require_once('php/_emptygroup.php');
-require_once('php/_spdrnavxls.php');
-require_once('php/_updateinvesconav.php');
+require_once('php/_updateinvesconetvalue.php');
+require_once('php/_spdrnetvaluexls.php');
 
 class _AdminNetValueAccount extends SymbolAccount
 {

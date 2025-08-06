@@ -64,7 +64,7 @@ function EchoAll()
     EchoFundPairSmaParagraph($a50_ref, '');
     EchoFundHistoryParagraph($ref);
     EchoFundHistoryParagraph($us_ref);
-	EchoNvCloseHistoryParagraph($us_ref);
+	EchoNetValueCloseParagraph($us_ref);
 //   	EchoFundShareParagraph($ref);
 //   	EchoFundShareParagraph($us_ref);
 

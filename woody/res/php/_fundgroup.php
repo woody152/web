@@ -8,7 +8,7 @@ require_once('../../php/ui/smaparagraph.php');
 require_once('../../php/ui/fundhistoryparagraph.php');
 require_once('../../php/ui/fundlistparagraph.php');
 require_once('../../php/ui/fundshareparagraph.php');
-require_once('../../php/ui/nvclosehistoryparagraph.php');
+require_once('../../php/ui/netvaluecloseparagraph.php');
 
 function GetTitle()
 {

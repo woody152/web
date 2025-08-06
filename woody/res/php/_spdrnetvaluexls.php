@@ -18,13 +18,13 @@ function _readXlsFile($bIshares, $strPathName, $netvalue_sql, $shares_sql, $strS
 	if ($bIshares)
 	{
 		$iSheet = 1;
-		$iNavIndex = 2;
+		$iNetValueIndex = 2;
 		$iSharesIndex = 4;
 	}
 	else
 	{
 		$iSheet = 0;
-		$iNavIndex = 1;
+		$iNetValueIndex = 1;
 		$iSharesIndex = 2;
 	}
 
@@ -53,7 +53,7 @@ function _readXlsFile($bIshares, $strPathName, $netvalue_sql, $shares_sql, $strS
 			if ($oldest_ymd->IsTooOld($strDate))	break;
    			if ($oldest_ymd->IsInvalid($strDate) === false)
    			{
-  				if ($netvalue_sql->WriteDaily($strStockId, $strDate, $ar[$iNavIndex]))
+  				if ($netvalue_sql->WriteDaily($strStockId, $strDate, $ar[$iNetValueIndex]))
   				{
   					$iCount ++;
   					if ($calibration_sql->GetClose($strStockId, $strDate))

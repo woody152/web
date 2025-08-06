@@ -302,10 +302,10 @@ function SqlDeleteNetValueHistory($strStockId)
 	}
 }
 
-function SqlSetNetValue($strStockId, $strDate, $strNav)
+function SqlSetNetValue($strStockId, $strDate, $strNetValue)
 {
 	$netvalue_sql = GetNetValueHistorySql();
-	return $netvalue_sql->InsertDaily($strStockId, $strDate, $strNav);
+	return $netvalue_sql->InsertDaily($strStockId, $strDate, $strNetValue);
 }
 
 function SqlGetNetValueByDate($strStockId, $strDate)

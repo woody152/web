@@ -38,15 +38,17 @@ function _echoExhaustiveHoldingsData($strSymbol, $fLimit, $bAdmin)
     	$arHoldingRef = $ref->GetHoldingRefArray();
     	if (count($arHoldingRef) == 2)
     	{
-    		$strNav = $ref->strNav;
-    		$str = $strDate.' '.$strNav;
     		$netvalue_sql = GetNetValueHistorySql();
     		if ($record = $netvalue_sql->GetRecordPrev($ref->GetStockId(), $strDate))
     		{
-    			$ref->strHoldingsDate = $record['date'];
-    			$ref->strNav = rtrim0($record['close']);
-    			$str .= ' <== '.$ref->strHoldingsDate.' '.$ref->strNav;
-    		
+    			$strPrevDate = $record['date'];
+    			$ref->SetHoldingsDate($strPrevDate);
+    			
+    			$strNetValue = $ref->GetNetValue();
+    			$strPrevNetValue = rtrim0($record['close']);
+    			$ref->SetNetValue($strPrevNetValue);
+    			
+    			$str = $strPrevDate.' '.$strPrevNetValue.' ==> '.$strDate.' '.$strNetValue;
     			$ref1 = $arHoldingRef[0];
     			$ref2 = $arHoldingRef[1];
     			$strStockId1 = $ref1->GetStockId();
@@ -61,7 +63,7 @@ function _echoExhaustiveHoldingsData($strSymbol, $fLimit, $bAdmin)
 										   new TableColumnEst(),
 										   new TableColumnError()
 										   ), 'exhaustiveholdings', $str);
-				for ($i = 1; $i < $iTotal; $i ++)	_echoExhaustiveHoldingsItem($ref, $i, $iTotal, $iOrg, $strStockId1, $strStockId2, $strDate, $strNav, $fLimit, $bAdmin);
+				for ($i = 1; $i < $iTotal; $i ++)	_echoExhaustiveHoldingsItem($ref, $i, $iTotal, $iOrg, $strStockId1, $strStockId2, $strDate, $strNetValue, $fLimit, $bAdmin);
 				EchoTableParagraphEnd();
 			}
 		}

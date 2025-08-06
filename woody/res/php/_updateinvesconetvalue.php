@@ -28,7 +28,7 @@ class _InvescoCsvFile extends DebugCsvFile
 		$this->calibration_sql = GetCalibrationSql();
     }
     
-    // Ticker,NAV,Date
+    // Ticker,NetValue,Date
     // QQQ,513.149999999999977,05/21/2025
     public function OnLineArray($arWord)
     {
@@ -41,11 +41,11 @@ class _InvescoCsvFile extends DebugCsvFile
 			if ($this->oldest_ymd->IsTooOld($strDate))	return false;
    			if ($this->oldest_ymd->IsInvalid($strDate) === false)
    			{
-   				$strNav = mysql_round($arWord[1]);
-//   				DebugString($strDate.' '.$strNav);
+   				$strNetValue = mysql_round($arWord[1]);
+//   				DebugString($strDate.' '.$strNetValue);
 				if ($this->ref)
 				{
-					if ($this->netvalue_sql->WriteDaily($this->strStockId, $strDate, $strNav))
+					if ($this->netvalue_sql->WriteDaily($this->strStockId, $strDate, $strNetValue))
 					{
 						$this->iCount ++;
 					}

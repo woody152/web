@@ -169,11 +169,11 @@
 	Echo20180413('中国外汇交易中心的中间价接口');
 ?>
 
-<h3><?php EchoNameTag('nvclosehistory', NVCLOSE_HISTORY_DISPLAY); ?></h3>
+<h3><?php EchoNameTag('netvalueclose', NETVALUE_CLOSE_DISPLAY); ?></h3>
 <p>2018年5月3日
 <br />交易了几年XOP下来, 发现它的收盘价经常跟净值有个1分2分的偏差, 不知道这其中是否有套利机会.
 </p>
-<?php EchoNvCloseDemo(); ?>
+<?php EchoNetValueCloseDemo(); ?>
 <p>增加这个页面倒是让我突然下了决心删除英文版本. 压死骆驼的最后一根稻草是这行代码, 混在其中的中文冒号让我恶向胆边生, 彻底放弃了本来就几乎没有什么浏览量的英文版本股票软件.
 </p>
 <blockquote><code>echo UrlGetQueryDisplay('symbol').($bChinese ? '净值和收盘价比较' :  ' NetValue Close History Compare');</code></blockquote>

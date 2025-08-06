@@ -71,9 +71,9 @@ function _textEstPremium($ref, $strEst)
 function _textEstNetValue($fund, $ref)
 {
 	$str = '';
-	if ($strNav = $fund->GetOfficialNetValue())		$str .= STOCK_DISP_OFFICIAL._textEstPremium($ref, $strNav).' '.$fund->GetOfficialDate().BOT_EOL;
-	if ($strNav = $fund->GetFairNetValue())			$str .= STOCK_DISP_FAIR._textEstPremium($ref, $strNav).BOT_EOL;
-   	if ($strNav = $fund->GetRealtimeNetValue())		$str .= STOCK_DISP_REALTIME._textEstPremium($ref, $strNav).BOT_EOL;
+	if ($strNetValue = $fund->GetOfficialNetValue())		$str .= STOCK_DISP_OFFICIAL._textEstPremium($ref, $strNetValue).' '.$fund->GetOfficialDate().BOT_EOL;
+	if ($strNetValue = $fund->GetFairNetValue())			$str .= STOCK_DISP_FAIR._textEstPremium($ref, $strNetValue).BOT_EOL;
+   	if ($strNetValue = $fund->GetRealtimeNetValue())		$str .= STOCK_DISP_REALTIME._textEstPremium($ref, $strNetValue).BOT_EOL;
 	return $str;
 }
 

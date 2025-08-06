@@ -72,7 +72,7 @@ class MyEWrapper(EWrapper):
         #self.arQQQ = {'SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941'}
         #self.arXOP = {'SH513350', 'SZ159518'}
         self.arOrder = {}
-        self.arOrder['KWEB'] = GetOrderArray([20.58, 29.58, 29.82, 33.53, 33.57, 35.17, 35.53, 35.61, 37.5, 38.57], 200, 5, 8)
+        self.arOrder['KWEB'] = GetOrderArray([20.58, 29.58, 29.82, 33.53, 33.57, 35.17, 35.53, 35.61, 37.5, 38.57], 200, 6, 8)
         if IsChinaMarketOpen():
         #if True:
             self.arOrder['IEO'] = GetOrderArray()

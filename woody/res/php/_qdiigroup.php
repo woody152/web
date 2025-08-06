@@ -110,10 +110,10 @@ class QdiiGroupAccount extends FundGroupAccount
     	EchoFutureSmaParagraph($ref);
     	EchoFundHistoryParagraph($ref);
     	EchoFundShareParagraph($ref);
-    	EchoNvCloseHistoryParagraph($ref->GetEstRef());
+    	EchoNetValueCloseParagraph($ref->GetEstRef());
     	foreach ($arLev as $leverage_ref)
     	{
-    		EchoNvCloseHistoryParagraph($leverage_ref);
+    		EchoNetValueCloseParagraph($leverage_ref);
 		}
     }
 

@@ -42,13 +42,13 @@ function _echoFundEstTableItem($ref, $bFair, $bWide = false)
 
 function _callbackSortFundEst($ref)
 {
-	$strNav = $ref->GetOfficialNetValue();
+	$strNetValue = $ref->GetOfficialNetValue();
 	if (method_exists($ref, 'GetStockRef'))
 	{
     	$stock_ref = $ref->GetStockRef();
-    	return $stock_ref->GetPercentage($strNav);
+    	return $stock_ref->GetPercentage($strNetValue);
 	}
-	return $ref->GetPercentage($strNav);
+	return $ref->GetPercentage($strNetValue);
 }
 
 function _getFundEstTableColumn($arRef, &$bFair, $bWide = false)

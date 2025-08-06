@@ -15,7 +15,7 @@ require_once('../../php/ui/fundestparagraph.php');
 require_once('../../php/ui/fundhistoryparagraph.php');
 require_once('../../php/ui/fundshareparagraph.php');
 require_once('../../php/ui/stockhistoryparagraph.php');
-require_once('../../php/ui/nvclosehistoryparagraph.php');
+require_once('../../php/ui/netvaluecloseparagraph.php');
 
 function _echoMyStockTransactions($acct, $ref, $strStockId)
 {                         
@@ -159,7 +159,7 @@ function _echoMyStockData($ref, $strStockId, $bAdmin)
 		}
    	}
    	
-	EchoNvCloseHistoryParagraph($ref);
+	EchoNetValueCloseParagraph($ref);
 	EchoFundShareParagraph($ref);
 	EchoStockHistoryParagraph($ref);
     

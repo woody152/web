@@ -184,7 +184,7 @@ function EchoAll()
 
     EchoFundHistoryParagraph($ref);
    	EchoFundShareParagraph($ref);
-	if ($us_ref)	EchoNvCloseHistoryParagraph($us_ref);
+	if ($us_ref)	EchoNetValueCloseParagraph($us_ref);
 
     if ($group = $acct->EchoTransaction()) 
     {

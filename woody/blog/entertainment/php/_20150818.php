@@ -10,7 +10,7 @@ require_once('../../../php/ui/fundlistparagraph.php');
 require_once('../../../php/ui/fundshareparagraph.php');
 require_once('../../../php/ui/netvaluehistoryparagraph.php');
 require_once('../../../php/ui/smaparagraph.php');
-require_once('../../../php/ui/nvclosehistoryparagraph.php');
+require_once('../../../php/ui/netvaluecloseparagraph.php');
 require_once('../../../php/ui/stockhistoryparagraph.php');
 require_once('_entertainment.php');
 
@@ -31,10 +31,10 @@ function _getDemoFundReference()
 	return StockGetFundReference(FUND_DEMO_SYMBOL);
 }
 
-function EchoNvCloseDemo($strSymbol = US_DEMO_SYMBOL)
+function EchoNetValueCloseDemo($strSymbol = US_DEMO_SYMBOL)
 {
     $ref = new MyStockReference($strSymbol);
-   	EchoNvCloseHistoryParagraph($ref);
+   	EchoNetValueCloseParagraph($ref);
 }
 
 function _getStockMenuLink($strItem)

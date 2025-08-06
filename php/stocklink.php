@@ -159,10 +159,10 @@ function GetNetValueHistoryLink($strSymbol, $strExtraQuery = false, $strExtraDis
     return GetStockSymbolLink('netvaluehistory', $strSymbol, $strDisplay, $strExtraQuery);
 }
 
-define('NVCLOSE_HISTORY_DISPLAY', '净值价格比较');
-function GetNvCloseHistoryLink($strSymbol)
+define('NETVALUE_CLOSE_DISPLAY', '净值价格比较');
+function GetNetValueCloseLink($strSymbol)
 {
-	return GetStockSymbolLink('nvclosehistory', $strSymbol, NVCLOSE_HISTORY_DISPLAY);
+	return GetStockSymbolLink('netvalueclose', $strSymbol, NETVALUE_CLOSE_DISPLAY);
 }
 
 define('ETF_DIVIDEND_DISPLAY', STOCK_OPTION_DIVIDEND.'数据');
@@ -181,7 +181,7 @@ function GetFundLinks($strSymbol)
 	$bQdiiMix = in_arrayQdiiMix($strSymbol);
 	$bSpecial = ($strSymbol == 'SZ164906') ? true : false;
 
-	$str = GetStockHistoryLink($strSymbol).' '.GetFundHistoryLink($strSymbol).' '.GetNetValueHistoryLink($strSymbol).' '.GetNvCloseHistoryLink($strSymbol).' '.GetFundShareLink($strSymbol);
+	$str = GetStockHistoryLink($strSymbol).' '.GetFundHistoryLink($strSymbol).' '.GetNetValueHistoryLink($strSymbol).' '.GetNetValueCloseLink($strSymbol).' '.GetFundShareLink($strSymbol);
 	if ($bChinaIndex || $bQdii || $bQdiiHk || $bQdiiJp || $bQdiiEu || $bQdiiMix)
 	{
 		$str .= ' '.GetCalibrationHistoryLink($strSymbol);
