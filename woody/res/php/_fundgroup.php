@@ -10,6 +10,29 @@ require_once('../../php/ui/fundlistparagraph.php');
 require_once('../../php/ui/fundshareparagraph.php');
 require_once('../../php/ui/netvaluecloseparagraph.php');
 
+function NeedOfficialNetValue($ref)
+{
+	if ($ref->HasData() == false)	return false;
+	
+	$strStockId = $ref->GetStockId();
+	$strDate = $ref->GetDate();
+	$his_sql = GetStockHistorySql();
+	if ($strPrevDate = $his_sql->GetDatePrev($strStockId, $strDate))
+	{
+		$netvalue_sql = GetNetValueHistorySql();
+		if ($netvalue_sql->GetRecord($strStockId, $strPrevDate))	return false;	// already have previous trading day's data
+	
+		$ref->SetTimeZone();
+		$now_ymd = GetNowYMD();
+		$iHourMinute = $now_ymd->GetHourMinute();
+		if ($now_ymd->GetYMD() == $strDate)
+		{
+			if ($iHourMinute < 930)	return false;		
+		}
+	}
+    return $strPrevDate;
+}
+
 function GetTitle()
 {
     global $acct;

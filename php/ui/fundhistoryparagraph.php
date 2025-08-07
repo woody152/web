@@ -56,11 +56,11 @@ function _echoHistoryTableData($his_sql, $fund_est_sql, $csv, $ref, $strStockId,
 function _echoFundHistoryParagraph($ref, $est_ref, $csv, $iStart, $iNum, $bAdmin)
 {
 	$close_col = new TableColumnPrice();
-	$nav_col = new TableColumnNetValue();
+	$netvalue_col = new TableColumnNetValue();
 	$premium_col = new TableColumnPremium();
 	
     $str = $ref->IsFundA() ? GetEastMoneyFundLink($ref) : GetXueqiuLink($ref);
-    $str .= '的历史'.$close_col->GetDisplay().'相对于'.$nav_col->GetDisplay().'的'.$premium_col->GetDisplay();
+    $str .= '的历史'.$close_col->GetDisplay().'相对于'.$netvalue_col->GetDisplay().'的'.$premium_col->GetDisplay();
     
     $strSymbol = $ref->GetSymbol();
 	$strStockId = $ref->GetStockId();
@@ -72,7 +72,7 @@ function _echoFundHistoryParagraph($ref, $est_ref, $csv, $iStart, $iNum, $bAdmin
     }
     else	$strMenuLink = StockGetMenuLink($strSymbol, $his_sql->Count($strStockId), $iStart, $iNum);
 
-	$ar = array(new TableColumnDate(), $close_col, $nav_col, $premium_col);
+	$ar = array(new TableColumnDate(), $close_col, $netvalue_col, $premium_col);
 	$fund_est_sql = GetFundEstSql();
 	if ($fund_est_sql->Count($strStockId) > 0)
 	{

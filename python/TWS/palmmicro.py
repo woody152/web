@@ -38,13 +38,13 @@ def qdii_get_peer_val(f_qdii, f_cny, f_calibration):
     return f_qdii * f_calibration / f_cny
 
 def _ref_get_peer_val(strType, arData):
-    f_qdii = fund_reverse_adjust_position(float(arData['position']), float(arData[strType + '_price']), float(arData['nav']))
+    f_qdii = fund_reverse_adjust_position(float(arData['position']), float(arData[strType + '_price']), float(arData['netvalue']))
     return qdii_get_peer_val(f_qdii, float(arData['CNY']), float(arData['calibration']))
 
 def _ref_get_peer_val2(strType, arData, arHedge):
     f_index = _ref_get_peer_val(strType, arData)
     f_index /= float(arHedge['calibration'])
-    return fund_adjust_position(float(arHedge['position']), f_index, float(arHedge['nav']))
+    return fund_adjust_position(float(arHedge['position']), f_index, float(arHedge['netvalue']))
 
 class Palmmicro:
     def __init__(self):

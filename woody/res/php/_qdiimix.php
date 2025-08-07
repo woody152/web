@@ -3,6 +3,7 @@ require_once('_fundgroup.php');
 require_once('_kraneholdingscsv.php');
 require_once('_sseholdings.php');
 require_once('_szseholdings.php');
+require_once('../../php/stock/kraneshares.php');
 
 // SH501225 全球芯片LOF SOXX*75%+SH516640*15%
 // SH501312 海外科技LOF ARKW*19.56;ARKK*19.66;ARKF*16.75;ARKG*11.86;ARKQ*5.37;QQQ*8.88;SOXX*7.44;XLK*5.2
@@ -29,7 +30,17 @@ class _QdiiMixAccount extends FundGroupAccount
         	break;
         	
         case 'SZ164906':
-        	$this->us_ref = new HoldingsReference('KWEB');
+        	$strSymbolUs = 'KWEB';
+        	$this->us_ref = new HoldingsReference($strSymbolUs);
+        	if ($strDate = NeedOfficialNetValue($this->us_ref))
+        	{
+        		if ($strNetValue = GetKraneNetValue($this->us_ref))
+        		{
+        			$netvalue_sql = GetNetValueHistorySql();
+        			$strStockIdUs = $this->us_ref->GetStockId();
+					if ($netvalue_sql->ModifyDaily($strStockIdUs, $strDate, $strNetValue))		ReadKraneHoldingsCsvFile($strSymbolUs, $strStockIdUs, $strDate, $strNetValue);
+        		}
+        	}
         	$this->pair_ref = new FundPairReference($strSymbol);
         	break;
         	
@@ -61,11 +72,11 @@ class _QdiiMixAccount extends FundGroupAccount
     	$ref = $this->ref;
     	$strStockId = $ref->GetStockId();
     	$netvalue_sql = GetNetValueHistorySql();
-    	$strNavDate = $netvalue_sql->GetDateNow($strStockId); 
+    	$strNetValueDate = $netvalue_sql->GetDateNow($strStockId); 
     	
     	$date_sql = new HoldingsDateSql();
     	$strHoldingsDate = $date_sql->ReadDate($strStockId);
-		if ($strNavDate == $strHoldingsDate)												return;	// Already up to date
+		if ($strNetValueDate == $strHoldingsDate)											return;	// Already up to date
     	if ($strHoldingsDate == $ref->GetOfficialDate())									return;
     	
     	$bUpdated = false;
@@ -75,9 +86,9 @@ class _QdiiMixAccount extends FundGroupAccount
 		case 'SZ164701':
 		case 'SH501225':
 		case 'SH501312':
-        	if ($strNavDate != $strHoldingsDate)		
+        	if ($strNetValueDate != $strHoldingsDate)		
         	{
-        		if ($date_sql->WriteDate($strStockId, $strNavDate))		$bUpdated = true;
+        		if ($date_sql->WriteDate($strStockId, $strNetValueDate))		$bUpdated = true;
         	}
         	break;
 		
@@ -90,7 +101,7 @@ class _QdiiMixAccount extends FundGroupAccount
 		default:
     		$fund_est_sql = GetFundEstSql();
     		$strEstDate = $fund_est_sql->GetDateNow($strStockId);
-    		if ($strEstDate == $strNavDate)													return;	//
+    		if ($strEstDate == $strNetValueDate)													return;	//
     		$strDate = $ref->GetDate();
     		if (!in_arrayHkMix($strSymbol))
     		{

@@ -16,11 +16,11 @@ function GetKraneNetValue($ref)
 	$strStockId = $ref->GetStockId();
 	$strDate = $ref->GetDate();
 	$netvalue_sql = GetNetValueHistorySql();
- 	$strNavDate = $netvalue_sql->GetDateNow($strStockId);	
-	if ($strNavDate == $strDate)	return false;		// already have current net value
+ 	$strNetValueDate = $netvalue_sql->GetDateNow($strStockId);	
+	if ($strNetValueDate == $strDate)	return false;		// already have current net value
 	$his_sql = GetStockHistorySql();
 	$strPrevDate = $his_sql->GetDatePrev($strStockId, $strDate);
-	if ($strNavDate == $strPrevDate)	return false;		// already up to date
+	if ($strNetValueDate == $strPrevDate)	return false;		// already up to date
 	
 //	$ref->SetTimeZone();
 	date_default_timezone_set('Europe/London');

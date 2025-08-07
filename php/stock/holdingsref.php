@@ -100,6 +100,16 @@ class HoldingsReference extends MyStockReference
     	return $this->arHoldingsRatio;
     }
     
+    function SetHoldingsRatioArray($ar)
+    {
+    	$iCount = 0;
+		foreach ($this->arHoldingsRatio as $strId => $strRatio)
+		{
+			$this->arHoldingsRatio[$strId] = $ar[$iCount];
+			$iCount ++;
+		}
+    }
+    
     function GetHoldingRefArray()
     {
     	return $this->ar_holdings_ref;
@@ -228,9 +238,9 @@ class HoldingsReference extends MyStockReference
 
     function GetNetValueChange()
     {
-    	$fNav = $this->_estNetValue();
-//    	DebugString(__CLASS__.'->'.__FUNCTION__.': '.strval($fNav).' '.$this->strNetValue, true);
-    	return $fNav / floatval($this->strNetValue);
+    	$fNetValue = $this->_estNetValue();
+//    	DebugString(__CLASS__.'->'.__FUNCTION__.': '.strval($fNetValue).' '.$this->strNetValue, true);
+    	return $fNetValue / floatval($this->strNetValue);
     }
     
     function _getEstDate()

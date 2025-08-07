@@ -11,7 +11,7 @@ class _AdminNetValueAccount extends SymbolAccount
 	    if ($ref = $this->GetSymbolRef())
 	    {
 	    	$strSymbol = $ref->GetSymbol();
-	    	if (GetInvescoOfficialUrl($strSymbol))	_updateInvescoNetValue($strSymbol);
+	    	if (GetInvescoOfficialUrl($strSymbol))	UpdateInvescoNetValue($strSymbol);
 	    	else							        DebugNetValueXlsStr($ref);
 	    }
 	}

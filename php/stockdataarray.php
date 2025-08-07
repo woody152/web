@@ -16,7 +16,7 @@ function _addIndexArray(&$ar, $strIndex, $strEtf)
 		$calibration_sql = GetCalibrationSql();
 		$arData['calibration'] = $calibration_sql->GetCloseNow($strEtfId);
 		$strDate = $calibration_sql->GetDateNow($strEtfId);
-		$arData['nav'] = SqlGetNetValueByDate($strEtfId, $strDate);
+		$arData['netvalue'] = SqlGetNetValueByDate($strEtfId, $strDate);
 
 		$ar[$strEtf] = $arData;
 	}
@@ -71,7 +71,7 @@ function GetStockDataArray($strSymbols)
 				$calibration_sql = GetCalibrationSql();
 				$arData['calibration'] = $calibration_sql->GetCloseNow($strStockId);
 				$strDate = $calibration_sql->GetDateNow($strStockId);
-				$arData['nav'] = SqlGetNetValueByDate($strStockId, $strDate);
+				$arData['netvalue'] = SqlGetNetValueByDate($strStockId, $strDate);
 			}
 		}
 		$ar[$strSymbol] = $arData;

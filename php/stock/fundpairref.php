@@ -225,54 +225,17 @@ class FundPairReference extends MyPairReference
     
  	function CalcFactor($strPairNetValue, $strNetValue, $strDate)
  	{
- 		$fPairNav = floatval($strPairNetValue); 
- 		$fNav = floatval($strNetValue); 
+ 		$fPairNetValue = floatval($strPairNetValue); 
+ 		$fNetValue = floatval($strNetValue); 
  		if ($this->cny_ref)
  		{
  			$fCny = $this->cny_ref->GetVal($strDate);
- 			if ($this->IsSymbolA())	$fNav /= $fCny;
- 			else					$fNav *= $fCny;
+ 			if ($this->IsSymbolA())	$fNetValue /= $fCny;
+ 			else					$fNetValue *= $fCny;
  		}
-		return $fPairNav / $fNav;
+		return $fPairNetValue / $fNetValue;
  	}
 
-/*
-function _adjustByCny($fVal, $fCny, $bSymbolA)
-    {
-    	if ($this->cny_ref)
-    	{
-    		$fCny = $fCny ? $fCny : floatval($this->cny_ref->GetPrice());
-    		if ($bSymbolA)
-    		{
-    			$fVal *= $this->fCnyValue;
-    			$fVal /= $fCny;
-    		}
-    		else
-    		{
-    			$fVal /= $this->fCnyValue;
-    			$fVal *= $fCny;
-    		}
-    	}
-    	return $fVal;
-    }
-    
-    // (fEst - fPairNetValue)/(x - fNetValue) = fFactor / fRatio;
-    // fRatio * (cny_now * fEst - cny * fPairNetValue)/(x - fNetValue) = cny * fPairNetValue / fNetValue 
-    // x = (fRatio * (cny_now * fEst - cny * fPairNetValue) / (cny * fPairNetValue) + 1) * fNetValue;
-    function EstFromPair($strEst = false, $fCny = false)
-    {
-//		DebugVal($this->fFactor, __FUNCTION__, true); 
-    	$fVal = (floatval($strEst) - floatval($this->strPairNetValue)) * $this->fRatio / $this->fFactor + floatval($this->strNetValue);
-    	return $this->_adjustByCny($fVal, $fCny, ($this->IsSymbolA() ? false : true));
-    }
-
-    // (x - fPairNetValue)/(fEsts - fNetValue) = fFactor / fRatio;
-    function EstToPair($fEst = false, $fCny = false)
-    {
-    	$fVal = ($fEst - floatval($this->strNetValue)) * $this->fFactor / $this->fRatio + floatval($this->strPairNetValue);
-    	return $this->_adjustByCny($fVal, $fCny, $this->IsSymbolA());
-    }
-*/
     function GetOfficialDate()
     {
         $strOfficialDate = $this->pair_ref->GetDate();

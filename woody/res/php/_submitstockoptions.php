@@ -236,10 +236,6 @@ function _updateStockOptionDividend($ref, $strSymbol, $strStockId, $his_sql, $st
 		DebugString('Dividend updated');
        	$calibration_sql = GetCalibrationSql();
 		$netvalue_sql = GetNetValueHistorySql();
-//		$fNav = floatval($netvalue_sql->GetClose($strStockId, $strDate));
-
-//		$fNewNetValue = $fNav - floatval($strVal); 
-//  	if ($strClose = $calibration_sql->GetClose($strStockId, $strDate))
   		if ($strClosePrev = $calibration_sql->GetClosePrev($strStockId, $strDate))
   		{	// SPY, TQQQ
   			$strDatePrev = $calibration_sql->GetDatePrev($strStockId, $strDate);

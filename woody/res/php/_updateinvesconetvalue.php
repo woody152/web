@@ -61,9 +61,9 @@ class _InvescoCsvFile extends DebugCsvFile
     }
 }    
 
-function _updateInvescoNetValue($strSymbol)
+function UpdateInvescoNetValue($strSymbol)
 {
-	$strFileName = $strSymbol.'_daily_nav.csv';
+	$strFileName = $strSymbol.'_daily_netvalue.csv';
 	$strUrl = GetInvescoNetValueUrl($strSymbol);
 	if (StockSaveDebugCsv($strFileName, $strUrl))
 	{

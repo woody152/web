@@ -1,5 +1,6 @@
 <?php
 require_once('_fundgroup.php');
+require_once('_updateinvesconetvalue.php');
 
 function _tradingUserDefined($strVal = false)
 {
@@ -60,16 +61,7 @@ class QdiiGroupAccount extends FundGroupAccount
     	
         if ($ar = YahooUpdateNetValue($est_ref))
         {
-//        	list($strNav, $strDate) = $ar;
-        	if ($est_ref->GetSymbol() == 'INDA')
-        	{
-        		$est_ref->DailyCalibration();
-/*        		if ($realtime_ref->GetDate() == $strDate)
-        		{
-        			$calibration_sql = GetCalibrationSql();
-        			$calibration_sql->WriteDaily($est_ref->GetStockId(), $strDate, strval(EtfGetCalibration($realtime_ref->GetPrice(), $strNav)));
-        		}*/
-        	}
+        	if ($est_ref->GetSymbol() == 'INDA')	$est_ref->DailyCalibration();
         }
         
         GetChinaMoney($stock_ref);
@@ -79,7 +71,11 @@ class QdiiGroupAccount extends FundGroupAccount
     	{
     		$leverage_ref = new FundPairReference($strSymbol);
     		$this->ar_leverage_ref[] = $leverage_ref;
-    		YahooUpdateNetValue($leverage_ref);
+    		if ($strSymbol == 'QQQ')
+    		{
+    			if (NeedOfficialNetValue($leverage_ref))	UpdateInvescoNetValue($strSymbol);
+    		}
+    		else											YahooUpdateNetValue($leverage_ref);
     		$leverage_ref->DailyCalibration();
     	}
         $this->CreateGroup(array_merge($arRef, $this->ar_leverage_ref));

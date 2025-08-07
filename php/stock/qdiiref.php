@@ -2,9 +2,9 @@
 
 define('POSITION_EST_LEVEL', '4.0');
 
-function QdiiGetCalibration($strEst, $strCNY, $strNav)
+function QdiiGetCalibration($strEst, $strCNY, $strNetValue)
 {
-	return floatval($strEst) * floatval($strCNY) / floatval($strNav);
+	return floatval($strEst) * floatval($strCNY) / floatval($strNetValue);
 }
 
 function QdiiGetVal($fEst, $fCny, $fFactor)
@@ -97,7 +97,7 @@ class _QdiiReference extends FundReference
         $this->SetForex($strForex);
     }
     
-    function _getEstNav($strDate)
+    function _getEstNetValue($strDate)
     {
        	$est_ref = $this->GetEstRef();
 		if ($str = SqlGetNetValueByDate($est_ref->GetStockId(), $strDate))
@@ -109,7 +109,7 @@ class _QdiiReference extends FundReference
 
     function _getEstVal($strDate)
     {
-		if ($str = $this->_getEstNav($strDate))
+		if ($str = $this->_getEstNetValue($strDate))
         {
         	return $str;
         }
@@ -188,7 +188,7 @@ class _QdiiReference extends FundReference
             if ($strCNY = $cny_ref->GetClose($strDate))
             {
             	$est_ref = $this->GetEstRef();
-	        	if (($strEst = $this->_getEstNav($strDate)) === false)
+	        	if (($strEst = $this->_getEstNetValue($strDate)) === false)
 	        	{
 //	           		if (($strEst = SqlGetHisByDate($est_ref->GetStockId(), $strDate)) === false)		return false;
 	           		if (($strEst = $est_ref->GetClose($strDate)) === false)		return false;

@@ -71,7 +71,7 @@ function CopyHoldings($date_sql, $strStockId, $strDstId)
     return true;
 }
 
-function ReadKraneHoldingsCsvFile($strSymbol, $strStockId, $strDate, $strNav)
+function ReadKraneHoldingsCsvFile($strSymbol, $strStockId, $strDate, $strNetValue)
 {
 	$arYMD = explode('-', $strDate);
 	$strFileName = $arYMD[1].'_'.$arYMD[2].'_'.$arYMD[0].'_'.strtolower($strSymbol).'_holdings.csv';
@@ -87,7 +87,7 @@ function ReadKraneHoldingsCsvFile($strSymbol, $strStockId, $strDate, $strNav)
 			if ($csv->UpdateHoldingsDate())
 			{
 				$shares_sql = new SharesHistorySql();
-				$shares_sql->WriteDaily($strStockId, $strDate, strval_round($fMarketValue / floatval($strNav) / 10000.0));
+				$shares_sql->WriteDaily($strStockId, $strDate, strval_round($fMarketValue / floatval($strNetValue) / 10000.0));
 				if ($strSymbol == 'KWEB')		CopyHoldings(new HoldingsDateSql(), $strStockId, SqlGetStockId('SZ164906'));
 			}
 		}

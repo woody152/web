@@ -20,8 +20,8 @@ function SinaFundNeedFile($sym, $strFileName)
 		$strStockId = SqlGetStockId($strSymbol);
 		$his_sql = GetStockHistorySql();
 		$strDate = $his_sql->GetDateNow($strStockId);
-		$strNavDate = UseSameDayNetValue($sym) ? $strDate : $his_sql->GetDatePrev($strStockId, $strDate);
-		if (SqlGetNetValueByDate($strStockId, $strNavDate))		return false;
+		$strNetValueDate = UseSameDayNetValue($sym) ? $strDate : $his_sql->GetDatePrev($strStockId, $strDate);
+		if (SqlGetNetValueByDate($strStockId, $strNetValueDate))		return false;
 
     	if (($now_ymd->GetYMD() == $strDate) && $now_ymd->GetHourMinute() < 1600)	return false;		// Market not closed
     }

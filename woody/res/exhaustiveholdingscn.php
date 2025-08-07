@@ -3,29 +3,27 @@ require_once('php/_stock.php');
 require_once('php/_emptygroup.php');
 require_once('../../php/ui/editinputform.php');
 
-function _echoExhaustiveHoldingsItem($ref, $i, $iTotal, $iOrg, $strStockId1, $strStockId2, $strDate, $strNav, $fLimit, $bAdmin)
+function _echoExhaustiveHoldingsItem($ref, $i, $iTotal, $arOrg, $strDate, $strNetValue, $fLimit, $bAdmin)
 {
 	$iFirst = $iTotal - $i;
-	$bMatch = ($iFirst == $iOrg) ? true : false;
+	$bMatch = (($iFirst == $arOrg[0]) && ($i == $arOrg[1])) ? true : false;
 	$str1 = strval($iFirst);
-	$ref->arHoldingsRatio[$strStockId1] = $str1;
-	
 	$str2 = strval($i);
-	$ref->arHoldingsRatio[$strStockId2] = $str2;
+	$ar = array($str1, $str2);
+	$ref->SetHoldingsRatioArray($ar);
 	
 	$fEst = $ref->_estNetValue($strDate);
 	$strEst = strval($fEst);
-	if ($bAdmin && ($bMatch == false) && $ref->GetPercentageString($strNav, $strEst) == '0')
+	if ($bAdmin && ($bMatch == false) && $ref->GetPercentageString($strNetValue, $strEst) == '0')
 	{
 		$strHoldings = SqlGetStockSymbol($strStockId1).'*'.$str1.';'.SqlGetStockSymbol($strStockId2).'*'.$str2;
-		$str1 = GetOnClickLink(PATH_STOCK.'submitholdings.php?symbol='.$ref->GetSymbol().'&date='.$strDate.'&holdings='.$strHoldings, '确认更新持仓：'.$strDate.' '.$strHoldings.'？', $str1);
+		$ar[0] = GetOnClickLink(PATH_STOCK.'submitholdings.php?symbol='.$ref->GetSymbol().'&date='.$strDate.'&holdings='.$strHoldings, '确认更新持仓：'.$strDate.' '.$strHoldings.'？', $str1);
 	}
 
-	if (abs($ref->GetPercentage($strNav, $strEst)) < $fLimit)
+	if (abs($ref->GetPercentage($strNetValue, $strEst)) < $fLimit)
 	{
-		$ar = array($str1, $str2);
 		$ar[] = strval_round($fEst, 3);
-		$ar[] = $ref->GetPercentageDisplay($strNav, $strEst);
+		$ar[] = $ref->GetPercentageDisplay($strNetValue, $strEst);
 		EchoTableColumn($ar, $bMatch ? 'yellow' : false);
 	}
 }
@@ -49,21 +47,20 @@ function _echoExhaustiveHoldingsData($strSymbol, $fLimit, $bAdmin)
     			$ref->SetNetValue($strPrevNetValue);
     			
     			$str = $strPrevDate.' '.$strPrevNetValue.' ==> '.$strDate.' '.$strNetValue;
-    			$ref1 = $arHoldingRef[0];
-    			$ref2 = $arHoldingRef[1];
-    			$strStockId1 = $ref1->GetStockId();
-    			$strStockId2 = $ref2->GetStockId();
-    			$arRatio = $ref->GetHoldingsRatioArray();
-    			$fRatio1 = floatval($arRatio[$strStockId1]);
-    			$iTotal = intval(round($fRatio1 + floatval($arRatio[$strStockId2])));
-    			$iOrg = intval(round($fRatio1));
-
-    			EchoTableParagraphBegin(array(new TableColumnStock($ref1),
-										   new TableColumnStock($ref2),
-										   new TableColumnEst(),
-										   new TableColumnError()
-										   ), 'exhaustiveholdings', $str);
-				for ($i = 1; $i < $iTotal; $i ++)	_echoExhaustiveHoldingsItem($ref, $i, $iTotal, $iOrg, $strStockId1, $strStockId2, $strDate, $strNetValue, $fLimit, $bAdmin);
+    			$iTotal = 0;
+    			$arOrg = array();
+    			foreach ($ref->GetHoldingsRatioArray() as $strHoldingId => $strRatio)
+    			{
+    				$iRatio = intval($strRatio);
+    				$iTotal += $iRatio;
+    				$arOrg[] = $iRatio;
+    			}
+    			$ar = array();
+    			foreach ($arHoldingRef as $holding_ref)	$ar[] = new TableColumnStock($holding_ref);
+				$ar[] = new TableColumnEst();
+				$ar[] = new TableColumnError();
+    			EchoTableParagraphBegin($ar, 'exhaustiveholdings', $str);
+				for ($i = 1; $i < $iTotal; $i ++)	_echoExhaustiveHoldingsItem($ref, $i, $iTotal, $arOrg, $strDate, $strNetValue, $fLimit, $bAdmin);
 				EchoTableParagraphEnd();
 			}
 		}
