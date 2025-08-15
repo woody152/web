@@ -78,6 +78,7 @@ class TelegramCallback
 				$strToken = UrlGetQueryValue('token');
 				if ($strChatId == TG_ADMIN_CHAT_ID && ($strToken == TG_TOKEN || $strToken == TG_TOKEN_ZHU))
 				{
+					DebugString(__CLASS__.'->'.__FUNCTION__.' '.$text);
 					$this->ReplyText(GetStockDataArray($text), $strMessageId, $strChatId);
 					return;
 				}

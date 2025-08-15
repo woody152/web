@@ -29,11 +29,12 @@ function _echoReferenceTableItem($ref, $strDescription, $bAdmin)
 {
 	$ar = array_merge(array($ref->GetExternalLink()), GetStockReferenceArray($ref));
 	$strFirstHint = false;
-	if ($strDescription || $bAdmin)
+	if ($strDescription)
 	{
 		$strFirstHint = array_pop($ar);
-		$ar[] = $bAdmin ? $ref->DebugLink() : $strDescription;
+		$ar[] = $strDescription;
 	}
+	if ($bAdmin)	$ar[] = $ref->DebugLink();
     EchoTableColumn($ar, false, $strFirstHint);
 }
 
@@ -82,10 +83,13 @@ function GetStockReferenceColumn()
 
 function EchoReferenceParagraph($arRef, $bAdmin = false)
 {
+	if ($_SESSION['mobile'])	$bAdmin = false;
+	
 	$str = '参考数据 '.GetTimeDisplay();
 	$ar = array_merge(array(new TableColumnSymbol()), GetStockReferenceColumn());
 	array_pop($ar);
-	$ar[] = $bAdmin ? new TableColumn('调试数据', 270) : new TableColumnName(false, 270);
+	$ar[] = new TableColumnName(false, 270);
+	if ($bAdmin)	$ar[] = new TableColumn('调试数据', TableColumnGetLastWidth($ar));
 	EchoTableParagraphBegin($ar, 'reference', $str);
 	_echoReferenceTableData($arRef, $bAdmin);
     EchoTableParagraphEnd();

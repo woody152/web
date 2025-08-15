@@ -21,11 +21,11 @@ function _echoTransactionTableItem($ref, $record, $bReadOnly, $bAdmin)
 			$strRemark = GetOnClickLink(PATH_STOCK.'submittransaction.php?empty='.$strId, '确认清空'.STOCK_DISP_REMARK.'：'.$strRemark.'？', '清空').$strRemark;
 			if (strpos($strRemark, STOCK_DISP_ORDER) !== false)
 			{
-				$netvalue_sql = GetNetValueHistorySql();
+				$net_sql = GetNetValueHistorySql();
 				$strStockId = $ref->GetStockId();
 				$strSymbol = $ref->GetSymbol();
-				if (in_arrayQdii($strSymbol) || in_arrayQdiiMix($strSymbol))		$strNetValue = $netvalue_sql->GetClosePrev($strStockId, $strDate);
-				else																	$strNetValue = $netvalue_sql->GetClose($strStockId, $strDate);
+				if (in_arrayQdii($strSymbol) || in_arrayQdiiMix($strSymbol))		$strNetValue = $net_sql->GetClosePrev($strStockId, $strDate);
+				else																	$strNetValue = $net_sql->GetClose($strStockId, $strDate);
 				
 				if ($strNetValue != $strPrice)
 				{

@@ -7,8 +7,8 @@ function ChinaMoneyGetUrl()
 
 function _chinaMoneyNeedData($strDate)
 {
-	$netvalue_sql = GetNetValueHistorySql();
-    if ($netvalue_sql->GetRecord(SqlGetStockId('USCNY'), $strDate))
+	$net_sql = GetNetValueHistorySql();
+    if ($net_sql->GetRecord(SqlGetStockId('USCNY'), $strDate))
     {
 //    	DebugString('Database entry existed');
     	return false;
@@ -19,8 +19,8 @@ function _chinaMoneyNeedData($strDate)
 function _chinaMoneyInsertData($strMoney, $strDate, $strPrice)
 {
 	DebugString('Insert '.$strMoney);
-	$netvalue_sql = GetNetValueHistorySql();
-	$netvalue_sql->InsertDaily(SqlGetStockId($strMoney), $strDate, $strPrice);
+	$net_sql = GetNetValueHistorySql();
+	$net_sql->InsertDaily(SqlGetStockId($strMoney), $strDate, $strPrice);
 }
 
 function GetChinaMoney($ref)

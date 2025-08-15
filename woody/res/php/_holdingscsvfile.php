@@ -73,13 +73,13 @@ class _HoldingsCsvFile extends DebugCsvFile
     	$sql = GetStockSql();
         $strUscnyId = $sql->GetId('USCNY');
         $strHkcnyId = $sql->GetId('HKCNY');
-        $netvalue_sql = GetNetValueHistorySql();
+        $net_sql = GetNetValueHistorySql();
         
-        $str = ($strUSDCNY = $netvalue_sql->GetClose($strUscnyId, $strDate)) ? $strUSDCNY : $netvalue_sql->GetCloseNow($strUscnyId);
+        $str = ($strUSDCNY = $net_sql->GetClose($strUscnyId, $strDate)) ? $strUSDCNY : $net_sql->GetCloseNow($strUscnyId);
         $this->fUSDCNY = floatval($str);
         $strDebug .= ' '.$str;
         
-        $str = ($strHKDCNY = $netvalue_sql->GetClose($strHkcnyId, $strDate)) ? $strHKDCNY : $netvalue_sql->GetCloseNow($strHkcnyId);
+        $str = ($strHKDCNY = $net_sql->GetClose($strHkcnyId, $strDate)) ? $strHKDCNY : $net_sql->GetCloseNow($strHkcnyId);
         $this->fHKDCNY = floatval($str);
         $strDebug .= ' '.$str;
         

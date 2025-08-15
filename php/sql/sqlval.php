@@ -76,14 +76,6 @@ class ValSql extends TableSql
     }
 }
 
-class FundPositionSql extends ValSql
-{
-    public function __construct()
-    {
-        parent::__construct('fundposition');
-    }
-}
-
 class LastCalibrationSql extends ValSql
 {
     public function __construct()

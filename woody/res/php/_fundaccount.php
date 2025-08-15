@@ -78,7 +78,7 @@ function _getFundAmount($strSymbol, $strDate)
 	return $iAmount * (1.0 - StockGetFundFeeRatio($strSymbol));
 }
 
-function _echoFundAccountItem($csv, $strDate, $strSharesDiff, $ref, $strSymbol, $strStockId, $his_sql, $netvalue_sql)
+function _echoFundAccountItem($csv, $strDate, $strSharesDiff, $ref, $strSymbol, $strStockId, $his_sql, $net_sql)
 {
     $iCount = 0;
     if ($result = $his_sql->GetFromDate($strStockId, $strDate, 5)) 
@@ -103,7 +103,7 @@ function _echoFundAccountItem($csv, $strDate, $strSharesDiff, $ref, $strSymbol, 
    	$ar = array($strDate, $strSharesDiff);
     if ($iCount == 5)
     {
-    	$fPurchaseValue = floatval($netvalue_sql->GetClose($strStockId, $strPurchaseDate));
+    	$fPurchaseValue = floatval($net_sql->GetClose($strStockId, $strPurchaseDate));
        	$fAmount = _getFundAmount($strSymbol, $strPurchaseDate);
     	$fAccount = floatval($strSharesDiff) * 10000.0 / ($fAmount / $fPurchaseValue);
     	$strAccount = strval(intval($fAccount));
@@ -112,7 +112,7 @@ function _echoFundAccountItem($csv, $strDate, $strSharesDiff, $ref, $strSymbol, 
     	
     	if ($strPurchaseDate == GetNextTradingDayYMD($strNetValueDate))
     	{
-    		$strNetValue = $netvalue_sql->GetClose($strStockId, $strNetValueDate);
+    		$strNetValue = $net_sql->GetClose($strStockId, $strNetValueDate);
     	
     		$ar[] = $ref->GetPriceDisplay($strClose, $strNetValue);
     		$ar[] = $strNetValue;
@@ -131,7 +131,7 @@ function _echoFundAccountItem($csv, $strDate, $strSharesDiff, $ref, $strSymbol, 
 	EchoTableColumn($ar);
 }
 
-function _echoFundAccountData($csv, $ref, $strSymbol, $strStockId, $his_sql, $netvalue_sql)
+function _echoFundAccountData($csv, $ref, $strSymbol, $strStockId, $his_sql, $net_sql)
 {
 	$sql = new SharesDiffSql();
     if ($result = $sql->GetAll($strStockId)) 
@@ -139,7 +139,7 @@ function _echoFundAccountData($csv, $ref, $strSymbol, $strStockId, $his_sql, $ne
         while ($record = mysqli_fetch_assoc($result)) 
         {
        		$strDate = $record['date'];
-       		_echoFundAccountItem($csv, $strDate, rtrim0($record['close']), $ref, $strSymbol, $strStockId, $his_sql, $netvalue_sql);
+       		_echoFundAccountItem($csv, $strDate, rtrim0($record['close']), $ref, $strSymbol, $strStockId, $his_sql, $net_sql);
         }
         mysqli_free_result($result);
     }
@@ -157,7 +157,7 @@ function _getFundAccountTableColumnArray()
 				   );
 }
 
-function _echoFundAccountParagraph($csv, $ref, $strSymbol, $strStockId, $his_sql, $netvalue_sql, $bAdmin)
+function _echoFundAccountParagraph($csv, $ref, $strSymbol, $strStockId, $his_sql, $net_sql, $bAdmin)
 {
  	$str = GetFundLinks($strSymbol);
 	if ($bAdmin)
@@ -166,11 +166,11 @@ function _echoFundAccountParagraph($csv, $ref, $strSymbol, $strStockId, $his_sql
 	}
 	
 	EchoTableParagraphBegin(_getFundAccountTableColumnArray(), 'fundaccount', $str);
-	_echoFundAccountData($csv, $ref, $strSymbol, $strStockId, $his_sql, $netvalue_sql);
+	_echoFundAccountData($csv, $ref, $strSymbol, $strStockId, $his_sql, $net_sql);
     EchoTableParagraphEnd();
 }
 
-function _echoFundAccountPredictData($ref, $strSymbol, $strStockId, $his_sql, $netvalue_sql, $jpg)
+function _echoFundAccountPredictData($ref, $strSymbol, $strStockId, $his_sql, $net_sql, $jpg)
 {
 //    date_default_timezone_set('PRC');
 	$ref->SetTimeZone();
@@ -205,8 +205,8 @@ function _echoFundAccountPredictData($ref, $strSymbol, $strStockId, $his_sql, $n
    	{
    		if ($strPurchaseDate == GetNextTradingDayYMD($strNetValueDate))
    		{
-   			$fPurchaseValue = floatval($netvalue_sql->GetClose($strStockId, $strPurchaseDate));
-   			$strNetValue = $netvalue_sql->GetClose($strStockId, $strNetValueDate);
+   			$fPurchaseValue = floatval($net_sql->GetClose($strStockId, $strPurchaseDate));
+   			$strNetValue = $net_sql->GetClose($strStockId, $strNetValueDate);
    			$fAccount = $jpg->GetY($ref->GetPercentage($strNetValue, $strClose));
    			$fAmount = _getFundAmount($strSymbol, $strPurchaseDate);
    			$fSharesDiff = ($fPurchaseValue == 0.0) ? 0.0 : $fAccount * ($fAmount / $fPurchaseValue) / 10000.0;
@@ -229,7 +229,7 @@ function _echoFundAccountPredictData($ref, $strSymbol, $strStockId, $his_sql, $n
 	EchoTableColumn($ar);
 }
 
-function _echoLinearRegressionGraph($csv, $ref, $strSymbol, $strStockId, $his_sql, $netvalue_sql)
+function _echoLinearRegressionGraph($csv, $ref, $strSymbol, $strStockId, $his_sql, $net_sql)
 {
     $jpg = new LinearImageFile();
     if ($jpg->Draw($csv->ReadColumn(5), $csv->ReadColumn(2)))
@@ -239,7 +239,7 @@ function _echoLinearRegressionGraph($csv, $ref, $strSymbol, $strStockId, $his_sq
     	$str .= '<br />下一交易日'.STOCK_OPTION_SHARE_DIFF.'预测';
 
     	EchoTableParagraphBegin(_getFundAccountTableColumnArray(), 'predict'.'fundaccount', $str);
-    	_echoFundAccountPredictData($ref, $strSymbol, $strStockId, $his_sql, $netvalue_sql, $jpg);
+    	_echoFundAccountPredictData($ref, $strSymbol, $strStockId, $his_sql, $net_sql, $jpg);
     	EchoTableParagraphEnd();
     }
 }
@@ -255,15 +255,15 @@ function EchoAll()
         if (in_arrayQdii($strSymbol) || in_arrayQdiiMix($strSymbol))
         {
         	$strStockId = $ref->GetStockId();
-        	$netvalue_sql = GetNetValueHistorySql();
+        	$net_sql = GetNetValueHistorySql();
         	$his_sql = GetStockHistorySql();
         	
         	$csv = new PageCsvFile();
-            _echoFundAccountParagraph($csv, $ref, $strSymbol, $strStockId, $his_sql, $netvalue_sql, $bAdmin);
+            _echoFundAccountParagraph($csv, $ref, $strSymbol, $strStockId, $his_sql, $net_sql, $bAdmin);
             $csv->Close();
             if ($csv->HasFile())
             {
-            	_echoLinearRegressionGraph($csv, $ref, $strSymbol, $strStockId, $his_sql, $netvalue_sql);
+            	_echoLinearRegressionGraph($csv, $ref, $strSymbol, $strStockId, $his_sql, $net_sql);
             }
             
             EchoRemarks($strSymbol);

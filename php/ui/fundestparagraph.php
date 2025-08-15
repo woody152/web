@@ -129,7 +129,7 @@ function EchoFundArrayEstParagraph($arRef, $str = false, $bWide = false)
 function _getFundPositionStr($ref)
 {
 	$str = '';
-	$fPosition = RefGetPosition($ref);
+	$fPosition = $ref->GetPosition();
 	if ($fPosition < 1.0)									$str .= GetFundPositionLink($ref->GetSymbol()).'值使用'.strval($fPosition).'。';
 	return $str;
 }

@@ -31,7 +31,7 @@ define('STOCK_OPTION_CLOSE', '更新收盘价');
 define('STOCK_OPTION_DIVIDEND', '分红');
 define('STOCK_OPTION_EDIT', '修改股票说明');
 define('STOCK_OPTION_EMA', '修改200/50日EMA');
-define('STOCK_OPTION_FUND', '修改对应配对代码');
+define('STOCK_OPTION_FUND', '修改对应配对代码和仓位');
 define('STOCK_OPTION_HA', '修改H股对应A股代码');
 define('STOCK_OPTION_HOLDINGS', '修改基金持仓');
 define('STOCK_OPTION_NETVALUE', '修改净值');

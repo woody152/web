@@ -87,6 +87,11 @@ function TableColumnGetTotalWidth($ar)
 	return $iTotal;
 }
 
+function TableColumnGetLastWidth($ar)
+{
+	return LayoutGetDisplayWidth() - TableColumnGetTotalWidth($ar);
+}
+
 function EchoTableParagraphBegin($ar, $strId, $str = '')
 {
 	$iTotal = TableColumnGetTotalWidth($ar);

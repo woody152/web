@@ -14,18 +14,19 @@ function _getFundPairLink($ref)
 function _echoFundListItem($ref, $sql, $last_sql, $callback)
 {
     $strStockId = $ref->GetStockId();
-    $fRatio = $ref->GetRatio();
+    $fPos = $ref->GetPosition();
     $fFactor = $ref->GetFactor();
+    $strDate = $sql->GetDateNow($strStockId);
+    
 	$ar = array();
-	
 	$ar[] = SymCalibrationHistoryLink($ref);
     $ar[] = _getFundPairLink($ref->GetPairRef());
-    $ar[] = GetNumberDisplay($fRatio);
+    $ar[] = GetNumberDisplay($fPos);
     $ar[] = GetNumberDisplay($fFactor);
-    $ar[] = $sql->GetDateNow($strStockId);
+    $ar[] = $strDate;
     if ($callback)
     {
-    	$ar[] = call_user_func($callback, $fRatio, $fFactor);
+    	$ar[] = strval(call_user_func($callback, $fPos, $fFactor, $strDate, $strStockId));
     }
     else
     {
@@ -42,7 +43,7 @@ function EchoFundListParagraph($arRef, $callback = false)
 								   new TableColumnPosition(),
 								   new TableColumnCalibration(),
 								   new TableColumnDate(),
-								   ($callback ? new TableColumnConvert() : new TableColumn('参考值'))
+								   ($callback ? new TableColumnHedge() : new TableColumn('参考值'))
 								   ), 'fundlist', $str);
 	
 	$sql = GetCalibrationSql();

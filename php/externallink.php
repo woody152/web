@@ -186,7 +186,7 @@ function GetYahooStockLink($sym)
 
 function GetYahooNetValueLink($strSymbol)
 {
-    $strHttp = GetYahooStockUrl(GetYahooNetValueSymbol($strSymbol));
+    $strHttp = GetYahooStockUrl(BuildYahooNetValueSymbol($strSymbol));
     return GetExternalLink($strHttp, $strSymbol);
 }
 

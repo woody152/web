@@ -4,12 +4,12 @@ require_once('php/_emptygroup.php');
 require_once('../../php/dateimagefile.php');
 require_once('../../php/ui/editinputform.php');
 
-function _echoFundPositionItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue, $strPrevDate, $netvalue_sql, $strStockId, $est_sql, $strEstId, $strInput, $bAdmin)
+function _echoFundPositionItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue, $strPrevDate, $net_sql, $strStockId, $est_sql, $strEstId, $strInput, $bAdmin)
 {
 	$bWritten = false;
 	$ar = array($strDate, $strNetValue);
 	
-   	$strPrev = $netvalue_sql->GetClose($strStockId, $strPrevDate);
+   	$strPrev = $net_sql->GetClose($strStockId, $strPrevDate);
 	$ar[] = $ref->GetPercentageDisplay($strPrev, $strNetValue);
 
 	$strCny = $cny_ref->GetClose($strDate);
@@ -37,11 +37,11 @@ function _echoFundPositionItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNet
 	EchoTableColumn($ar);
 }
 
-function _getSwitchDateArray($netvalue_sql, $strStockId, $est_sql, $strEstId)
+function _getSwitchDateArray($net_sql, $strStockId, $est_sql, $strEstId)
 {
 	$arDate = array();
 	$bFirst = true;
-    if ($result = $netvalue_sql->GetAll($strStockId)) 
+    if ($result = $net_sql->GetAll($strStockId)) 
     {
         while ($record = mysqli_fetch_assoc($result)) 
         {
@@ -95,14 +95,14 @@ function _echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $strInput, $bAdmi
 {
    	$strStockId = $ref->GetStockId();
 	$strEstId = $est_ref->GetStockId();
-	$netvalue_sql = GetNetValueHistorySql();
-	$est_sql = ($est_ref->CountNetValue() > 0) ? $netvalue_sql : GetStockHistorySql(); 
+	$net_sql = GetNetValueHistorySql();
+	$est_sql = ($est_ref->CountNetValue() > 0) ? $net_sql : GetStockHistorySql(); 
 
-	$arDate = _getSwitchDateArray($netvalue_sql, $strStockId, $est_sql, $strEstId);
+	$arDate = _getSwitchDateArray($net_sql, $strStockId, $est_sql, $strEstId);
 	if (count($arDate) == 0)		return;
  
  	$iIndex = 0;
-    if ($result = $netvalue_sql->GetAll($strStockId)) 
+    if ($result = $net_sql->GetAll($strStockId)) 
     {
         while ($record = mysqli_fetch_assoc($result)) 
         {
@@ -111,7 +111,7 @@ function _echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $strInput, $bAdmi
        		if ($strDate == $arDate[$iIndex])
        		{
    				$iIndex ++;
-   				if (isset($arDate[$iIndex]))	_echoFundPositionItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue, $arDate[$iIndex], $netvalue_sql, $strStockId, $est_sql, $strEstId, $strInput, $bAdmin);
+   				if (isset($arDate[$iIndex]))	_echoFundPositionItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue, $arDate[$iIndex], $net_sql, $strStockId, $est_sql, $strEstId, $strInput, $bAdmin);
    				else
    				{
    					$csv->Write($strDate, $strNetValue);

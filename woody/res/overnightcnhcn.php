@@ -2,155 +2,120 @@
 require_once('php/_stock.php');
 require_once('../../php/ui/editinputform.php');
 
-function _echoFundPositionItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue, $strPrevDate, $netvalue_sql, $strStockId, $est_sql, $strEstId, $strInput, $bAdmin)
+function _getAvailableQuantity($stock_ref, $bSell)
 {
-	$bWritten = false;
-	$ar = array($strDate, $strNetValue);
-	
-   	$strPrev = $netvalue_sql->GetClose($strStockId, $strPrevDate);
-	$ar[] = $ref->GetPercentageDisplay($strPrev, $strNetValue);
-
-	$strCny = $cny_ref->GetClose($strDate);
-	$ar[] = $strCny;
-	if ($strCnyPrev = $cny_ref->GetClose($strPrevDate))		$ar[] = $cny_ref->GetPercentageDisplay($strCnyPrev, $strCny);
-	else															$ar[] = '';
-		
-	if ($strEst = $est_sql->GetClose($strEstId, $strDate))
+	if ($bSell)
 	{
-		$ar[] = $strEst;
-		if ($strEstPrev = $est_sql->GetClose($strEstId, $strPrevDate))
-		{
-			$ar[] = $est_ref->GetPercentageDisplay($strEstPrev, $strEst);
-			if ($strPosition = QdiiGetStockPosition($strEstPrev, $strEst, $strPrev, $strNetValue, $strCnyPrev, $strCny, $strInput))
-			{
-				$bWritten = true;
-				$csv->Write($strDate, $strNetValue, $strPosition);
-				if ($bAdmin)	$strPosition = GetOnClickLink('/php/_submitoperation.php?stockid='.$strStockId.'&fundposition='.$strPosition, "确认使用{$strPosition}作为估值仓位？", $strPosition);
-				$ar[] = $strPosition;
-			}
-		}
+		if ($strQuantity = $stock_ref->GetBidQuantity())	return $strQuantity;
 	}
+	else
+	{
+		if ($strQuantity = $stock_ref->GetAskQuantity())	return $strQuantity;
+	}
+	return false;
+}
 
-	if ($bWritten == false)		$csv->Write($strDate, $strNetValue);
+function _buildHedgeString($fQuantity, $strSymbol)
+{
+	return strval($fQuantity).'股'.GetMyStockLink($strSymbol);
+}
+
+function _echoOverNightCnhItem($strSymbol, $fCnh, $bSell)
+{
+	$ref = StockGetFundReference($strSymbol);
+	$ar = array();
+	
+	$ar[] = $ref->GetStockLink();
+   	if (method_exists($ref, 'GetStockRef'))
+   	{
+   		$stock_ref = $ref->GetStockRef();
+   		$est_ref = $ref->GetEstRef();
+   	}
+   	else
+   	{
+   		$stock_ref = $ref;
+   		if ($strSymbol == 'SZ164906')	$est_ref = new MyStockReference('KWEB');
+   		else							$est_ref = false;
+   	}
+   	
+   	if ($strQuantity = _getAvailableQuantity($stock_ref, $bSell))
+   	{
+   		$strPrice = $bSell ? $stock_ref->GetBidPrice() : $stock_ref->GetAskPrice();
+   		$ar[] = $strPrice;
+   		$ar[] = $strQuantity;
+
+		$strStockId = $ref->GetStockId();
+   		$fPos = $ref->GetPosition();
+		$fHintQuantity = ($fCnh / $fPos) / floatval($strPrice);
+		$strHedge = '';
+		$strMemo = '';
+
+   		if ($est_ref)
+   		{
+			$cal_sql = GetCalibrationSql();
+			if ($record = $cal_sql->GetRecordNow($strStockId))
+			{
+				$fCal = floatval($record['close']);
+				if ($strEtf = GetLeverageHedgeSymbol($strSymbol))
+				{
+					$strEtfId = SqlGetStockId($strEtf);
+					$pos_sql = GetPositionSql();
+					$fHedge = StockCalcLeverageHedge($fCal, $fPos, floatval($cal_sql->GetClose($strEtfId, $record['date'])), $pos_sql->ReadVal($strEtfId));
+				}
+				else
+				{
+					$fHedge = StockCalcHedge($fCal, $fPos);
+					$strEtf = $est_ref->GetSymbol();
+				}
+				$fHedgeQuantity = floor($fHintQuantity / $fHedge);
+				$fHintQuantity = $fHedgeQuantity * $fHedge;
+				$strHedge = strval($fHedge);
+				$strMemo = _buildHedgeString($fHedgeQuantity, $strEtf);
+			}
+   		}
+   		else	// SZ164701
+   		{
+   			$net_sql = GetNetValueHistorySql();
+   			if ($record = $net_sql->GetRecordNow($strStockId))
+   			{
+   				$strDate = $record['date'];
+   				$fCny = floatval($record['close']) * $fHintQuantity * $fPos;
+   				
+   				$sql = GetStockSql();
+   				$his_sql = GetStockHistorySql();
+   				$cny_ref = $ref->GetCnyRef();
+   				$fUsd = $fCny / $cny_ref->GetVal($strDate);
+   				foreach ($ref->GetHoldingsRatioArray() as $strHoldingId => $strRatio)
+   				{
+   					$fHoldingQuantity = round($fUsd * floatval($strRatio) / 100.0 / floatval($his_sql->GetClose($strHoldingId, $strDate)));
+   					$strMemo .= _buildHedgeString($fHoldingQuantity, $sql->GetStockSymbol($strHoldingId)).'、';
+   				}
+   				$strMemo = rtrim($strMemo, '、');
+   			}
+   		}
+		$fHintQuantity = round($fHintQuantity / 100.0) * 100.0;
+		$strHintQuantity = strval($fHintQuantity);
+		if ($fHintQuantity > floatval($strQuantity))	$strHintQuantity = GetFontElement($strHintQuantity);
+		$ar[] = $strHintQuantity;
+		$ar[] = $strHedge;
+		$ar[] = ($bSell ? '买入' : '卖出').$strMemo;
+   	}
 	EchoTableColumn($ar);
 }
 
-function _getSwitchDateArray($netvalue_sql, $strStockId, $est_sql, $strEstId)
+function _echoOverNightCnhParagraph($arSymbol, $fCnh)
 {
-	$arDate = array();
-	$bFirst = true;
-    if ($result = $netvalue_sql->GetAll($strStockId)) 
-    {
-        while ($record = mysqli_fetch_assoc($result)) 
-        {
-       		$strDate = $record['date'];
-       		if ($strEst = $est_sql->GetClose($strEstId, $strDate))
-       		{
-       			$fCur = floatval($strEst);
-       			if ($bFirst)
-       			{
-       				$arDate[] = $strDate;
-       				$bSecond = true;
-       				$bFirst = false;
-       			}
-       			else
-       			{
-       				if ($bSecond)
-       				{
-       					$bUp = ($fOld > $fCur) ? true : false;
-       					$bSecond = false;
-       				}
-       				else
-       				{
-       					if ($bUp)
-       					{
-       						if ($fOld < $fCur)
-       						{
-       							$bUp = false;
-       							$arDate[] = $strOldDate;
-       						}
-       					}
-       					else
-       					{
-       						if ($fOld > $fCur)
-       						{
-       							$bUp = true;
-       							$arDate[] = $strOldDate;
-       						}
-       					}
-       				}
-       			}
-   				$fOld = $fCur;
-   				$strOldDate = $strDate;
-       		}
-        }
-        mysqli_free_result($result);
-    }
-    return $arDate;
-}
+	$bSell = ($fCnh < 0.0) ? true : false;
+	$fCnh = abs($fCnh);
+	$strPrefix = '可'.($bSell ? '卖' : '买');
+	$strHint = '建议';
 	
-function _echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $strInput, $bAdmin)
-{
-   	$strStockId = $ref->GetStockId();
-	$strEstId = $est_ref->GetStockId();
-	$netvalue_sql = GetNetValueHistorySql();
-	$est_sql = ($est_ref->CountNetValue() > 0) ? $netvalue_sql : GetStockHistorySql(); 
-
-	$arDate = _getSwitchDateArray($netvalue_sql, $strStockId, $est_sql, $strEstId);
-	if (count($arDate) == 0)		return;
- 
- 	$iIndex = 0;
-    if ($result = $netvalue_sql->GetAll($strStockId)) 
-    {
-        while ($record = mysqli_fetch_assoc($result)) 
-        {
-       		$strDate = $record['date'];
-       		$strNetValue = rtrim0($record['close']);
-       		if ($strDate == $arDate[$iIndex])
-       		{
-   				$iIndex ++;
-   				if (isset($arDate[$iIndex]))	_echoFundPositionItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue, $arDate[$iIndex], $netvalue_sql, $strStockId, $est_sql, $strEstId, $strInput, $bAdmin);
-   				else
-   				{
-   					$csv->Write($strDate, $strNetValue);
-   					break;
-       			}
-       		}
-       		else	$csv->Write($strDate, $strNetValue);
-        }
-        mysqli_free_result($result);
-    }
-}
-
-function _echoFundPositionParagraph($ref, $cny_ref, $est_ref, $strSymbol, $strInput, $bAdmin)
-{
- 	$str = GetFundLinks($strSymbol);
-	$change_col = new TableColumnChange();
-	$position_col = new TableColumnPosition();
-	EchoTableParagraphBegin(array(new TableColumnDate(),
-								   new TableColumnNetValue(),
-								   $change_col,
-								   new TableColumnStock($cny_ref),
-								   $change_col,
-								   RefGetTableColumnNetValue($est_ref),
-								   $change_col,
-								   $position_col
-								   ), 'fundposition', $str);
-	
-	$csv = new PageCsvFile();
-	_echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $strInput, $bAdmin);
-	$csv->Close();
-	
-	if ($csv->HasFile())
-	{
-		$jpg = new DateImageFile();
-		$strNewLine = GetBreakElement();
-		
-		$str = $strNewLine.$csv->GetLink();
-		if ($jpg->Draw($csv->ReadColumn(2), $csv->ReadColumn(1)))	$str .= $strNewLine.$jpg->GetAll($position_col->GetDisplay(), $strSymbol);
-		EchoTableParagraphEnd($str);
-   	}
-}
+	$ar = array(new TableColumnSymbol(), new TableColumnPrice($strPrefix), new TableColumnQuantity($strPrefix), new TableColumnQuantity($strHint), new TableColumnHedge());
+	$ar[] = new TableColumn($strHint.'对冲操作', TableColumnGetLastWidth($ar));
+	EchoTableParagraphBegin($ar, 'overnightcnh');
+	foreach ($arSymbol as $strSymbol)	_echoOverNightCnhItem($strSymbol, $fCnh, $bSell);
+	EchoTableParagraphEnd();
+}               
 
 function EchoAll()
 {
@@ -163,6 +128,9 @@ function EchoAll()
    	EchoEditInputForm('需要平衡的离岸人民币CNH', $strInput);
    	if ($strInput != '')
    	{
+		$arSymbol = GetOverNightSymbolArray();
+   		StockPrefetchArrayExtendedData($arSymbol);
+   		_echoOverNightCnhParagraph($arSymbol, floatval($strInput));
     }
     $acct->EchoLinks();
 }

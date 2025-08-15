@@ -31,7 +31,7 @@ function _echoPairItem($ref, $pos_sql, $bWide)
 function _echoPairParagraph($ar, $strId, $str, $arRef, $bWide)
 {
 	if (count($arRef) > 2)	$arRef = RefSortByNumeric($arRef, '_callbackSortPair');
-	$pos_sql = new FundPositionSql();
+	$pos_sql = GetPositionSql();
 
 	EchoTableParagraphBegin($ar, $strId, $str);
 	foreach ($arRef as $ref)		_echoPairItem($ref, $pos_sql, $bWide);

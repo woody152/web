@@ -8,7 +8,7 @@ class _AdminOperationAccount extends Account
     {
     	if ($strPosition = UrlGetQueryValue('fundposition'))
     	{
-    		$sql = new FundPositionSql();
+    		$sql = GetPositionSql();
     		$sql->WriteVal(UrlGetQueryValue('stockid'), $strPosition);
     	}
     	else if ($strIp = UrlGetQueryValue('ip'))

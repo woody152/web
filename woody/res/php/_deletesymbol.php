@@ -68,12 +68,12 @@ function _deleteHasFundPair($strSymbol)
 
 function _deleteHasCalibration($strStockId)
 {
-   	$calibration_sql = GetCalibrationSql();
-	$iTotal = $calibration_sql->Count($strStockId);
+   	$cal_sql = GetCalibrationSql();
+	$iTotal = $cal_sql->Count($strStockId);
 	if ($iTotal > 0)
 	{
 		DebugVal($iTotal, 'Calibration history existed');
-		$calibration_sql->DeleteAll($strStockId);
+		$cal_sql->DeleteAll($strStockId);
 	}
 	return false;
 }

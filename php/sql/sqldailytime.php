@@ -39,14 +39,6 @@ class DailyTimeSql extends DailyCloseSql
 */    
 }
 
-class FundEstSql extends DailyTimeSql
-{
-    public function __construct() 
-    {
-        parent::__construct('fundest');
-    }
-}
-
 class CalibrationSql extends DailyTimeSql
 {
     public function __construct() 

@@ -30,8 +30,8 @@ function _getStockOptionDate($strSubmit, $ref, $strSymbol)
 		}
 		else
 		{
-			$netvalue_sql = GetNetValueHistorySql();
-			if ($strDate = $netvalue_sql->GetDateNow($strStockId))		return $strDate;
+			$net_sql = GetNetValueHistorySql();
+			if ($strDate = $net_sql->GetDateNow($strStockId))		return $strDate;
 			if ($strDate = $his_sql->GetDateNow($strStockId))		return $strDate;
 		}
 	 	return $strYMD;
@@ -124,7 +124,7 @@ function _getStockOptionAdr($strSymbol)
 	$pair_sql = new AdrPairSql();
 	if ($strAdr = $pair_sql->GetSymbol($strSymbol))
 	{
-		$pos_sql = new FundPositionSql();
+		$pos_sql = GetPositionSql();
 		if ($fRatio = $pos_sql->ReadVal(SqlGetStockId($strAdr)))	return $strAdr.'/'.strval($fRatio);
 		return $strAdr;
 	}
@@ -133,13 +133,17 @@ function _getStockOptionAdr($strSymbol)
 
 function _getStockOptionFund($strSymbol)
 {
+	$pos_sql = GetPositionSql();
+	if ($fPos = $pos_sql->ReadVal(SqlGetStockId($strSymbol)))	$strPos = strval($fPos);
+		
 	$pair_sql = new FundPairSql();
 	if ($strIndex = $pair_sql->GetPairSymbol($strSymbol))
 	{
-		$pos_sql = new FundPositionSql();
-		if ($fRatio = $pos_sql->ReadVal(SqlGetStockId($strSymbol)))	return $strIndex.'*'.strval($fRatio);
+		$pos_sql = GetPositionSql();
+		if ($fPos)	return $strIndex.'*'.$strPos;
 		return $strIndex;
 	}
+	if ($fPos)	return $strPos;
 	return 'INDEX*1';
 }
 
@@ -308,7 +312,7 @@ function _getStockOptionMemo($strSubmit)
 		return '股票收盘后的第2天修改才会生效，同时删除以往全部EMA记录。';
 
 	case STOCK_OPTION_FUND:
-		return '输入INDEX*0删除对应关系和全部'.CALIBRATION_HISTORY_DISPLAY.'。';
+		return '输入INDEX*0删除对应关系和全部'.CALIBRATION_HISTORY_DISPLAY.'，输入0删除仓位。';
 
 	case STOCK_OPTION_HA:
 		return '清空输入删除对应A股。';

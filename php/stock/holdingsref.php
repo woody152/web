@@ -115,6 +115,13 @@ class HoldingsReference extends MyStockReference
     	return $this->ar_holdings_ref;
     }
     
+    function GetHoldingDisplay()
+    {
+    	$str = '';
+    	foreach ($this->ar_holdings_ref as $ref)	$str .= $ref->GetSymbol().'*'.$this->arHoldingsRatio[$ref->GetStockId()].';';
+    	return rtrim($str, ';');
+    }
+    
     function GetRealtimeRefArray()
     {
     	return $this->ar_realtime_ref;
@@ -229,7 +236,7 @@ class HoldingsReference extends MyStockReference
 		}
 		
 		$fTotalChange -= $fTotalRatio;
-		$fTotalChange *= RefGetPosition($this);
+		$fTotalChange *= $this->GetPosition();
 
 		$fNewNetValue = floatval($this->strNetValue) * (1.0 + $fTotalChange);
 		if ($this->IsFundA())		$fNewNetValue /= $fAdjustCny;

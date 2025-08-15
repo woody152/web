@@ -160,7 +160,7 @@ function DebugString($str, $bAdminOnly = false)
 	
 	if ($str === false)	$str = '(false)';
 	$strTimeZone = date_default_timezone_get();
-    file_put_contents(DebugGetFile(), DebugGetTime(time()).' '.UrlGetIp().' '.UrlGetCur().' '.strip_tags($str).PHP_EOL, FILE_APPEND);	// DebugGetTime will change timezone!
+    file_put_contents(DebugGetFile(), DebugGetTime(time()).' '.UrlGetIp().' '.UrlGetUri().' '.strip_tags($str).PHP_EOL, FILE_APPEND);	// DebugGetTime will change timezone!
     if ($strTimeZone != DEBUG_TIME_ZONE)		date_default_timezone_set($strTimeZone);
 }
 

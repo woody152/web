@@ -80,7 +80,7 @@ function EchoAll()
     	{
     		$arHoldingRef = $ref->GetHoldingRefArray();
     		$str = '持仓和测算示意';
-    		if (count($arHoldingRef) == 2)	$str .= ' '.GetExhaustiveHoldingsLink($strSymbol);
+    		if (count($arHoldingRef) <= 3)	$str .= ' '.GetExhaustiveHoldingsLink($strSymbol);
     		
 		    EchoHoldingsEstParagraph($ref);
     		EchoReferenceParagraph(array_merge(array($ref), RefSort($arHoldingRef)), $acct->IsAdmin());

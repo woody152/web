@@ -1,23 +1,20 @@
 <?php
 require_once('stock.php');
 
-function _addIndexArray(&$ar, $strIndex, $strEtf)
+function _addIndexArray(&$ar, $strIndex, $strEtf, $strDate, $cal_sql)
 {
 	if (!isset($ar[$strEtf]))
 	{
 		$arData = array();
-		//$arData['CNY'] = '1.0';
-		$arData['symbol_hedge'] = $strIndex;
 		
 		$strEtfId = SqlGetStockId($strEtf);
-		$pos_sql = new FundPositionSql();
-		$arData['position'] = strval($pos_sql->ReadVal($strEtfId));
-		
-		$calibration_sql = GetCalibrationSql();
-		$arData['calibration'] = $calibration_sql->GetCloseNow($strEtfId);
-		$strDate = $calibration_sql->GetDateNow($strEtfId);
+		$arData['calibration'] = $cal_sql->GetClose($strEtfId, $strDate);
 		$arData['netvalue'] = SqlGetNetValueByDate($strEtfId, $strDate);
 
+		$pos_sql = GetPositionSql();
+		$arData['position'] = strval($pos_sql->ReadVal($strEtfId));
+
+		$arData['symbol_hedge'] = $strIndex;
 		$ar[$strEtf] = $arData;
 	}
 }
@@ -38,45 +35,50 @@ function GetStockDataArray($strSymbols)
 			if ($ref->IsFundA())
 			{
 				$fund_ref = StockGetFundReference($strSymbol);
-				if (method_exists($fund_ref, 'GetEstRef'))
-				{	
-					if ($est_ref = $fund_ref->GetEstRef())
-					{
-						$strIndex = $est_ref->GetSymbol();
-						if ($est_ref->IsIndex())
+				$cny_ref = $fund_ref->GetCnyRef();
+				
+				$strStockId = $ref->GetStockId();
+				$cal_sql = GetCalibrationSql();
+				if ($record = $cal_sql->GetRecordNow($strStockId))
+				{
+					$arData['calibration'] = $record['close'];
+					$strDate = $record['date'];
+					$arData['netvalue'] = SqlGetNetValueByDate($strStockId, $strDate);
+				
+					if (method_exists($fund_ref, 'GetEstRef'))
+					{	
+						if ($est_ref = $fund_ref->GetEstRef())
 						{
-							switch ($strIndex)
+							$strIndex = $est_ref->GetSymbol();
+							if ($strEtf = GetLeverageHedgeSymbol($strSymbol))
 							{
-							case '^GSPC':
-								$strEtf  = 'SPY';
-								break;
-							
-							case '^NDX':
-								$strEtf = 'QQQ';
-								break;
+								_addIndexArray($ar, $strIndex, $strEtf, $strDate, $cal_sql);
+								$strIndex = $strEtf;
 							}
-							_addIndexArray($ar, $strIndex, $strEtf);
-							$strIndex = $strEtf;
 						}
 					}
+					else if ($strSymbol == 'SZ164906')			$strIndex = 'KWEB';
 				}
-				else if ($strSymbol == 'SZ164906')			$strIndex = 'KWEB';
-
-				$cny_ref = $fund_ref->GetCnyRef();
+				else if ($strSymbol == 'SZ164701')
+				{
+					$strIndex = 'GLD';
+					$net_sql = GetNetValueHistorySql();
+					if ($record = $net_sql->GetRecordNow($strStockId))
+					{
+						$strNetValue = $record['close'];
+						$strDate = $record['date'];
+						$arData['calibration'] = strval(round(floatval(SqlGetHistoryByDate(SqlGetStockId($strIndex), $strDate)) * floatval($cny_ref->GetPrice()) / floatval($strNetValue), 6));
+						$arData['netvalue'] = $strNetValue;
+					}
+				}
 				$arData['CNY'] = $cny_ref->GetPrice();
+				$arData['position'] = strval($fund_ref->GetPosition());
 				$arData['symbol_hedge'] = $strIndex;
-				$arData['position'] = strval(RefGetPosition($fund_ref));
-
-				$strStockId = $ref->GetStockId();
-				$calibration_sql = GetCalibrationSql();
-				$arData['calibration'] = $calibration_sql->GetCloseNow($strStockId);
-				$strDate = $calibration_sql->GetDateNow($strStockId);
-				$arData['netvalue'] = SqlGetNetValueByDate($strStockId, $strDate);
 			}
 		}
 		$ar[$strSymbol] = $arData;
     }
-    
+    DebugPrint($ar);
     return $ar;
 }
 

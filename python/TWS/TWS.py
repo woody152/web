@@ -16,6 +16,7 @@ def IsChinaMarketOpen():
     elif iTime >= 1300 and iTime < 1500:
         return True
     return False
+#    return True
 
 def IsMarketOpen():
     iTime = GetExchangeTime()
@@ -69,12 +70,13 @@ class MyEWrapper(EWrapper):
 
     def nextValidId(self, orderId: int):
         self.arHedge = {'SZ161125', 'SZ161127', 'SZ161130', 'SZ162411', 'SZ162415', 'SZ162719', 'SZ164906'}
+        #, 'SZ164701'
         #self.arQQQ = {'SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941'}
         #self.arXOP = {'SH513350', 'SZ159518'}
         self.arOrder = {}
-        self.arOrder['KWEB'] = GetOrderArray([20.58, 29.58, 29.82, 33.53, 33.57, 35.17, 35.53, 35.61, 37.5, 38.57], 200, 6, 8)
+        self.arOrder['KWEB'] = GetOrderArray([20.58, 29.58, 29.75, 33.57, 34.37, 35.99, 36.05, 36.52, 37.61, 38.57], 200, 7, -1)
         if IsChinaMarketOpen():
-        #if True:
+            #self.arOrder['GLD'] = GetOrderArray()
             self.arOrder['IEO'] = GetOrderArray()
             self.arOrder['QQQ'] = GetOrderArray()
             self.arOrder['SPY'] = GetOrderArray()
@@ -84,8 +86,8 @@ class MyEWrapper(EWrapper):
         else:
         #if IsMarketOpen():
             #self.arOrder['TLT'] = GetOrderArray([80.42, 83.53, 83.65, 85.44, 85.81, 87.11, 90.57, 92.68, 98.05], 100, 0, 2)
-            self.arOrder['SPX'] = GetOrderArray([4722.51, 5016.08, 5864.55, 6175.64, 6204.75, 6301.63, 6314.03, 6342.45, 6423.31, 6713.03])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.004, 3, 8)
+            self.arOrder['SPX'] = GetOrderArray([4722.51, 5032.46, 5907.11, 6218.87, 6233.34, 6362.37, 6384.22, 6438.58, 6491.4, 6781.76])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0031, 7, 8)
             self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0153, -1, -1)
         self.palmmicro = Palmmicro()
         self.client.StartStreaming(orderId)

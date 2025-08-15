@@ -318,13 +318,13 @@ function _yahooStockGetData($strSymbol, $strStockId)
    		$arIndicators = $arResult['indicators'];
 		$arAdjClose = $arIndicators['adjclose'][0]['adjclose'];
 
-		$netvalue_sql = GetNetValueHistorySql();
+		$net_sql = GetNetValueHistorySql();
 		for ($i = 0; $i < count($arTimeStamp); $i ++)
 		{
     		$ymd = new TickYMD(intval($arTimeStamp[$i]));
     		$strDate = $ymd->GetYMD();
     		$strNetValue = mysql_round($arAdjClose[$i]);
-    		if ($netvalue_sql->WriteDaily($strStockId, $strDate, $strNetValue))
+    		if ($net_sql->WriteDaily($strStockId, $strDate, $strNetValue))
     		{
     			DebugString(__FUNCTION__.' Update net value for '.$strSymbol.' '.$strDate.' '.$strNetValue);
     			return array($strNetValue, $strDate);
@@ -340,7 +340,7 @@ function YahooGetNetValue($ref)
 //	date_default_timezone_set('America/New_York');
 	$ref->SetTimeZone();
 	$strSymbol = $ref->GetSymbol();
-	return _yahooStockGetData(($ref->IsIndex() ? $strSymbol : GetYahooNetValueSymbol($strSymbol)), $ref->GetStockId());
+	return _yahooStockGetData(($ref->IsIndex() ? $strSymbol : BuildYahooNetValueSymbol($strSymbol)), $ref->GetStockId());
 }
 
 function _yahooGetNetValueSymbol($sym, $strSymbol)
@@ -371,7 +371,7 @@ function _yahooGetNetValueSymbol($sym, $strSymbol)
    			return false;
    		}
    	}
-   	return GetYahooNetValueSymbol($strSymbol);
+   	return BuildYahooNetValueSymbol($strSymbol);
 }
 
 function YahooUpdateNetValue($ref)
@@ -383,10 +383,10 @@ function YahooUpdateNetValue($ref)
 	
 //    date_default_timezone_set('America/New_York');
 	$ref->SetTimeZone();
-	$netvalue_sql = GetNetValueHistorySql();
+	$net_sql = GetNetValueHistorySql();
 	$strStockId = $ref->GetStockId();
 	$strDate = $ref->GetDate();
-    if ($netvalue_sql->GetRecord($strStockId, $strDate))	return;	// already have today's data
+    if ($net_sql->GetRecord($strStockId, $strDate))	return;	// already have today's data
 	
     $now_ymd = GetNowYMD();
     $iHourMinute = $now_ymd->GetHourMinute();

@@ -36,9 +36,9 @@ class _QdiiMixAccount extends FundGroupAccount
         	{
         		if ($strNetValue = GetKraneNetValue($this->us_ref))
         		{
-        			$netvalue_sql = GetNetValueHistorySql();
+        			$net_sql = GetNetValueHistorySql();
         			$strStockIdUs = $this->us_ref->GetStockId();
-					if ($netvalue_sql->ModifyDaily($strStockIdUs, $strDate, $strNetValue))		ReadKraneHoldingsCsvFile($strSymbolUs, $strStockIdUs, $strDate, $strNetValue);
+					if ($net_sql->ModifyDaily($strStockIdUs, $strDate, $strNetValue))		ReadKraneHoldingsCsvFile($strSymbolUs, $strStockIdUs, $strDate, $strNetValue);
         		}
         	}
         	$this->pair_ref = new FundPairReference($strSymbol);
@@ -71,8 +71,8 @@ class _QdiiMixAccount extends FundGroupAccount
     {
     	$ref = $this->ref;
     	$strStockId = $ref->GetStockId();
-    	$netvalue_sql = GetNetValueHistorySql();
-    	$strNetValueDate = $netvalue_sql->GetDateNow($strStockId); 
+    	$net_sql = GetNetValueHistorySql();
+    	$strNetValueDate = $net_sql->GetDateNow($strStockId); 
     	
     	$date_sql = new HoldingsDateSql();
     	$strHoldingsDate = $date_sql->ReadDate($strStockId);
@@ -82,6 +82,7 @@ class _QdiiMixAccount extends FundGroupAccount
     	$bUpdated = false;
     	switch ($strSymbol)
     	{
+    	case 'SZ160216':
 		case 'SZ160644':
 		case 'SZ164701':
 		case 'SH501225':
@@ -157,9 +158,9 @@ function _callbackQdiiMixTrading($strVal = false)
    	return TableColumnGetStock($us_ref).TableColumnGetPrice();
 }
 
-function _callbackFundList($fRatio, $fFactor)
+function _callbackFundListHedge($fPos, $fFactor, $strDate, $strStockId)
 {
-   	return strval(round($fFactor / $fRatio));
+   	return StockCalcHedge($fFactor, $fPos);
 }
 
 function EchoAll()
@@ -183,7 +184,7 @@ function EchoAll()
 		EchoFundTradingParagraph($ref, '_callbackQdiiMixTrading');
 		EchoHoldingsEstParagraph($us_ref);
 		$pair_ref = $acct->GetPairRef();
-		EchoFundListParagraph(array($pair_ref), '_callbackFundList');
+		EchoFundListParagraph(array($pair_ref), '_callbackFundListHedge');
 		EchoSmaParagraph($us_ref, false, $pair_ref, '_callbackQdiiMixSma');
 	}
 	else	

@@ -10,6 +10,7 @@ znb_UKX,znb_DAX,znb_INDEXCF,znb_CAC,znb_SMI,znb_FTSEMIB,znb_MADX,znb_OMX,znb_HEX
 
 define('SINA_FOREX_PREFIX', 'fx_s');
 define('SINA_FUTURE_PREFIX', 'hf_');
+define('SINA_CN_FUTURE_PREFIX', 'nf_');
 define('SINA_FUND_PREFIX', 'f_');
 define('SINA_INDEX_PREFIX', 'znb_');
 define('SINA_HK_PREFIX', 'rt_hk');
@@ -61,7 +62,7 @@ function in_arrayGoldQdii($strSymbol)
 
 function QdiiGetOilSymbolArray()
 {
-    return array('SH501018', 'SZ160216', 'SZ160723', 'SZ161129'); 
+    return array('SH501018', 'SZ160723', 'SZ161129'); 
 }
 
 function in_arrayOilQdii($strSymbol)
@@ -267,7 +268,7 @@ function in_arrayHkMix($strSymbol)
 
 function QdiiMixGetSymbolArray()
 {
-    $ar = array_merge(array('SH501225', 'SH501312', 'SH513360', 'SZ159509', 'SZ159529', 'SZ160644', 'SZ164701') 
+    $ar = array_merge(array('SH501225', 'SH501312', 'SH513360', 'SZ159509', 'SZ159529', 'SZ160216', 'SZ160644', 'SZ164701') 
     				   , GetChinaInternetSymbolArray()
     				   , GetHkMixSymbolArray()
     				   , GetMsciUs50SymbolArray());
@@ -294,6 +295,11 @@ function GetAllSymbolArray()
 function in_arrayAll($strSymbol)
 {
     return in_array($strSymbol, GetAllSymbolArray());
+}
+
+function GetOverNightSymbolArray()
+{
+	return array('SZ161125', 'SZ161127', 'SZ161130', 'SZ162411', 'SZ162415', 'SZ162719', 'SZ164701', 'SZ164906');
 }
 
 function IsChinaStockDigit($strDigit)
@@ -707,16 +713,10 @@ class StockSymbol
     	return StrHasPrefix($this->strSymbol, SINA_INDEX_PREFIX); 
     }
     
-    // AUO, AG1712, nf_AG0
+    // nf_AU0,nf_AG2512,nf_AG0
     function IsSinaFutureCn()
     {
-        if ($this->IsSymbolA())                   return false;
-
-        $this->_getFirstChar();
-        if (is_numeric($this->strFirstChar))    return false;
-        
-        if (is_numeric(substr($this->strSymbol, -1, 1)))  return true;
-        return false;
+    	return StrHasPrefix($this->strSymbol, SINA_CN_FUTURE_PREFIX); 
     }
 
     function IsSinaFutureUs()
@@ -1015,7 +1015,6 @@ class StockSymbol
     {
     	$strEDT = 'America/New_York';
     	
-       	// IsSinaFund must be called before IsSinaFuture
         if ($this->IsSinaFund())								{}
         else if ($this->IsSinaFuture())
         {
@@ -1053,6 +1052,7 @@ class StockSymbol
     function GetDisplay()
     {
         if ($str = $this->IsSinaFutureUs())		return $str;
+        if ($str = $this->IsSinaFutureCn())		return $str;
         if ($str = $this->IsNewSinaForex())		return $str;
 		if ($str = $this->IsSinaGlobalIndex())	return $str;
 		return $this->GetSymbol();

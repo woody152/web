@@ -26,6 +26,10 @@ function _getStockCost($strGroupItemId, $strQuantity, $strPrice)
    		{
    			$fCommission = 0.62;
    		}
+   		else if ($sym->IsSinaForex())
+   		{
+   			$fCommission = 15.0;
+   		}
 		else if ($sym->IsSymbolA())
    		{
    			if ($sym->IsFundA())			$fCommission = $fAmount * 0.0001;
@@ -114,10 +118,11 @@ class _SubmitTransactionAccount extends StockAccount
     	$sql = new StockGroupItemSql($strGroupId);
     	if (($strGroupItemId = $sql->GetId($strFundId)) == false)    return false;
     	
-   		$fFeeRatio = StockGetFundFeeRatio(SqlGetStockSymbol($strFundId));
+    	$strFundSymbol = SqlGetStockSymbol($strFundId);
+   		$fFeeRatio = StockGetFundFeeRatio($strFundSymbol);
     	$fAmount = floatval($strAmount);
     	$fQuantity = $fAmount / (1.0 + $fFeeRatio) / floatval($strNetValue);
-    	$strRemark = '}'.GetArbitrageQuantity($strFundId, $fQuantity).' '.STOCK_DISP_ORDER;
+    	$strRemark = '}'.GetArbitrageQuantity($strFundSymbol, $strFundId, $fQuantity).' '.STOCK_DISP_ORDER;
     	if ($sql->trans_sql->Insert($strGroupItemId, strval(intval($fQuantity)), $strNetValue, strval_round($fAmount * $fFeeRatio * 0.1), $strRemark))
     	{
 	       	_debugFundPurchase($strGroupId, $strFundId);

@@ -319,7 +319,7 @@ function EchoPage20160818($strPage)
 {
 	$strHead = GetHeadElement(_getStockMenuTag($strPage).'中考虑当日CL交易情况后的T+1估值');
 	$strJisilu = GetJisiluQdiiLink();
-	$strNav = TableColumnGetNetValue();
+	$strNetValue = TableColumnGetNetValue();
 	
 	$offical_col = new TableColumnOfficalEst();
 	$strOfficalEst = $offical_col->GetDisplay();
@@ -345,7 +345,7 @@ function EchoPage20160818($strPage)
 <p>2016年8月18日
 <br />发现有人的Excel计算表格中有这一项，我也就顺应潮流把它加上了。大概是沿用{$strJisilu}的叫法，把已经公布的净值称为T-1、把估算的官方将要公布的下一日净值称为T、而把考虑了当日美油期货CL变动的称为T+1估值，大致意思是用白天CL的变动预测晚上XOP的变动。
 按我的看法，拉长到一年看CL和XOP对应关系可能是不错，但是具体到每一天就未必了，所以在自己的套利交易中目前是不考虑这个T+1估值的。当然需要进行期货交易也是我不做它的一个重要因素，怕不小心杠杆赌大了把自己搞破产。一手CL是1000桶，目前每桶油价大约50美元，也就是说每次要交易五万美元的货值。
-<br />因为特立独行的原因，我不喜欢T-1/T/T+1这种叫法。于是我在网页中把T-1直接写成了{$strNav}，T日估值称为{$strOfficalEst}，而把T+1估值称为{$strRealtimeEst}。另外还有一个{$strFairEst}，接下来解释一下这些看上去混乱的估值名称。
+<br />因为特立独行的原因，我不喜欢T-1/T/T+1这种叫法。于是我在网页中把T-1直接写成了{$strNetValue}，T日估值称为{$strOfficalEst}，而把T+1估值称为{$strRealtimeEst}。另外还有一个{$strFairEst}，接下来解释一下这些看上去混乱的估值名称。
 <br />{$strFairEst}和{$strRealtimeEst}的区别仅仅是用不用CL的实时交易数据。{$strRealtimeEst}假定SZ162411和CL关联程度是100%，XOP和USO关联程度也是按照100%估算。由于估值依赖CL和{$strUSO}在美股交易时段的自动校准，而期货总是免不了升水贴水，每个月20日左右CL期货换月的当天{$strRealtimeEst}是不准确的。
 另外因为CL期货的每日结算价格通常跟收盘价不同，CL期货收盘比美股晚一个小时的收盘价也不同于我在估值中实际用来参考的美股收盘时的CL价格，有可能出现CL价格的显示高(或低)于上一日，而{$strFairEst}低(或高)于{$strRealtimeEst}的情况。
 <br />先说明一下如何把华宝油气{$strOfficalEst}精确到0.001元。说实在话，刚开始我也不可能想到花了整整一年时间才做到这一点。
@@ -379,7 +379,7 @@ END2;
 function Echo20161008($strHead)
 {
 	$strHead = GetHeadElement($strHead);
-	$strLink = GetSinaDataLink('AU0');
+	$strLink = GetSinaDataLink('nf_AU0');
 	
     echo <<<END
 	$strHead
@@ -388,7 +388,7 @@ function Echo20161008($strHead)
 </p>
 END;
 }
-
+                                                       
 function Echo20161017($strHead)
 {
 	$strHead = GetHeadElement($strHead);
@@ -682,8 +682,8 @@ function Echo20191025($strHead)
 {
 	$strHead = GetHeadElement($strHead);
 	$strFundAccount = GetFundAccountLink(FUND_DEMO_SYMBOL);
-	$strNavHistory = GetNameLink('netvaluehistory', NETVALUE_HISTORY_DISPLAY);
-	$strNavHistoryLink = GetNetValueHistoryLink(FUND_DEMO_SYMBOL, 'num=0', '统计');
+	$strNetValueHistory = GetNameLink('netvaluehistory', NETVALUE_HISTORY_DISPLAY);
+	$strNetValueHistoryLink = GetNetValueHistoryLink(FUND_DEMO_SYMBOL, 'num=0', '统计');
 	$strFundPositionLink = GetFundPositionLink(FUND_DEMO_SYMBOL);
 	$strQDII = _getStockMenuLink('qdii');
 	$strSZ160216 = GetFundPositionLink('SZ160216', true);
@@ -704,7 +704,7 @@ function Echo20191025($strHead)
 <br />10月22日那天场内新增了5766万股，对应限购1000人民币下场内满额申购了22127户，全部场内份额已经接近65亿股。好几个人看到迅速增加的份额后都问我华宝油气会不会继续把限额降到100块或者是彻底关门。
 我暗自一笑，回答说你们想多了。华宝基金有对它来说更聪明应对方式，其实在8月份刚开始限额申购后的那一轮溢价申购时已经表现出来了。
 <br />这个聪明方法是主动降低股票持仓仓位比例，把大家新申购的人民币拿在手里除了收管理费以外什么都不做。 
-我修改了一下平时基本闲置的{$strNavHistory}页面，{$strNavHistoryLink}了过去4年来的华宝油气仓位估算结果。
+我修改了一下平时基本闲置的{$strNetValueHistory}页面，{$strNetValueHistoryLink}了过去4年来的华宝油气仓位估算结果。
 可以看出在今年8月份之前，基本上都是稳定维持在基金说明书中写的95%附近；8月份降到了85%-90%，9月份经过连续11个交易日折价大量赎回后，9月底时仓位又回到了95%。
 <br />为了避免一般的华宝油气官方估值的误差来源的影响，我在这里只选择了XOP当晚净值涨跌幅度大于4%的日子进行仓位估算，因为仓位回到95%以后没有这样的大波动，这样的话当前华宝油气具体仓位依然是个谜。 
 下一个XOP大涨或者大跌后不出意外的话，肯定是会再次看到华宝油气上涨跟不上涨幅，下跌也跟不上跌幅的。
@@ -767,13 +767,13 @@ END;
 function Echo20210714($strHead)
 {
 	$strHead = GetHeadElement($strHead);
-	$strNavHistory = GetNameLink('netvaluehistory', NETVALUE_HISTORY_DISPLAY);
+	$strNetValueHistory = GetNameLink('netvaluehistory', NETVALUE_HISTORY_DISPLAY);
 	$strFundLinks = GetFundLinks(FUND_DEMO_SYMBOL);
 	
     echo <<<END
 	$strHead
 <p>2021年7月14日
-<br />相对于{$strNavHistory}等其它历史数据，这个页面来得实在是比较晚，主要是之前做华宝油气套利时不需要特别关注每天的场内新增份额，反正流动性足够好。不过随着XOP一路上涨，华宝油气的上百亿场内规模只剩下了零头，失去了流动性的华宝油气和XOP跨市场套利变成了屠龙之技。
+<br />相对于{$strNetValueHistory}等其它历史数据，这个页面来得实在是比较晚，主要是之前做华宝油气套利时不需要特别关注每天的场内新增份额，反正流动性足够好。不过随着XOP一路上涨，华宝油气的上百亿场内规模只剩下了零头，失去了流动性的华宝油气和XOP跨市场套利变成了屠龙之技。
 我也被迫开始关注像SZ164906这种流动性不是那么好的品种，为以后的套利早做打算。
 <br />历史数据页面汇总：{$strFundLinks}
 </p>

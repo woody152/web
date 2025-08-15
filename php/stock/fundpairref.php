@@ -1,5 +1,11 @@
 <?php
 
+function GetEuropeMarketCloseTick($strDate)
+{
+	date_default_timezone_set('Europe/Berlin');
+	return strtotime($strDate.' 17:30:00');
+}
+
 function PairNetValueGetClose($ref, $strDate)
 {
 	if ($ref->IsFund())
@@ -19,7 +25,6 @@ class MyPairReference extends MyStockReference
     var $cny_ref = false;
     
 	var $fLastCalibrationVal = false;
-    var $fRatio;
 	
     public function __construct($strSymbol, $pair_sql) 
     {
@@ -48,8 +53,6 @@ class MyPairReference extends MyStockReference
         		if ($this->IsSymbolA())			$strCNY = 'USCNY';
         	}
         	if ($strCNY)		$this->cny_ref = new CnyReference($strCNY);
-    	
-        	$this->fRatio = RefGetPosition($this);
         	$this->LoadCalibration();
     	}
     }
@@ -57,20 +60,18 @@ class MyPairReference extends MyStockReference
     function LoadCalibration()
     {
 		$strStockId = $this->GetStockId();
-		$calibration_sql = GetCalibrationSql();
-		if ($record = $calibration_sql->GetRecordNow($strStockId))
+		$cal_sql = GetCalibrationSql();
+		if ($record = $cal_sql->GetRecordNow($strStockId))
     	{
 			$this->fFactor = floatval($record['close']);
 			$sql = new LastCalibrationSql();
 			$this->fLastCalibrationVal = $sql->ReadVal($strStockId); 
 			if ($this->fLastCalibrationVal === false)	$this->fLastCalibrationVal = floatval(SqlGetNetValueByDate($strStockId, $record['date'])); 
     	}
-		else	$this->fFactor = 1.0 / $this->fRatio; 
-    }
-    
-    function GetRatio()
-    {
-    	return $this->fRatio;
+		else
+		{
+			$this->fFactor = 1.0 / $this->GetPosition();
+		}
     }
     
     function GetPairRef()
@@ -99,7 +100,7 @@ class MyPairReference extends MyStockReference
     	
     	if ($this->IsSymbolA())	$fVal = QdiiGetVal($fPairVal, $fCny, $this->fFactor);
     	else						$fVal = ($fPairVal / $fCny) / $this->fFactor;
-		return FundAdjustPosition($this->fRatio, $fVal, ($this->fLastCalibrationVal ? $this->fLastCalibrationVal : $fVal));
+		return FundAdjustPosition($this->GetPosition(), $fVal, ($this->fLastCalibrationVal ? $this->fLastCalibrationVal : $fVal));
     }
     
     function EstToPair($fMyVal = false, $fCny = false)
@@ -107,7 +108,7 @@ class MyPairReference extends MyStockReference
     	if ($fMyVal == false)	$fMyVal = floatval($this->GetPrice());
     	if ($fCny == false)		$fCny = $this->GetDefaultCny();
     	
-		$fVal = FundReverseAdjustPosition($this->fRatio, $fMyVal, ($this->fLastCalibrationVal ? $this->fLastCalibrationVal : $fMyVal));
+		$fVal = FundReverseAdjustPosition($this->GetPosition(), $fMyVal, ($this->fLastCalibrationVal ? $this->fLastCalibrationVal : $fMyVal));
 		if ($this->IsSymbolA())	return QdiiGetPeerVal($fVal, $fCny, $this->fFactor);
 		return ($fVal * $fCny) * $this->fFactor;
     }
@@ -172,6 +173,7 @@ class FundPairReference extends MyPairReference
 			if ($this->pair_ref->IsSinaFuture())
 			{
         		if ($this->pair_ref->CheckAdjustFactorTime($this))	$this->AverageCalibraion();
+        		if ($strSymbol == 'GLD' || $strSymbol == 'USO')		$this->_buildForeignMarketData();
        		}
         	
 			if ($this->IsSinaFuture())
@@ -182,6 +184,33 @@ class FundPairReference extends MyPairReference
 			else	$this->netvalue_ref = new NetValueReference($strSymbol);
         }
     }
+    
+    function _buildForeignMarketData()
+    {
+		$strSymbolEu = BuildEuropeSymbol($this->GetSymbol());
+		$strStockIdEu = SqlGetStockId($strSymbolEu);
+		
+		$strDate = $this->GetDate();
+		$strTime = $this->GetTime();
+		$this->SetTimeZone();
+		$iCurTick = strtotime($strDate.' '.$strTime);
+		$iCloseTick = GetEuropeMarketCloseTick($strDate);
+		
+		$tick_sql = new IntSql('stocktick', 'tick');
+		$iTick = $tick_sql->ReadInt($strStockIdEu);
+		if (($iTick === false) || (abs($iCurTick - $iCloseTick) < abs($iTick - $iCloseTick)))
+		{
+			$his_sql = GetStockHistorySql();
+			if ($record = $his_sql->GetRecord($this->GetStockId(), $strDate))
+    		{
+    			if ($his_sql->WriteHistory($strStockIdEu, $strDate, $record['close'], $record['open'], $record['high'], $record['low'], $record['volume']))
+    			{
+    				$tick_sql->WriteInt($strStockIdEu, $iCurTick);
+    				DebugString(__CLASS__.'->'.__FUNCTION__.': '.$strSymbolEu.' updated history on '.$strDate.' '.$strTime);
+    			}
+    		}
+		}
+    }
 
     function AverageCalibraion()
     {
@@ -190,8 +219,8 @@ class FundPairReference extends MyPairReference
 		$strPrice = $this->GetPrice();
 		
 		$fFactor = $this->CalcFactor($this->pair_ref->GetPrice(), $strPrice, $strDate);
-		$calibration_sql = GetCalibrationSql();
-        $calibration_sql->WriteDailyAverage($strStockId, $strDate, strval($fFactor));
+		$cal_sql = GetCalibrationSql();
+        $cal_sql->WriteDailyAverage($strStockId, $strDate, strval($fFactor));
         			
         $sql = new LastCalibrationSql();
         $sql->WriteVal($strStockId, $strPrice); 
@@ -201,17 +230,17 @@ class FundPairReference extends MyPairReference
 	function DailyCalibration()
 	{
 		$strStockId = $this->GetStockId();
-		$netvalue_sql = GetNetValueHistorySql();
-		$calibration_sql = GetCalibrationSql();
-		$strDate = $netvalue_sql->GetDateNow($strStockId);
-		if ($strDate == $calibration_sql->GetDateNow($strStockId))	return;
+		$net_sql = GetNetValueHistorySql();
+		$cal_sql = GetCalibrationSql();
+		$strDate = $net_sql->GetDateNow($strStockId);
+		if ($strDate == $cal_sql->GetDateNow($strStockId))	return;
 		
-		if ($strNetValue = $netvalue_sql->GetCloseNow($strStockId))
+		if ($strNetValue = $net_sql->GetCloseNow($strStockId))
 		{
 			if ($strPairNetValue = PairNetValueGetClose($this->pair_ref, $strDate))	
 			{
 				$fFactor = $this->CalcFactor($strPairNetValue, $strNetValue, $strDate);
-				$calibration_sql->WriteDaily($strStockId, $strDate, strval($fFactor));
+				$cal_sql->WriteDaily($strStockId, $strDate, strval($fFactor));
         	
 				$this->LoadCalibration();
 			}

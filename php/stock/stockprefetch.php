@@ -124,7 +124,7 @@ function _prefetchSinaData($arSym)
         $strFileName = DebugGetSinaFileName($str);
         $sym->SetTimeZone();
 		if ($sym->IsSinaFund())
-        {   // fund, IsSinaFund must be called before IsSinaFuture
+        {
 			if (SinaFundNeedFile($sym, $strFileName) == false)		continue;
         }
         else if ($sym->IsSinaFuture() || $sym->IsSinaForex())
@@ -165,7 +165,7 @@ function PrefetchSinaStockData($arSymbol)
         {
             $sym = new StockSymbol($strSymbol);
             if ($sym->IsSinaFund() || $sym->IsSinaForex())
-            {  	// IsSinaFund must be called before IsSinaFuture
+            {
                 $arPrefetch[$strSymbol] = $sym;
             }
             else if ($sym->IsSinaFuture())

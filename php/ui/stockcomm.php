@@ -62,23 +62,9 @@ function RefEchoTableColumn($ref, $ar, $bWide = false)
     EchoTableColumn($ar, false, $bWide ? false : SqlGetStockName($ref->GetSymbol()));
 }
 
-function GetArbitrageRatio($strStockId)
+function GetArbitrageQuantity($strSymbol, $strStockId, $fQuantity)
 {
-   	$calibration_sql = GetCalibrationSql();
-   	if ($strCalibration = $calibration_sql->GetCloseNow($strStockId))
-   	{
-   		$pos_sql = new FundPositionSql();
-   		if ($fPosition = $pos_sql->ReadVal($strStockId))
-   		{
-   			return intval(round(floatval($strCalibration) / $fPosition));
-   		}
-   	}
-   	return 1;
-}
-
-function GetArbitrageQuantity($strStockId, $fQuantity)
-{
-	return strval(round($fQuantity / GetArbitrageRatio($strStockId)));
+	return strval(round($fQuantity / GetStockHedge($strSymbol, $strStockId)));
 }
 
 function GetTurnoverDisplay($fVolume, $fShare, $iPrecision = 2)

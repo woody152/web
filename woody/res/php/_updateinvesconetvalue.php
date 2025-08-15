@@ -9,8 +9,8 @@ class _InvescoCsvFile extends DebugCsvFile
 	var $strSymbol;
 	var $strStockId;
 	var $oldest_ymd;
-	var $netvalue_sql;
-	var $calibration_sql;
+	var $net_sql;
+	var $cal_sql;
     
     public function __construct($strFileName, $strSymbol) 
     {
@@ -24,8 +24,8 @@ class _InvescoCsvFile extends DebugCsvFile
     	}
     	
 		$this->oldest_ymd = new OldestYMD();
-		$this->netvalue_sql = GetNetValueHistorySql();
-		$this->calibration_sql = GetCalibrationSql();
+		$this->net_sql = GetNetValueHistorySql();
+		$this->cal_sql = GetCalibrationSql();
     }
     
     // Ticker,NetValue,Date
@@ -45,7 +45,7 @@ class _InvescoCsvFile extends DebugCsvFile
 //   				DebugString($strDate.' '.$strNetValue);
 				if ($this->ref)
 				{
-					if ($this->netvalue_sql->WriteDaily($this->strStockId, $strDate, $strNetValue))
+					if ($this->net_sql->WriteDaily($this->strStockId, $strDate, $strNetValue))
 					{
 						$this->iCount ++;
 					}

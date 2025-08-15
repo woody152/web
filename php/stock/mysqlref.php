@@ -11,6 +11,7 @@ class MysqlReference extends StockReference
 	var $bConvertGB2312 = false;
 
     var $fFactor = 1.0;			// 'close' field in calibrationhistory table
+    var $fRatio = 1.0;
     
     var $iNetValueCount = 0;
     
@@ -31,8 +32,11 @@ class MysqlReference extends StockReference
 
     	if ($this->strSqlId)
     	{
-    		$netvalue_sql = GetNetValueHistorySql();
-    		$this->iNetValueCount = $netvalue_sql->Count($this->strSqlId);
+    		$net_sql = GetNetValueHistorySql();
+    		$this->iNetValueCount = $net_sql->Count($this->strSqlId);
+    		
+    		$pos_sql = GetPositionSql();
+    		$this->fRatio = ($fRatio = $pos_sql->ReadVal($this->strSqlId)) ? $fRatio : $this->GetDefaultPosition();
     	}
     }
     
@@ -44,9 +48,7 @@ class MysqlReference extends StockReference
 	public function GetClose($strDate)
 	{
 		if ($strDate == $this->GetDate())	return $this->GetPrice();
-//		return SqlGetHisByDate($this->strSqlId, $strDate);
-		$his_sql = GetStockHistorySql();
-		return $his_sql->GetClose($this->strSqlId, $strDate);
+		return SqlGetHistoryByDate($this->strSqlId, $strDate);
 	}
 	
 	public function GetVal($strDate = false)
@@ -78,14 +80,19 @@ class MysqlReference extends StockReference
     	return $this->fFactor;
     }
     
+    function GetPosition()
+    {
+    	return $this->fRatio;
+    }
+    
     function LoadSqlNetValueData()
     {
-    	$netvalue_sql = GetNetValueHistorySql();
-       	if ($record = $netvalue_sql->GetRecordNow($this->strSqlId))
+    	$net_sql = GetNetValueHistorySql();
+       	if ($record = $net_sql->GetRecordNow($this->strSqlId))
        	{
    			$this->strPrice = $record['close'];
    			$this->strDate = $record['date'];
-   			$this->strPrevPrice = $netvalue_sql->GetClosePrev($this->strSqlId, $this->strDate);
+   			$this->strPrevPrice = $net_sql->GetClosePrev($this->strSqlId, $this->strDate);
    		}
     }
 

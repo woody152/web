@@ -26,14 +26,14 @@ function _echoNetValueCloseItem($csv, $his_sql, $shares_sql, $arHistory, $arFund
 function _echoNetValueCloseData($his_sql, $ref, $strStockId, $csv, $iStart, $iNum, $bAdmin)
 {
 	$bSameDay = UseSameDayNetValue($ref);
-	$netvalue_sql = GetNetValueHistorySql();
+	$net_sql = GetNetValueHistorySql();
 	$shares_sql = new SharesHistorySql();
     if ($result = $his_sql->GetAll($strStockId, $iStart, $iNum)) 
     {
         while ($arHistory = mysqli_fetch_assoc($result)) 
         {
        		$strDate = $bSameDay ? $arHistory['date'] : $his_sql->GetDatePrev($strStockId, $arHistory['date']);
-        	if ($arFundNetValue = $netvalue_sql->GetRecord($strStockId, $strDate))	_echoNetValueCloseItem($csv, $his_sql, $shares_sql, $arHistory, $arFundNetValue, $ref, $strStockId, $bAdmin);
+        	if ($arFundNetValue = $net_sql->GetRecord($strStockId, $strDate))	_echoNetValueCloseItem($csv, $his_sql, $shares_sql, $arHistory, $arFundNetValue, $ref, $strStockId, $bAdmin);
         }
         mysqli_free_result($result);
     }

@@ -21,7 +21,6 @@ function _echoTradingTableItem($strColor, $strAskBid, $strPrice, $strQuantity, $
 	if ($strEstPrice)	$ar[] = $ref->GetPercentageDisplay($strEstPrice, $strPrice);
 	if ($strEstPrice2)	$ar[] = $ref->GetPercentageDisplay($strEstPrice2, $strPrice);
 	if ($strEstPrice3)	$ar[] = $ref->GetPercentageDisplay($strEstPrice3, $strPrice);
-
     if ($callback && (empty($strPrice) == false))
     {
     	$ar[] = call_user_func($callback, $strPrice);
@@ -49,18 +48,12 @@ function _echoTradingTableData($ref, $strEstPrice, $strEstPrice2, $strEstPrice3,
     
     for ($i = TRADING_QUOTE_NUM - 1; $i >= 0; $i --)
     {
-    	if (isset($ref->arAskQuantity[$i]))
-    	{
-    		_echoTradingTableItem(_getTradingColor($i), '卖'._getTradingIndex($i), $ref->arAskPrice[$i], $ref->arAskQuantity[$i], $ref, $strEstPrice, $strEstPrice2, $strEstPrice3, $callback);
-    	}
+    	if ($strQuantity = $ref->GetAskQuantity($i))	_echoTradingTableItem(_getTradingColor($i), '卖'._getTradingIndex($i), $ref->GetAskPrice($i), $strQuantity, $ref, $strEstPrice, $strEstPrice2, $strEstPrice3, $callback);
     }
 
     for ($i = 0; $i < TRADING_QUOTE_NUM; $i ++)
     {
-    	if (isset($ref->arBidQuantity[$i]))
-    	{
-    		_echoTradingTableItem(_getTradingColor($i), '买'._getTradingIndex($i), $ref->arBidPrice[$i], $ref->arBidQuantity[$i], $ref, $strEstPrice, $strEstPrice2, $strEstPrice3, $callback);
-    	}
+    	if ($strQuantity = $ref->GetBidQuantity($i))	_echoTradingTableItem(_getTradingColor($i), '买'._getTradingIndex($i), $ref->GetBidPrice($i), $strQuantity, $ref, $strEstPrice, $strEstPrice2, $strEstPrice3, $callback);
     }
 
 	_echoTradingTableItem($strColor, '跌停', strval_round(floatval($strPrice) * 0.9, $iPrecision), '', $ref, $strEstPrice, $strEstPrice2, $strEstPrice3, $callback);
@@ -70,14 +63,14 @@ function _checkTradingQuantity($ref)
 {
     for ($i = 0; $i < TRADING_QUOTE_NUM; $i ++)
     {
-    	if (isset($ref->arAskQuantity[$i]))
+    	if ($strQuantity = $ref->GetAskQuantity($i))
     	{
-    		if ($ref->arAskQuantity[$i] != '0')	return false;
+    		if ($strQuantity != '0')	return false;
     	}
 
-    	if (isset($ref->arBidQuantity[$i]))
+    	if ($strQuantity = $ref->GetBidQuantity($i))
     	{
-    		if ($ref->arBidQuantity[$i] != '0')	return false;
+    		if ($strQuantity != '0')	return false;
     	}
     }
     return true;

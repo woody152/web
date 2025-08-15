@@ -1,7 +1,7 @@
 <?php
 require_once('../../php/class/PHPExcel/IOFactory.php');
 
-function _readXlsFile($bIshares, $strPathName, $netvalue_sql, $shares_sql, $strStockId)
+function _readXlsFile($bIshares, $strPathName, $net_sql, $shares_sql, $strStockId)
 {
 //	date_default_timezone_set('America/New_York');
 	try 
@@ -34,7 +34,7 @@ function _readXlsFile($bIshares, $strPathName, $netvalue_sql, $shares_sql, $strS
 	$highestColumn = $sheet->getHighestColumn();
 
 	$oldest_ymd = new OldestYMD();
-   	$calibration_sql = GetCalibrationSql();
+   	$cal_sql = GetCalibrationSql();
 	
 	// 获取一行的数据
 	$iCount = 0;
@@ -53,13 +53,13 @@ function _readXlsFile($bIshares, $strPathName, $netvalue_sql, $shares_sql, $strS
 			if ($oldest_ymd->IsTooOld($strDate))	break;
    			if ($oldest_ymd->IsInvalid($strDate) === false)
    			{
-  				if ($netvalue_sql->WriteDaily($strStockId, $strDate, $ar[$iNetValueIndex]))
+  				if ($net_sql->WriteDaily($strStockId, $strDate, $ar[$iNetValueIndex]))
   				{
   					$iCount ++;
-  					if ($calibration_sql->GetClose($strStockId, $strDate))
+  					if ($cal_sql->GetClose($strStockId, $strDate))
   					{
   						DebugString('Delete calibaration on '.$strDate);
-  						$calibration_sql->DeleteByDate($strStockId, $strDate);
+  						$cal_sql->DeleteByDate($strStockId, $strDate);
   					}
   				}
   				if ($shares_sql->WriteDaily($strStockId, $strDate, strval(floatval($ar[$iSharesIndex]) / 10000.0)))
@@ -91,9 +91,9 @@ function GetNetValueXlsStr($sym, $bAutoCheck = false)
 			file_put_contents($strPathName, $str);
 			$sym->SetTimeZone();
 			$strStockId = SqlGetStockId($strSymbol);
-			$netvalue_sql = GetNetValueHistorySql();
+			$net_sql = GetNetValueHistorySql();
 			$shares_sql = new SharesHistorySql();
-			return _readXlsFile($bIshares, $strPathName, $netvalue_sql, $shares_sql, $strStockId);
+			return _readXlsFile($bIshares, $strPathName, $net_sql, $shares_sql, $strStockId);
 		}
 		else
 		{

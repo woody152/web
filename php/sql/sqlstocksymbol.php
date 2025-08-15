@@ -5,6 +5,7 @@ require_once('sqlkeytable.php');
 require_once('sqldailyclose.php');
 require_once('sqldailytime.php');
 require_once('sqlholdings.php');
+require_once('sqlval.php');
 
 class StockHistorySql extends DailyCloseSql
 {
@@ -98,25 +99,27 @@ class StockHistorySql extends DailyCloseSql
 
 class StockSql extends KeyNameSql
 {
-    var $calibration_sql;
+    var $cal_sql;
     var $ema50_sql;
     var $ema200_sql;
 	var $fund_est_sql;
     var $his_sql;
 	var $holdings_sql;
-    var $netvalue_sql;
+    var $net_sql;
+    var $pos_sql;
     
     public function __construct()
     {
         parent::__construct('stock', 'symbol');
         
-       	$this->calibration_sql = new CalibrationSql();
+       	$this->cal_sql = new CalibrationSql();
        	$this->ema50_sql = new StockEmaSql(50);
        	$this->ema200_sql = new StockEmaSql(200);
-       	$this->fund_est_sql = new FundEstSql();
+       	$this->fund_est_sql = new DailyTimeSql('fundest');
        	$this->his_sql = new StockHistorySql();
         $this->holdings_sql = new HoldingsSql();
-       	$this->netvalue_sql = new DailyCloseSql('netvaluehistory');
+       	$this->net_sql = new DailyCloseSql('netvaluehistory');
+       	$this->pos_sql = new ValSql('fundposition');
     }
 
     public function Create()
@@ -227,7 +230,7 @@ function SqlGetStockSymbolAndId($strWhere, $strLimit = false)
 function GetCalibrationSql()
 {
 	global $g_stock_sql;
-   	return $g_stock_sql->calibration_sql;
+   	return $g_stock_sql->cal_sql;
 }
 
 function GetFundEstSql()
@@ -255,13 +258,13 @@ function SqlDeleteStockHistory($strStockId)
 		}
 	}
 }
-/*
-function SqlGetHisByDate($strStockId, $strDate)
+
+function SqlGetHistoryByDate($strStockId, $strDate)
 {
 	$his_sql = GetStockHistorySql();
 	return $his_sql->GetClose($strStockId, $strDate);
 }
-*/
+
 function GetStockEmaSql($iDays)
 {
 	global $g_stock_sql;
@@ -288,36 +291,36 @@ function SqlDeleteStockEma($strStockId)
 function GetNetValueHistorySql()
 {
 	global $g_stock_sql;
-   	return $g_stock_sql->netvalue_sql;
+   	return $g_stock_sql->net_sql;
 }
 
 function SqlDeleteNetValueHistory($strStockId)
 {
-	$netvalue_sql = GetNetValueHistorySql();
-	$iTotal = $netvalue_sql->Count($strStockId);
+	$net_sql = GetNetValueHistorySql();
+	$iTotal = $net_sql->Count($strStockId);
 	if ($iTotal > 0)
 	{
 		DebugVal($iTotal, 'Net value history existed');
-		$netvalue_sql->DeleteAll($strStockId);
+		$net_sql->DeleteAll($strStockId);
 	}
 }
 
 function SqlSetNetValue($strStockId, $strDate, $strNetValue)
 {
-	$netvalue_sql = GetNetValueHistorySql();
-	return $netvalue_sql->InsertDaily($strStockId, $strDate, $strNetValue);
+	$net_sql = GetNetValueHistorySql();
+	return $net_sql->InsertDaily($strStockId, $strDate, $strNetValue);
 }
 
 function SqlGetNetValueByDate($strStockId, $strDate)
 {
-	$netvalue_sql = GetNetValueHistorySql();
-	return $netvalue_sql->GetClose($strStockId, $strDate);
+	$net_sql = GetNetValueHistorySql();
+	return $net_sql->GetClose($strStockId, $strDate);
 }
 
 function SqlGetNetValue($strStockId)
 {
-	$netvalue_sql = GetNetValueHistorySql();
-	return $netvalue_sql->GetCloseNow($strStockId);
+	$net_sql = GetNetValueHistorySql();
+	return $net_sql->GetCloseNow($strStockId);
 }
 
 function SqlGetUscny()
@@ -345,6 +348,12 @@ function SqlCountHoldings($strSymbol)
 {
 	$holdings_sql = GetHoldingsSql();
 	return $holdings_sql->Count(SqlGetStockId($strSymbol));
+}
+
+function GetPositionSql()
+{
+	global $g_stock_sql;
+   	return $g_stock_sql->pos_sql;
 }
 
 ?>

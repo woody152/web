@@ -27,14 +27,6 @@ class TableColumnChange extends TableColumn
 	}
 }
 
-class TableColumnConvert extends TableColumn
-{
-	public function __construct()
-	{
-        parent::__construct(STOCK_DISP_CONVERT, 80, 'navy');
-	}
-}
-
 class TableColumnError extends TableColumn
 {
 	public function __construct()
@@ -78,6 +70,14 @@ class TableColumnRealtimeEst extends TableColumnEst
 	public function __construct()
 	{
         parent::__construct(STOCK_DISP_REALTIME);
+	}
+}
+
+class TableColumnHedge extends TableColumn
+{
+	public function __construct()
+	{
+        parent::__construct(STOCK_DISP_HEDGE, 80, 'navy');
 	}
 }
 
@@ -173,9 +173,9 @@ class TableColumnProfit extends TableColumn
 
 class TableColumnQuantity extends TableColumn
 {
-	public function __construct($iWidth = 100)
+	public function __construct($strPrefix = false, $iWidth = 100)
 	{
-        parent::__construct(STOCK_DISP_QUANTITY, $iWidth, 'indigo');
+        parent::__construct(STOCK_DISP_QUANTITY, $iWidth, 'indigo', $strPrefix);
 	}
 }
 

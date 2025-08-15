@@ -9,12 +9,11 @@ class _AdminHoldingsAccount extends SymbolAccount
     {
 	    if ($ref = $this->GetSymbolRef())
 	    {
-			if ($strDate = UrlGetQueryValue('date'))
+			if ($strHoldings = UrlGetQueryValue('holdings'))
 			{
-				if ($strHoldings = UrlGetQueryValue('holdings'))
-				{
-					_updateStockOptionHoldings($ref->GetSymbol(), $ref->GetStockId(), $strDate, $strHoldings);
-				}
+				$strSymbol = $ref->GetSymbol();
+				$ref = new HoldingsReference($strSymbol);
+				if ($strDate = $ref->GetHoldingsDate())		_updateStockOptionHoldings($strSymbol, $ref->GetStockId(), $strDate, $strHoldings);
 			}
 	    }
 	}

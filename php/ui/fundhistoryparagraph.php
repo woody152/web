@@ -1,21 +1,21 @@
 <?php
 require_once('stocktable.php');
 
-function _echoFundHistoryTableItem($csv, $strNav, $arHistory, $arFundEst, $ref, $est_ref, $his_sql, $bAdmin)
+function _echoFundHistoryTableItem($csv, $strNetValue, $arHistory, $arFundEst, $ref, $est_ref, $his_sql, $bAdmin)
 {
 	$strClose = $arHistory['close'];
 	$strDate = $arHistory['date'];
-    if ($csv)		$csv->Write($strDate, $strNav, $ref->GetPercentageString($strNav, $strClose));
+    if ($csv)		$csv->Write($strDate, $strNetValue, $ref->GetPercentageString($strNetValue, $strClose));
 
-   	$ar = array($strDate, $ref->GetPriceDisplay($strClose, $strNav), $strNav, $ref->GetPercentageDisplay($strNav, $strClose));
+   	$ar = array($strDate, $ref->GetPriceDisplay($strClose, $strNetValue), $strNetValue, $ref->GetPercentageDisplay($strNetValue, $strClose));
     if ($arFundEst)
     {
     	if ($strEstValue = $arFundEst['close'])
     	{
-    		$ar[] = $ref->GetPriceDisplay($strEstValue, $strNav);
+    		$ar[] = $ref->GetPriceDisplay($strEstValue, $strNetValue);
     		$strTime = GetHM($arFundEst['time']); 
     		$ar[] = $bAdmin ? GetOnClickLink('/php/_submitdelete.php?'.'fundest'.'='.$arFundEst['id'], '确认删除估值记录'.$strEstValue.'？', $strTime) : $strTime;
-    		$ar[] = $ref->GetPercentageDisplay($strNav, $strEstValue);
+    		$ar[] = $ref->GetPercentageDisplay($strNetValue, $strEstValue);
 		
     		if ($est_ref)
     		{
@@ -34,8 +34,8 @@ function _echoFundHistoryTableItem($csv, $strNav, $arHistory, $arFundEst, $ref, 
 function _echoHistoryTableData($his_sql, $fund_est_sql, $csv, $ref, $strStockId, $est_ref, $iStart, $iNum, $bAdmin)
 {
 	$bSameDay = UseSameDayNetValue($ref);
-	$netvalue_sql = GetNetValueHistorySql();
-	if ($est_ref)		$est_sql = ($est_ref->CountNetValue() > 0) ? $netvalue_sql : $his_sql;
+	$net_sql = GetNetValueHistorySql();
+	if ($est_ref)		$est_sql = ($est_ref->CountNetValue() > 0) ? $net_sql : $his_sql;
 	else				$est_sql = false;
 	
     if ($result = $his_sql->GetAll($strStockId, $iStart, $iNum)) 
@@ -43,10 +43,10 @@ function _echoHistoryTableData($his_sql, $fund_est_sql, $csv, $ref, $strStockId,
         while ($arHistory = mysqli_fetch_assoc($result)) 
         {
        		$strDate = $bSameDay ? $arHistory['date'] : $his_sql->GetDatePrev($strStockId, $arHistory['date']);
-        	if ($strNav = $netvalue_sql->GetClose($strStockId, $strDate))
+        	if ($strNetValue = $net_sql->GetClose($strStockId, $strDate))
         	{
    				$arFundEst = $fund_est_sql ? $fund_est_sql->GetRecord($strStockId, $strDate) : false;
-        		_echoFundHistoryTableItem($csv, $strNav, $arHistory, $arFundEst, $ref, $est_ref, $est_sql, $bAdmin);
+        		_echoFundHistoryTableItem($csv, $strNetValue, $arHistory, $arFundEst, $ref, $est_ref, $est_sql, $bAdmin);
         	}
         }
         mysqli_free_result($result);

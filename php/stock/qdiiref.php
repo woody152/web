@@ -190,7 +190,6 @@ class _QdiiReference extends FundReference
             	$est_ref = $this->GetEstRef();
 	        	if (($strEst = $this->_getEstNetValue($strDate)) === false)
 	        	{
-//	           		if (($strEst = SqlGetHisByDate($est_ref->GetStockId(), $strDate)) === false)		return false;
 	           		if (($strEst = $est_ref->GetClose($strDate)) === false)		return false;
                 }
         

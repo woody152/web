@@ -93,7 +93,7 @@ function _updateStockOptionAdr($strSymbol, $strVal)
 	if ($strStockId = SqlGetStockId($strAdr))
 	{
 		$pair_sql = new AdrPairSql();
-		$pos_sql = new FundPositionSql();
+		$pos_sql = GetPositionSql();
 		if ($strRatio == '0')
 		{
 			$pair_sql->DeleteBySymbol($strAdr);
@@ -139,32 +139,48 @@ function _updateStockOptionEma($strSymbol, $strStockId, $strDate, $strVal)
     unlinkConfigFile($strSymbol);
 }
 
-function _updateStockOptionFund($strSymbol, $strVal)
+function _updateStockOptionFund($strSymbol, $strStockId, $strVal)
 {
 	if (strpos($strVal, '*') !== false)
 	{
 		$ar = explode('*', $strVal);
 		$strIndex = $ar[0];
-		$strRatio = $ar[1];
+		$strPos = $ar[1];
 	}
 	else
 	{
-		$strIndex = $strVal;
-		$strRatio = false;
+		if (is_numeric($strVal) && floatval($strVal) < 3.0 + MIN_FLOAT_VAL)
+		{
+			$strIndex = false;
+			$strPos = $strVal;
+		}
+		else
+		{
+			$strIndex = $strVal;
+			$strPos = false;
+		}
 	}
 	
-	$strStockId = SqlGetStockId($strSymbol);
 	$pair_sql = new FundPairSql();
-	$pos_sql = new FundPositionSql();
-	if ($strRatio == '0')
+	$pos_sql = GetPositionSql();
+	if ($strPos == '0')
 	{
-		$pair_sql->DeleteBySymbol($strSymbol);
+		if ($strIndex)
+		{
+			$cal_sql = GetCalibrationSql();
+			$cal_sql->DeleteAll($strStockId);
+			
+			$last_sql = new LastCalibrationSql();
+			$last_sql->DeleteById($strStockId);
+
+			$pair_sql->DeleteBySymbol($strSymbol);
+		}
 		$pos_sql->DeleteById($strStockId);
 	}
 	else
 	{
-		$pair_sql->WritePairSymbol($strSymbol, StockGetSymbol($strIndex));
-		if ($strRatio)	$pos_sql->WriteVal($strStockId, $strRatio); 
+		if ($strIndex)	$pair_sql->WritePairSymbol($strSymbol, StockGetSymbol($strIndex));
+		if ($strPos)	$pos_sql->WriteVal($strStockId, $strPos); 
 	}
 }
 
@@ -234,16 +250,16 @@ function _updateStockOptionDividend($ref, $strSymbol, $strStockId, $his_sql, $st
 	if (_updateOptionDailySql($sql, $strStockId, $strDate, $strVal))
 	{
 		DebugString('Dividend updated');
-       	$calibration_sql = GetCalibrationSql();
-		$netvalue_sql = GetNetValueHistorySql();
-  		if ($strClosePrev = $calibration_sql->GetClosePrev($strStockId, $strDate))
+       	$cal_sql = GetCalibrationSql();
+		$net_sql = GetNetValueHistorySql();
+  		if ($strClosePrev = $cal_sql->GetClosePrev($strStockId, $strDate))
   		{	// SPY, TQQQ
-  			$strDatePrev = $calibration_sql->GetDatePrev($strStockId, $strDate);
+  			$strDatePrev = $cal_sql->GetDatePrev($strStockId, $strDate);
   			DebugString($strSymbol.' Change calibaration on '.$strDatePrev);
-  			$fNav = floatval($netvalue_sql->GetClose($strStockId, $strDatePrev));
-  			$fNewNetValue = $fNav - floatval($strVal); 
-  			$fFactor = floatval($strClosePrev) * $fNav / $fNewNetValue;
-  			$calibration_sql->WriteDaily($strStockId, $strDatePrev, strval($fFactor));
+  			$fNetValue = floatval($net_sql->GetClose($strStockId, $strDatePrev));
+  			$fNewNetValue = $fNetValue - floatval($strVal); 
+  			$fFactor = floatval($strClosePrev) * $fNetValue / $fNewNetValue;
+  			$cal_sql->WriteDaily($strStockId, $strDatePrev, strval($fFactor));
   		}
   		else
   		{
@@ -272,18 +288,18 @@ function _updateStockOptionDividend($ref, $strSymbol, $strStockId, $his_sql, $st
 			foreach ($arQdii as $strQdii)
 			{
 				$strQdiiId = SqlGetStockId($strQdii);
-				if ($strClosePrev = $calibration_sql->GetClosePrev($strQdiiId, $strDate))
+				if ($strClosePrev = $cal_sql->GetClosePrev($strQdiiId, $strDate))
 				{
-					$strDatePrev = $calibration_sql->GetDatePrev($strQdiiId, $strDate);
+					$strDatePrev = $cal_sql->GetDatePrev($strQdiiId, $strDate);
 					DebugString(__FUNCTION__.' '.$strQdii.' Change calibaration on '.$strDatePrev);
-					$fNav = floatval($netvalue_sql->GetClose($strStockId, $strDatePrev));
-					$fNewNetValue = $fNav - floatval($strVal); 
-					$fFactor = floatval($strClosePrev) * $fNewNetValue / $fNav;
-					$calibration_sql->WriteDaily($strQdiiId, $strDatePrev, strval($fFactor));
+					$fNetValue = floatval($net_sql->GetClose($strStockId, $strDatePrev));
+					$fNewNetValue = $fNetValue - floatval($strVal); 
+					$fFactor = floatval($strClosePrev) * $fNewNetValue / $fNetValue;
+					$cal_sql->WriteDaily($strQdiiId, $strDatePrev, strval($fFactor));
 				}
   			}
   		}
- 		if ($strClosePrev)	$netvalue_sql->WriteDaily($strStockId, $strDatePrev, strval($fNewNetValue));
+ 		if ($strClosePrev)	$net_sql->WriteDaily($strStockId, $strDatePrev, strval($fNewNetValue));
 		_updateStockHistoryAdjCloseByDividend($ref, $strSymbol, $strStockId, $his_sql, $strDate, $strVal);
 	}
 }
@@ -293,9 +309,7 @@ function _updateStockOptionCalibration($strSymbol, $strStockId, $strDate, $strVa
 	DebugString($strSymbol.' '.$strDate.' '.$strVal);
 	if (!empty($strVal))
 	{
-		$strNav = SqlGetNetValueByDate($strStockId, $strDate);
-//		if ($strNav == false)	return;
-		
+		$strNetValue = SqlGetNetValueByDate($strStockId, $strDate);
 		if ($strSymbol == 'INDA' || $strSymbol == 'ASHR')
 		{
 			$ref = new FundPairReference($strSymbol);
@@ -317,7 +331,7 @@ function _updateStockOptionCalibration($strSymbol, $strStockId, $strDate, $strVa
 			else 																	return;
 
 			if ($strCNY == false)	return;
-			$strVal = strval(QdiiGetCalibration($strVal, $strCNY, $strNav));
+			$strVal = strval(QdiiGetCalibration($strVal, $strCNY, $strNetValue));
 		}
 	}
 	
@@ -372,7 +386,7 @@ class _SubmitOptionsAccount extends Account
 			break;
 			
 		case STOCK_OPTION_FUND:
-			if ($bAdmin)	_updateStockOptionFund($strSymbol, $strVal);
+			if ($bAdmin)	_updateStockOptionFund($strSymbol, $strStockId, $strVal);
 			break;
 			
 		case STOCK_OPTION_HA:

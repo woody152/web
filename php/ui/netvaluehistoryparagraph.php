@@ -1,11 +1,11 @@
 <?php
 require_once('stocktable.php');
 
-function _echoNetValueItem($csv, $netvalue_sql, $strStockId, $est_sql, $strEstId, $strNetValue, $strDate, $ref, $est_ref, $cny_ref)
+function _echoNetValueItem($csv, $net_sql, $strStockId, $est_sql, $strEstId, $strNetValue, $strDate, $ref, $est_ref, $cny_ref)
 {
 	$bWritten = false;
 	$ar = array($strDate, $strNetValue);
-	if ($record = $netvalue_sql->GetRecordPrev($strStockId, $strDate))
+	if ($record = $net_sql->GetRecordPrev($strStockId, $strDate))
     {
     	$strPrevDate = $record['date'];
     	$strPrev = rtrim0($record['close']);
@@ -50,11 +50,11 @@ function _echoNetValueItem($csv, $netvalue_sql, $strStockId, $est_sql, $strEstId
 
 function _echoNetValueData($csv, $ref, $est_ref, $cny_ref, $iStart, $iNum)
 {
-	$netvalue_sql = GetNetValueHistorySql();
+	$net_sql = GetNetValueHistorySql();
 	if ($est_ref)
 	{
 		$strEstId = $est_ref->GetStockId();
-		$est_sql = $netvalue_sql;
+		$est_sql = $net_sql;
 		if ($est_sql->Count($strEstId) == 0 || $est_ref->IsIndex())
 		{
 			$est_sql = GetStockHistorySql();
@@ -67,11 +67,11 @@ function _echoNetValueData($csv, $ref, $est_ref, $cny_ref, $iStart, $iNum)
 	}
 
 	$strStockId = $ref->GetStockId();
-    if ($result = $netvalue_sql->GetAll($strStockId, $iStart, $iNum)) 
+    if ($result = $net_sql->GetAll($strStockId, $iStart, $iNum)) 
     {
         while ($record = mysqli_fetch_assoc($result)) 
         {
-			_echoNetValueItem($csv, $netvalue_sql, $strStockId, $est_sql, $strEstId, rtrim0($record['close']), $record['date'], $ref, $est_ref, $cny_ref);
+			_echoNetValueItem($csv, $net_sql, $strStockId, $est_sql, $strEstId, rtrim0($record['close']), $record['date'], $ref, $est_ref, $cny_ref);
         }
         mysqli_free_result($result);
     }

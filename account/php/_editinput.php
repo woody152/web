@@ -404,9 +404,9 @@ function _getSinaJsInterpretationArray($strSymbol, $bChinese)
 	else if (preg_match('/^'.SINA_FUND_PREFIX.'\d{6}$/', $strSymbol))	return _getSinaJsFundArray($bChinese);
 	else if (str_starts_with($strSymbol, SINA_US_PREFIX))				return _getSinaJsAmericanArray($bChinese);
 	else if (str_starts_with($strSymbol, SINA_FUTURE_PREFIX))			return _getSinaJsFutureArray($bChinese);
-	else if (str_starts_with($strSymbol, SINA_FOREX_PREFIX))				return _getSinaJsForexArray($bChinese);
+	else if (str_starts_with($strSymbol, SINA_CN_FUTURE_PREFIX))		return _getSinaJsChineseFutureArray($bChinese);
+	else if (str_starts_with($strSymbol, SINA_FOREX_PREFIX))			return _getSinaJsForexArray($bChinese);
 	else if (str_starts_with($strSymbol, SINA_HK_PREFIX))				return _getSinaJsHongkongArray($bChinese);	// rt_hkHSCEI, rt_hk00386
-	else if (str_ends_with($strSymbol, '0'))								return _getSinaJsChineseFutureArray($bChinese);
 	return false;
 }
 
@@ -602,7 +602,7 @@ function _getDefaultInput($strPage)
     	break;
     		
    	case 'sinajs':
-    	$str = 'sz162411,f_162411,gb_xop,hf_CL,fx_susdcnh,rt_hk00386,AU0,b_TPX,rt_hkHSIII';
+    	$str = 'sz162411,f_162411,gb_xop,hf_CL,fx_susdcnh,rt_hk00386,nf_AU0,b_TPX,rt_hkHSIII';
    		break;
    		
     default:

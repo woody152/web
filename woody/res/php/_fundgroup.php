@@ -19,8 +19,8 @@ function NeedOfficialNetValue($ref)
 	$his_sql = GetStockHistorySql();
 	if ($strPrevDate = $his_sql->GetDatePrev($strStockId, $strDate))
 	{
-		$netvalue_sql = GetNetValueHistorySql();
-		if ($netvalue_sql->GetRecord($strStockId, $strPrevDate))	return false;	// already have previous trading day's data
+		$net_sql = GetNetValueHistorySql();
+		if ($net_sql->GetRecord($strStockId, $strPrevDate))	return false;	// already have previous trading day's data
 	
 		$ref->SetTimeZone();
 		$now_ymd = GetNowYMD();

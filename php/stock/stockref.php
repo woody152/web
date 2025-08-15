@@ -55,6 +55,28 @@ class StockReference extends StockSymbol
     	return $this->strVolume;
     }
     
+    function GetAskPrice($iIndex = 0)
+    {
+    	return $this->arAskPrice[$iIndex];
+    }
+    
+    function GetBidPrice($iIndex = 0)
+    {
+    	return $this->arBidPrice[$iIndex];
+    }
+
+    function GetAskQuantity($iIndex = 0)
+    {
+    	if (isset($this->arAskQuantity[$iIndex]))	return $this->arAskQuantity[$iIndex];
+    	return false;
+    }
+    
+    function GetBidQuantity($iIndex = 0)
+    {
+    	if (isset($this->arBidQuantity[$iIndex]))	return $this->arBidQuantity[$iIndex];
+    	return false;
+    }
+    
     function GetExternalLink()
     {
         return $this->strExternalLink;
@@ -126,6 +148,11 @@ class StockReference extends StockSymbol
     {
         return $this->strDate;
     }
+
+	function GetTime()
+	{
+		return $this->strTime;
+	}
     
     // 06:56:22 => 06:56
 	function GetTimeHM()

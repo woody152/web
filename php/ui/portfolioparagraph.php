@@ -6,7 +6,7 @@ function _getPortfolioTestVal($iShares, $strSymbol)
 	switch ($strSymbol)
     {
     case 'KWEB':
-		$iQuantity = 400;
+		$iQuantity = 00;
 		break;
 		
     case 'SH600104':
@@ -71,7 +71,7 @@ function _getArbitrageTestStr($iShares, $strGroupId, $strStockId, $strSymbol)
     if ($record)
     {
     	$iQuantity = _getPortfolioTestVal($iShares, $strSymbol); 
-    	return strval($iArbitrageQuantity + $iQuantity * GetArbitrageRatio($record['stock_id']));
+    	return strval($iArbitrageQuantity + $iQuantity * intval(GetStockHedge(SqlGetStockSymbol($record['stock_id']), $record['stock_id'])));
     }
     return '';
 }
@@ -92,7 +92,7 @@ function _echoPortfolioTableItem($trans)
     if ($iShares != 0)
     {
     	$fVal = $trans->GetValue();
-    	if (in_arrayQdiiMix($strSymbol) || in_arrayQdii($strSymbol))	$fCny += $fVal * RefGetPosition($ref);
+    	if (in_arrayQdiiMix($strSymbol) || in_arrayQdii($strSymbol))	$fCny += $fVal * $ref->GetPosition();
     	
         $ar[] = GetNumberDisplay($fVal);
         $ar[] = strval($iShares); 
@@ -114,11 +114,13 @@ function _echoPortfolioTableItem($trans)
         	$ar[] = strval(_getPortfolioTestVal($iShares, $strSymbol));
 			break;
 
-//        case 'SZ161127':
+        case 'SZ161125':
+        case 'SZ161127':
+        case 'SZ161130':
 		case 'SZ162411':
 		case 'SZ162415':
         case 'SZ164906':
-        	$ar[] = GetArbitrageQuantity($strStockId, floatval($iShares));
+        	$ar[] = GetArbitrageQuantity($strSymbol, $strStockId, floatval($iShares));
 			break;
 
 		case 'hf_ES':
@@ -129,7 +131,7 @@ function _echoPortfolioTableItem($trans)
 			$fVal += $fCny;
 //			$ar[] = GetNumberDisplay($fVal).' $'.GetNumberDisplay($fVal / floatval($ref->GetPrice()));
 			$strPage = 'overnightcnh';
-			$ar[] = GetStockPhpLink($strPage, '$'.strval_round($fVal / floatval($ref->GetPrice()), 0), $strPage.'='.strval_round($fVal, 0));
+			$ar[] = GetStockPhpLink($strPage, '$'.strval(round($fVal / $ref->GetVal() / 1000.0)).'K', $strPage.'='.strval_round(0.0 - $fVal, 0));
 			break;
    		}
     }

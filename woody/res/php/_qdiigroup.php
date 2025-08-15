@@ -12,7 +12,10 @@ function _tradingUserDefined($strVal = false)
 
     if ($strVal)
     {
-    	if ($strVal == '0')	return '';
+    	if ($strVal == '0')
+    	{
+    		return '';
+    	}
     	else
     	{
     		$strEst = $fund->GetEstValue($strVal);
@@ -34,15 +37,26 @@ function _tradingUserDefined($strVal = false)
    	return TableColumnGetStock($est_ref).$strLev.TableColumnGetPrice();
 }
 
-function _convertCallback($fRatio, $fFactor)
+function _callbackFundListHedge($fPos, $fFactor, $strDate, $strStockId)
 {
 	global $acct;
-   	$calibration_sql = GetCalibrationSql();
     
 	$ref = $acct->GetRef();
-   	$fPosition = RefGetPosition($ref);
-   	$fCalibration = floatval($calibration_sql->GetCloseNow($ref->GetStockId()));
-   	return strval(round(($fCalibration / $fPosition) * ($fRatio / $fFactor)));
+   	$fQdiiPos = $ref->GetPosition();
+   	
+   	$cal_sql = GetCalibrationSql();
+	if ($record = $cal_sql->GetRecordNow($ref->GetStockId()))
+    {
+		$fQdiiCalibration = floatval($record['close']);
+		$strQdiiDate = $record['date']; 
+		if ($strQdiiDate != $strDate)
+		{
+			$fFactor = floatval($cal_sql->GetClose($strStockId, $strQdiiDate));
+			// DebugString(__FUNCTION__.' Reload calibration factor because of difference date: '.$strQdiiDate.' '.$strDate);
+		}
+		return StockCalcLeverageHedge($fQdiiCalibration, $fQdiiPos, $fFactor, $fPos);
+	}
+	return '';
 }
 
 class QdiiGroupAccount extends FundGroupAccount 
@@ -75,7 +89,10 @@ class QdiiGroupAccount extends FundGroupAccount
     		{
     			if (NeedOfficialNetValue($leverage_ref))	UpdateInvescoNetValue($strSymbol);
     		}
-    		else											YahooUpdateNetValue($leverage_ref);
+    		else
+    		{
+    			YahooUpdateNetValue($leverage_ref);
+    		}
     		$leverage_ref->DailyCalibration();
     	}
         $this->CreateGroup(array_merge($arRef, $this->ar_leverage_ref));
@@ -100,7 +117,7 @@ class QdiiGroupAccount extends FundGroupAccount
     	EchoQdiiSmaParagraph($ref);
     	if (count($arLev) > 0)	
     	{
-    		EchoFundListParagraph($arLev, '_convertCallback');
+    		EchoFundListParagraph($arLev, '_callbackFundListHedge');
     		EchoFundPairSmaParagraphs($ref->GetEstRef(), $arLev);
     	}
     	EchoFutureSmaParagraph($ref);

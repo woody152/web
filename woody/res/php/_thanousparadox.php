@@ -51,9 +51,9 @@ function _echoThanousParadoxItem($csv, $strNetValue, $strClose, $strDate, $ref, 
 	EchoTableColumn($ar);
 }
 
-function _echoThanousParadoxData($csv, $netvalue_sql, $ref, $strStockId, $est_ref, $iStart, $iNum)
+function _echoThanousParadoxData($csv, $net_sql, $ref, $strStockId, $est_ref, $iStart, $iNum)
 {
-    if ($result = $netvalue_sql->GetAll($strStockId, $iStart, $iNum)) 
+    if ($result = $net_sql->GetAll($strStockId, $iStart, $iNum)) 
     {
     	$his_sql = GetStockHistorySql();
     	$strEstStockId = $est_ref->GetStockId();
@@ -82,8 +82,8 @@ function _echoThanousParadoxParagraph($strSymbol, $iStart, $iNum)
  	$str = GetFundLinks($strSymbol);
 
  	$strStockId = $ref->GetStockId();
-	$netvalue_sql = GetNetValueHistorySql();
-   	$strMenuLink = StockGetMenuLink($strSymbol, $netvalue_sql->Count($strStockId), $iStart, $iNum);
+	$net_sql = GetNetValueHistorySql();
+   	$strMenuLink = StockGetMenuLink($strSymbol, $net_sql->Count($strStockId), $iStart, $iNum);
 	$str .= ' '.$strMenuLink;
 
 	EchoTableParagraphBegin(array(new TableColumnDate(),
@@ -95,7 +95,7 @@ function _echoThanousParadoxParagraph($strSymbol, $iStart, $iNum)
 								   ), 'thanousparadox', $str);
 
    	$csv = new PageCsvFile();
-	_echoThanousParadoxData($csv, $netvalue_sql, $ref->GetStockRef(), $strStockId, $est_ref, $iStart, $iNum);
+	_echoThanousParadoxData($csv, $net_sql, $ref->GetStockRef(), $strStockId, $est_ref, $iStart, $iNum);
     $csv->Close();
     EchoTableParagraphEnd($strMenuLink);
 

@@ -15,8 +15,8 @@ function GetKraneNetValue($ref)
 {
 	$strStockId = $ref->GetStockId();
 	$strDate = $ref->GetDate();
-	$netvalue_sql = GetNetValueHistorySql();
- 	$strNetValueDate = $netvalue_sql->GetDateNow($strStockId);	
+	$net_sql = GetNetValueHistorySql();
+ 	$strNetValueDate = $net_sql->GetDateNow($strStockId);	
 	if ($strNetValueDate == $strDate)	return false;		// already have current net value
 	$his_sql = GetStockHistorySql();
 	$strPrevDate = $his_sql->GetDatePrev($strStockId, $strDate);

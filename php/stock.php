@@ -42,10 +42,15 @@ function GetInputSymbolArray($strSymbols)
     return $arSymbol;
 }
 
-function GetYahooNetValueSymbol($strEtfSymbol)
+function BuildYahooNetValueSymbol($strSymbol, $strSurFix = 'IV')
 {
-    if (empty($strEtfSymbol))   return false;
-    return YAHOO_INDEX_CHAR.$strEtfSymbol.'-IV';
+    if (empty($strSymbol))   return false;
+    return YAHOO_INDEX_CHAR.$strSymbol.'-'.$strSurFix;
+}
+
+function BuildEuropeSymbol($strSymbol)
+{
+	return BuildYahooNetValueSymbol($strSymbol, 'EU');
 }
 
 // ****************************** Stock data functions *******************************************************
@@ -63,7 +68,7 @@ http://hq.sinajs.cn/list=int_ftse 英金融时报指数
 */
 // http://blog.sina.com.cn/s/blog_7ed3ed3d0101gphj.html
 // http://hq.sinajs.cn/list=sh600151,sz000830,s_sh000001,s_sz399001,s_sz399106,s_sz399107,s_sz399108
-// 期货 http://hq.sinajs.cn/rn=1318986550609&amp;list=hf_CL,hf_GC,hf_SI,hf_CAD,hf_ZSD,hf_S,hf_C,hf_W
+// 期货 http://hq.sinajs.cn/rn=1318986550609&amp;list=hf_CL,hf_GC,hf_SI,hf_CAD,hf_ZSD,hf_S,hf_C,hf_W,hf_XAU
 // http://hq.sinajs.cn/rn=1318986628214&amp;list=USDCNY,USDHKD,EURCNY,GBPCNY,USDJPY,EURUSD,GBPUSD,
 // http://hq.sinajs.cn/list=gb_dji
 
@@ -154,8 +159,8 @@ function StockGetPercentage($strDivisor, $strDividend)
 
 function StockCompareEstResult($strStockId, $strNetValue, $strDate, $strSymbol)
 {
-	$netvalue_sql = GetNetValueHistorySql();
-    if ($netvalue_sql->InsertDaily($strStockId, $strDate, $strNetValue))
+	$net_sql = GetNetValueHistorySql();
+    if ($net_sql->InsertDaily($strStockId, $strDate, $strNetValue))
     {
     	$fund_est_sql = GetFundEstSql();
        	if ($strEstValue = $fund_est_sql->GetClose($strStockId, $strDate))
@@ -175,8 +180,8 @@ function StockCompareEstResult($strStockId, $strNetValue, $strDate, $strSymbol)
 
 function StockUpdateEstResult($strStockId, $strNetValue, $strDate)
 {
-	$netvalue_sql = GetNetValueHistorySql();
-	if ($netvalue_sql->GetRecord($strStockId, $strDate) == false)
+	$net_sql = GetNetValueHistorySql();
+	if ($net_sql->GetRecord($strStockId, $strDate) == false)
     {   // Only update when net value is NOT ready
     	$fund_est_sql = GetFundEstSql();
 		$fund_est_sql->WriteDaily($strStockId, $strDate, $strNetValue);
@@ -188,13 +193,6 @@ function RefGetTableColumnNetValue($ref)
 	$strStockDisplay = TableColumnGetStock($ref);
 	if ($ref->CountNetValue() > 0)		return new TableColumnNetValue($strStockDisplay);	
 	return 								   new TableColumnPrice($strStockDisplay);
-}
-
-function RefGetPosition($ref)
-{
-	$sql = new FundPositionSql();
-   	if ($fRatio = $sql->ReadVal($ref->GetStockId()))	return $fRatio;
-	return $ref->GetDefaultPosition();  
 }
 
 function StockPrefetchArrayData($arSymbol)
@@ -230,7 +228,7 @@ function _getAllSymbolArray($strSymbol)
         if (in_arrayQdiiMix($strSymbol))
         {
         	_addHoldingsSymbol($ar, $strSymbol);
-        	if ($strSymbol == 'SZ164906')				$ar[] = 'KWEB';
+        	if ($strSymbol == 'SZ164906')			$ar[] = 'KWEB';
 			else if ($strSymbol == 'SH501225')		$ar[] = 'SMH';
         }
         else if (in_arrayQdii($strSymbol))
@@ -401,10 +399,46 @@ function StockGetPairReferences($strSymbol)
 function UseSameDayNetValue($sym)
 {
 	$strSymbol = $sym->GetSymbol();
-	if (in_arrayQdii($strSymbol))				return false;
+	if (in_arrayQdii($strSymbol))			return false;
 	else if (in_arrayQdiiMix($strSymbol))	return	in_arrayHkMix($strSymbol);
 	return true;
 }
 
+function StockCalcHedge($fCalibration, $fPos)
+{
+	return round($fCalibration / $fPos);
+}
 	
+function StockCalcLeverageHedge($fCalibration, $fPos, $fEtfCalibration, $fEtfPos)
+{
+	return round(($fCalibration / $fPos) / ($fEtfCalibration / $fEtfPos));
+}
+
+function GetLeverageHedgeSymbol($strSymbol)
+{
+	if (in_arraySpyQdii($strSymbol))	return 'SPY';
+	if (in_arrayQqqQdii($strSymbol))	return 'QQQ';
+    return false;
+}
+
+function GetStockHedge($strSymbol, $strStockId)
+{
+	$pos_sql = GetPositionSql();
+	if ($fPos = $pos_sql->ReadVal($strStockId))
+   	{
+   		$cal_sql = GetCalibrationSql();
+		if ($record = $cal_sql->GetRecordNow($strStockId))
+    	{
+			$fCal = floatval($record['close']);
+			if ($strLev = GetLeverageHedgeSymbol($strSymbol))
+			{
+				$strLevId = SqlGetStockId($strLev);
+				return StockCalcLeverageHedge($fCal, $fPos, floatval($cal_sql->GetClose($strLevId, $record['date'])), $pos_sql->ReadVal($strLevId));
+			}
+   			return StockCalcHedge($fCal, $fPos);
+   		}
+   	}
+   	return 1.0;
+}
+
 ?>

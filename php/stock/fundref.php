@@ -38,8 +38,8 @@ class FundReference extends MysqlReference
         }
         if ($strStockId = $this->GetStockId())
         {
-	       	$calibration_sql = GetCalibrationSql();
-        	if ($strClose = $calibration_sql->GetCloseNow($strStockId))		$this->fFactor = floatval($strClose); 
+	       	$cal_sql = GetCalibrationSql();
+        	if ($strClose = $cal_sql->GetCloseNow($strStockId))		$this->fFactor = floatval($strClose); 
         }
     }
    
@@ -99,8 +99,8 @@ class FundReference extends MysqlReference
 
     function InsertFundCalibration()
     {
-       	$calibration_sql = GetCalibrationSql();
-    	$calibration_sql->WriteDaily($this->GetStockId(), $this->GetDate(), strval($this->fFactor));
+       	$cal_sql = GetCalibrationSql();
+    	$cal_sql->WriteDaily($this->GetStockId(), $this->GetDate(), strval($this->fFactor));
     }
 
     public function GetSymbol()
@@ -162,24 +162,19 @@ class FundReference extends MysqlReference
     function _getCalibrationBaseVal()
     {
     	$strStockId = $this->GetStockId();
-       	$calibration_sql = GetCalibrationSql();
-		$strDate = $calibration_sql->GetDateNow($strStockId);
+       	$cal_sql = GetCalibrationSql();
+		$strDate = $cal_sql->GetDateNow($strStockId);
 		return floatval(SqlGetNetValueByDate($strStockId, $strDate));
-//		return floatval($this->GetPrice());
     }
     
     function AdjustPosition($fVal)
     {
-    	$fRatio = RefGetPosition($this);
-//        return $fRatio * $fVal + (1.0 - $fRatio) * floatval($this->GetPrice());
-		return FundAdjustPosition($fRatio, $fVal, $this->_getCalibrationBaseVal());
+		return FundAdjustPosition($this->GetPosition(), $fVal, $this->_getCalibrationBaseVal());
     }
     
     function ReverseAdjustPosition($fVal)
     {
-    	$fRatio = RefGetPosition($this);
-//        return $fVal / $fRatio - floatval($this->GetPrice()) * (1.0 / $fRatio - 1.0);
-		return FundReverseAdjustPosition($fRatio, $fVal, $this->_getCalibrationBaseVal());
+		return FundReverseAdjustPosition($this->GetPosition(), $fVal, $this->_getCalibrationBaseVal());
     }
     
 }
