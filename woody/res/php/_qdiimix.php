@@ -171,8 +171,12 @@ function EchoAll()
     $us_ref = $acct->GetUsRef();
     $uscny_ref = $ref->GetCnyRef();
     $hkcny_ref = $ref->GetHkcnyRef();
-    $arForex = array($acct->cnh_ref, $uscny_ref);
-    if ($hkcny_ref !== false)	$arForex[] = $hkcny_ref;
+    $arForex = array($acct->cnh_ref, $ref->GetUsdcnyRef(), $uscny_ref);
+    if ($hkcny_ref !== false)
+    {
+    	$arForex[] = $ref->GetHkdcnyRef();
+    	$arForex[] = $hkcny_ref;
+    }
     
 	EchoHoldingsEstParagraph($ref);
     EchoReferenceParagraph(array_merge($acct->GetStockRefArray(), 

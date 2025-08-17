@@ -205,12 +205,6 @@ function SqlGetStockSymbol($strStockId)
 	return $sql->GetStockSymbol($strStockId);
 }
 
-function SqlDeleteStock($strStockId)
-{
-	$sql = GetStockSql();
-	$sql->DeleteById($strStockId);
-}
-
 function SqlGetStockSymbolAndId($strWhere, $strLimit = false)
 {
 	$sql = GetStockSql();
@@ -294,48 +288,10 @@ function GetNetValueHistorySql()
    	return $g_stock_sql->net_sql;
 }
 
-function SqlDeleteNetValueHistory($strStockId)
-{
-	$net_sql = GetNetValueHistorySql();
-	$iTotal = $net_sql->Count($strStockId);
-	if ($iTotal > 0)
-	{
-		DebugVal($iTotal, 'Net value history existed');
-		$net_sql->DeleteAll($strStockId);
-	}
-}
-
-function SqlSetNetValue($strStockId, $strDate, $strNetValue)
-{
-	$net_sql = GetNetValueHistorySql();
-	return $net_sql->InsertDaily($strStockId, $strDate, $strNetValue);
-}
-
 function SqlGetNetValueByDate($strStockId, $strDate)
 {
 	$net_sql = GetNetValueHistorySql();
 	return $net_sql->GetClose($strStockId, $strDate);
-}
-
-function SqlGetNetValue($strStockId)
-{
-	$net_sql = GetNetValueHistorySql();
-	return $net_sql->GetCloseNow($strStockId);
-}
-
-function SqlGetUscny()
-{
-	return floatval(SqlGetNetValue(SqlGetStockId('USCNY')));
-}
-
-function SqlGetHkcny()
-{
-	return floatval(SqlGetNetValue(SqlGetStockId('HKCNY')));
-}
-
-function SqlGetUshkd()
-{
-	return SqlGetUscny() / SqlGetHkcny(); 
 }
 
 function GetHoldingsSql()

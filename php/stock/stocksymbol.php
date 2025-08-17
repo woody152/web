@@ -172,7 +172,7 @@ function in_arrayHSharesQdiiHk($strSymbol)
 
 function QdiiHkGetHangSengSymbolArray()
 {
-    return array('SH501302', 'SH513600', 'SH513660', 'SZ159312', 'SZ159920', 'SZ160924', 'SZ164705');
+    return array('SH501302', 'SH513210', 'SH513600', 'SH513660', 'SZ159312', 'SZ159920', 'SZ160924', 'SZ164705');
 }
 
 function in_arrayHangSengQdiiHk($strSymbol)

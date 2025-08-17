@@ -69,7 +69,7 @@ http://hq.sinajs.cn/list=int_ftse 英金融时报指数
 // http://blog.sina.com.cn/s/blog_7ed3ed3d0101gphj.html
 // http://hq.sinajs.cn/list=sh600151,sz000830,s_sh000001,s_sz399001,s_sz399106,s_sz399107,s_sz399108
 // 期货 http://hq.sinajs.cn/rn=1318986550609&amp;list=hf_CL,hf_GC,hf_SI,hf_CAD,hf_ZSD,hf_S,hf_C,hf_W,hf_XAU
-// http://hq.sinajs.cn/rn=1318986628214&amp;list=USDCNY,USDHKD,EURCNY,GBPCNY,USDJPY,EURUSD,GBPUSD,
+// http://hq.sinajs.cn/rn=1318986628214&amp;list=fx_susdcny,USDHKD,EURCNY,GBPCNY,USDJPY,EURUSD,GBPUSD,
 // http://hq.sinajs.cn/list=gb_dji
 
 function RemoveDoubleQuotationMarks($str)
@@ -214,7 +214,11 @@ function _addHoldingsSymbol(&$ar, $strSymbol)
 		$holdings_sql = GetHoldingsSql();
     	foreach ($holdings_sql->GetHoldingsArray($sql->GetId($strSymbol)) as $strId => $strRatio)
     	{
-    		_addFundPairSymbol($ar, $sql->GetStockSymbol($strId));
+    		$strHoldingSymbol = $sql->GetStockSymbol($strId);
+    		_addFundPairSymbol($ar, $strHoldingSymbol);
+    		
+    		$holding_sym = new StockSymbol($strHoldingSymbol);
+    		if ($holding_sym->IsSymbolH())	$ar[] = 'fx_shkdcny';
     	}
     }
 }
@@ -227,6 +231,7 @@ function _getAllSymbolArray($strSymbol)
     {
         if (in_arrayQdiiMix($strSymbol))
         {
+        	$ar[] = 'fx_susdcny';
         	_addHoldingsSymbol($ar, $strSymbol);
         	if ($strSymbol == 'SZ164906')			$ar[] = 'KWEB';
 			else if ($strSymbol == 'SH501225')		$ar[] = 'SMH';
@@ -234,18 +239,22 @@ function _getAllSymbolArray($strSymbol)
         else if (in_arrayQdii($strSymbol))
         {
         	if ($strEstSymbol = QdiiGetEstSymbol($strSymbol))		_addFundPairSymbol($ar, $strEstSymbol);
+        	$ar[] = 'fx_susdcny';
         }
         else if (in_arrayQdiiHk($strSymbol))
         {
         	if ($strEstSymbol = QdiiHkGetEstSymbol($strSymbol))		_addFundPairSymbol($ar, $strEstSymbol);
+        	$ar[] = 'fx_shkdcny';
         }
         else if (in_arrayQdiiJp($strSymbol))
         {
         	if ($strEstSymbol = QdiiJpGetEstSymbol($strSymbol))		_addFundPairSymbol($ar, $strEstSymbol); 
+        	$ar[] = 'fx_sjpycny';
         }
         else if (in_arrayQdiiEu($strSymbol))
         {
         	if ($strEstSymbol = QdiiEuGetEstSymbol($strSymbol))		_addFundPairSymbol($ar, $strEstSymbol); 
+        	$ar[] = 'fx_seurcny';
         }
         else
         {

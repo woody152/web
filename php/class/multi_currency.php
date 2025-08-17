@@ -19,7 +19,7 @@ class MultiCurrency
         $this->fUSD = 0.0;
     }
 
-    function Convert($strUSDCNY, $strHKDCNY = false) 
+    function Convert($strUSDCNY = false, $strHKDCNY = false) 
     {
         $this->fConvertCNY = $this->fCNY;
         if ($strUSDCNY)   $this->fConvertCNY += $this->fUSD * floatval($strUSDCNY);    

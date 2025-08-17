@@ -1,6 +1,7 @@
 <?php
 require_once('_commonupdatestock.php');
 require_once('../csvfile.php');
+require_once('../deletestock.php');
 
 function GetSinaMarketJsonUrl()
 {
@@ -160,10 +161,7 @@ function DeleteOldChinaStock($arSymbolId)
 		if ($ah_sql->DeleteById($strStockId))	DebugString($strSymbol.' had ah_pair');
 		if (SqlDeleteStockGroupItemByStockId($strStockId))
 		{
-			SqlDeleteStockEma($strStockId);
-			SqlDeleteStockHistory($strStockId);
-			SqlDeleteNetValueHistory($strStockId);
-			SqlDeleteStock($strStockId);
+			DeleteStock($strStockId);
 			DebugString($strSymbol.' deleted');
 		}
 		else	DebugString($strSymbol.' NOT deleted');

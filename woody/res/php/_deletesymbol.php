@@ -1,6 +1,7 @@
 <?php
 require_once('_stock.php');
 require_once('_emptygroup.php');
+require_once('../../php/deletestock.php');
 
 function _deleteHasAbPair($strSymbol)
 {
@@ -97,10 +98,7 @@ function _deleteStockSymbol($ref)
 */
 	if (SqlDeleteStockGroupItemByStockId($strStockId))
 	{
-		SqlDeleteStockEma($strStockId);
-		SqlDeleteStockHistory($strStockId);
-		SqlDeleteNetValueHistory($strStockId);
-		SqlDeleteStock($strStockId);
+		DeleteStock($strStockId);
 		DebugString('已删除');
 		SwitchRemoveFromSess('symbol='.$strSymbol);
 	}

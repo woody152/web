@@ -91,10 +91,10 @@ class _QdiiReference extends FundReference
 {
     var $strOfficialCNY = false;
     
-    public function __construct($strSymbol, $strForex)
+    public function __construct($strSymbol, $strCny)
     {
         parent::__construct($strSymbol);
-        $this->SetForex($strForex);
+        $this->SetForex($strCny);
     }
     
     function _getEstNetValue($strDate)
@@ -249,6 +249,7 @@ class QdiiReference extends _QdiiReference
         {
         	$this->est_ref = new FundPairReference($strEstSymbol);
         }
+        $this->forex_ref = new MyStockReference('fx_susdcny');
         $this->EstNetValue();
     }
 }
@@ -263,7 +264,7 @@ class QdiiHkReference extends _QdiiReference
         {
             $this->est_ref = new FundPairReference($strEstSymbol);
         }
-        
+        $this->forex_ref = new MyStockReference('fx_shkdcny');
         $this->EstNetValue();
     }
 }
@@ -278,7 +279,7 @@ class QdiiJpReference extends _QdiiReference
         {
             $this->est_ref = new FundPairReference($strEstSymbol);
         }
-        
+        $this->forex_ref = new MyStockReference('fx_sjpycny');
         $this->EstNetValue();
     }
 }
@@ -293,7 +294,7 @@ class QdiiEuReference extends _QdiiReference
         {
             $this->est_ref = new FundPairReference($strEstSymbol);
         }
-        
+        $this->forex_ref = new MyStockReference('fx_seurcny');
         $this->EstNetValue();
     }
 }

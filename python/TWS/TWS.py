@@ -74,7 +74,7 @@ class MyEWrapper(EWrapper):
         #self.arQQQ = {'SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941'}
         #self.arXOP = {'SH513350', 'SZ159518'}
         self.arOrder = {}
-        self.arOrder['KWEB'] = GetOrderArray([20.58, 29.58, 29.75, 33.57, 34.37, 35.99, 36.05, 36.52, 37.61, 38.57], 200, 7, -1)
+        self.arOrder['KWEB'] = GetOrderArray([20.58, 29.58, 29.75, 33.57, 34.37, 35.99, 36.05, 36.52, 37.61, 38.57], 200, -1, -1)
         if IsChinaMarketOpen():
             #self.arOrder['GLD'] = GetOrderArray()
             self.arOrder['IEO'] = GetOrderArray()
@@ -290,7 +290,7 @@ class MyEWrapper(EWrapper):
         strSymbol = data['symbol']
         #arAll = self.arHedge | self.arXOP
         #arPalmmicro = self.palmmicro.FetchData(arAll | self.arQQQ)
-        arAll = self.arHedge
+        arAll = sorted(self.arHedge)
         arPalmmicro = self.palmmicro.FetchData(arAll)
         for strHedge in arAll:
             arReply = arPalmmicro[strHedge]

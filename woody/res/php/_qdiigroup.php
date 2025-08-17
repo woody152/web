@@ -61,7 +61,6 @@ function _callbackFundListHedge($fPos, $fFactor, $strDate, $strStockId)
 
 class QdiiGroupAccount extends FundGroupAccount 
 {
-//    var $arLeverage = array();
     var $arLeverage;
     var $ar_leverage_ref = array();
     

@@ -1,10 +1,20 @@
 <?php
 
+/*
+function SqlSetNetValue($strStockId, $strDate, $strNetValue)
+{
+	$net_sql = GetNetValueHistorySql();
+	return $net_sql->InsertDaily($strStockId, $strDate, $strNetValue);
+}
+*/
+
 class HoldingsReference extends MyStockReference
 {
 	var $netvalue_ref;
     var $uscny_ref;
+    var $usdcny_ref;
     var $hkcny_ref = false;
+    var $hkdcny_ref = false;
     
     var $ar_holdings_ref = array();
     var $ar_realtime_ref = array();
@@ -18,6 +28,7 @@ class HoldingsReference extends MyStockReference
         parent::__construct($strSymbol);
        	$this->netvalue_ref = new NetValueReference($strSymbol);
    		$this->uscny_ref = new CnyReference('USCNY');
+        $this->usdcny_ref = new MyStockReference('fx_susdcny');
 
         $strStockId = $this->GetStockId();
     	$date_sql = new HoldingsDateSql();
@@ -35,8 +46,8 @@ class HoldingsReference extends MyStockReference
 					if ($ref->IsSymbolH())
 					{
 						if ($this->hkcny_ref === false)		$this->hkcny_ref = new CnyReference('HKCNY');
+						if ($this->hkdcny_ref === false)	$this->hkdcny_ref = new MyStockReference('fx_shkdcny');
 					}
-
 				}
 			}
 			else	
@@ -80,9 +91,19 @@ class HoldingsReference extends MyStockReference
     	return $this->uscny_ref;
     }
     
+    function GetUsdcnyRef()
+    {
+    	return $this->usdcny_ref;
+    }
+    
     function GetHkcnyRef()
     {
     	return $this->hkcny_ref;
+    }
+    
+    function GetHkdcnyRef()
+    {
+    	return $this->hkdcny_ref;
     }
     
     function GetHoldingsDate()

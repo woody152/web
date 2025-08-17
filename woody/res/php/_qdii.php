@@ -31,17 +31,14 @@ class QdiiAccount extends QdiiGroupAccount
 function EchoAll()
 {
    	global $acct;
-    
    	$ref = $acct->GetRef();
-	$cny_ref = $ref->GetCnyRef();
     
     EchoFundEstParagraph($ref);
-    EchoReferenceParagraph(array_merge($acct->GetStockRefArray(), array($acct->oil_ref, $acct->cnh_ref, $cny_ref)), $acct->IsAdmin());
+    EchoReferenceParagraph(array_merge($acct->GetStockRefArray(), array($acct->oil_ref, $acct->cnh_ref), $ref->GetForexRefArray()), $acct->IsAdmin());
     $acct->EchoCommonParagraphs();
-      
     if ($group = $acct->EchoTransaction()) 
     {
-        $acct->EchoMoneyParagraph($group, $cny_ref);
+        $acct->EchoMoneyParagraph($group, $ref->GetCnyRef());
 	}
 	
     $acct->EchoDebugParagraph();

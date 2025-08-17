@@ -19,8 +19,9 @@ class FundReference extends MysqlReference
 {
     var $stock_ref = false;     // MyStockReference
     var $est_ref = false;       // MyStockRefenrence for fund net value estimation
-    var $cny_ref;
-
+    var $cny_ref = false;
+    var $forex_ref = false;
+    
     // estimated data
     var $fOfficialNetValue = false;
     var $fFairNetValue = false;
@@ -81,11 +82,11 @@ class FundReference extends MysqlReference
     	return false;
     }
     
-    function SetForex($strForex)
+    function SetForex($strCny)
     {
-        $this->cny_ref = new CnyReference($strForex);
+        $this->cny_ref = new CnyReference($strCny);
     }
-
+    
     // Update database
     function UpdateEstNetValue()
     {
@@ -159,6 +160,16 @@ class FundReference extends MysqlReference
     	return $this->cny_ref;
     }
 
+    function GetForexRef()
+    {
+    	return $this->forex_ref;
+    }
+
+    function GetForexRefArray()
+    {
+    	return array($this->forex_ref, $this->cny_ref);
+    }
+    	
     function _getCalibrationBaseVal()
     {
     	$strStockId = $this->GetStockId();

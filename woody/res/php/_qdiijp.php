@@ -18,16 +18,14 @@ class _QdiiJpAccount extends QdiiGroupAccount
 function EchoAll()
 {
    	global $acct;
-    
    	$ref = $acct->GetRef();
-	$cny_ref = $ref->GetCnyRef();
+   	
     EchoFundEstParagraph($ref);
-    EchoReferenceParagraph(array_merge($acct->GetStockRefArray(), array($cny_ref)), $acct->IsAdmin());
+    EchoReferenceParagraph(array_merge($acct->GetStockRefArray(), $ref->GetForexRefArray()), $acct->IsAdmin());
     $acct->EchoCommonParagraphs();
-
     if ($group = $acct->EchoTransaction()) 
     {
-        $acct->EchoMoneyParagraph($group, false, $cny_ref);
+        $acct->EchoMoneyParagraph($group);
 	}
 	    
     $acct->EchoDebugParagraph();

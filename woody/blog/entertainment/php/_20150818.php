@@ -300,7 +300,7 @@ END;
 function Echo20160615($strHead)
 {
 	$strHead = GetHeadElement($strHead);
-	$strUSDCNY = GetSinaDataLink('USDCNY');
+	$strUSDCNY = GetSinaDataLink('fx_susdcny');
 	$strQdii = GetStockMenuLink('qdii');
 	$strXueqiu = GetXueqiuIdLink('6706948861', 'zzzzv');
     $strUSCNY = GetExternalLink('https://quote.eastmoney.com/cnyrate/USDCNYC.html', 'USCNY');

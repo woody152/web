@@ -191,7 +191,7 @@ END;
     	return false;
     }
     
-    function EchoMoneyParagraphs($arGroup, $uscny_ref, $hkcny_ref = false)
+    function EchoMoneyParagraphs($arGroup, $uscny_ref = false, $hkcny_ref = false)
     {
     	$strUSDCNY = $uscny_ref ? $uscny_ref->GetPrice() : false;
     	$strHKDCNY = $hkcny_ref ? $hkcny_ref->GetPrice() : false;
@@ -201,7 +201,7 @@ END;
     	EchoTableParagraphEnd();
     }
 
-    function EchoMoneyParagraph($group, $uscny_ref, $hkcny_ref = false)
+    function EchoMoneyParagraph($group, $uscny_ref = false, $hkcny_ref = false)
     {
     	$this->EchoMoneyParagraphs(array($group), $uscny_ref, $hkcny_ref);
     }

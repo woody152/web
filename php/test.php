@@ -10,6 +10,27 @@ define('DEBUG_UTF8_BOM', "\xef\xbb\xbf");
 // http://www.todayir.com/en/index.php HSFML25
 
 /*
+function SqlGetNetValue($strStockId)
+{
+	$net_sql = GetNetValueHistorySql();
+	return $net_sql->GetCloseNow($strStockId);
+}
+
+function SqlGetUscny()
+{
+	return floatval(SqlGetNetValue(SqlGetStockId('USCNY')));
+}
+
+function SqlGetHkcny()
+{
+	return floatval(SqlGetNetValue(SqlGetStockId('HKCNY')));
+}
+
+function SqlGetUshkd()
+{
+	return SqlGetUscny() / SqlGetHkcny(); 
+}
+
 function TestModifyTransactions($strGroupId, $strSymbol, $strNewSymbol, $iRatio)
 {
 	$sql = new StockGroupItemSql($strGroupId);
