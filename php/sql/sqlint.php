@@ -56,4 +56,13 @@ class IntSql extends ValSql
     }
 }
 
+class StockTickSql extends IntSql
+{
+    public function __construct()
+    {
+        parent::__construct('stocktick', 'tick');
+    }
+}
+
+
 ?>

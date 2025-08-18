@@ -218,7 +218,9 @@ function _addHoldingsSymbol(&$ar, $strSymbol)
     		_addFundPairSymbol($ar, $strHoldingSymbol);
     		
     		$holding_sym = new StockSymbol($strHoldingSymbol);
+    		if ($holding_sym->IsSymbolA())	{}
     		if ($holding_sym->IsSymbolH())	$ar[] = 'fx_shkdcny';
+    		else							$ar[] = 'fx_susdcny';
     	}
     }
 }
@@ -231,7 +233,6 @@ function _getAllSymbolArray($strSymbol)
     {
         if (in_arrayQdiiMix($strSymbol))
         {
-        	$ar[] = 'fx_susdcny';
         	_addHoldingsSymbol($ar, $strSymbol);
         	if ($strSymbol == 'SZ164906')			$ar[] = 'KWEB';
 			else if ($strSymbol == 'SH501225')		$ar[] = 'SMH';

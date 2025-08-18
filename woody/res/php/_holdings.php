@@ -13,14 +13,14 @@ function RefSort($arRef)
     foreach ($arRef as $ref)
     {
     	if ($ref->IsSymbolA())			$arA[] = $ref;
-		else if ($ref->IsSymbolH())      	$arH[] = $ref;
-		else			                	$arUS[] = $ref;
+		else if ($ref->IsSymbolH())     $arH[] = $ref;
+		else			                $arUS[] = $ref;
 	}
 	
 	return array_merge(RefSortBySymbol($arA), RefSortBySymbol($arH), RefSortBySymbol($arUS));
 }
 
-function _echoHoldingItem($ref, $arRatio, $strDate, $his_sql, $fNetValueChange, $fAdjustCny, $fAdjustHkd)
+function _echoHoldingItem($ref, $arRatio, $strDate, $his_sql, $fNetValueChange, $fAdjust)
 {
 	static $fTotalOld = 0.0;
 	static $fTotalNew = 0.0;
@@ -28,14 +28,10 @@ function _echoHoldingItem($ref, $arRatio, $strDate, $his_sql, $fNetValueChange, 
 	
 	if ($ref == false)
 	{
-		$ar = array(DISP_ALL_CN, strval_round($fTotalOld, 2), '', strval_round(($fNetValueChange - 1.0) * 100, 2).'%', strval_round($fTotalNew, 2), strval_round($fTotalChange, 2));
+		$ar = array(DISP_ALL_CN, strval_round($fTotalOld, 2), '', strval_round(($fNetValueChange - 1.0) * 100, 2).'%', strval_round($fTotalNew, 2), strval_round($fTotalChange * $fAdjust, 2));
 	    EchoTableColumn($ar);
 	    return;
 	}
-	
-	if ($ref->IsSymbolA())		$fAdjust = $fAdjustCny;
-	else if ($ref->IsSymbolH())	$fAdjust = $fAdjustHkd;
-	else							$fAdjust = false;
 	
 	$strStockId = $ref->GetStockId();
 	$strClose = $his_sql->GetAdjClose($strStockId, $strDate);
@@ -44,7 +40,7 @@ function _echoHoldingItem($ref, $arRatio, $strDate, $his_sql, $fNetValueChange, 
 //	$fChange = $ref->GetPercentage($strClose, $strPrice) / 100.0;
 	$fClose = floatval($strClose);
 	$fChange = ($fClose > MIN_FLOAT_VAL) ? floatval($strPrice) / $fClose : 0.0;
-    if ($fAdjust)		$fChange *= $fAdjust;
+	$fChange /= $fAdjust;
 	
 	$ar = array();
 	$ar[] = RefGetMyStockLink($ref);
@@ -63,7 +59,7 @@ function _echoHoldingItem($ref, $arRatio, $strDate, $his_sql, $fNetValueChange, 
 	$fTotalChange += $fRatioChange;
     $ar[] = strval_round($fRatioChange, 4);
     
-    if ($fAdjust)		$ar[] = strval_round($fAdjust, 4);
+    $ar[] = strval_round($fAdjust, 4);
     
     RefEchoTableColumn($ref, $ar);
 }
@@ -96,13 +92,13 @@ function EchoAll()
 			$his_sql = GetStockHistorySql();
 			$arRatio = $ref->GetHoldingsRatioArray();
 			$fNetValueChange = $ref->GetNetValueChange();
-			$fAdjustCny = $ref->GetAdjustCny();
-			$fAdjustHkd = $ref->GetAdjustHkd();
+			$fAdjustUSD = $ref->GetAdjustUSD();
+			$fAdjustHKD = $ref->GetAdjustHKD();
 			foreach ($arHoldingRef as $holding_ref)
 			{
-				_echoHoldingItem($holding_ref, $arRatio, $strDate, $his_sql, $fNetValueChange, $fAdjustCny, $fAdjustHkd);
+				_echoHoldingItem($holding_ref, $arRatio, $strDate, $his_sql, $fNetValueChange, RefAdjustForex($holding_ref, $fAdjustHKD, $fAdjustUSD));
 			}
-			_echoHoldingItem(false, $arRatio, $strDate, $his_sql, $fNetValueChange, $fAdjustCny, $fAdjustHkd);
+			_echoHoldingItem(false, $arRatio, $strDate, $his_sql, $fNetValueChange, RefAdjustForex($ref, $fAdjustHKD, $fAdjustUSD));
 			EchoTableParagraphEnd();
 		}
     }

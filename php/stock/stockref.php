@@ -40,6 +40,11 @@ class StockReference extends StockSymbol
     	return $this->bHasData;
     }
     
+    function SetHasData($bData = true)
+    {
+    	$this->bHasData = $bData;
+    }
+    
     function GetPrice()
     {
         return rtrim0($this->strPrice);
@@ -82,6 +87,11 @@ class StockReference extends StockSymbol
         return $this->strExternalLink;
     }
 
+    function SetExternalLink($strLink)
+    {
+    	$this->strExternalLink = $strLink;
+    }
+    
     function GetPercentage($strDivisor = false, $strDividend = false)
     {
     	if ($strDivisor == false)	$strDivisor = $this->strPrevPrice;
@@ -154,6 +164,11 @@ class StockReference extends StockSymbol
 		return $this->strTime;
 	}
     
+	function SetTime($strTime)
+	{
+		$this->strTime = $strTime;
+	}
+	
     // 06:56:22 => 06:56
 	function GetTimeHM()
 	{
@@ -173,6 +188,12 @@ class StockReference extends StockSymbol
     function GetHourMinute()
     {
         return intval(str_replace(':', '', $this->GetTimeHM()));
+    }
+    
+    function ConvertTick()
+    {
+		$this->SetTimeZone();
+		return strtotime($this->strDate.' '.$this->strTime);
     }
     
 	function IsExtendedMarket()
@@ -198,8 +219,7 @@ class StockReference extends StockSymbol
         }
         else
         {
-        	$this->SetTimeZone();
-			$iTime = strtotime($this->strDate.' '.$this->strTime);
+        	$iTime = $this->ConvertTick();
             $strDate = DebugGetDate($iTime, $strTimeZone);
             $strTime = DebugGetTime($iTime, $strTimeZone);
 //            DebugString(__FUNCTION__.': '.$strTimeZone.' '.$etf_ref->GetSymbol().' '.$etf_ref->GetDate().' '.$etf_ref->GetTimeHM().' vs '.$strDate.' '.$strTime);

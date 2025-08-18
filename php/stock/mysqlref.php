@@ -42,7 +42,7 @@ class MysqlReference extends StockReference
     
     public function LoadData()
     {
-    	$this->bHasData = false;
+    	$this->SetHasData(false);
     }
     
 	public function GetClose($strDate)
@@ -85,15 +85,21 @@ class MysqlReference extends StockReference
     	return $this->fRatio;
     }
     
-    function LoadSqlNetValueData()
+    function LoadDailySqlData($sql)
     {
-    	$net_sql = GetNetValueHistorySql();
-       	if ($record = $net_sql->GetRecordNow($this->strSqlId))
+       	if ($record = $sql->GetRecordNow($this->strSqlId))
        	{
    			$this->strPrice = $record['close'];
    			$this->strDate = $record['date'];
-   			$this->strPrevPrice = $net_sql->GetClosePrev($this->strSqlId, $this->strDate);
+   			$this->strPrevPrice = $sql->GetClosePrev($this->strSqlId, $this->strDate);
+   			return $this->strPrevPrice;
    		}
+   		return false;
+    }
+
+    function LoadSqlNetValueData()
+    {
+    	$this->LoadDailySqlData(GetNetValueHistorySql());
     }
 
     function CountNetValue()

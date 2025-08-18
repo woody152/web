@@ -1,7 +1,7 @@
 <?php 
-require('php/_qdii.php');
+require('php/_qdiimix.php');
 
-function GetQdiiRelated($strDigitA)
+function GetQdiiMixRelated($strDigitA)
 {
 	$str = GetBreakElement();
 	$str .= GetJiaShiSoftwareLinks($strDigitA);

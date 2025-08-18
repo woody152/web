@@ -7,20 +7,6 @@ require_once('../../php/ui/ahparagraph.php');
 require_once('../../php/ui/fundestparagraph.php');
 require_once('../../php/ui/imagedisp.php');
 
-function in_array_ref($ref, $arRef)
-{
-	if ($ref)
-	{
-		$strSymbol = $ref->GetSymbol();
-		foreach ($arRef as $ref)
-		{
-			if ($ref->GetSymbol() == $strSymbol)	return $ref;
-		}
-		return false;
-	}
-	return true;
-}
-
 function _echoStockGroupArray($arStock, $bWide)
 {
     StockPrefetchArrayExtendedData($arStock);

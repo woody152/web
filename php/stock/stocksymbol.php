@@ -50,16 +50,6 @@ function in_arrayChinaIndex($strSymbol)
     return in_array($strSymbol, ChinaIndexGetSymbolArray());
 }
 
-function QdiiGetGoldSymbolArray()
-{
-    return array('SZ160719', 'SZ161116'); 
-}
-
-function in_arrayGoldQdii($strSymbol)
-{
-    return in_array($strSymbol, QdiiGetGoldSymbolArray());
-}
-
 function QdiiGetOilSymbolArray()
 {
     return array('SH501018', 'SZ160723', 'SZ161129'); 
@@ -133,7 +123,6 @@ function in_arrayXbiQdii($strSymbol)
 function QdiiGetSymbolArray()
 {
     $ar = array_merge(array('SH501300', 'SH513290', 'SH513400', 'SZ160140', 'SZ161126', 'SZ161128', 'SZ162415', 'SZ164824') 
-    				   , QdiiGetGoldSymbolArray()
     				   , QdiiGetOilSymbolArray()
     				   , QdiiGetXbiSymbolArray()
     				   , QdiiGetXopSymbolArray()
@@ -268,7 +257,7 @@ function in_arrayHkMix($strSymbol)
 
 function QdiiMixGetSymbolArray()
 {
-    $ar = array_merge(array('SH501225', 'SH501312', 'SH513360', 'SZ159509', 'SZ159529', 'SZ160216', 'SZ160644', 'SZ164701') 
+    $ar = array_merge(array('SH501225', 'SH501312', 'SH513360', 'SZ159509', 'SZ159529', 'SZ160216', 'SZ160644', 'SZ160719', 'SZ161116', 'SZ164701') 
     				   , GetChinaInternetSymbolArray()
     				   , GetHkMixSymbolArray()
     				   , GetMsciUs50SymbolArray());
@@ -299,7 +288,7 @@ function in_arrayAll($strSymbol)
 
 function GetOverNightSymbolArray()
 {
-	return array('SZ161125', 'SZ161127', 'SZ161130', 'SZ162411', 'SZ162415', 'SZ162719', 'SZ164701', 'SZ164906');
+	return array('SZ160719', 'SZ161116', 'SZ161125', 'SZ161127', 'SZ161130', 'SZ162411', 'SZ162415', 'SZ162719', 'SZ164701', 'SZ164906');
 }
 
 function IsChinaStockDigit($strDigit)
@@ -792,7 +781,7 @@ class StockSymbol
         {
 			if ($this->GetSinaIndexH())		    return SINA_HK_PREFIX.$this->strSinaIndexH;
 			else if ($this->GetSinaIndexUS())	return SINA_US_PREFIX.$this->strSinaIndexUS;
-            else                                   return false;
+            else                                return false;
         }
         else if ($this->IsSymbolH())
         {   // Hongkong market

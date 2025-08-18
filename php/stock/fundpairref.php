@@ -190,13 +190,11 @@ class FundPairReference extends MyPairReference
 		$strSymbolEu = BuildEuropeSymbol($this->GetSymbol());
 		$strStockIdEu = SqlGetStockId($strSymbolEu);
 		
+		$iCurTick = $this->ConvertTick();
 		$strDate = $this->GetDate();
-		$strTime = $this->GetTime();
-		$this->SetTimeZone();
-		$iCurTick = strtotime($strDate.' '.$strTime);
 		$iCloseTick = GetEuropeMarketCloseTick($strDate);
 		
-		$tick_sql = new IntSql('stocktick', 'tick');
+		$tick_sql = new StockTickSql();
 		$iTick = $tick_sql->ReadInt($strStockIdEu);
 		if (($iTick === false) || (abs($iCurTick - $iCloseTick) < abs($iTick - $iCloseTick)))
 		{
@@ -206,7 +204,7 @@ class FundPairReference extends MyPairReference
     			if ($his_sql->WriteHistory($strStockIdEu, $strDate, $record['close'], $record['open'], $record['high'], $record['low'], $record['volume']))
     			{
     				$tick_sql->WriteInt($strStockIdEu, $iCurTick);
-    				DebugString(__CLASS__.'->'.__FUNCTION__.': '.$strSymbolEu.' updated history on '.$strDate.' '.$strTime);
+    				DebugString(__CLASS__.'->'.__FUNCTION__.': '.$strSymbolEu.' updated history on '.$strDate);
     			}
     		}
 		}

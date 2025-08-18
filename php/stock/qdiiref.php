@@ -56,7 +56,6 @@ function QdiiGetEstSymbol($strSymbol)
     else if ($strSymbol == 'SH501300')   			return 'AGG';
     else if ($strSymbol == 'SH513290')   			return 'IBB';
     else if ($strSymbol == 'SH513400')   			return '^DJI';
-	else if (in_arrayGoldQdii($strSymbol))   		return 'GLD';
     else 
         return false;
 }

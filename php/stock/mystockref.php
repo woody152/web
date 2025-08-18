@@ -19,6 +19,20 @@ class MyStockReference extends MysqlReference
    					if ($now_ymd->IsStockTradingHourEnd())	$this->_updateStockEma($strStockId, $strDate);
    				}
    			}
+   			else
+   			{
+				if ($this->LoadDailySqlData(GetStockHistorySql()))
+				{
+					$tick_sql = new StockTickSql();
+					$ymd = new TickYMD($tick_sql->ReadInt($strStockId));
+					if ($ymd->GetYMD() == $this->GetDate())
+					{
+						$this->SetTime($ymd->GetHMS());
+						$this->SetExternalLink($strSymbol);
+						$this->SetHasData();
+					}
+				}
+   			}
    		}
     }
     
@@ -26,7 +40,7 @@ class MyStockReference extends MysqlReference
     {
     	if ($this->IsSinaFuture())	        $this->LoadSinaFutureData();
     	else if ($this->IsSinaForex())		$this->LoadSinaForexData();
-    	else									$this->LoadSinaData();
+    	else								$this->LoadSinaData();
         $this->bConvertGB2312 = true;     // Sina name is GB2312 coded
     }
     

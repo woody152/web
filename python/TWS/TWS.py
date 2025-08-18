@@ -69,14 +69,13 @@ class MyEWrapper(EWrapper):
         self.arDebug = {}
 
     def nextValidId(self, orderId: int):
-        self.arHedge = {'SZ161125', 'SZ161127', 'SZ161130', 'SZ162411', 'SZ162415', 'SZ162719', 'SZ164906'}
-        #, 'SZ164701'
+        self.arHedge = {'SZ161125', 'SZ161127', 'SZ161130', 'SZ162411', 'SZ162415', 'SZ162719', 'SZ164701', 'SZ164906'}
         #self.arQQQ = {'SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941'}
         #self.arXOP = {'SH513350', 'SZ159518'}
         self.arOrder = {}
-        self.arOrder['KWEB'] = GetOrderArray([20.58, 29.58, 29.75, 33.57, 34.37, 35.99, 36.05, 36.52, 37.61, 38.57], 200, -1, -1)
+        self.arOrder['KWEB'] = GetOrderArray([20.58, 29.58, 29.85, 33.88, 34.31, 36.04, 36.26, 36.94, 37.78, 37.91, 38.57], 200, 7, 9)
         if IsChinaMarketOpen():
-            #self.arOrder['GLD'] = GetOrderArray()
+            self.arOrder['GLD'] = GetOrderArray()
             self.arOrder['IEO'] = GetOrderArray()
             self.arOrder['QQQ'] = GetOrderArray()
             self.arOrder['SPY'] = GetOrderArray()
@@ -86,8 +85,8 @@ class MyEWrapper(EWrapper):
         else:
         #if IsMarketOpen():
             #self.arOrder['TLT'] = GetOrderArray([80.42, 83.53, 83.65, 85.44, 85.81, 87.11, 90.57, 92.68, 98.05], 100, 0, 2)
-            self.arOrder['SPX'] = GetOrderArray([4722.51, 5032.46, 5907.11, 6218.87, 6233.34, 6362.37, 6384.22, 6438.58, 6491.4, 6781.76])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0031, 7, 8)
+            self.arOrder['SPX'] = GetOrderArray([4722.51, 5188.99, 5979.51, 6237.36, 6369.96, 6397.54, 6457.67, 6502.56, 6770.04])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0031, 6, 7)
             self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0153, -1, -1)
         self.palmmicro = Palmmicro()
         self.client.StartStreaming(orderId)

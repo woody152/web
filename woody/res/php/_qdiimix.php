@@ -59,7 +59,12 @@ class _QdiiMixAccount extends FundGroupAccount
         {
         	$ar_realtime_ref = $this->ref->GetRealtimeRefArray();
         	$arRef = array_merge($arRef, $ar_realtime_ref);
-        	foreach ($ar_realtime_ref as $ref)	$arRef[] = $ref->GetPairRef();
+        	$arPairSymbol = array();
+        	foreach ($ar_realtime_ref as $ref)
+        	{
+        		$pair_ref = $ref->GetPairRef();
+				if (in_array_ref($pair_ref, $arRef) == false)	$arRef[] = $pair_ref;
+        	}
         }
 
         GetChinaMoney($this->ref);
@@ -84,6 +89,8 @@ class _QdiiMixAccount extends FundGroupAccount
     	{
     	case 'SZ160216':
 		case 'SZ160644':
+		case 'SZ160719':
+		case 'SZ161116':
 		case 'SZ164701':
 		case 'SH501225':
 		case 'SH501312':
@@ -171,7 +178,12 @@ function EchoAll()
     $us_ref = $acct->GetUsRef();
     $uscny_ref = $ref->GetCnyRef();
     $hkcny_ref = $ref->GetHkcnyRef();
-    $arForex = array($acct->cnh_ref, $ref->GetUsdcnyRef(), $uscny_ref);
+    $arForex = array($acct->cnh_ref);
+    if ($uscny_ref !== false)
+    {
+    	$arForex[] = $ref->GetUsdcnyRef();
+    	$arForex[] = $uscny_ref;
+    }
     if ($hkcny_ref !== false)
     {
     	$arForex[] = $ref->GetHkdcnyRef();

@@ -179,4 +179,18 @@ function _GetKnownBugs()
 	return '</p>'.GetKnownBugs(func_get_args()).'<p>';
 }
 
+function in_array_ref($ref, $arRef)
+{
+	if ($ref)
+	{
+		$strSymbol = $ref->GetSymbol();
+		foreach ($arRef as $ref)
+		{
+			if ($ref->GetSymbol() == $strSymbol)	return $ref;
+		}
+		return false;
+	}
+	return true;
+}
+
 ?>
