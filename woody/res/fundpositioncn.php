@@ -146,7 +146,7 @@ function _echoFundPositionParagraph($ref, $cny_ref, $est_ref, $strSymbol, $strIn
 	if ($csv->HasFile())
 	{
 		$jpg = new DateImageFile();
-		$strNewLine = GetBreakElement();
+		$strNewLine = GetHtmlNewLine();
 		
 		$str = $strNewLine.$csv->GetLink();
 		if ($jpg->Draw($csv->ReadColumn(2), $csv->ReadColumn(1)))	$str .= $strNewLine.$jpg->GetAll($position_col->GetDisplay(), $strSymbol);

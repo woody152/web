@@ -5,7 +5,7 @@ function GetQdiiRelated($strDigitA)
 {
 	$str = GetQqqSoftwareLinks();
 	$str .= GetChinaInternetSoftwareLinks();
-	$str .= GetBreakElement();
+	$str .= GetHtmlNewLine();
 	$str .= GetEFundSoftwareLinks($strDigitA);
 	return $str;
 }

@@ -153,8 +153,8 @@ function GetChinaStockSymbolId($strNode)
 
 function DeleteOldChinaStock($arSymbolId)
 {
-	$ab_sql = new AbPairSql();
-	$ah_sql = new AhPairSql();
+	$ab_sql = GetAbPairSql();
+	$ah_sql = GetAhPairSql();
 	foreach ($arSymbolId as $strSymbol => $strStockId)
 	{
 		if ($ab_sql->DeletePair($strStockId))	DebugString($strSymbol.' had ab_pair');
@@ -177,7 +177,7 @@ class _AdminChinaStockAccount extends TitleAccount
 
     function _updateAhPairSql($strNode, $iCount)
     {
-    	$ah_sql = new AhPairSql();
+    	$ah_sql = GetAhPairSql();
 		$arOld = $ah_sql->GetAllIdVal();
 		DebugVal(count($arOld), 'Original '.$strNode);
 		

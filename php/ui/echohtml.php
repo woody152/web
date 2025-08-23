@@ -35,7 +35,9 @@ function EchoBody($bChinese = true, $bDisplay = true)
 	LayoutEnd();
 	
 	if ($bDisplay)	_LayoutBottom($bChinese, $bAdsense);
-	else				LayoutTail($bChinese);
+	else			LayoutTail($bChinese);
+	
+	DebugString(DebugGetStopWatchDisplay(), true);
 }
 
 ?>

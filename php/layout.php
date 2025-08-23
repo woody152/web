@@ -112,7 +112,7 @@ function GetWechatPay($iType = 0, $bChinese = true)
 */		
 	}
 	
-	return $strImage.GetBreakElement().GetRemarkElement($strRemark);
+	return $strImage.GetHtmlNewLine().GetRemarkElement($strRemark);
 }
 
 function LayoutScreenWidthOk()

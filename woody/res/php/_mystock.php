@@ -163,7 +163,7 @@ function _echoMyStockData($ref, $strStockId, $bAdmin)
 	EchoFundShareParagraph($ref);
 	EchoStockHistoryParagraph($ref);
     
-	$strNewLine = GetBreakElement();
+	$strNewLine = GetHtmlNewLine();
    	$str = GetMyStockLink();
    	if ($strStockId)
    	{
@@ -194,7 +194,7 @@ function GetMyStockLinks($ref)
 			{
 				if (in_array($strSymbol, GetCategoryArray($strItem)))
 				{
-					$str .= GetStockCategoryLinks($strItem).GetBreakElement();
+					$str .= GetStockCategoryLinks($strItem).GetHtmlNewLine();
 					break;
 				}
 			}

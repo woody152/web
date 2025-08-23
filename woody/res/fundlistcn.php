@@ -7,7 +7,7 @@ function EchoAll()
 {
 	global $acct;
 
-	$pair_sql = new FundPairSql();
+	$pair_sql = GetFundPairSql();
     $ar = $pair_sql->GetSymbolArray();
     StockPrefetchArrayExtendedData($ar);
     

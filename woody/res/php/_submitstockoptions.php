@@ -92,7 +92,7 @@ function _updateStockOptionAdr($strSymbol, $strVal)
 
 	if ($strStockId = SqlGetStockId($strAdr))
 	{
-		$pair_sql = new AdrPairSql();
+		$pair_sql = GetAdrPairSql();
 		$pos_sql = GetPositionSql();
 		if ($strRatio == '0')
 		{
@@ -110,14 +110,14 @@ function _updateStockOptionAdr($strSymbol, $strVal)
 
 function _updateStockOptionHa($strSymbolH, $strSymbolA)
 {
-	$pair_sql = new AhPairSql();
+	$pair_sql = GetAhPairSql();
 	if (empty($strSymbolA))		$pair_sql->DeleteByPairSymbol($strSymbolH);
 	else							$pair_sql->WritePairSymbol($strSymbolA, $strSymbolH);
 }
 
 function _updateStockOptionAh($strSymbolA, $strSymbolH)
 {
-	$pair_sql = new AhPairSql();
+	$pair_sql = GetAhPairSql();
 	if (empty($strSymbolH))		$pair_sql->DeleteBySymbol($strSymbolA);
 	else							$pair_sql->WritePairSymbol($strSymbolA, $strSymbolH);
 }
@@ -161,7 +161,7 @@ function _updateStockOptionFund($strSymbol, $strStockId, $strVal)
 		}
 	}
 	
-	$pair_sql = new FundPairSql();
+	$pair_sql = GetFundPairSql();
 	$pos_sql = GetPositionSql();
 	if ($strPos == '0')
 	{

@@ -150,7 +150,7 @@ END;
 
 function EchoTableParagraphEnd($str = '')
 {
-	if ($str == '')	$str = '&nbsp;';
+	if ($str == '')	$str = GetHtmlSpace();
     echo <<<END
     	
     		</tbody>

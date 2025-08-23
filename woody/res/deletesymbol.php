@@ -5,7 +5,7 @@ require_once('../../php/deletestock.php');
 
 function _deleteHasAbPair($strSymbol)
 {
-	$sql = new AbPairSql();
+	$sql = GetAbPairSql();
 	if ($strSymbolB = $sql->GetPairSymbol($strSymbol))
 	{
 		DebugString('(A)B stock existed: '.$strSymbolB);
@@ -21,7 +21,7 @@ function _deleteHasAbPair($strSymbol)
 
 function _deleteHasAhPair($strSymbol)
 {
-	$sql = new AhPairSql();
+	$sql = GetAhPairSql();
 	if ($strSymbolH = $sql->GetPairSymbol($strSymbol))
 	{
 		DebugString('(A)H stock existed: '.$strSymbolH);
@@ -37,7 +37,7 @@ function _deleteHasAhPair($strSymbol)
 
 function _deleteHasAdrPair($strSymbol)
 {
-	$sql = new AdrPairSql();
+	$sql = GetAdrPairSql();
 	if ($strSymbolH = $sql->GetPairSymbol($strSymbol))
 	{
 		DebugString('(ADR)H existed: '.$strSymbolH);
@@ -53,7 +53,7 @@ function _deleteHasAdrPair($strSymbol)
 
 function _deleteHasFundPair($strSymbol)
 {
-	$sql = new FundPairSql();
+	$sql = GetFundPairSql();
 	if ($strIndex = $sql->GetPairSymbol($strSymbol))
 	{
 		DebugString('(Fund) Index existed: '.$strIndex);

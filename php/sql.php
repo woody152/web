@@ -170,7 +170,7 @@ function _errorHandler($errno, $errstr, $errfile, $errline)
  	file_put_contents($strFileName, $errno.','.$strCount);
    	if ($iCount <= 5)
    	{
-   		$strNewLine = GetBreakElement();
+   		$strNewLine = GetHtmlNewLine();
    		
    		$strSubject = ($errno == '1024') ? '调试消息' : "PHP错误: [$errno]";
    		$str = str_replace(PHP_EOL, $strNewLine, $errstr).$strNewLine.'位于'.$errfile.'第'.$errline.'行';

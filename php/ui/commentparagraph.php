@@ -109,7 +109,7 @@ class CommentAccount extends TitleAccount
     function _echoSingleComment($record, $strWhere, $bChinese)
     {
     	$strDescription = $this->GetCommentDescription($record, $strWhere, $bChinese);
-    	$strComment = nl2br($record['comment']);
+    	$strComment = ConvertToHtmlDisplay($record['comment']);
 	
     	echo <<<END
 	<p>$strDescription 

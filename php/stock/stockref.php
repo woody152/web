@@ -462,6 +462,12 @@ class StockReference extends StockSymbol
 //        		$this->strTime = $ar[0];
         		$this->strPrevPrice = $ar[3];
         		$this->strPrice = $ar[8];
+        		if ($this->GetSymbol() == 'fx_sjpycny')
+        		{
+        			$this->strPrice = strval(floatval($this->strPrice) * 100.0);
+        			$this->strPrevPrice = strval(floatval($this->strPrevPrice) * 100.0);
+        		}
+        		
         		$this->strName = $ar[9];
 //        		$this->strDate = $ar[10];
 //				$this->strDate = end($ar);

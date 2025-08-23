@@ -110,7 +110,7 @@ class StockAccount extends TitleAccount
     
     function EchoLinks($strVer = false, $callback = false)
     {
-    	$strNewLine = GetBreakElement();
+    	$strNewLine = GetHtmlNewLine();
     	$strWechatPay = GetHtmlElement(GetWechatPay());
     	$bAdmin = $this->IsAdmin();
     	

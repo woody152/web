@@ -121,7 +121,7 @@ function _getStockOptionPremium($strStockId, $strDate)
 
 function _getStockOptionAdr($strSymbol)
 {
-	$pair_sql = new AdrPairSql();
+	$pair_sql = GetAdrPairSql();
 	if ($strAdr = $pair_sql->GetSymbol($strSymbol))
 	{
 		$pos_sql = GetPositionSql();
@@ -136,7 +136,7 @@ function _getStockOptionFund($strSymbol)
 	$pos_sql = GetPositionSql();
 	if ($fPos = $pos_sql->ReadVal(SqlGetStockId($strSymbol)))	$strPos = strval($fPos);
 		
-	$pair_sql = new FundPairSql();
+	$pair_sql = GetFundPairSql();
 	if ($strIndex = $pair_sql->GetPairSymbol($strSymbol))
 	{
 		$pos_sql = GetPositionSql();

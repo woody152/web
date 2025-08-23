@@ -15,9 +15,14 @@ function GetImgElement($strPathName, $strText)
 	return '<img src='.$strPathName.' alt='.GetDoubleQuotes($strText).' />';
 }
 
-function GetBreakElement()
+function GetHtmlNewLine()
 {
 	return '<br />';
+}
+
+function GetHtmlSpace()
+{
+	return '&nbsp;';
 }
 
 function GetHtmlElement($strContent, $strTag = 'p', $arAttribute = false)
@@ -36,7 +41,7 @@ function GetHtmlElement($strContent, $strTag = 'p', $arAttribute = false)
 
 function GetEmptyElement()
 {
-	return GetHtmlElement('&nbsp;');
+	return GetHtmlElement(GetHtmlSpace());
 }
 
 function GetLinkElement($strContent, $strPathName, $arExtraAttribute = false)
@@ -140,5 +145,12 @@ function HtmlGetJsArray($ar)
 	foreach ($ar as $strId => $strVal)		$str .= $strId.':"'.$strVal.'", ';
 	return rtrim($str, ', ');
 }
+
+function ConvertToHtmlDisplay($str)
+{
+	$str = str_replace(' ', GetHtmlSpace(), $str);
+	return nl2br($str);
+}
+
 
 ?>

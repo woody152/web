@@ -3,7 +3,7 @@ require('php/_qdii.php');
 
 function GetQdiiRelated($strDigitA)
 {
-	$str = GetBreakElement().GetIsharesOfficialLink('IEO').' '.GetSpindicesOfficialLink('DJSOEP');
+	$str = GetHtmlNewLine().GetIsharesOfficialLink('IEO').' '.GetSpindicesOfficialLink('DJSOEP');
 	$str .= GetGuangFaSoftwareLinks($strDigitA);
 	return $str;
 }

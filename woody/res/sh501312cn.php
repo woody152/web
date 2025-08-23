@@ -3,7 +3,7 @@ require('php/_qdiimix.php');
 
 function GetQdiiMixRelated($strDigitA)
 {
-	$str = GetBreakElement();
+	$str = GetHtmlNewLine();
 	$str .= GetHuaBaoSoftwareLinks($strDigitA);
 	return $str;
 }

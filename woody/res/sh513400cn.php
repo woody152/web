@@ -5,7 +5,7 @@ function GetQdiiRelated($strDigitA)
 {
 	$str = GetQqqSoftwareLinks();
 	$str .= GetChinaInternetSoftwareLinks();
-	$str .= GetBreakElement().GetSpindicesOfficialLink('DJI');
+	$str .= GetHtmlNewLine().GetSpindicesOfficialLink('DJI');
 	$str .= GetPenghuaSoftwareLinks($strDigitA);
 	return $str;
 }

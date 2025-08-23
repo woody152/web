@@ -310,7 +310,7 @@ function GetStockDividendLink($sym)
 
 function GetReferenceRateForexLink($strSymbol)
 {
-    $strHttp = 'http://www.chinamoney.com.cn/index.html';
+    $strHttp = GetChinaMoneyUrl();
     return GetExternalLink($strHttp, $strSymbol);
 }
 

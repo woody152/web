@@ -5,7 +5,7 @@ function GetQdiiRelated($strDigitA)
 {
 	$str = GetQqqSoftwareLinks();
 	$str .= GetChinaInternetSoftwareLinks();
-	$str .= GetBreakElement().GetSpdrOfficialLink('XLY');
+	$str .= GetHtmlNewLine().GetSpdrOfficialLink('XLY');
 	$str .= GetHuaBaoSoftwareLinks($strDigitA);
 	return $str;
 }

@@ -137,7 +137,7 @@ class AbPairReference extends MyPairReference
 {
     public function __construct($strSymbolA) 
     {
-        parent::__construct($strSymbolA, new AbPairSql());
+        parent::__construct($strSymbolA, GetAbPairSql());
     }
 }
 
@@ -145,7 +145,7 @@ class AdrPairReference extends MyPairReference
 {
     public function __construct($strAdr) 
     {
-        parent::__construct($strAdr, new AdrPairSql());
+        parent::__construct($strAdr, GetAdrPairSql());
     }
 }
 
@@ -153,7 +153,7 @@ class AhPairReference extends MyPairReference
 {
     public function __construct($strSymbolA) 
     {
-        parent::__construct($strSymbolA, new AhPairSql());
+        parent::__construct($strSymbolA, GetAhPairSql());
     }
 }
 
@@ -164,7 +164,7 @@ class FundPairReference extends MyPairReference
  
     public function __construct($strSymbol, $callback = false) 
     {
-        parent::__construct($strSymbol, new FundPairSql());
+        parent::__construct($strSymbol, GetFundPairSql());
         
 		if ($this->pair_ref)
 		{

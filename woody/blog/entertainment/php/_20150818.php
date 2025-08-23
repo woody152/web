@@ -639,7 +639,7 @@ function Echo20180413($strHead)
 {
 	$strHead = GetHeadElement($strHead);
 	$strUSCNY = GetNameLink('uscny');
-	$strLink = GetExternalLink('http://www.chinamoney.com.cn/r/cms/www/chinamoney/data/fx/ccpr.json');
+	$strLink = GetExternalLink(GetChinaMoneyJsonUrl());
 	
     echo <<<END
 	$strHead

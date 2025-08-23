@@ -31,6 +31,12 @@ class HoldingsReference extends MyStockReference
     var $strHoldingsDate;
     var $arHoldingsRatio = array();
     
+    var $strEstDate;
+    
+    var $strOfficialNetValue = false;
+    var $strFairNetValue = false;
+    var $strRealtimeNetValue = false;
+    
     public function __construct($strSymbol) 
     {
         parent::__construct($strSymbol);
@@ -43,13 +49,26 @@ class HoldingsReference extends MyStockReference
     	{
 			if ($this->strNetValue = SqlGetNetValueByDate($strStockId, $this->strHoldingsDate))
 			{
+				$strDateH = false;
+				$strDateUS = false;
 				$holdings_sql = GetHoldingsSql();
 				$this->arHoldingsRatio = $holdings_sql->GetHoldingsArray($strStockId);
 				$sql = GetStockSql();
+				$fund_pair_sql = GetFundPairSql();
 				foreach ($this->arHoldingsRatio as $strId => $strRatio)
 				{
-					$holding_ref = $this->_selectReference($sql->GetStockSymbol($strId));
+					$strHoldingSymbol = $sql->GetStockSymbol($strId);
+					if ($fund_pair_sql->GetPairSymbol($strHoldingSymbol))
+					{
+						$holding_ref = new FundPairReference($strHoldingSymbol);
+						$this->ar_realtime_ref[] = $holding_ref;
+					}
+					else
+					{
+						$holding_ref = new MyStockReference($strHoldingSymbol);
+					}
 					$this->ar_holdings_ref[] = $holding_ref;
+					
 					if ($holding_ref->IsSymbolA())
 					{
 					}
@@ -57,13 +76,24 @@ class HoldingsReference extends MyStockReference
 					{
 						if ($this->hkcny_ref === false)		$this->hkcny_ref = new CnyReference('HKCNY');
 						if ($this->hkdcny_ref === false)	$this->hkdcny_ref = new MyStockReference('fx_shkdcny');
+						if ($strDateH === false)			$strDateH = $holding_ref->GetDate();
 					}
 					else
 					{
 						if ($this->uscny_ref === false)		$this->uscny_ref = new CnyReference('USCNY');
 						if ($this->usdcny_ref === false)	$this->usdcny_ref = new MyStockReference('fx_susdcny');
+						if ($strDateUS === false)			$strDateUS = $holding_ref->GetDate();
 					}
 				}
+				
+				if ($strDateH)
+				{
+					if (($strDateUS === false) || ($strDateH == $strDateUS) || (strtotime($strDateH) < strtotime($strDateUS)))		$this->strEstDate = $strDateH;
+				}
+				else
+				{
+					$this->strEstDate = $strDateUS;
+				}			
 			}
 			else	
 			{
@@ -75,17 +105,6 @@ class HoldingsReference extends MyStockReference
     	}
     }
 
-    function _selectReference($strSymbol)
-    {
-    	if (SqlGetFundPair($strSymbol))
-    	{
-    		$ref = new FundPairReference($strSymbol);
-    		$this->ar_realtime_ref[] = $ref;
-    		return $ref;
-    	}	
-    	return new MyStockReference($strSymbol);
-    }
-    
     function GetNetValue()
     {
     	return $this->strNetValue;
@@ -168,82 +187,37 @@ class HoldingsReference extends MyStockReference
     	return count($this->ar_realtime_ref) > 0 ? true : false;
     }
 
-/*
-    function GetAdjustUSD($strDate = false)
+    function _adjustToCNY($old_ref, $new_ref, $strDate = false)
     {
-    	if ($this->uscny_ref === false)		return 1.0;
+    	if ($old_ref === false)		return 1.0;
     	
-		$fUSDCNY = floatval($this->uscny_ref->GetPrice());
-		if ($strOldUSDCNY = $this->uscny_ref->GetClose($this->strHoldingsDate))
-		{
-			$fOldUSDCNY = floatval($strOldUSDCNY);
-		}
-		else
-		{
-			$fOldUSDCNY = $fUSDCNY;
-		}
-		
-		if ($strDate)
-		{
-			if ($strUSDCNY = $this->uscny_ref->GetClose($strDate))		$fUSDCNY = floatval($strUSDCNY);
-		}
-		return $fOldUSDCNY / $fUSDCNY;
-    }
-    
-    function GetAdjustHkd($strDate = false)
-    {
-    	if ($this->hkcny_ref === false)		return 1.0;
-    	
-        if ($strHKDCNY = $this->hkcny_ref->GetClose($this->strHoldingsDate))
-        {
-        	$fOldUSDHKD = floatval($this->uscny_ref->GetClose($this->strHoldingsDate)) / floatval($strHKDCNY);
-        }
-        else
-        {
-        	return 1.0;
-        }
-        
-		$fUSDHKD = floatval($this->uscny_ref->GetPrice()) / floatval($this->hkcny_ref->GetPrice());
-		if ($strDate)	
-		{
-			if ($strHKDCNY = $this->hkcny_ref->GetClose($strDate))	
-			{
-				if ($strUSDCNY = $this->uscny_ref->GetClose($strDate))		$fUSDHKD = floatval($strUSDCNY) / floatval($strHKDCNY);
-			}
-		}
-		return $fOldUSDHKD / $fUSDHKD;
-    }
-*/
-    
-    function _adjustToCNY($cny_ref, $strDate = false)
-    {
-    	if ($cny_ref === false)		return 1.0;
-    	
-		$fCNY = floatval($cny_ref->GetPrice());
-		if ($strOldCNY = $cny_ref->GetClose($this->strHoldingsDate))
+		if ($strOldCNY = $old_ref->GetClose($this->strHoldingsDate))
 		{
 			$fOldCNY = floatval($strOldCNY);
 		}
 		else
 		{
-			$fOldCNY = $fCNY;
+			$fOldCNY = floatval($old_ref->GetPrice());;
 		}
 		
+		$fCNY = floatval($new_ref->GetPrice());
 		if ($strDate)
 		{
-			if ($strCNY = $cny_ref->GetClose($strDate))		$fCNY = floatval($strCNY);
+			if ($strCNY = $new_ref->GetClose($strDate))		$fCNY = floatval($strCNY);
 		}
 		return $fOldCNY / $fCNY;
     }
     
     function GetAdjustUSD($strDate = false)
     {
-		return $this->_adjustToCNY($this->uscny_ref, $strDate);
+    	if (($strDate === false) && $this->IsEtfA())	return $this->_adjustToCNY($this->uscny_ref, $this->usdcny_ref);
+		return $this->_adjustToCNY($this->uscny_ref, $this->uscny_ref, $strDate);
     }
     
     function GetAdjustHKD($strDate = false)
     {
-		return $this->_adjustToCNY($this->hkcny_ref, $strDate);
+    	if (($strDate === false) && $this->IsEtfA())	return $this->_adjustToCNY($this->hkcny_ref, $this->hkdcny_ref);
+		return $this->_adjustToCNY($this->hkcny_ref, $this->hkcny_ref, $strDate);
     }
     
 /*
@@ -320,36 +294,7 @@ class HoldingsReference extends MyStockReference
 //    	DebugString(__CLASS__.'->'.__FUNCTION__.': '.strval($fNetValue).' '.$this->strNetValue, true);
     	return $fNetValue / floatval($this->strNetValue);
     }
-    
-    function _getEstDate()
-    {
-    	$strH = false;
-   		foreach ($this->ar_holdings_ref as $ref)
-   		{
-   			if ($ref->IsSymbolH())
-   			{
-    			$strH = $ref->GetDate();
-    			break;
-   			}
-   		}
-   		
-    	$strUS = false;
-   		foreach ($this->ar_holdings_ref as $ref)
-   		{
-   			if ($ref->IsSymbolUS())
-   			{
-    			$strUS = $ref->GetDate();
-    			break;
-   			}
-   		}
-   		
-   		if ($strH)
-   		{
-   			if (($strUS === false) || ($strH == $strUS) || (strtotime($strH) < strtotime($strUS)))		return $strH;
-   		}
-		return $strUS;
-    }
-    
+
     function _needAdjustOfficialDate($strDate)
     {
 		if ($this->uscny_ref)
@@ -368,7 +313,7 @@ class HoldingsReference extends MyStockReference
    		$strDate = $this->GetDate();
     	if ($this->IsFundA())
     	{
-			if ($str = $this->_getEstDate())		$strDate = $str;
+			if ($this->strEstDate)		$strDate = $this->strEstDate;
 
 			$fund_est_sql = GetFundEstSql();
 			if ($this->_needAdjustOfficialDate($strDate))		$strDate = $fund_est_sql->GetDatePrev($this->GetStockId(), $strDate);	// Load last value from database
@@ -378,16 +323,21 @@ class HoldingsReference extends MyStockReference
     
     public function GetOfficialNetValue()
     {
-    	$strDate = $this->GetOfficialDate();
-    	$strVal = strval($this->_estNetValue($strDate));
-   		StockUpdateEstResult($this->GetStockId(), $strVal, $strDate);
-   		return $strVal;
+    	if ($this->strOfficialNetValue === false)
+    	{
+    		$strDate = $this->GetOfficialDate();
+    		$this->strOfficialNetValue = strval($this->_estNetValue($strDate));
+    		StockUpdateEstResult($this->GetStockId(), $this->strOfficialNetValue, $strDate);
+    	}
+   		return $this->strOfficialNetValue;
     }
     
     function _needFairNetValue()
     {
+    	if ($this->IsEtfA())								return true;
+    	
     	$strDate = $this->GetOfficialDate();
-    	if ($this->_getEstDate() != $strDate)	return true;
+    	if ($this->strEstDate != $strDate)					return true;
 		if ($this->uscny_ref)
 		{
 			if ($this->uscny_ref->GetDate() != $strDate)	return true;
@@ -401,17 +351,20 @@ class HoldingsReference extends MyStockReference
 
     public function GetFairNetValue()
     {
-		if ($this->_needFairNetValue())
-		{
-			return strval($this->_estNetValue());
-		}
-		return false;
+    	if ($this->strFairNetValue === false)
+    	{
+    		if ($this->_needFairNetValue())		$this->strFairNetValue = strval($this->_estNetValue());
+    	}
+		return $this->strFairNetValue;
     }
 
     public function GetRealtimeNetValue()
     {
-    	if ($this->UseRealtimeEst())		return strval($this->_estNetValue(false, true));
-   		return false;
+    	if ($this->strRealtimeNetValue === false)
+    	{
+    		if ($this->UseRealtimeEst())	$this->strRealtimeNetValue = strval($this->_estNetValue(false, true));
+    	}
+   		return $this->strRealtimeNetValue;
     }
 }
 

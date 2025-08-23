@@ -6,6 +6,7 @@ require_once('sqldailyclose.php');
 require_once('sqldailytime.php');
 require_once('sqlholdings.php');
 require_once('sqlval.php');
+require_once('sqlstockpair.php');
 
 class StockHistorySql extends DailyCloseSql
 {
@@ -108,6 +109,11 @@ class StockSql extends KeyNameSql
     var $net_sql;
     var $pos_sql;
     
+    var $ab_pair_sql;
+    var $adr_pair_sql;
+    var $ah_pair_sql;
+    var $fund_pair_sql;
+    
     public function __construct()
     {
         parent::__construct('stock', 'symbol');
@@ -120,6 +126,11 @@ class StockSql extends KeyNameSql
         $this->holdings_sql = new HoldingsSql();
        	$this->net_sql = new DailyCloseSql('netvaluehistory');
        	$this->pos_sql = new ValSql('fundposition');
+       	
+       	$this->ab_pair_sql = new StockPairSql('abpair');
+       	$this->adr_pair_sql = new StockPairSql('adrpair');
+       	$this->ah_pair_sql = new StockPairSql('ahpair');
+       	$this->fund_pair_sql = new StockPairSql('fundpair');
     }
 
     public function Create()
@@ -310,6 +321,72 @@ function GetPositionSql()
 {
 	global $g_stock_sql;
    	return $g_stock_sql->pos_sql;
+}
+
+function GetFundPairSql()
+{
+	global $g_stock_sql;
+   	return $g_stock_sql->fund_pair_sql;
+}
+
+function SqlGetFundPair($strFund)
+{
+	$fund_pair_sql = GetFundPairSql();
+	return $fund_pair_sql->GetPairSymbol($strFund);
+}
+
+function GetAbPairSql()
+{
+	global $g_stock_sql;
+   	return $g_stock_sql->ab_pair_sql;
+}
+
+function SqlGetAbPair($strSymbolA)
+{
+	$pair_sql = GetAbPairSql();
+	return $pair_sql->GetPairSymbol($strSymbolA);
+}
+
+function SqlGetBaPair($strSymbolB)
+{
+	$pair_sql = GetAbPairSql();
+	return $pair_sql->GetSymbol($strSymbolB);
+}
+
+function GetAhPairSql()
+{
+	global $g_stock_sql;
+   	return $g_stock_sql->ah_pair_sql;
+}
+
+function SqlGetAhPair($strSymbolA)
+{
+	$ah_pair_sql = GetAhPairSql();
+	return $ah_pair_sql->GetPairSymbol($strSymbolA);
+}
+
+function SqlGetHaPair($strSymbolH)
+{
+	$ah_pair_sql = GetAhPairSql();
+	return $ah_pair_sql->GetSymbol($strSymbolH);
+}
+
+function GetAdrPairSql()
+{
+	global $g_stock_sql;
+   	return $g_stock_sql->adr_pair_sql;
+}
+
+function SqlGetAdrhPair($strSymbolAdr)
+{
+	$pair_sql = GetAdrPairSql();
+	return $pair_sql->GetPairSymbol($strSymbolAdr);
+}
+
+function SqlGetHadrPair($strSymbolH)
+{
+	$pair_sql = GetAdrPairSql();
+	return $pair_sql->GetSymbol($strSymbolH);
 }
 
 ?>

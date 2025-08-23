@@ -37,6 +37,7 @@ class MysqlReference extends StockReference
     		
     		$pos_sql = GetPositionSql();
     		$this->fRatio = ($fRatio = $pos_sql->ReadVal($this->strSqlId)) ? $fRatio : $this->GetDefaultPosition();
+//    		DebugVal($this->fRatio, $strSymbol.' position', true);
     	}
     }
     

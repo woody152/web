@@ -143,7 +143,7 @@ function EchoAll($bChinese = true)
 	        $strPhone = $profile['phone'];
 	        $strAddress = $profile['address'];
 	        $strWeb = GetExternalLink($profile['web']);
-	        $strSignature = nl2br($profile['signature']);
+	        $strSignature = ConvertToHtmlDisplay($profile['signature']);
 	    }
 	    else
 	    {

@@ -3,7 +3,7 @@ require('php/_qdiimix.php');
 
 function GetQdiiMixRelated($strDigitA)
 {
-	$str = GetBreakElement().GetCsindexOfficialLink('H30533').' ';
+	$str = GetHtmlNewLine().GetCsindexOfficialLink('H30533').' ';
 	$str .= GetEFundSoftwareLinks($strDigitA);
 	return $str;
 }

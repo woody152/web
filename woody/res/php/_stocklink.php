@@ -6,17 +6,17 @@ function GetCategoryArray($strItem)
     switch ($strItem)
     {
     case 'abcompare':
-   		$pair_sql = new AbPairSql();
+   		$pair_sql = GetAbPairSql();
         $ar = $pair_sql->GetSymbolArray();
         break;
   
     case 'adrhcompare':
-   		$pair_sql = new AdrPairSql();
+   		$pair_sql = GetAdrPairSql();
         $ar = $pair_sql->GetSymbolArray();
         break;
   
     case 'ahcompare':
-   		$pair_sql = new AhPairSql();
+   		$pair_sql = GetAhPairSql();
         $ar = $pair_sql->GetSymbolArray();
         break;
   

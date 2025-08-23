@@ -31,7 +31,7 @@ function _echoDebugParagraph($arDebug, $str)
 	$str .= '：';
     foreach ($arDebug as $strIp => $iCount)
     {
-    	if ($iCount > 2)		$str .= GetBreakElement().GetVisitorLink($strIp).' '.strval($iCount);
+    	if ($iCount > 2)		$str .= GetHtmlNewLine().GetVisitorLink($strIp).' '.strval($iCount);
     }
     EchoHtmlElement($str);
 }

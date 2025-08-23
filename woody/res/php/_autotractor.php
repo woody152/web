@@ -24,7 +24,7 @@ function EchoAll()
     							'在本页面下载银河拖拉机自动化PC软件脚本的3个文件到同一个子目录下，分别是'.GetFileLink('/autoit/yinhe.au3').'、'.GetFileLink('/debug/autoitscript/yinheaccounts.au3').'和'.GetFileLink('/debug/autoitscript/Tesseract.au3').'。'));
 */    							
     
-   	$strNewLine = GetBreakElement();
+   	$strNewLine = GetHtmlNewLine();
    	$strYinheAu3 = GetInfoElement('yinhe.au3');
    	$strYinheAu3Now = GetInfoElement('yinhe0'.YINHE_AU3_VER.'.au3');
     $str = GetRemarkElement('软件更新：');

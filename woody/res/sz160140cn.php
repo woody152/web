@@ -5,7 +5,7 @@ function GetQdiiRelated($strDigitA)
 {
 	$str = GetOilSoftwareLinks();
 	$str .= GetChinaInternetSoftwareLinks();
-	$str .= GetBreakElement().GetNanFangSoftwareLinks($strDigitA);
+	$str .= GetHtmlNewLine().GetNanFangSoftwareLinks($strDigitA);
 	return $str;
 }
 

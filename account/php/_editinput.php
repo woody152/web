@@ -14,6 +14,8 @@ require_once('../php/ui/imagedisp.php');
 
 require_once('../php/stock.php');
 
+// https://stock2.finance.sina.com.cn/futures/api/jsonp.php/var%20t1nf_AG2512=/InnerFuturesNewService.getMinLine?symbol=AG2512
+
 function HexView($strInput)
 {
 	$str = '<br />Hex: ';
@@ -114,17 +116,18 @@ function _getSimpleTestString($strInput, $bChinese)
     		$strFileName = DebugGetPathName('simpletest.txt');
     		file_put_contents($strFileName, $strRead);
     		DebugString('Saved '.$strInput.' to '.$strFileName);
-    		$str = GetFileDebugLink($strFileName).GetBreakElement();
+   		   	$strNewLine = GetHtmlNewLine();
+    		$str = GetFileDebugLink($strFileName).$strNewLine;
     		if ($ar = json_decode($strRead, true))
     		{
     			DebugPrint($ar);
-    			$str .= strip_tags(print_r($ar, true));
+    			$str .= ConvertToHtmlDisplay(print_r($ar, true));
     		}
     		else
     		{
     			$strRead = strip_tags($strRead);
     			DebugString($strRead);
-    			$str .= $strRead;
+    			$str .= ConvertToHtmlDisplay($strRead);
     		}
     	}
     	else	$str = $bChinese ? 'Curl读错误' : 'Curl read error';
@@ -270,7 +273,7 @@ function _getLinearRegressionString($strInput, $bChinese)
 		$strInput = rtrim($strInput, ')');
 	}
 
-   	$strNewLine = GetBreakElement();
+   	$strNewLine = GetHtmlNewLine();
    	$strSeparator = ', ';
 	if ($strFunction == 'stock')		$strData = _getLinearRegressionStockArrays($arX, $arY, $strInput, $strSeparator, $strNewLine);
 	else								$strData = _getLinearRegressionArrays($arX, $arY, $strInput, $strSeparator, $strNewLine, $strFunction);
@@ -416,7 +419,7 @@ function _getSinaJsString($strInput, $bChinese)
     {
     	$arLine = explode("\n", $str);
     	$str = '';
-    	$strNewLine = GetBreakElement();
+    	$strNewLine = GetHtmlNewLine();
     	foreach ($arLine as $strLine)
     	{
     		if ($strLine != '')

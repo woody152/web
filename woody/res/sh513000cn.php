@@ -3,7 +3,7 @@ require('php/_qdiijp.php');
 
 function GetQdiiJpRelated($strDigitA)
 {
-	$str = GetBreakElement();
+	$str = GetHtmlNewLine();
 	$str .= GetEFundSoftwareLinks($strDigitA);
 	return $str;
 }

@@ -1,10 +1,5 @@
 <?php
 
-function ChinaMoneyGetUrl()
-{
-	return 'http://www.chinamoney.com.cn/r/cms/www/chinamoney/data/fx/ccpr.json';
-}
-
 function _chinaMoneyNeedData($strDate)
 {
 	$net_sql = GetNetValueHistorySql();
@@ -33,7 +28,7 @@ function GetChinaMoney($ref)
 	$strFileName = DebugGetChinaMoneyFile();
 	if (StockNeedFile($strFileName) == false)						return; 	// updates on every minute
 	
-   	if ($str = url_get_contents(ChinaMoneyGetUrl()))
+   	if ($str = url_get_contents(GetChinaMoneyJsonUrl()))
    	{
    		DebugString($strFileName.': Save new file');
    		file_put_contents($strFileName, $str);

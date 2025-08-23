@@ -3,7 +3,7 @@ require('php/_qdii.php');
 
 function GetQdiiRelated($strDigitA)
 {
-	$str = GetBreakElement().GetEFundSoftwareLinks($strDigitA);
+	$str = GetHtmlNewLine().GetEFundSoftwareLinks($strDigitA);
 	return $str;
 }
 

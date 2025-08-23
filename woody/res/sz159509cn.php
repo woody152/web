@@ -3,7 +3,7 @@ require('php/_qdiimix.php');
 
 function GetQdiiMixRelated($strDigitA)
 {
-	$str = GetBreakElement();
+	$str = GetHtmlNewLine();
 	$str .= GetExternalLink('https://indexes.nasdaqomx.com/Index/Overview/NDXTMC', 'NDXTMC'); 
 	$str .= ' '.GetJingShunSoftwareLinks($strDigitA);
 	return $str;

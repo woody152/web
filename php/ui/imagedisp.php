@@ -2,7 +2,7 @@
 
 function GetImgQuote($strPathName, $strText = '', $bChinese = true)
 {
-   	$strNewLine = GetBreakElement();
+   	$strNewLine = GetHtmlNewLine();
 	return $strNewLine.GetImgElement($strPathName, $strText).$strNewLine.GetQuoteElement($strText);
 }
 
@@ -255,7 +255,7 @@ function GetVideoControl($strPathName, $strText = '', $bChinese = true)
 		{
 			$iWidth = $imageInfo[0]; // Width is at index 0
 			$iHeight = $imageInfo[1]; // Height is at index 1
-			$strNewLine = GetBreakElement();
+			$strNewLine = GetHtmlNewLine();
 			if (LayoutGetDisplayWidth() < $iWidth)
 			{
 				$str = GetFileLink($strPathName);

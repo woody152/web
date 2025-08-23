@@ -3,7 +3,7 @@ require('php/_qdiieu.php');
 
 function GetQdiiEuRelated($strDigitA)
 {
-	$str = GetBreakElement().GetJiaShiSoftwareLinks($strDigitA);
+	$str = GetHtmlNewLine().GetJiaShiSoftwareLinks($strDigitA);
 	return $str;
 }
 

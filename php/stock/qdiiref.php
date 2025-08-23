@@ -165,7 +165,7 @@ class _QdiiReference extends FundReference
         
         $strDate = $est_ref->GetDate();
        	$cny_ref = $this->GetCnyRef();
-       	if (($cny_ref->GetDate() != $this->strOfficialDate) || ($strDate != $this->strOfficialDate))
+       	if ($this->IsEtfA() || ($cny_ref->GetDate() != $this->strOfficialDate) || ($strDate != $this->strOfficialDate))
        	{
 			$strEstVal = $this->_getEstVal($strDate);
         	$this->fFairNetValue = $this->GetQdiiValue($strEstVal);
@@ -205,7 +205,7 @@ class _QdiiReference extends FundReference
     {
     	if ($strCNY == false)
     	{
-	       	$cny_ref = $this->GetCnyRef();
+	       	$cny_ref = $this->IsEtfA() ? $this->GetForexRef() : $this->GetCnyRef();
 	       	$strCNY = $cny_ref->GetPrice();
     	}
     	

@@ -107,8 +107,9 @@ function GetHM($strHMS)
 	return substr($strHMS, 0, 5);
 }
 
-function DebugGetStopWatchDisplay($fStart, $iPrecision = 2)
+function DebugGetStopWatchDisplay($fStart = false, $iPrecision = 2)
 {
+	if ($fStart === false)	$fStart = $_SERVER['REQUEST_TIME_FLOAT'];
     return ' ('.strval_round(microtime(true) - $fStart, $iPrecision).'s)';
 }
 

@@ -3,7 +3,7 @@ require('php/_chinaindex.php');
 
 function GetChinaIndexRelated($strDigitA)
 {
-	$str = GetBreakElement();
+	$str = GetHtmlNewLine();
 	$str .= GetHuaTaiSoftwareLinks($strDigitA);
 	return $str;
 }

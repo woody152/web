@@ -49,27 +49,29 @@ def _ref_get_peer_val2(strType, arData, arHedge):
 
 class Palmmicro:
     def __init__(self):
-        self.arData = {}
+        self.arSym = {}
         self.iTimer = 0
+        self.bNewSinaData = False
         self.arSendMsg = {'telegram':{'key':WECHAT_KEY, 'count':3, 'timer':0, 'msg':'', 'array_msg':[]},
-                          'gld':{'key':WECHAT_GLD_KEY, 'count':7, 'timer':0, 'msg':'', 'array_msg':[]},
-                          'kweb':{'key':WECHAT_KWEB_KEY, 'count':5, 'timer':0, 'msg':'', 'array_msg':[]},
-                          'qqq':{'key':WECHAT_QQQ_KEY, 'count':7, 'timer':0, 'msg':'', 'array_msg':[]},
-                          'spy':{'key':WECHAT_SPY_KEY, 'count':5, 'timer':0, 'msg':'', 'array_msg':[]},
-                          'xbi':{'key':WECHAT_XBI_KEY, 'count':7, 'timer':0, 'msg':'', 'array_msg':[]},
-                          'xly':{'key':WECHAT_XLY_KEY, 'count':5, 'timer':0, 'msg':'', 'array_msg':[]},
-                          'xop':{'key':WECHAT_XOP_KEY, 'count':7, 'timer':0, 'msg':'', 'array_msg':[]},
-                          'ieo':{'key':WECHAT_IEO_KEY, 'count':5, 'timer':0, 'msg':'', 'array_msg':[]}
+                          'GLD':{'key':WECHAT_GLD_KEY, 'count':5, 'timer':0, 'msg':'', 'array_msg':[]},
+                          'IEO':{'key':WECHAT_IEO_KEY, 'count':7, 'timer':0, 'msg':'', 'array_msg':[]},
+                          'KWEB':{'key':WECHAT_KWEB_KEY, 'count':5, 'timer':0, 'msg':'', 'array_msg':[]},
+                          'QQQ':{'key':WECHAT_QQQ_KEY, 'count':7, 'timer':0, 'msg':'', 'array_msg':[]},
+                          'SPY':{'key':WECHAT_SPY_KEY, 'count':5, 'timer':0, 'msg':'', 'array_msg':[]},
+                          'XBI':{'key':WECHAT_XBI_KEY, 'count':7, 'timer':0, 'msg':'', 'array_msg':[]},
+                          'XLY':{'key':WECHAT_XLY_KEY, 'count':5, 'timer':0, 'msg':'', 'array_msg':[]},
+                          'XOP':{'key':WECHAT_XOP_KEY, 'count':7, 'timer':0, 'msg':'', 'array_msg':[]},
                          }
 
-    def GetTelegramChatId(self):
+    def _getTelegramChatId(self):
         return 992671436
 
-    def FetchSinaData(self, strSymbols):
+    def _fetchSinaData(self, strSymbols):
         strUrl = f'http://hq.sinajs.cn/list={strSymbols.lower()}'
         try:
             response = requests.get(strUrl, headers={'Referer': 'https://finance.sina.com.cn'})
             if response.status_code == 200:
+                self.bNewSinaData = True
                 arLine = response.text.split("\n")
                 iLen = len('var hq_str_')
                 for strLine in arLine:
@@ -77,32 +79,32 @@ class Palmmicro:
                         strSymbol = strLine[iLen:].split('"')[0]
                         strSymbol = strSymbol.rstrip('=')
                         strSymbol = strSymbol.upper()
-                        if strSymbol in self.arData:
-                            arData = self.arData[strSymbol]
+                        if strSymbol in self.arSym:
                             arItem = strLine.split(',')
-                            arData['bid_price'] = arItem[6]
-                            arData['ask_price'] = arItem[7]
-                            arData['bid_size'] = int(arItem[10])
-                            arData['ask_size'] =  int(arItem[20])
-                            if arData['symbol_hedge'] in self.arData:
-                                arHedge = self.arData[arData['symbol_hedge']]
-                                arData['hedge'] = _get_hedge2(arData, arHedge)
-                                arData['position_hedge'] = float(arHedge['position'])
-                                arData['bid_price_hedge'] = _ref_get_peer_val2('bid', arData, arHedge)
-                                arData['ask_price_hedge'] = _ref_get_peer_val2('ask', arData, arHedge)
+                            arSymData = self.arSym[strSymbol]
+                            arSymData['BUY_price'] = arItem[6]
+                            arSymData['SELL_price'] = arItem[7]
+                            arSymData['BUY_size'] = int(arItem[10])
+                            arSymData['SELL_size'] =  int(arItem[20])
+                            if arSymData['symbol_hedge'] in self.arSym:
+                                arHedgeSymData = self.arSym[arSymData['symbol_hedge']]
+                                arSymData['hedge'] = _get_hedge2(arSymData, arHedgeSymData)
+                                arSymData['position_hedge'] = float(arHedgeSymData['position'])
+                                arSymData['BUY_price_hedge'] = _ref_get_peer_val2('BUY', arSymData, arHedgeSymData)
+                                arSymData['SELL_price_hedge'] = _ref_get_peer_val2('SELL', arSymData, arHedgeSymData)
                             else:
-                                arData['hedge'] = _get_hedge(arData)
-                                arData['bid_price_hedge'] = _ref_get_peer_val('bid', arData)
-                                arData['ask_price_hedge'] = _ref_get_peer_val('ask', arData)
-                            arData['bid_size_hedge'] = _get_hedge_quantity('bid', arData)
-                            arData['ask_size_hedge'] = _get_hedge_quantity('ask', arData)
+                                arSymData['hedge'] = _get_hedge(arSymData)
+                                arSymData['BUY_price_hedge'] = _ref_get_peer_val('BUY', arSymData)
+                                arSymData['SELL_price_hedge'] = _ref_get_peer_val('SELL', arSymData)
+                            arSymData['BUY_size_hedge'] = _get_hedge_quantity('BUY', arSymData)
+                            arSymData['SELL_size_hedge'] = _get_hedge_quantity('SELL', arSymData)
             else:
                 print('Failed to send request. Status code:', response.status_code)
         except requests.exceptions.RequestException as e:
-            print('FetchSinaData Error occurred:', e)
+            print('_fetchSinaData error:', e)
 
-    def FetchPalmmicroData(self, strSymbols):
-        iChatId = self.GetTelegramChatId()
+    def _fetchPalmmicroData(self, strSymbols):
+        iChatId = self._getTelegramChatId()
         arMsg = {
             'update_id': 886050244,
             'message': {
@@ -134,47 +136,47 @@ class Palmmicro:
             if response.status_code == 200:
                 response_data = response.json()  # Parse the JSON response data
                 print('Response data:', response_data)
-                #self.arData.clear()
-                self.arData = response_data['text']
+                #self.arSym.clear()
+                self.arSym = response_data['text']
             else:
                 print('Failed to send POST request. Status code:', response.status_code)
         except requests.exceptions.RequestException as e:
-            print('FetchData Error occurred:', e)
+            print('_fetchPalmmicroData error:', e)
 
     def FetchData(self, arSymbol):
         iCur = int(time.time())
-        if iCur - self.iTimer < 19:
-            return self.arData
-        self.iTimer = iCur
-        strSymbols = ','.join(arSymbol)
-        if not self.arData:
-            self.FetchPalmmicroData(strSymbols)
-        self.FetchSinaData(strSymbols)
-        return self.arData
+        if iCur - self.iTimer >= 19:
+            self.iTimer = iCur
+            strSymbols = ','.join(arSymbol)
+            if not self.arSym:
+                self._fetchPalmmicroData(strSymbols)
+            self._fetchSinaData(strSymbols)
+        return self.arSym
     
     #@staticmethod
     def GetPeerStr(self, strType):
-        if strType == 'ask':
-            return 'bid'
-        elif strType == 'bid':
-            return 'ask'
+        if strType == 'SELL':
+            return 'BUY'
+        elif strType == 'BUY':
+            return 'SELL'
     
-    def GetArbitrageResult(self, strSymbol, arPeerData, strType):
+    def GetArbitrageResult(self, strSymbol, arMktData, strType):
         arResult = {'ratio': 0.0, 'size': 0}
         strPeerType = self.GetPeerStr(strType) 
-        price = arPeerData[strPeerType + '_price']
-        size = arPeerData[strPeerType + '_size'] 
-        arReply = self.arData[strSymbol]
+        fPrice = arMktData[strPeerType + '_price']
+        iSize = arMktData[strPeerType + '_size'] 
+        arSymData = self.arSym[strSymbol]
         strSizeIndex = strType + '_size'
-        if strSizeIndex in arReply:
-            if arReply[strSizeIndex] > 0 and price > 0:
-                fRatio = price / arReply[strType + '_price_hedge'] - 1.0
-                if 'position_hedge' in arReply:
-                    fRatio /= arReply['position_hedge']
+        if strSizeIndex in arSymData:
+            if arSymData[strSizeIndex] > 0 and fPrice > 0.0:
+                fRatio = fPrice / arSymData[strType + '_price_hedge'] - 1.0
+                if 'position_hedge' in arSymData:
+                    fRatio /= arSymData['position_hedge']
+                fRatio *= float(arSymData['position'])
                 arResult['ratio'] = round(fRatio, 4)
-                iSize = min(size, arReply[strType + '_size_hedge'])
+                iSize = min(iSize, arSymData[strType + '_size_hedge'])
                 arResult['size'] = iSize;
-                arResult['size_hedge'] = int((float(iSize) * arReply['hedge'] + 50.0) / 100.0) * 100
+                arResult['size_hedge'] = int((float(iSize) * arSymData['hedge'] + 50.0) / 100.0) * 100
         return arResult
     
     def IsFree(self, group):
@@ -234,14 +236,20 @@ class Palmmicro:
                 self.__send_msg(group)
 
     def SendSymbolMsg(self, strMsg, strSymbol):
-        if strSymbol in ['GLD', 'IEO', 'KWEB', 'QQQ', 'SPY', 'XBI', 'XLY', 'XOP']:
-            self.SendMsg(strMsg.replace(' ' + strSymbol, ''), strSymbol.lower())
+        if strSymbol in self.arSendMsg:
+            self.SendMsg(strMsg.replace(' ' + strSymbol, ''), strSymbol)
 
     def SendOldMsg(self):
         for group, value in self.arSendMsg.items():
             if self.IsFree(group):
                 if len(value['array_msg']) > 0:
                     self.__send_msg(group)
+
+    def CheckNewSinaData(self):
+        if self.bNewSinaData == True:
+            self.bNewSinaData = False
+            return True
+        return False
 
 
 class Calibration:

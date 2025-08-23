@@ -118,7 +118,7 @@ function GetProsharesUrl()
 
 // https://kraneshares.com/kweb/
 // https://kraneshares.com/csv/06_22_2021_kweb_holdings.csv
-// https://kraneshares.com/product-json/?pid=477&type=premium-discount&start=2024-03-15&end=2024-03-15
+// https://kraneshares.com/product-json/?pid=477&type=premium-discount&start=2025-08-18&end=2025-08-19
 function GetKraneUrl()
 {
 	return 'https://kraneshares.com/';
@@ -277,5 +277,16 @@ function GetEtfNetValueUrl($strSymbol)
 	}
 	return false;
 }
+
+function GetChinaMoneyUrl()
+{
+	return 'https://www.chinamoney.com.cn/';
+}
+
+function GetChinaMoneyJsonUrl()
+{
+	return GetChinaMoneyUrl().'r/cms/www/chinamoney/data/fx/ccpr.json';
+}
+
 
 ?>

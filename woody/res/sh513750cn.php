@@ -3,7 +3,7 @@ require('php/_qdiimix.php');
 
 function GetQdiiMixRelated($strDigitA)
 {
-	$str = GetBreakElement();
+	$str = GetHtmlNewLine();
 	$str .= GetGuangFaSoftwareLinks($strDigitA);
 	return $str;
 }

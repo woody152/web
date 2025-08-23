@@ -51,7 +51,8 @@ function _callbackFundListHedge($fPos, $fFactor, $strDate, $strStockId)
 		$strQdiiDate = $record['date']; 
 		if ($strQdiiDate != $strDate)
 		{
-			$fFactor = floatval($cal_sql->GetClose($strStockId, $strQdiiDate));
+			if ($strFactor = $cal_sql->GetClose($strStockId, $strQdiiDate))		$fFactor = floatval($strFactor);
+			else																return '';
 			// DebugString(__FUNCTION__.' Reload calibration factor because of difference date: '.$strQdiiDate.' '.$strDate);
 		}
 		return StockCalcLeverageHedge($fQdiiCalibration, $fQdiiPos, $fFactor, $fPos);
@@ -131,7 +132,7 @@ class QdiiGroupAccount extends FundGroupAccount
 
     function GetLeverageSymbols($strEstSymbol)
     {
-   		$pair_sql = new FundPairSql();
+   		$pair_sql = GetFundPairSql();
         $this->arLeverage = $pair_sql->GetSymbolArray($strEstSymbol);
     }
     
