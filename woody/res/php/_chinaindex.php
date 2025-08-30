@@ -79,9 +79,7 @@ function EchoAll()
 function GetChinaIndexLinks($sym)
 {
 	$str = GetExternalLink('https://dws.com/US/EN/Product-Detail-Page/ASHR', 'ASHR官网');
-	$str .= GetASharesSoftwareLinks();
-	$str .= GetChinaInternetSoftwareLinks();
-	$str .= GetOilSoftwareLinks();
+	$str .= GetStockCategoryLinks($sym->GetSymbol());
 	return $str.GetChinaIndexRelated($sym->GetDigitA());
 }
 

@@ -29,7 +29,7 @@ function QdiiGetStockPosition($strEstPrev, $strEst, $strPrev, $strNetValue, $str
 			$fVal = StockGetPercentage($strPrev, $strNetValue) / $f;
 			if ($fVal > 0.1)
 			{
-				return strval_round($fVal, 2);
+				return number_format($fVal, 2);
 			}
 		}
 	}

@@ -15,6 +15,7 @@ define('SPY_GROUP_DISPLAY', '标普500');
 
 define('LOF_ALL_DISPLAY', 'LOF基金');
 define('OVERNIGHT_DISPLAY', '义工群对比');
+define('OVERNIGHT_CNH_DISPLAY', '义工群对冲计算器');
 
 define('CHINA_INDEX_DISPLAY', 'A股指数');
 define('QDII_DISPLAY', '美股QDII');
@@ -74,16 +75,6 @@ function GetStockPhpLink($strPage, $strDisplay, $strQuery = false)
     return GetPhpLink(PATH_STOCK.$strPage, $strQuery, $strDisplay);
 }
 
-function GetAllLofLink()
-{
-    return GetStockPhpLink('lof', LOF_ALL_DISPLAY);
-}
-
-function GetOvernightLink()
-{
-    return GetStockPhpLink('overnight', OVERNIGHT_DISPLAY);
-}
-
 function GetStockCategoryLink($strItem)
 {
     $ar = GetStockCategoryArray();
@@ -99,6 +90,22 @@ function GetStockMenuLink($strItem)
 function GetStockPageLink($strPage, $strDisplay, $strQuery = false)
 {
 	return GetPageLink(PATH_STOCK, $strPage, $strQuery, $strDisplay);
+}
+
+function GetAllLofLink()
+{
+    return GetStockPageLink('lof', LOF_ALL_DISPLAY);
+}
+
+function GetOvernightLink()
+{
+    return GetStockPageLink('overnight', OVERNIGHT_DISPLAY);
+}
+
+function GetOvernightCnhLink($strDisplay = OVERNIGHT_CNH_DISPLAY, $strAmount = '95000')
+{
+	$strPage = 'overnightcnh';
+	return GetStockPageLink($strPage, $strDisplay, $strPage.'='.$strAmount);
 }
 
 function GetStockSymbolLink($strPage, $strSymbol, $strDisplay = false, $strExtraQuery = false)

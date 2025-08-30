@@ -53,17 +53,14 @@ class MyStockReference extends MysqlReference
     
     function _updateStockHistory($strStockId, $strDate)
     {
-        $strOpen = $this->strOpen;
-        if ($this->_invalidHistoryData($strOpen))  return;
-        $strHigh = $this->strHigh;
-        if ($this->_invalidHistoryData($strHigh))  return;
-        $strLow = $this->strLow;
-        if ($this->_invalidHistoryData($strLow))  return;
+        if ($this->_invalidHistoryData($this->strOpen))  return;
+        if ($this->_invalidHistoryData($this->strHigh))  return;
+        if ($this->_invalidHistoryData($this->strLow))  return;
         $strClose = $this->GetPrice();
         if ($this->_invalidHistoryData($strClose))  return;
         
         $his_sql = GetStockHistorySql();
-        return $his_sql->WriteHistory($strStockId, $strDate, $strClose, $strOpen, $strHigh, $strLow, $this->GetVolume());
+        return $his_sql->WriteHistory($strStockId, $strDate, $strClose, $this->GetVolume());
     }
     
     // En = k * X0 + (1 - k) * Em; 其中m = n - 1; k = 2 / (n + 1)

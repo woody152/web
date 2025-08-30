@@ -129,9 +129,7 @@ function _echoPortfolioTableItem($trans)
 			
 		case 'fx_susdcnh':
 			$fVal += $fCny;
-//			$ar[] = GetNumberDisplay($fVal).' $'.GetNumberDisplay($fVal / floatval($ref->GetPrice()));
-			$strPage = 'overnightcnh';
-			$ar[] = GetStockPhpLink($strPage, '$'.strval(round($fVal / $ref->GetVal() / 1000.0)).'K', $strPage.'='.strval_round(0.0 - $fVal, 0));
+			$ar[] = GetOvernightCnhLink('$'.number_format($fVal / $ref->GetVal() / 1000.0).'K', strval(round(0.0 - $fVal)));
 			break;
    		}
     }

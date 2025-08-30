@@ -12,10 +12,18 @@ from _tgprivate import WECHAT_GLD_KEY
 from _tgprivate import WECHAT_IEO_KEY
 from _tgprivate import WECHAT_KWEB_KEY
 from _tgprivate import WECHAT_QQQ_KEY
+from _tgprivate import WECHAT_SLV_KEY
 from _tgprivate import WECHAT_SPY_KEY
 from _tgprivate import WECHAT_XBI_KEY
 from _tgprivate import WECHAT_XLY_KEY
 from _tgprivate import WECHAT_XOP_KEY
+
+def convert_fake_symbol(symbol):
+    if symbol.startswith('^'):
+        symbol = symbol[1:]
+        if '-' in symbol:
+            symbol = symbol.split('-')[0]
+    return symbol
 
 def _get_hedge(arData):
     return float(arData['calibration'])/float(arData['position'])
@@ -23,10 +31,13 @@ def _get_hedge(arData):
 def _get_hedge2(arData, arHedge):
     return _get_hedge(arData) / _get_hedge(arHedge)
 
-def _get_hedge_quantity(strType, arData):
-    f_quantity = float(arData[strType + '_size']) / 100.0
-    f_quantity = math.floor(f_quantity) * 100.0
-    f_floor = math.floor(f_quantity / arData['hedge'])
+def _get_floor_quantity(fQuantity):
+    fQuantity /= 100.0
+    return math.floor(fQuantity) * 100.0
+
+def _get_hedge_quantity(strType, arSymData, fHedge):
+    f_quantity = _get_floor_quantity(float(arSymData[strType + '_size']))
+    f_floor = math.floor(f_quantity / fHedge)
     return int(f_floor)
 
 def fund_adjust_position(f_position, f_val, f_old_val):
@@ -47,21 +58,32 @@ def _ref_get_peer_val2(strType, arData, arHedge):
     f_index /= float(arHedge['calibration'])
     return fund_adjust_position(float(arHedge['position']), f_index, float(arHedge['netvalue']))
 
+def GetSendMsgArray(strKey):
+    ar = {'key': strKey,
+          'count': 6,
+          'timer': 0,
+          'msg': '',
+          'array_msg': []
+         }
+    return ar
+
+
 class Palmmicro:
     def __init__(self):
         self.arSym = {}
         self.iTimer = 0
         self.bNewSinaData = False
-        self.arSendMsg = {'telegram':{'key':WECHAT_KEY, 'count':3, 'timer':0, 'msg':'', 'array_msg':[]},
-                          'GLD':{'key':WECHAT_GLD_KEY, 'count':5, 'timer':0, 'msg':'', 'array_msg':[]},
-                          'IEO':{'key':WECHAT_IEO_KEY, 'count':7, 'timer':0, 'msg':'', 'array_msg':[]},
-                          'KWEB':{'key':WECHAT_KWEB_KEY, 'count':5, 'timer':0, 'msg':'', 'array_msg':[]},
-                          'QQQ':{'key':WECHAT_QQQ_KEY, 'count':7, 'timer':0, 'msg':'', 'array_msg':[]},
-                          'SPY':{'key':WECHAT_SPY_KEY, 'count':5, 'timer':0, 'msg':'', 'array_msg':[]},
-                          'XBI':{'key':WECHAT_XBI_KEY, 'count':7, 'timer':0, 'msg':'', 'array_msg':[]},
-                          'XLY':{'key':WECHAT_XLY_KEY, 'count':5, 'timer':0, 'msg':'', 'array_msg':[]},
-                          'XOP':{'key':WECHAT_XOP_KEY, 'count':7, 'timer':0, 'msg':'', 'array_msg':[]},
-                         }
+        self.arSendMsg = {}
+        self.arSendMsg['telegram'] = GetSendMsgArray(WECHAT_KEY)
+        self.arSendMsg['GLD'] = GetSendMsgArray(WECHAT_GLD_KEY)
+        self.arSendMsg['IEO'] = GetSendMsgArray(WECHAT_IEO_KEY)
+        self.arSendMsg['KWEB'] = GetSendMsgArray(WECHAT_KWEB_KEY)
+        self.arSendMsg['QQQ'] = GetSendMsgArray(WECHAT_QQQ_KEY)
+        self.arSendMsg['SLV'] = GetSendMsgArray(WECHAT_SLV_KEY)
+        self.arSendMsg['SPY'] = GetSendMsgArray(WECHAT_SPY_KEY)
+        self.arSendMsg['XBI'] = GetSendMsgArray(WECHAT_XBI_KEY)
+        self.arSendMsg['XLY'] = GetSendMsgArray(WECHAT_XLY_KEY)
+        self.arSendMsg['XOP'] = GetSendMsgArray(WECHAT_XOP_KEY)
 
     def _getTelegramChatId(self):
         return 992671436
@@ -86,18 +108,6 @@ class Palmmicro:
                             arSymData['SELL_price'] = arItem[7]
                             arSymData['BUY_size'] = int(arItem[10])
                             arSymData['SELL_size'] =  int(arItem[20])
-                            if arSymData['symbol_hedge'] in self.arSym:
-                                arHedgeSymData = self.arSym[arSymData['symbol_hedge']]
-                                arSymData['hedge'] = _get_hedge2(arSymData, arHedgeSymData)
-                                arSymData['position_hedge'] = float(arHedgeSymData['position'])
-                                arSymData['BUY_price_hedge'] = _ref_get_peer_val2('BUY', arSymData, arHedgeSymData)
-                                arSymData['SELL_price_hedge'] = _ref_get_peer_val2('SELL', arSymData, arHedgeSymData)
-                            else:
-                                arSymData['hedge'] = _get_hedge(arSymData)
-                                arSymData['BUY_price_hedge'] = _ref_get_peer_val('BUY', arSymData)
-                                arSymData['SELL_price_hedge'] = _ref_get_peer_val('SELL', arSymData)
-                            arSymData['BUY_size_hedge'] = _get_hedge_quantity('BUY', arSymData)
-                            arSymData['SELL_size_hedge'] = _get_hedge_quantity('SELL', arSymData)
             else:
                 print('Failed to send request. Status code:', response.status_code)
         except requests.exceptions.RequestException as e:
@@ -152,32 +162,93 @@ class Palmmicro:
                 self._fetchPalmmicroData(strSymbols)
             self._fetchSinaData(strSymbols)
         return self.arSym
-    
-    #@staticmethod
-    def GetPeerStr(self, strType):
-        if strType == 'SELL':
-            return 'BUY'
-        elif strType == 'BUY':
-            return 'SELL'
-    
-    def GetArbitrageResult(self, strSymbol, arMktData, strType):
-        arResult = {'ratio': 0.0, 'size': 0}
-        strPeerType = self.GetPeerStr(strType) 
-        fPrice = arMktData[strPeerType + '_price']
-        iSize = arMktData[strPeerType + '_size'] 
+
+    def _getSymDebugString(self, strSymbol, iSize, strType, strPeerType):
+        arSymData = self.arSym[strSymbol]
+        return ' | ' + strPeerType + ' ' + strSymbol + ' ' + str(iSize) + ' @' + arSymData[strType + '_price']
+
+    def _getMktDebugString(self, strHedgeSymbol, iSize, fPrice):
+        return ' ' + strHedgeSymbol + ' ' + str(iSize) + ' @' + str(fPrice)
+            
+    def CalcCalibrationArbitrage(self, arMktData, strMktSymbol, strMktType, strSymbol, strType):
+        fMktPrice = arMktData[strMktType + '_price']
+        iMktSize = arMktData[strMktType + '_size'] 
         arSymData = self.arSym[strSymbol]
         strSizeIndex = strType + '_size'
         if strSizeIndex in arSymData:
-            if arSymData[strSizeIndex] > 0 and fPrice > 0.0:
-                fRatio = fPrice / arSymData[strType + '_price_hedge'] - 1.0
-                if 'position_hedge' in arSymData:
-                    fRatio /= arSymData['position_hedge']
+            if arSymData[strSizeIndex] > 0 and fMktPrice > 0.001:
+                if strMktSymbol in self.arSym:
+                    arLevSymData = self.arSym[strMktSymbol]
+                    fHedge = _get_hedge2(arSymData, arLevSymData)
+                    fHedgePos = float(arLevSymData['position'])
+                    fHedgePrice = _ref_get_peer_val2(strType, arSymData, arLevSymData)
+                else:
+                    fHedgePos = False
+                    fHedge = _get_hedge(arSymData)
+                    fHedgePrice = _ref_get_peer_val(strType, arSymData)
+                iHedgeSize = _get_hedge_quantity(strType, arSymData, fHedge)
+                fRatio = fMktPrice / fHedgePrice - 1.0
+                if fHedgePos:
+                    fRatio /= fHedgePos
                 fRatio *= float(arSymData['position'])
-                arResult['ratio'] = round(fRatio, 4)
-                iSize = min(iSize, arSymData[strType + '_size_hedge'])
-                arResult['size'] = iSize;
-                arResult['size_hedge'] = int((float(iSize) * arSymData['hedge'] + 50.0) / 100.0) * 100
-        return arResult
+                arSymData['discount'] = fRatio
+                iMktSize = min(iMktSize, iHedgeSize)
+                arSymData['quantity'] = iMktSize;
+                strDebug = strType + self._getMktDebugString(strMktSymbol, iMktSize, fMktPrice)
+                iSize = int((float(iMktSize) * fHedge + 50.0) / 100.0) * 100
+                strDebug += self._getSymDebugString(strSymbol, iSize, strType, strMktType)
+                return strDebug
+        return False
+
+    def CalcHoldingsArbitrage(self, arMkt, strMktSymbol, strMktType, iMktSize, strSymbol, strType):
+        arSymData = self.arSym[strSymbol]
+        fQuantity = _get_floor_quantity(float(arSymData[strType + '_size']))
+        fNetValue = float(arSymData['netvalue'])
+        fCNYholdings = float(arSymData['CNYholdings'])
+        fAmount = fQuantity * fNetValue / fCNYholdings
+        if strSymbol != 'SZ164701':
+            fMktAmount = float(arSymData['symbol_hedge'][strMktSymbol]['price']) * float(iMktSize)
+            if fMktAmount < fAmount:
+                fAmount = fMktAmount
+                fQuantity = fAmount * fCNYholdings / fNetValue
+                fQuantity = _get_floor_quantity(fQuantity)
+                fAmount = fQuantity * fNetValue / fCNYholdings
+        strDebug = strType
+        iTotalQuantity = 0
+        bDisplayTotalQuantity = False
+        fTotal = 0.0
+        for strHoldingSymbol, arHoldingData in arSymData['symbol_hedge'].items():
+            strRealSymbol = convert_fake_symbol(strHoldingSymbol)
+            if strRealSymbol != strHoldingSymbol:
+                bDisplayTotalQuantity = True
+            for reqId, arMktData in arMkt.items():
+                if arMktData['symbol'] == strRealSymbol:
+                    fCurPrice = arMktData[strMktType + '_price']
+                    if fCurPrice != None:
+                        fRatio = float(arHoldingData['ratio']) / 100.0
+                        fPrice = float(arHoldingData['price'])
+                        iHoldingQuantity = int(round(fAmount * fRatio / fPrice))
+                        iTotalQuantity += iHoldingQuantity
+                        fTotal += fRatio * (fCurPrice / fPrice)
+                        strDebug += self._getMktDebugString(strHoldingSymbol, iHoldingQuantity, fCurPrice) + ' and'
+                    else:
+                        return False
+                    break
+        strDebug = strDebug.rstrip(' and')
+        if bDisplayTotalQuantity == True:
+            strDebug += ' total ' + str(iTotalQuantity)
+        strDebug += self._getSymDebugString(strSymbol, int(fQuantity), strType, strMktType)
+        fTotal *= float(arSymData['CNY']) / fCNYholdings
+        fTotal -= 1.0
+        fTotal *= float(arSymData['position'])
+        fTotal += 1.0
+        fTotal *= fNetValue
+        fPrice = float(arSymData[strType + '_price'])
+        if (fPrice > 0.001):
+            arSymData['discount'] = fTotal / fPrice - 1.0
+            arSymData['quantity'] = iTotalQuantity
+            return strDebug
+        return False
     
     def IsFree(self, group):
         iCur = int(time.time())
@@ -220,20 +291,30 @@ class Palmmicro:
         except requests.exceptions.RequestException as e:
             print('SendWechatMsg Error occurred:', e)
 
+    def __convert_array_msg(self, group):
+        if len(self.arSendMsg[group]['array_msg']) == 0:
+            str = ''
+        else:
+            unique = set(self.arSendMsg[group]['array_msg'])
+            str = '\n\n'.join(unique)
+        return GetBeijingTimeDisplay() + ' | ' + str
+
     def __send_msg(self, group):
-        unique = set(self.arSendMsg[group]['array_msg'])
-        str = '\n\n'.join(unique)
-        self.SendWechatMsg(GetBeijingTimeDisplay() + ' | ' + str, group)
+        str = self.__convert_array_msg(group)
+        self.SendWechatMsg(str, group)
         #if group == 'telegram':
             #self.SendTelegramMsg(str)
         self.arSendMsg[group]['array_msg'].clear()
 
     def SendMsg(self, strMsg, group='telegram'):
         if self.arSendMsg[group]['msg'] != strMsg:
-            self.arSendMsg[group]['msg'] = strMsg
-            self.arSendMsg[group]['array_msg'].append(strMsg)
-            if self.IsFree(group):
-                self.__send_msg(group)
+            if len(self.__convert_array_msg(group)) + len(strMsg) < 2046:
+                self.arSendMsg[group]['msg'] = strMsg
+                self.arSendMsg[group]['array_msg'].append(strMsg)
+                if self.IsFree(group):
+                    self.__send_msg(group)
+            else:
+                print('too many message in group: ', group)
 
     def SendSymbolMsg(self, strMsg, strSymbol):
         if strSymbol in self.arSendMsg:

@@ -454,7 +454,6 @@ class StockSymbol
         return true;
     }
     
-//    https://hq.sinajs.cn/list=rt_hkHSTECH,hkHSTECH_i,rt_hkCSCSHQ
     function IsSymbolH()
     {
         if ($this->iDigitH >= 0)   return true;
@@ -702,7 +701,6 @@ class StockSymbol
     	return StrHasPrefix($this->strSymbol, SINA_INDEX_PREFIX); 
     }
     
-    // nf_AU0,nf_AG2512,nf_AG0
     function IsSinaFutureCn()
     {
     	return StrHasPrefix($this->strSymbol, SINA_CN_FUTURE_PREFIX); 

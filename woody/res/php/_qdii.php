@@ -49,13 +49,15 @@ function GetQdiiLinks($sym)
 {
    	global $acct;
    	
+	$strSymbol = $sym->GetSymbol();
+   	
    	$ref = $acct->GetRef();
+   	
    	if ($realtime_ref = $ref->GetRealtimeRef())		$strRealtimeSymbol = $realtime_ref->GetSymbol();
    	else											$strRealtimeSymbol = false;
 
 	$str = GetJisiluQdiiLink();
 	
-	$strSymbol = $sym->GetSymbol();
 	if (in_arrayOilQdii($strSymbol))
 	{
 		$str .= ' '.GetUscfLink();
@@ -82,33 +84,8 @@ function GetQdiiLinks($sym)
 	}
 	
 	if ($strCmeUrl = GetCmeUrl($strRealtimeSymbol))				$str .= ' '.GetExternalLink($strCmeUrl, '芝商所');
-	
-	$str .= GetSpySoftwareLinks();
-	if (in_arraySpyQdii($strSymbol))
-	{
-		$str .= GetChinaInternetSoftwareLinks();
-		$str .= GetHSharesSoftwareLinks();
-	}
-	else if (in_arrayQqqQdii($strSymbol))
-	{
-		$str .= GetQqqSoftwareLinks();
-		$str .= GetChinaInternetSoftwareLinks();
-	}
-	else if (in_arrayXbiQdii($strSymbol) || $strSymbol == 'SH513290')
-	{
-		$str .= GetQqqSoftwareLinks();
-		$str .= GetXbiSoftwareLinks();
-	}
-	else if ($strRealtimeSymbol == 'hf_CL' || in_arrayOilEtfQdii($strSymbol) || in_arrayXopQdii($strSymbol))
-	{
-		$str .= GetOilSoftwareLinks();
-		$str .= GetChinaInternetSoftwareLinks();
-	}
-	else if ($strRealtimeSymbol == 'hf_GC' || in_arrayCommodityQdii($strSymbol))								
-	{
-		$str .= GetCommoditySoftwareLinks();
-		$str .= GetOilSoftwareLinks();
-	}
+
+	$str .= GetStockCategoryLinks($strSymbol);
 	return $str.GetQdiiRelated($sym->GetDigitA());
 }
 

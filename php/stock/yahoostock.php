@@ -468,7 +468,7 @@ function UpdateYahooHistoryChart($ref)
 	        if ($oldest_ymd->IsInvalid($strDate) == false)
 	        {
 	        	$iTotal ++;
-	        	if ($his_sql->WriteHistory($strStockId, $strDate, $strClose, $strOpen, $strHigh, $strLow, $strVolume, $strAdjClose))
+	        	if ($his_sql->WriteHistory($strStockId, $strDate, $strClose, $strVolume, $strAdjClose))
 	        	{
 	        		$iModified ++;
 	        	}

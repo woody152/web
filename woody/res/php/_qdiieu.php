@@ -35,10 +35,7 @@ function EchoAll()
 function GetQdiiEuLinks($sym)
 {
 	$str = GetJisiluQdiiLink();
-	$str .= GetSpySoftwareLinks();
-	$str .= GetChinaInternetSoftwareLinks();
-	$str .= GetHangSengSoftwareLinks();
-
+	$str .= GetStockCategoryLinks($sym->GetSymbol());
 	return $str.GetQdiiEuRelated($sym->GetDigitA());
 }
 

@@ -201,7 +201,7 @@ class FundPairReference extends MyPairReference
 			$his_sql = GetStockHistorySql();
 			if ($record = $his_sql->GetRecord($this->GetStockId(), $strDate))
     		{
-    			if ($his_sql->WriteHistory($strStockIdEu, $strDate, $record['close'], $record['open'], $record['high'], $record['low'], $record['volume']))
+    			if ($his_sql->WriteHistory($strStockIdEu, $strDate, $record['close'], $record['volume']))
     			{
     				$tick_sql->WriteInt($strStockIdEu, $iCurTick);
     				DebugString(__CLASS__.'->'.__FUNCTION__.': '.$strSymbolEu.' updated history on '.$strDate);

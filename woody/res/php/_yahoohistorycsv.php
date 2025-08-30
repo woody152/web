@@ -62,7 +62,7 @@ class _YahooHistoryCsvFile extends CsvFile
         {
         	$this->iTotal ++;
         	$his_sql = GetStockHistorySql();
-        	if ($his_sql->WriteHistory($this->strStockId, $strDate, $strClose, $strOpen, $strHigh, $strLow, $strVolume, SqlCleanString($arWord[5])))
+        	if ($his_sql->WriteHistory($this->strStockId, $strDate, $strClose, $strVolume, SqlCleanString($arWord[5])))
         	{
 //        		DebugString(implode(',', $arWord));
         		$this->iModified ++;

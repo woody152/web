@@ -115,7 +115,9 @@ class StockAccount extends TitleAccount
     	$bAdmin = $this->IsAdmin();
     	
     	$strPage = $this->GetPage();
-    	$str = GetStockMenuLinks().$strNewLine.GetAllLofLink().' '.GetOvernightLink().' '.GetAhCompareLink().' '.GetAutoTractorLink().' '.GetAccountToolLink('simpletest').' '.GetDevLink('entertainment/20150818cn.php#'.($strVer ? $strVer : $strPage)).$strNewLine;
+    	$str = GetStockMenuLinks();
+    	$str .= $strNewLine.GetAllLofLink().' '.GetOvernightLink().' '.GetOvernightCnhLink().' '.GetAhCompareLink().' '.GetAutoTractorLink().' '.GetAccountToolLink('simpletest').' '.GetDevLink('entertainment/20150818cn.php#'.($strVer ? $strVer : $strPage));
+    	$str .= $strNewLine;
 		if ($strLoginId = $this->GetLoginId())
     	{
     		$str .= GetMyPortfolioLink().$this->_getPersonalLinks($strLoginId);
@@ -128,17 +130,22 @@ class StockAccount extends TitleAccount
     				if ($strGroupId = $this->GetGroupId())		$strMemberId = $this->GetGroupMemberId($strGroupId);
     			}
    				if ($strMemberId != $strLoginId)	$str .= $strNewLine.GetMemberLink($strMemberId);
-    			$str .= $strNewLine.GetStockPhpLink('debug', STOCK_DISP_DEBUG).' '.GetDebugFileLink().' '.GetFileLink('/php/test.php');
+    			$str .= $strNewLine.GetStockPageLink('debug', STOCK_DISP_DEBUG).' '.GetDebugFileLink().' '.GetFileLink('/php/test.php');
     		}
-    		$str .= $strNewLine;
     	}
     	if ($callback)
     	{
-    		if ($ref = $this->GetRef())		$str .= $this->_getStockExchangeLinks($ref).' ';
-    		$str .= call_user_func($callback, $ref);
+    		if ($ref = $this->GetRef())
+    		{
+    			$str .= ' '.$this->_getStockExchangeLinks($ref);
+    			$str .= ' '.call_user_func($callback, $ref);
+    		}
     	}
-    	else	$str .= GetCategoryLinks(GetStockCategoryArray());
-    	
+    	else
+    	{
+    		$str .= $strNewLine.GetCategoryLinks(GetStockCategoryArray());
+    	}
+	
 		$strHead = GetHeadElement('相关链接');
 		$str = GetHtmlElement($str);
 		echo <<<END

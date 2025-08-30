@@ -192,7 +192,7 @@ function EchoAll()
     
 	EchoHoldingsEstParagraph($ref);
     EchoReferenceParagraph(array_merge($acct->GetStockRefArray(), 
-    									//$ref->GetHoldingRefArray(), 
+    									//$ref->GetHoldingsRefArray(), 
     									$arForex), $acct->IsAdmin());
     
 	if ($ref->GetSymbol() == 'SZ164906')
@@ -224,9 +224,7 @@ function EchoAll()
 
 function GetQdiiMixLinks($sym)
 {
-	$str = GetSpySoftwareLinks();
-	$str .= GetHSharesSoftwareLinks();
-	$str .= GetChinaInternetSoftwareLinks();
+	$str = GetStockCategoryLinks($sym->GetSymbol());
 	return $str.GetQdiiMixRelated($sym->GetDigitA());
 }
 

@@ -16,6 +16,12 @@ function RefAdjustForex($ref, $fAdjustHKD, $fAdjustUSD)
 	return $fAdjust;
 }
 
+function _add_holdings_ratio(&$fTotal, $fRatio)
+{
+	if ($fTotal === false)	$fTotal = $fRatio;
+	else					$fTotal += $fRatio;
+}
+
 class HoldingsReference extends MyStockReference
 {
 	var $netvalue_ref;
@@ -29,6 +35,7 @@ class HoldingsReference extends MyStockReference
 
     var $strNetValue;
     var $strHoldingsDate;
+    var $arHoldingsDateHistory = array();
     var $arHoldingsRatio = array();
     
     var $strEstDate;
@@ -36,6 +43,10 @@ class HoldingsReference extends MyStockReference
     var $strOfficialNetValue = false;
     var $strFairNetValue = false;
     var $strRealtimeNetValue = false;
+    
+    var $fRatioCN = false;
+    var $fRatioHK = false;
+    var $fRatioUS = false;
     
     public function __construct($strSymbol) 
     {
@@ -69,38 +80,36 @@ class HoldingsReference extends MyStockReference
 					}
 					$this->ar_holdings_ref[] = $holding_ref;
 					
+					$fRatio = floatval($strRatio);
 					if ($holding_ref->IsSymbolA())
 					{
+						_add_holdings_ratio($this->fRatioCN, $fRatio);
 					}
 					else if ($holding_ref->IsSymbolH())
 					{
+						_add_holdings_ratio($this->fRatioHK, $fRatio);
 						if ($this->hkcny_ref === false)		$this->hkcny_ref = new CnyReference('HKCNY');
 						if ($this->hkdcny_ref === false)	$this->hkdcny_ref = new MyStockReference('fx_shkdcny');
 						if ($strDateH === false)			$strDateH = $holding_ref->GetDate();
 					}
 					else
 					{
+						_add_holdings_ratio($this->fRatioUS, $fRatio);
 						if ($this->uscny_ref === false)		$this->uscny_ref = new CnyReference('USCNY');
 						if ($this->usdcny_ref === false)	$this->usdcny_ref = new MyStockReference('fx_susdcny');
 						if ($strDateUS === false)			$strDateUS = $holding_ref->GetDate();
 					}
 				}
 				
+				$this->strEstDate = $strDateUS;
 				if ($strDateH)
 				{
 					if (($strDateUS === false) || ($strDateH == $strDateUS) || (strtotime($strDateH) < strtotime($strDateUS)))		$this->strEstDate = $strDateH;
 				}
-				else
-				{
-					$this->strEstDate = $strDateUS;
-				}			
 			}
 			else	
 			{
 				DebugString(__CLASS__.'->'.__FUNCTION__.': Missing net value on '.$this->strHoldingsDate);
-//				$netvalue_ref = new NetValueReference($strSymbol);
-//				SqlSetNetValue($strStockId, $this->strHoldingsDate, $netvalue_ref->GetPrevPrice());
-//				if ($this->strHoldingsDate == $netvalue_ref->GetDate())		SqlSetNetValue($strStockId, $this->strHoldingsDate, $netvalue_ref->GetPrice());
 			}
     	}
     }
@@ -148,6 +157,9 @@ class HoldingsReference extends MyStockReference
     function SetHoldingsDate($strDate)
     {
     	$this->strHoldingsDate = $strDate;
+    	
+    	unset($this->arHoldingsDateHistory);
+    	$this->arHoldingsDateHistory = array();
     }
     
     function GetHoldingsRatioArray()
@@ -165,16 +177,25 @@ class HoldingsReference extends MyStockReference
 		}
     }
     
-    function GetHoldingRefArray()
+    function GetHoldingsRefArray()
     {
     	return $this->ar_holdings_ref;
     }
     
-    function GetHoldingDisplay()
+    function GetHoldingsDisplay()
     {
     	$str = '';
     	foreach ($this->ar_holdings_ref as $ref)	$str .= $ref->GetSymbol().'*'.$this->arHoldingsRatio[$ref->GetStockId()].';';
     	return rtrim($str, ';');
+    }
+    
+    function GetHoldingsRatioDisplay()
+    {
+    	$str = '';
+    	if ($this->fRatioCN !== false)	$str .= 'A股'.number_format($this->fRatioCN).'% ';
+    	if ($this->fRatioHK !== false)	$str .= '港股'.number_format($this->fRatioHK).'% ';
+    	if ($this->fRatioUS !== false)	$str .= '美股'.number_format($this->fRatioUS).'% ';
+    	return rtrim($str, ' ');
     }
     
     function GetRealtimeRefArray()
@@ -220,6 +241,19 @@ class HoldingsReference extends MyStockReference
 		return $this->_adjustToCNY($this->hkcny_ref, $this->hkcny_ref, $strDate);
     }
     
+    function GetHoldingDateHistory($his_sql)
+    {
+    	if (count($this->arHoldingsDateHistory) == 0)
+    	{
+    		foreach ($this->ar_holdings_ref as $ref)
+    		{
+    			$strStockId = $ref->GetStockId();
+    			if ($strAdjClose = $his_sql->GetAdjClose($strStockId, $this->strHoldingsDate))	$this->arHoldingsDateHistory[$strStockId] = floatval($strAdjClose);
+    		}
+    	}
+    	return $this->arHoldingsDateHistory;
+    }
+    
 /*
     function _getStrictRef($strSymbol)
     {
@@ -238,12 +272,14 @@ class HoldingsReference extends MyStockReference
 		$fAdjustUSD = $this->GetAdjustUSD($strDate);
     	
 		$his_sql = GetStockHistorySql();
+		$arHoldingsDateHistory = $this->GetHoldingDateHistory($his_sql);
+		
 		$fTotalChange = 0.0;
 		$fTotalRatio = 0.0;
 		foreach ($this->ar_holdings_ref as $ref)
 		{
 			$strStockId = $ref->GetStockId();
-			$fRatio = floatval($this->arHoldingsRatio[$strStockId]) / 100.0;
+			$fRatio = floatval($this->arHoldingsRatio[$strStockId]);
 			$fTotalRatio += $fRatio;
 /*			
 			if ($bStrict)
@@ -271,19 +307,18 @@ class HoldingsReference extends MyStockReference
 				if (method_exists($ref, 'EstFromPair'))		$fPrice = $ref->EstFromPair();
 			}
 			
-			if ($strAdjClose = $his_sql->GetAdjClose($strStockId, $this->strHoldingsDate))
+			if (isset($arHoldingsDateHistory[$strStockId]))
 			{
-				$fChange = $fRatio * $fPrice / floatval($strAdjClose);
+				$fChange = $fRatio * $fPrice / $arHoldingsDateHistory[$strStockId];
 				$fChange /= RefAdjustForex($ref, $fAdjustHKD, $fAdjustUSD);
 				$fTotalChange += $fChange;
-//				DebugString(__CLASS__.'->'.__FUNCTION__.': '.$ref->GetSymbol().' '.strval_round($fChange, 4), true);
 			}
 		}
 		
 		$fTotalChange -= $fTotalRatio;
 		$fTotalChange *= $this->GetPosition();
 
-		$fNewNetValue = floatval($this->strNetValue) * (1.0 + $fTotalChange);
+		$fNewNetValue = floatval($this->strNetValue) * (1.0 + $fTotalChange / 100.0);
 		$fNewNetValue *= RefAdjustForex($this, $fAdjustHKD, $fAdjustUSD);
 		return $fNewNetValue; 
     }

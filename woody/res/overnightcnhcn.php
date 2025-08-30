@@ -59,21 +59,31 @@ function _echoOverNightCnhItem($strSymbol, $fCnh, $bSell)
 				if ($strEtf = GetLeverageHedgeSymbol($strSymbol))
 				{
 					$strEtfId = SqlGetStockId($strEtf);
-					$pos_sql = GetPositionSql();
-					$fHedge = StockCalcLeverageHedge($fCal, $fPos, floatval($cal_sql->GetClose($strEtfId, $record['date'])), $pos_sql->ReadVal($strEtfId));
+					if ($strFactor = $cal_sql->GetClose($strEtfId, $record['date']))
+					{
+						$pos_sql = GetPositionSql();
+						$fHedge = StockCalcLeverageHedge($fCal, $fPos, floatval($strFactor), $pos_sql->ReadVal($strEtfId));
+					}
+					else
+					{
+						$fHedge = false;
+					}
 				}
 				else
 				{
 					$fHedge = StockCalcHedge($fCal, $fPos);
 					$strEtf = $est_ref->GetSymbol();
 				}
-				$fHedgeQuantity = floor($fHintQuantity / $fHedge);
-				$fHintQuantity = $fHedgeQuantity * $fHedge;
-				$strHedge = strval($fHedge);
-				$strMemo = _buildHedgeString($fHedgeQuantity, $strEtf);
+				if ($fHedge)
+				{
+					$fHedgeQuantity = floor($fHintQuantity / $fHedge);
+					$fHintQuantity = $fHedgeQuantity * $fHedge;
+					$strHedge = strval($fHedge);
+					$strMemo = _buildHedgeString($fHedgeQuantity, $strEtf);
+				}
 			}
    		}
-   		else	// SZ164701
+   		else
    		{
    			$net_sql = GetNetValueHistorySql();
    			if ($record = $net_sql->GetRecordNow($strStockId))
@@ -85,12 +95,15 @@ function _echoOverNightCnhItem($strSymbol, $fCnh, $bSell)
    				$his_sql = GetStockHistorySql();
    				$cny_ref = $ref->GetCnyRef();
    				$fUsd = $fCny / $cny_ref->GetVal($strDate);
+   				$iTotalQuantity = 0;
    				foreach ($ref->GetHoldingsRatioArray() as $strHoldingId => $strRatio)
    				{
    					$fHoldingQuantity = round($fUsd * floatval($strRatio) / 100.0 / floatval($his_sql->GetClose($strHoldingId, $strDate)));
+   					$iTotalQuantity += intval($fHoldingQuantity);
    					$strMemo .= _buildHedgeString($fHoldingQuantity, $sql->GetStockSymbol($strHoldingId)).'、';
    				}
    				$strMemo = rtrim($strMemo, '、');
+   				if ($strSymbol != 'SZ164701')	$strMemo .= '，共'.strval($iTotalQuantity).'股。';
    			}
    		}
 		$fHintQuantity = round($fHintQuantity / 100.0) * 100.0;
@@ -143,7 +156,7 @@ function GetMetaDescription()
 
 function GetTitle()
 {
-	return '义工群汇率对冲计算器';
+	return OVERNIGHT_CNH_DISPLAY;
 }
 
 	$acct = new StockAccount();

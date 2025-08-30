@@ -41,7 +41,7 @@ function _echoExhaustiveHoldingsItem($ref, $arNew, $arOrg, $strDate, $strNetValu
 		$bHit = ($ref->GetPercentageString($strNetValue, $strEst) == '0') ? true : false;
 		if ($bAdmin && ($bMatch == false) && $bHit)
 		{
-			$strHoldings = $ref->GetHoldingDisplay();
+			$strHoldings = $ref->GetHoldingsDisplay();
 			$ar[] = GetOnClickLink(PATH_STOCK.'submitholdings.php?symbol='.$ref->GetSymbol().'&holdings='.$strHoldings, '确认更新持仓：'.$strHoldings.'？', '0');
 		}	
 		else	$ar[] = $ref->GetPercentageDisplay($strNetValue, $strEst);
@@ -56,7 +56,7 @@ function _echoExhaustiveHoldingsData($strSymbol, $fLimit, $bAdmin)
 	$ref = new HoldingsReference($strSymbol);
     if ($strDate = $ref->GetHoldingsDate())
     {
-    	$arHoldingRef = $ref->GetHoldingRefArray();
+    	$arHoldingRef = $ref->GetHoldingsRefArray();
     	$iCount = count($arHoldingRef);
     	if ($iCount <= 3)
     	{

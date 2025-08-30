@@ -9,9 +9,6 @@ function _echoStockHistoryItem($record, $ref, $csv, $bAdmin)
    	$ar[] = $bAdmin ? GetOnClickLink('/php/_submitdelete.php?'.'stockhistory'.'='.$record['id'], '确认删除'.$strDate.STOCK_HISTORY_DISPLAY.'？', $strDate) : $strDate;
    	
 	$strPrev = $ref->GetPrevPrice();
-	$ar[] = $ref->GetPriceDisplay($record['open'], $strPrev);
- 	$ar[] = $ref->GetPriceDisplay($record['high'], $strPrev);
- 	$ar[] = $ref->GetPriceDisplay($record['low'], $strPrev);
  	$ar[] = $ref->GetPriceDisplay($record['close'], $strPrev);
     $ar[] = $record['volume'];
 	$ar[] = $ref->GetPriceDisplay($record['adjclose'], $strPrev);
@@ -40,9 +37,6 @@ function EchoStockHistoryParagraph($ref, $str = false, $csv = false, $iStart = 0
     $strMenuLink = IsTableCommonDisplay($iStart, $iNum) ? '' : StockGetMenuLink($strSymbol, $his_sql->Count($strStockId), $iStart, $iNum);
     
 	EchoTableParagraphBegin(array(new TableColumnDate(),
-								   new TableColumn(STOCK_DISP_OPEN),
-								   new TableColumn(STOCK_DISP_HIGH),
-								   new TableColumn(STOCK_DISP_LOW),
 								   new TableColumnPrice(),
 								   new TableColumnQuantity(false, 120),
 								   new TableColumnPrice('复权')

@@ -190,19 +190,12 @@ function GetMyStockLinks($ref)
 		if ($strDigitA = $ref->IsFundA())
 		{
 			$strSymbol = $ref->GetSymbol();
-			foreach (GetStockCategoryArray() as $strItem => $strDisplay)
-			{
-				if (in_array($strSymbol, GetCategoryArray($strItem)))
-				{
-					$str .= GetStockCategoryLinks($strItem).GetHtmlNewLine();
-					break;
-				}
-			}
-			
+			$str .= GetStockCategoryLinks($strSymbol);
+
 			$netvalue_ref = new NetValueReference($strSymbol);
 			$strName = $netvalue_ref->GetChineseName();
-			if (stripos($strName, '博时') !== false)		$str .= GetBoShiSoftwareLinks($strDigitA);
-			else if (stripos($strName, '易方达') !== false)	$str .= GetEFundSoftwareLinks($strDigitA);
+			if (stripos($strName, '博时') !== false)				$str .= GetBoShiSoftwareLinks($strDigitA);
+			else if (stripos($strName, '易方达') !== false)		$str .= GetEFundSoftwareLinks($strDigitA);
 			else if (stripos($strName, '招商') !== false)		$str .= GetCmfSoftwareLinks($strDigitA);
 			else if (stripos($strName, '广发') !== false)		$str .= GetGuangFaSoftwareLinks($strDigitA);
 			else if (stripos($strName, '华安') !== false)		$str .= GetHuaAnSoftwareLinks($strDigitA);

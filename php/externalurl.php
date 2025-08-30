@@ -20,9 +20,29 @@ function GetYahooDataUrl($strVersion = '6')
 	return 'https://query1.finance.yahoo.com/v'.$strVersion.'/finance';
 }
 
+/* Sina data
+nf_IC2006. nf_AU0,nf_AG2512,nf_AG0
+http://hq.sinajs.cn/list=s_sh000001 上证指数
+http://hq.sinajs.cn/list=s_sz399001 深证成指
+http://hq.sinajs.cn/list=int_hangseng 恒生指数
+http://hq.sinajs.cn/list=s_sz399300 沪生300
+http://hq.sinajs.cn/list=int_dji 道琼斯
+http://hq.sinajs.cn/list=int_nasdaq 纳斯达克
+http://hq.sinajs.cn/list=int_sp500 标普500
+http://hq.sinajs.cn/list=int_ftse 英金融时报指数
+http://blog.sina.com.cn/s/blog_7ed3ed3d0101gphj.html
+http://hq.sinajs.cn/list=sh600151,sz000830,s_sh000001,s_sz399001,s_sz399106,s_sz399107,s_sz399108
+期货 http://hq.sinajs.cn/rn=1318986550609&amp;list=hf_CL,hf_GC,hf_SI,hf_CAD,hf_ZSD,hf_S,hf_C,hf_W,hf_XAU
+http://hq.sinajs.cn/rn=1318986628214&amp;list=fx_susdcny,USDHKD,EURCNY,GBPCNY,USDJPY,EURUSD,GBPUSD,
+http://hq.sinajs.cn/list=gb_dji
+https://hq.sinajs.cn/list=rt_hkHSTECH,hkHSTECH_i,rt_hkCSCSHQ,market_status_hk
+https://w.sinajs.cn/rn=9037858664&list=hkHSI_i,hkHSCEI_i,hkHSTECH_i,hkHSCCI_i
+https://w.sinajs.cn/rn=5130947756&list=rt_hkHSI_preipo,rt_hkHSCEI_preipo,rt_hkHSTECH_preipo,rt_hkHSCCI_preipo
+*/
 function GetSinaDataUrl($strSinaSymbols)
 {
 	return 'http://hq.sinajs.cn/list='.$strSinaSymbols;
+//	return 'https://w.sinajs.cn/list='.$strSinaSymbols;
 }	
 
 function GetSinaFinanceUrl()

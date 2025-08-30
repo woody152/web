@@ -89,19 +89,23 @@ function GetAccountToolStr($strPage, $bChinese = true)
 	return $ar[$strPage];
 }
 
-function GetAccountToolLink($strPage, $strQuery = false, $bChinese = true)
+function GetAccountToolLink($strPage, $strQuery = false, $strDisplay = false, $bChinese = true)
 {
-    return GetPhpLink(PATH_ACCOUNT.$strPage, ($strQuery ? $strPage.'='.$strQuery : false), ($strQuery ? $strQuery : GetAccountToolStr($strPage, $bChinese)), $bChinese);
+	if ($strDisplay === false)
+	{
+		$strDisplay = $strQuery ? $strQuery : GetAccountToolStr($strPage, $bChinese);
+	}
+    return GetPhpLink(PATH_ACCOUNT.$strPage, ($strQuery ? $strPage.'='.$strQuery : false), $strDisplay, $bChinese);
 }
 
 function GetCommonPhraseLink($bChinese = true)
 {
-    return GetAccountToolLink('commonphrase', false, $bChinese);
+    return GetAccountToolLink('commonphrase', false, false, $bChinese);
 }
 
-function GetSinaDataLink($strSinaSymbols)
+function GetSinaDataLink($strSinaSymbols, $strDisplay = false)
 {
-	return GetAccountToolLink('sinajs', $strSinaSymbols);
+	return GetAccountToolLink('sinajs', $strSinaSymbols, $strDisplay);
 }
 
 function _getIpLink($strPage, $strIp, $bChinese)

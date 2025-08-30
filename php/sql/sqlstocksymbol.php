@@ -17,23 +17,17 @@ class StockHistorySql extends DailyCloseSql
 
     public function Create()
     {
-    	$str = ' `open` DOUBLE(10,3) NOT NULL ,'
-         	  . ' `high` DOUBLE(10,3) NOT NULL ,'
-         	  . ' `low` DOUBLE(10,3) NOT NULL ,'
-         	  . ' `close` DOUBLE(10,3) NOT NULL ,'
+    	$str = ' `close` DOUBLE(10,3) NOT NULL ,'
          	  . ' `volume` BIGINT UNSIGNED NOT NULL ,'
          	  . ' `adjclose` DOUBLE(13,6) NOT NULL';
         return $this->CreateDailyCloseTable($str);
     }
 
-    function WriteHistory($strStockId, $strDate, $strClose, $strOpen = '', $strHigh = '', $strLow = '', $strVolume = '', $strAdjClose = false)
+    function WriteHistory($strStockId, $strDate, $strClose, $strVolume = '', $strAdjClose = false)
     {
     	if ($strAdjClose == false)	$strAdjClose = $strClose;
     	
     	$ar = array('date' => $strDate,
-    				   'open' => $strOpen,
-    				   'high' => $strHigh,
-    				   'low' => $strLow,
     				   'close' => $strClose,
     				   'volume' => $strVolume,
     				   'adjclose' => $strAdjClose);
@@ -41,9 +35,6 @@ class StockHistorySql extends DailyCloseSql
     	if ($record = $this->GetRecord($strStockId, $strDate))
     	{
     		unset($ar['date']);
-    		if (abs(floatval($record['open']) - floatval($strOpen)) < 0.0005)					unset($ar['open']);
-    		if (abs(floatval($record['high']) - floatval($strHigh)) < 0.0005)					unset($ar['high']);
-    		if (abs(floatval($record['low']) - floatval($strLow)) < 0.0005)						unset($ar['low']);
     		if (abs(floatval($record['close']) - floatval($strClose)) < 0.0005)					unset($ar['close']);
     		if ($record['volume'] == $strVolume)												unset($ar['volume']);
     		if (abs(floatval($record['adjclose']) - floatval($strAdjClose)) < MIN_FLOAT_VAL)	unset($ar['adjclose']);

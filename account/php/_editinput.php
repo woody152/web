@@ -61,22 +61,17 @@ function _getBenfordsLawString($strInput, $bChinese)
 
 function _getChiSquaredTestString($strInput, $bChinese)
 {
+   	$strNewLine = GetHtmlNewLine();
 	$ar = explode(';', $strInput);
 	if (count($ar) == 2)
 	{
 		$strExpected = trim($ar[0]);
 		$strObserved = trim($ar[1]);
 		$str = ($bChinese ? '期望值' : 'Expected').': '.$strExpected;
-		$str .= '<br />'.($bChinese ? '观察值' : 'Observed').': '.$strObserved;
+		$str .= $strNewLine.($bChinese ? '观察值' : 'Observed').': '.$strObserved.$strNewLine;
 		
-		if ($f = PearsonChiSquaredTest(explode_float($strExpected), explode_float($strObserved)))
-		{
-			$str .= '<br />'.($bChinese ? '符合期望的概率' : 'P value').': '.strval_round($f);
-		}
-		else
-		{
-			$str .= '<br />'.($bChinese ? '无法计算' : 'Can not calculate');
-		}
+		if ($f = PearsonChiSquaredTest(explode_float($strExpected), explode_float($strObserved)))	$str .= ($bChinese ? '符合期望的概率' : 'P value').': '.number_format($f, 3);
+		else																						$str .= $bChinese ? '无法计算' : 'Can not calculate';
 	}
 	else
 	{
@@ -295,23 +290,24 @@ function _getLinearEquationString($strA, $strB, $strC)
 
 function _getCramersLawString($strInput, $bChinese)
 {
+   	$strNewLine = GetHtmlNewLine();
 	$ar = explode(';', $strInput);
 	if (count($ar) == 2)
 	{
 		list($strA1, $strB1, $strC1) = explode(',', trim($ar[0]));
 		list($strA2, $strB2, $strC2) = explode(',', trim($ar[1]));
 		$str = _getLinearEquationString($strA1, $strB1, $strC1);
-		$str .= '<br />'._getLinearEquationString($strA2, $strB2, $strC2);
+		$str .= $strNewLine._getLinearEquationString($strA2, $strB2, $strC2).$strNewLine;
 		
 		if ($arXY = CramersRule(floatval($strA1), floatval($strB1), floatval($strC1), floatval($strA2), floatval($strB2), floatval($strC2)))
 		{
 			list($fX, $fY) = $arXY;
-			$str .= '<br /><br /><b>x = '.strval_round($fX);
-			$str .= '; y = '.strval_round($fY).'</b>';
+			$str .= $strNewLine.'<b>x = '.number_format($fX, 3);
+			$str .= '; y = '.number_format($fY, 3).'</b>';
 		}
 		else
 		{
-			$str .= '<br />'.($bChinese ? '无解' : 'No solution');
+			$str .= $bChinese ? '无解' : 'No solution';
 		}
 	}
 	else

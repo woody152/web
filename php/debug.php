@@ -110,7 +110,12 @@ function GetHM($strHMS)
 function DebugGetStopWatchDisplay($fStart = false, $iPrecision = 2)
 {
 	if ($fStart === false)	$fStart = $_SERVER['REQUEST_TIME_FLOAT'];
-    return ' ('.strval_round(microtime(true) - $fStart, $iPrecision).'s)';
+    return ' ('.number_format(microtime(true) - $fStart, $iPrecision).'s)';
+}
+                     
+function DebugNow($str = '')
+{
+	DebugString($str.DebugGetStopWatchDisplay(), true);
 }
 
 function _checkDebugPath()

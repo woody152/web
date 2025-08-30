@@ -117,7 +117,7 @@ class StockReference extends StockSymbol
    		$str = $this->GetPercentageString($strDivisor, $strDividend);
    		if ($str != '' && $str != '0')
    		{
-   			$str = strval_round(floatval($str), 2).'%';
+   			$str = number_format(floatval($str), 2).'%';
    		}
    		return $str;
    	}

@@ -57,9 +57,36 @@ function GetStockDataArray($strSymbols)
 							}
 						}
 					}
-					else if ($strSymbol == 'SZ164906')			$strIndex = 'KWEB';
+					else
+					{
+						$strIndex = SqlGetFundPair($strSymbol);
+					}
+/*					else if ($strSymbol == 'SZ164906')
+					{
+						$strIndex = 'KWEB';
+					}*/
+					if ($strIndex)	$arData['symbol_hedge'] = $strIndex;
 				}
-				else if ($strSymbol == 'SZ164701')
+				else
+				{
+					$arData['netvalue'] = $fund_ref->GetNetValue();
+					$strDate = $fund_ref->GetHoldingsDate();
+					$arData['CNYholdings'] = $cny_ref->GetClose($strDate);
+
+					$arSymbolHedge = array();
+					$sql = GetStockSql();
+					$his_sql = GetStockHistorySql();
+					foreach ($fund_ref->GetHoldingsRatioArray() as $strHoldingId => $strRatio)
+					{	
+						$arHolding = array();
+						$arHolding['ratio'] = $strRatio;
+						$arHolding['price'] = $his_sql->GetClose($strHoldingId, $strDate);
+						$strHoldingSymbol = $sql->GetStockSymbol($strHoldingId);
+						$arSymbolHedge[$strHoldingSymbol] = $arHolding;
+					}
+					if (count($arSymbolHedge) > 0)	$arData['symbol_hedge'] = $arSymbolHedge;
+				}
+/*				else if ($strSymbol == 'SZ164701')
 				{
 					$strIndex = 'GLD';
 					$net_sql = GetNetValueHistorySql();
@@ -70,10 +97,9 @@ function GetStockDataArray($strSymbols)
 						$arData['calibration'] = strval(round(floatval(SqlGetHistoryByDate(SqlGetStockId($strIndex), $strDate)) * floatval($cny_ref->GetPrice()) / floatval($strNetValue), 6));
 						$arData['netvalue'] = $strNetValue;
 					}
-				}
+				}*/
 				$arData['CNY'] = $cny_ref->GetPrice();
 				$arData['position'] = strval($fund_ref->GetPosition());
-				$arData['symbol_hedge'] = $strIndex;
 			}
 		}
 		$ar[$strSymbol] = $arData;

@@ -197,7 +197,9 @@ function _callbackFutureSma($ref, $strEst = false)
 	if ($strEst)
 	{
 		$f = floatval($strEst) * RefGetFuturePremium($ref);
-		return strval_round(round(4.0 * $f) / 4.0, 2);
+		$f = round(4.0 * $f) / 4.0;
+//		DebugVal($f, __FUNCTION__, true);
+		return strval(round($f, 2));
 	}
 	return $ref;
 }

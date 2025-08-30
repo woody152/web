@@ -52,7 +52,7 @@ class LinearImageFile extends PageImageFile
     
     function GetEquation()
     {
-    	$str = 'y = '.strval_round($this->fA);
+    	$str = 'y = '.number_format($this->fA, 3);
     	if ($this->fB < 0.0)
     	{
     	}
@@ -60,12 +60,16 @@ class LinearImageFile extends PageImageFile
     	{
     		$str .= ' + ';
     	}
-    	return $str.strval_round($this->fB).' * x; r =  '.strval_round($this->fR);
+    	return $str.number_format($this->fB, 3).' * x; r =  '.number_format($this->fR, 3);
     }
     
     function GetAllLinks()
     {
-    	return GetAccountToolLink('linearregression').'<br />'.$this->GetEquation().'<br />'.$this->GetLink();
+    	$strNewLine = GetHtmlNewLine();
+    	$str = GetAccountToolLink('linearregression');
+    	$str .= $strNewLine.$this->GetEquation();
+    	$str .= $strNewLine.$this->GetLink();
+    	return $str;
     }
 }
 

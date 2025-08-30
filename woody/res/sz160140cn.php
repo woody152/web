@@ -3,9 +3,7 @@ require('php/_qdii.php');
 
 function GetQdiiRelated($strDigitA)
 {
-	$str = GetOilSoftwareLinks();
-	$str .= GetChinaInternetSoftwareLinks();
-	$str .= GetHtmlNewLine().GetNanFangSoftwareLinks($strDigitA);
+	$str = GetNanFangSoftwareLinks($strDigitA);
 	return $str;
 }
 

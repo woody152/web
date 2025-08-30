@@ -35,25 +35,7 @@ function EchoAll()
 function GetQdiiHkLinks($sym)
 {
 	$str = GetJisiluQdiiLink(true);	// .' '.GetExternalLink('https://www.hkex.com.hk/market-data/securities-prices/exchange-traded-products', '港股ETF汇总');
-	$str .= GetHangSengSoftwareLinks();
-	
-	$strSymbol = $sym->GetSymbol();
-	if (in_arrayHangSengQdiiHk($strSymbol))
-	{
-		$str .= GetChinaInternetSoftwareLinks();
-		$str .= GetSpySoftwareLinks();
-	}
-	else if (in_arrayTechQdiiHk($strSymbol))
-	{
-		$str .= GetHsTechSoftwareLinks();
-		$str .= GetChinaInternetSoftwareLinks();
-	}
-	else	// if (in_arrayHSharesQdiiHk($strSymbol))
-	{
-		$str .= GetHSharesSoftwareLinks();
-		$str .= GetHsTechSoftwareLinks();
-	}
-
+	$str .= GetStockCategoryLinks($sym->GetSymbol());
 	return $str.GetQdiiHkRelated($sym->GetDigitA());
 }
 

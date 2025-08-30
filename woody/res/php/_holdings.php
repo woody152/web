@@ -3,6 +3,7 @@ require_once('_stock.php');
 require_once('_emptygroup.php');
 require_once('../../php/ui/referenceparagraph.php');
 require_once('../../php/ui/fundestparagraph.php');
+require_once('../../php/ui/ahparagraph.php');
 
 function RefSort($arRef)
 {
@@ -20,7 +21,7 @@ function RefSort($arRef)
 	return array_merge(RefSortBySymbol($arA), RefSortBySymbol($arH), RefSortBySymbol($arUS));
 }
 
-function _echoHoldingItem($ref, $arRatio, $strDate, $his_sql, $fNetValueChange, $fAdjust)
+function _echoHoldingItem($ref, $arRatio, $fNetValueChange, $arHistory, $fAdjust)
 {
 	static $fTotalOld = 0.0;
 	static $fTotalNew = 0.0;
@@ -34,11 +35,12 @@ function _echoHoldingItem($ref, $arRatio, $strDate, $his_sql, $fNetValueChange, 
 	}
 	
 	$strStockId = $ref->GetStockId();
-	$strClose = $his_sql->GetAdjClose($strStockId, $strDate);
+	$fClose = $arHistory[$strStockId];
+	$strClose = strval($fClose);
+	
 	$strPrice = $ref->GetPrice();
 	$fRatio = floatval($arRatio[$strStockId]);
 //	$fChange = $ref->GetPercentage($strClose, $strPrice) / 100.0;
-	$fClose = floatval($strClose);
 	$fChange = ($fClose > MIN_FLOAT_VAL) ? floatval($strPrice) / $fClose : 0.0;
 	$fChange /= $fAdjust;
 	
@@ -70,13 +72,18 @@ function EchoAll()
 	
     if ($ref = $acct->EchoStockGroup())
     {
+   		//DebugNow('拿新浪数据存文件时间点');
    		$strSymbol = $ref->GetSymbol();
    		$ref = new HoldingsReference($strSymbol);
-    	if ($strDate = $ref->GetHoldingsDate())
+   		//DebugNow('读数据文件时间点');
+    	if ($ref->GetHoldingsDate())
     	{
-    		$arHoldingRef = $ref->GetHoldingRefArray();
-    		$str = '持仓和测算示意';
-    		if (count($arHoldingRef) <= 3)	$str .= ' '.GetExhaustiveHoldingsLink($strSymbol);
+    		$arHoldingRef = $ref->GetHoldingsRefArray();
+    		$str = '持仓和测算示意 ';
+    		$iTotal = count($arHoldingRef);
+    		if ($iTotal <= 3)	$str .= GetExhaustiveHoldingsLink($strSymbol);
+    		else				$str .= '总数'.strval($iTotal);
+    		$str .= ' '.$ref->GetHoldingsRatioDisplay();
     		
 		    EchoHoldingsEstParagraph($ref);
     		EchoReferenceParagraph(array_merge(array($ref), RefSort($arHoldingRef)), $acct->IsAdmin());
@@ -88,18 +95,24 @@ function EchoAll()
 										   new TableColumnPercentage('影响'),
 										   new TableColumn('汇率调整', 100)
 										   ), 'holdings', $str);
-	
-			$his_sql = GetStockHistorySql();
+			$arAdrhRef = array();
 			$arRatio = $ref->GetHoldingsRatioArray();
 			$fNetValueChange = $ref->GetNetValueChange();
+			$arHistory = $ref->GetHoldingDateHistory(GetStockHistorySql());
 			$fAdjustUSD = $ref->GetAdjustUSD();
 			$fAdjustHKD = $ref->GetAdjustHKD();
 			foreach ($arHoldingRef as $holding_ref)
 			{
-				_echoHoldingItem($holding_ref, $arRatio, $strDate, $his_sql, $fNetValueChange, RefAdjustForex($holding_ref, $fAdjustHKD, $fAdjustUSD));
+				_echoHoldingItem($holding_ref, $arRatio, $fNetValueChange, $arHistory, RefAdjustForex($holding_ref, $fAdjustHKD, $fAdjustUSD));
+				if ($holding_ref->IsSymbolH())
+				{
+					if ($strAdrSymbol = SqlGetHadrPair($holding_ref->GetSymbol()))	$arAdrhRef[] = new AdrPairReference($strAdrSymbol);	
+				}
 			}
-			_echoHoldingItem(false, $arRatio, $strDate, $his_sql, $fNetValueChange, RefAdjustForex($ref, $fAdjustHKD, $fAdjustUSD));
+			_echoHoldingItem(false, $arRatio, $fNetValueChange, $arHistory, RefAdjustForex($ref, $fAdjustHKD, $fAdjustUSD));
 			EchoTableParagraphEnd();
+			
+			EchoAdrhParagraph($arAdrhRef, LayoutUseWide());
 		}
     }
     $acct->EchoLinks();
