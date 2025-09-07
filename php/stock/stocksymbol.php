@@ -255,9 +255,15 @@ function in_arrayHkMix($strSymbol)
     return in_array($strSymbol, GetHkMixSymbolArray());
 }
 
+function GetQdiiGoldSymbolArray()
+{
+	return array('SZ160719', 'SZ161116', 'SZ164701');
+}
+
 function QdiiMixGetSymbolArray()
 {
-    $ar = array_merge(array('SH501225', 'SH501312', 'SH513360', 'SZ159509', 'SZ159529', 'SZ160216', 'SZ160644', 'SZ160719', 'SZ161116', 'SZ164701') 
+    $ar = array_merge(array('SH501225', 'SH501312', 'SH513360', 'SZ159509', 'SZ159529', 'SZ160216', 'SZ160644') 
+    				   , GetQdiiGoldSymbolArray()
     				   , GetChinaInternetSymbolArray()
     				   , GetHkMixSymbolArray()
     				   , GetMsciUs50SymbolArray());
@@ -288,7 +294,7 @@ function in_arrayAll($strSymbol)
 
 function GetOverNightSymbolArray()
 {
-	return array('SZ160719', 'SZ161116', 'SZ161125', 'SZ161127', 'SZ161130', 'SZ162411', 'SZ162415', 'SZ162719', 'SZ164701', 'SZ164906');
+	return array_merge(QdiiGetXopSymbolArray(), GetQdiiGoldSymbolArray(), array('SZ161125', 'SZ161127', 'SZ161130', 'SZ162415', 'SZ162719', 'SZ164906'));
 }
 
 function IsChinaStockDigit($strDigit)

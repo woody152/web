@@ -162,7 +162,7 @@ class FundReference extends MysqlReference
 
     function GetForexRef()
     {
-    	return $this->forex_ref;
+		return $this->IsEtfA() ? $this->forex_ref : $this->cny_ref;
     }
 
     function GetForexRefArray()

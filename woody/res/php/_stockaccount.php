@@ -55,8 +55,10 @@ class StockAccount extends TitleAccount
     	$this->ref = $ref;
     }
     
-    function StockCheckSymbol($str)
+    function StockCheckSymbol($str = false)
     {
+    	if ($str === false)		$str = $this->GetQuery();
+    	
     	if (strlen($str) > 11)				return false;		// hf_CHA50CFD is the longest symbol
     	if (strpos($str, "'") !== false)	return false;
     	$str = rtrim($str, '/');
@@ -97,13 +99,13 @@ class StockAccount extends TitleAccount
     	return $str;
     }
 
-    function _getStockExchangeLinks($sym)
+    function _getStockExchangeLinks($ref)
     {
-		if ($sym->IsShenZhenLof())		$str = GetShenZhenLofLink();
-		else if ($sym->IsShenZhenEtf())	$str = GetShenZhenEtfListLink();
-		else if ($sym->IsShangHaiLof())	$str = GetShangHaiLofShareLink();
-		else if ($sym->IsShangHaiEtf())	$str = GetShangHaiEtfShareLink().' '.GetShangHaiEtfListLink();
-		else								$str = '';
+		if ($ref->IsShenZhenLof())		$str = GetShenZhenLofLink();
+		else if ($ref->IsShenZhenEtf())	$str = GetShenZhenEtfListLink($ref);
+		else if ($ref->IsShangHaiLof())	$str = GetShangHaiLofShareLink();
+		else if ($ref->IsShangHaiEtf())	$str = GetShangHaiEtfShareLink().' '.GetShangHaiEtfListLink($ref);
+		else							$str = '';
 		
 		return $str;
     }
@@ -137,7 +139,7 @@ class StockAccount extends TitleAccount
     	{
     		if ($ref = $this->GetRef())
     		{
-    			$str .= ' '.$this->_getStockExchangeLinks($ref);
+    			$str .= ' '.$this->_getStockExchangeLinks(method_exists($ref, 'GetStockRef') ? $ref->GetStockRef() : $ref);
     			$str .= ' '.call_user_func($callback, $ref);
     		}
     	}

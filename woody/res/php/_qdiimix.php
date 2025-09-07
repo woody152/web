@@ -25,10 +25,6 @@ class _QdiiMixAccount extends FundGroupAccount
         $this->ref = new HoldingsReference($strSymbol);
         switch ($strSymbol)
         {
-        case 'SH501225':
-        	$this->us_ref = new MyStockReference('SMH');
-        	break;
-        	
         case 'SZ164906':
         	$strSymbolUs = 'KWEB';
         	$this->us_ref = new HoldingsReference($strSymbolUs);
@@ -96,7 +92,10 @@ class _QdiiMixAccount extends FundGroupAccount
 		case 'SH501312':
         	if ($strNetValueDate != $strHoldingsDate)		
         	{
-        		if ($date_sql->WriteDate($strStockId, $strNetValueDate))		$bUpdated = true;
+        		if ($ref->CheckHoldingsDate($strNetValueDate))
+        		{
+        			if ($date_sql->WriteDate($strStockId, $strNetValueDate))		$bUpdated = true;
+        		}
         	}
         	break;
 		

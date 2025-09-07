@@ -177,6 +177,16 @@ class HoldingsReference extends MyStockReference
 		}
     }
     
+    function CheckHoldingsDate($strDate)
+    {
+    	$his_sql = GetStockHistorySql();
+		foreach ($this->arHoldingsRatio as $strId => $strRatio)
+		{
+			if ($his_sql->GetClose($strId, $strDate) === false)		return false;
+		}
+		return true;
+    }
+    
     function GetHoldingsRefArray()
     {
     	return $this->ar_holdings_ref;
@@ -309,17 +319,17 @@ class HoldingsReference extends MyStockReference
 			
 			if (isset($arHoldingsDateHistory[$strStockId]))
 			{
-				$fChange = $fRatio * $fPrice / $arHoldingsDateHistory[$strStockId];
+				$fChange = $fRatio * ($fPrice / $arHoldingsDateHistory[$strStockId]);
 				$fChange /= RefAdjustForex($ref, $fAdjustHKD, $fAdjustUSD);
 				$fTotalChange += $fChange;
 			}
 		}
 		
-		$fTotalChange -= $fTotalRatio;
+		$fTotalChange /= $fTotalRatio;
+		$fTotalChange -= 1.0;
+		$fTotalChange *= RefAdjustForex($this, $fAdjustHKD, $fAdjustUSD);
 		$fTotalChange *= $this->GetPosition();
-
-		$fNewNetValue = floatval($this->strNetValue) * (1.0 + $fTotalChange / 100.0);
-		$fNewNetValue *= RefAdjustForex($this, $fAdjustHKD, $fAdjustUSD);
+		$fNewNetValue = floatval($this->strNetValue) * (1.0 + $fTotalChange);
 		return $fNewNetValue; 
     }
 

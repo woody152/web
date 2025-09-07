@@ -43,9 +43,9 @@ function QdiiGetEstSymbol($strSymbol)
     else if ($strSymbol == 'SZ162719')   			return 'IEO'; // '^DJSOEP'
     else if ($strSymbol == 'SZ162415')   			return 'XLY';	// '^IXY'
     else if (in_arrayOilQdii($strSymbol)) 			return 'USO';
-    else if ($strSymbol == 'SZ160140')   			return 'SCHH';
+    else if ($strSymbol == 'SZ160140')   			return 'VNQ';	// SCHH
     else if ($strSymbol == 'SZ160416')   			return 'IXC';	// '^SPGOGUP'
-    else if ($strSymbol == 'SZ161126')   			return 'XLV';
+    else if ($strSymbol == 'SZ161126')   			return 'RSPH';
     else if (in_arrayXbiQdii($strSymbol))   		return 'XBI';
     else if ($strSymbol == 'SZ161128')   			return 'XLK';
     else if ($strSymbol == 'SZ163208')   			return 'XLE';
@@ -205,7 +205,7 @@ class _QdiiReference extends FundReference
     {
     	if ($strCNY == false)
     	{
-	       	$cny_ref = $this->IsEtfA() ? $this->GetForexRef() : $this->GetCnyRef();
+	       	$cny_ref = $this->GetForexRef();
 	       	$strCNY = $cny_ref->GetPrice();
     	}
     	

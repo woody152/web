@@ -2,19 +2,6 @@
 require_once('php/_stock.php');
 require_once('../../php/ui/editinputform.php');
 
-function _getAvailableQuantity($stock_ref, $bSell)
-{
-	if ($bSell)
-	{
-		if ($strQuantity = $stock_ref->GetBidQuantity())	return $strQuantity;
-	}
-	else
-	{
-		if ($strQuantity = $stock_ref->GetAskQuantity())	return $strQuantity;
-	}
-	return false;
-}
-
 function _buildHedgeString($fQuantity, $strSymbol)
 {
 	return strval($fQuantity).'股'.GetMyStockLink($strSymbol);
@@ -38,9 +25,9 @@ function _echoOverNightCnhItem($strSymbol, $fCnh, $bSell)
    		else							$est_ref = false;
    	}
    	
-   	if ($strQuantity = _getAvailableQuantity($stock_ref, $bSell))
+   	if ($strQuantity = $stock_ref->GetAvailableQuantity($bSell))
    	{
-   		$strPrice = $bSell ? $stock_ref->GetBidPrice() : $stock_ref->GetAskPrice();
+   		$strPrice = $stock_ref->GetAvailablePrice($bSell);
    		$ar[] = $strPrice;
    		$ar[] = $strQuantity;
 
@@ -58,9 +45,12 @@ function _echoOverNightCnhItem($strSymbol, $fCnh, $bSell)
 				$fCal = floatval($record['close']);
 				if ($strEtf = GetLeverageHedgeSymbol($strSymbol))
 				{
+					$strDate = $record['date'];
 					$strEtfId = SqlGetStockId($strEtf);
-					if ($strFactor = $cal_sql->GetClose($strEtfId, $record['date']))
+					if ($strFactor = $cal_sql->GetCloseFrom($strEtfId, $strDate))
 					{
+						$strEtfDate = $cal_sql->GetDateFrom($strEtfId, $strDate);
+						if ($strEtfDate != $strDate)	DebugString($strEtf.' calibration date '.$strEtfDate.' is different from '.$strSymbol.': '.$strDate, true);
 						$pos_sql = GetPositionSql();
 						$fHedge = StockCalcLeverageHedge($fCal, $fPos, floatval($strFactor), $pos_sql->ReadVal($strEtfId));
 					}
@@ -78,40 +68,38 @@ function _echoOverNightCnhItem($strSymbol, $fCnh, $bSell)
 				{
 					$fHedgeQuantity = floor($fHintQuantity / $fHedge);
 					$fHintQuantity = $fHedgeQuantity * $fHedge;
-					$strHedge = strval($fHedge);
+					$strHedge = number_format($fHedge);
 					$strMemo = _buildHedgeString($fHedgeQuantity, $strEtf);
 				}
 			}
    		}
    		else
    		{
-   			$net_sql = GetNetValueHistorySql();
-   			if ($record = $net_sql->GetRecordNow($strStockId))
-   			{
-   				$strDate = $record['date'];
-   				$fCny = floatval($record['close']) * $fHintQuantity * $fPos;
-   				
-   				$sql = GetStockSql();
-   				$his_sql = GetStockHistorySql();
-   				$cny_ref = $ref->GetCnyRef();
-   				$fUsd = $fCny / $cny_ref->GetVal($strDate);
-   				$iTotalQuantity = 0;
-   				foreach ($ref->GetHoldingsRatioArray() as $strHoldingId => $strRatio)
+   			$strDate = $ref->GetHoldingsDate();
+			$fCny = floatval($ref->GetNetValue()) * $fHintQuantity * $fPos;
+			$sql = GetStockSql();
+			$his_sql = GetStockHistorySql();
+			$cny_ref = $ref->GetCnyRef();
+			$fUsd = $fCny / $cny_ref->GetVal($strDate);
+			$iTotalQuantity = 0;
+			foreach ($ref->GetHoldingsRatioArray() as $strHoldingId => $strRatio)
+			{
+				if ($strClose = $his_sql->GetClose($strHoldingId, $strDate))
    				{
-   					$fHoldingQuantity = round($fUsd * floatval($strRatio) / 100.0 / floatval($his_sql->GetClose($strHoldingId, $strDate)));
-   					$iTotalQuantity += intval($fHoldingQuantity);
-   					$strMemo .= _buildHedgeString($fHoldingQuantity, $sql->GetStockSymbol($strHoldingId)).'、';
-   				}
-   				$strMemo = rtrim($strMemo, '、');
-   				if ($strSymbol != 'SZ164701')	$strMemo .= '，共'.strval($iTotalQuantity).'股。';
-   			}
+					$fHoldingQuantity = round($fUsd * floatval($strRatio) / 100.0 / floatval($strClose));
+					$iTotalQuantity += intval($fHoldingQuantity);
+					$strMemo .= _buildHedgeString($fHoldingQuantity, $sql->GetStockSymbol($strHoldingId)).'、';
+				}
+			}
+			$strMemo = rtrim($strMemo, '、');
+			if ($strSymbol != 'SZ164701')	$strMemo .= '，共'.strval($iTotalQuantity).'股。';
    		}
 		$fHintQuantity = round($fHintQuantity / 100.0) * 100.0;
 		$strHintQuantity = strval($fHintQuantity);
 		if ($fHintQuantity > floatval($strQuantity))	$strHintQuantity = GetFontElement($strHintQuantity);
 		$ar[] = $strHintQuantity;
 		$ar[] = $strHedge;
-		$ar[] = ($bSell ? '买入' : '卖出').$strMemo;
+		if ($strMemo != '')		$ar[] = ($bSell ? '买入' : '卖出').$strMemo;
    	}
 	EchoTableColumn($ar);
 }

@@ -125,13 +125,13 @@ function Echo20160108($strHead)
 {
 	$strHead = GetHeadElement($strHead);
 	$strXueqiu = GetXueqiuIdLink('2091843424', '塔夫男');
-	$strLink = GetSinaDataLink('sz162411');
+	$strLink = GetSinaDataLink(_getDemoFundReference()->GetSinaSymbol(), '新浪A股实时数据');
 
     echo <<<END
 	$strHead
 <p>2016年1月8日
 <br />在{$strXueqiu}等人的建议下，加入华宝油气基金历史表格记录每天的折价溢价情况。最近几天的直接显示在当前页面，同时增加单独显示全部历史数据的页面。
-<br />开始动手后发现几个月前分析的新浪A股实时数据接口的字段意义已经差不多忘光了。好记性不如烂笔头，本着磨刀不误砍柴工的精神，先在这里完整记录一下，以便日后查阅：{$strLink}
+<br />开始动手后发现几个月前分析的{$strLink}接口的字段意义已经差不多忘光了。好记性不如烂笔头，本着磨刀不误砍柴工的精神，从新这里完整记录一下，以便日后查阅。
 </p>
 END;
 
@@ -142,13 +142,13 @@ function Echo20160126($strHead)
 {
 	$strHead = GetHeadElement($strHead);
 	$strXueqiu = GetXueqiuIdLink('8907500725', 'oldwain');
-	$strLink = GetSinaDataLink('hf_CL');
+	$strLink = GetSinaDataLink('hf_CL', '新浪外盘期货');
 	$strStockReference = GetCodeElement('StockReference');
 
     echo <<<END
 	$strHead
 <p>2016年1月26日
-<br />在{$strXueqiu}的建议下，在相关价格记录的时间中加入日期显示。这下上次的A股接口记录就派上用场了，不过新浪外盘期货的格式又重新看了一遍，加个记录以防以后还要用：{$strLink}
+<br />在{$strXueqiu}的建议下，在相关价格记录的时间中加入日期显示。这下上次的A股接口记录就派上用场了，不过又把{$strLink}的格式重新看了一遍，加个记录以防以后还要用。
 <br />原来版本中没有它是因为自己觉得交易日期很明显，完全没有必要出来占地方。不过既然有人觉得有问题，我就效仿白居易写诗先读给妇孺听的优良传统改了。
 估计跟我从2000年开始就在美股赔钱不同，很多人还是不熟悉美国股市交易时间。而在这里，美股数据后面跟的是美东日期和时间。
 <br />虽说是个小的分离数据和显示改动，但是忍不住哗啦哗啦又整理优化了一大片代码，{$strStockReference}类要被挤爆了。
@@ -191,14 +191,14 @@ function Echo20160216($strHead)
 {
 	$strHead = GetHeadElement($strHead);
 	$strXueqiu = GetXueqiuIdLink('5240589924', 'uqot');
-	$strLink = GetSinaDataLink('f_162411');
+	$strLink = GetSinaDataLink(_getDemoFundReference()->GetSinaFundSymbol(), '新浪基金数据');
 	
     echo <<<END
 	$strHead
 <p>2016年2月16日
 <br />晚上九点多的时候，{$strXueqiu}跟我说华宝油气净值出问题了。我看了一下调试信息，发现八点的时候做了一次自动校准。按照流程，拿到15日的SZ162411净值后先跟15日XOP的收盘值校准，但是昨天美股因为总统日没有交易，这一步没有成功。
 接下来进入使用前一个交易日的数据校准的代码，而不幸的是美股的上周五交易日刚好碰上中国春节假期，A股没有交易。数据中的上一个交易日净值是春节前的，于是软件拿节前最后一个交易日的华宝油气净值跟上周五XOP收盘价做了错误的自动校准。这种问题只在中美轮流休市的情况下才会出现，而过去的一周恰好是这种情况！
-<br />我先用手工校准的功能恢复了正确的数据，然后趁着又看了一遍新浪基金数据接口字段意义的热乎劲，依旧加个记录备用：$strLink
+<br />我先用手工校准的功能恢复了正确的数据，然后趁着又看了一遍{$strLink}接口字段意义的热乎劲，依旧加个记录备用。
 <br />接下来我想到，这么追着做以前日期的自动校准太蠢了，应该只做当天的然后存下来，如果当天不满足自动校准的条件，就用最近保存的校准数据估值就是了。
 本来每次拿到官方发布的净值后都会根据净值当天的美股数据做一次自动校准，从现在开始全部记录下来，同时还方便观察长期趋势。校准时间就是拿到新的官方净值后第一次访问的时间。
 <br />碰到XOP分红除权的日子，就需要进行手工校准。否则的话要等下一次自动校准后，估值结果才会再次正确。
@@ -267,12 +267,12 @@ function Echo20160423($strHead)
 	$strQdiiHk = _getStockMenuLink('qdiihk');
 	$strStockReference = GetCodeElement('StockReference');
 	$strXueqiu = GetXueqiuIdLink('5174320624', '均金无忌');
-	$strLink = GetSinaDataLink('rt_hkHSCEI');
+	$strLink = GetSinaDataLink('rt_hkHSCEI', '港股数据');
 	
     echo <<<END
 	$strHead
 <p>2016年4月23日
-<br />用Yahoo拿港股数据给{$strQdiiHk}估值搞了半年后，一贯后知后觉的我才在{$strXueqiu}的帮助下发现新浪也有港股数据。这次吸取以往教训，挽起袖子改我的{$strStockReference}类前先写这个格式文档：$strLink
+<br />用Yahoo拿港股数据给{$strQdiiHk}估值搞了半年后，一贯后知后觉的我才在{$strXueqiu}的帮助下发现新浪也有{$strLink}。这次吸取以往教训，挽起袖子改我的{$strStockReference}类前先写格式文档。
 <br />刚过去的周四净值页面系列的当日总访问量创纪录的超过了2200，激励我继续优化页面反应速度。
 </p>
 END;
@@ -379,12 +379,12 @@ END2;
 function Echo20161008($strHead)
 {
 	$strHead = GetHeadElement($strHead);
-	$strLink = GetSinaDataLink('nf_AU0');
+	$strLink = GetSinaDataLink('nf_AU0', '新浪国内期货');
 	
     echo <<<END
 	$strHead
 <p>2016年10月8日
-<br />国际黄金价格在国庆期间暴跌，为了寻找内外盘套利的机会，赶快把国内黄金期货的数据看了一下：$strLink
+<br />国际黄金价格在国庆期间暴跌，为了寻找内外盘套利的机会，赶快把{$strLink}的数据格式记录了一下。
 </p>
 END;
 }
@@ -393,13 +393,13 @@ function Echo20161017($strHead)
 {
 	$strHead = GetHeadElement($strHead);
 	$strSMA = GetNameLink('sma');
-	$strLink = GetSinaDataLink('gb_xop');
+	$strLink = GetSinaDataLink('gb_xop', '新浪实时美股数据');
 	
     echo <<<END
 	$strHead
 <p>2016年10月17日
 <br />最近在股票交易中对{$strSMA}均线的依赖越来越严重，而同时Yahoo的负面用户体验和甩卖消息越来越多，让我比较担心哪一天Yahoo突然不提供历史数据了，毕竟是一个非公开的东西。
-于是下决心自己开始记录历史数据，刚开始改程序就发现去年写的读取新浪实时美股数据的代码中缺Yahoo历史数据中提供的的开盘价、最高价、最低价和成交量，又重新看了一遍数据接口的字段意义：{$strLink}
+于是下决心自己开始记录历史数据，刚开始改程序就发现去年写的读取{$strLink}的代码中缺Yahoo历史数据中提供的的开盘价、最高价、最低价和成交量，又重新看了一遍数据接口的字段意义记录下来。
 </p>
 END;
 }

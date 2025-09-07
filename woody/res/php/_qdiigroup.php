@@ -51,13 +51,13 @@ function _callbackFundListHedge($fPos, $fFactor, $strDate, $strStockId)
 		$strQdiiDate = $record['date']; 
 		if ($strQdiiDate != $strDate)
 		{
-			if ($strFactor = $cal_sql->GetClose($strStockId, $strQdiiDate))		$fFactor = floatval($strFactor);
-			else																return '';
+			if ($strFactor = $cal_sql->GetCloseFrom($strStockId, $strQdiiDate))		$fFactor = floatval($strFactor);
+			else																		return '';
 			// DebugString(__FUNCTION__.' Reload calibration factor because of difference date: '.$strQdiiDate.' '.$strDate);
 		}
 		return StockCalcLeverageHedge($fQdiiCalibration, $fQdiiPos, $fFactor, $fPos);
 	}
-	return '';
+	return 1.0;
 }
 
 class QdiiGroupAccount extends FundGroupAccount 

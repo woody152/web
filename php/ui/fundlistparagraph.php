@@ -26,7 +26,7 @@ function _echoFundListItem($ref, $sql, $last_sql, $callback)
     $ar[] = $strDate;
     if ($callback)
     {
-    	$ar[] = strval(call_user_func($callback, $fPos, $fFactor, $strDate, $strStockId));
+    	$ar[] = number_format(call_user_func($callback, $fPos, $fFactor, $strDate, $strStockId));
     }
     else
     {

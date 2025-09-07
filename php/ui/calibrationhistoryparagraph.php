@@ -9,7 +9,7 @@ function _echoCalibrationHistoryItem($fPosition, $net_sql, $strStockId, $record)
 	if ($fPosition)
 	{
 		$ar[] = $net_sql->GetClose($strStockId, $strDate);
-		$ar[] = strval(StockCalcHedge($fCalibration, $fPosition));
+		$ar[] = number_format(StockCalcHedge($fCalibration, $fPosition));
 	}
 	EchoTableColumn($ar);
 }

@@ -33,7 +33,7 @@ function GetCategoryArray($strItem)
         break;
         
     case 'commodity':
-        $ar = array_merge(QdiiGetCommoditySymbolArray(), array('SZ160216', 'SZ160719', 'SZ161116', 'SZ164701'));
+        $ar = array_merge(QdiiGetCommoditySymbolArray(), GetQdiiGoldSymbolArray(), array('SZ160216'));
         break;
         
     case 'hangseng':
@@ -159,11 +159,12 @@ function GetEFundSoftwareLinks($strDigitA)
     return ' '.GetOfficialLink($strUrl.'/fund/'.$strDigitA.'.shtml', $strDigitA)._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '易方达基金'));
 }
 
+// https://www.fullgoal.com.cn/fundDetail/513350/index.html
 function GetFuGuoSoftwareLinks($strDigitA)
 {
     $ar = array('SH513350', 'SH513870', 'SZ159792');
 	$strUrl = 'https://www.fullgoal.com.cn';
-    return ' '.GetOfficialLink($strUrl.'/funds/zhishu/'.$strDigitA.'/index.html', $strDigitA)._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '富国基金'));
+    return ' '.GetOfficialLink($strUrl.'/fundDetail/'.$strDigitA.'/index.html', $strDigitA)._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '富国基金'));
 }
 
 function GetGuangFaSoftwareLinks($strDigitA)

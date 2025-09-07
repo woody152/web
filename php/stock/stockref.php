@@ -82,6 +82,24 @@ class StockReference extends StockSymbol
     	return false;
     }
     
+    function GetAvailableQuantity($bSell, $iIndex = 0)
+    {
+    	if ($bSell)
+    	{
+    		if ($strQuantity = $this->GetBidQuantity($iIndex))	return $strQuantity;
+    	}
+    	else
+    	{
+    		if ($strQuantity = $this->GetAskQuantity($iIndex))	return $strQuantity;
+    	}
+    	return false;
+    }
+    
+    function GetAvailablePrice($bSell, $iIndex = 0)
+    {
+		return $bSell ? $this->GetBidPrice($iIndex) : $this->GetAskPrice($iIndex);
+    }
+    
     function GetExternalLink()
     {
         return $this->strExternalLink;

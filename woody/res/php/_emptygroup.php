@@ -20,7 +20,7 @@ class SymbolAccount extends StockAccount
     	if ($ref = $this->GetRef())		return $ref;
     	else
     	{
-    		if ($strSymbol = $this->StockCheckSymbol($this->GetQuery()))
+    		if ($strSymbol = $this->StockCheckSymbol())
     		{
     			StockPrefetchExtendedData($strSymbol);
     			$ref = StockGetReference($strSymbol);
@@ -54,7 +54,7 @@ class SymbolAccount extends StockAccount
     function GetStockDisplay()
     {
     	$ref = $this->GetSymbolRef();
-        return $ref ? RefGetStockDisplay($ref) : '';
+        return $ref ? RefGetStockDisplay($ref) : '【缺少股票代码】';
     }
 
     function GetTitleDisplay($strDisplay = '')

@@ -218,7 +218,6 @@ function _getAllSymbolArray($strSymbol)
         {
         	_addHoldingsSymbol($ar, $strSymbol);
         	if ($strSymbol == 'SZ164906')			$ar[] = 'KWEB';
-			else if ($strSymbol == 'SH501225')		$ar[] = 'SMH';
         }
         else if (in_arrayQdii($strSymbol))
         {
@@ -336,6 +335,11 @@ function StockGetFundReference($strSymbol)
 	return new FundReference($strSymbol);
 }
 
+function GetStockRef($fund_ref)
+{
+	return method_exists($fund_ref, 'GetStockRef') ? $fund_ref->GetStockRef() : $fund_ref;
+}
+
 function _getAbPairReference($strSymbol)
 {
 	$pair_sql = GetAbPairSql();
@@ -399,12 +403,12 @@ function UseSameDayNetValue($sym)
 
 function StockCalcHedge($fCalibration, $fPos)
 {
-	return round($fCalibration / $fPos);
+	return $fCalibration / $fPos;
 }
 	
 function StockCalcLeverageHedge($fCalibration, $fPos, $fEtfCalibration, $fEtfPos)
 {
-	return round(($fCalibration / $fPos) / ($fEtfCalibration / $fEtfPos));
+	return StockCalcHedge($fCalibration, $fPos) / StockCalcHedge($fEtfCalibration, $fEtfPos);
 }
 
 function GetLeverageHedgeSymbol($strSymbol)
@@ -426,7 +430,7 @@ function GetStockHedge($strSymbol, $strStockId)
 			if ($strLev = GetLeverageHedgeSymbol($strSymbol))
 			{
 				$strLevId = SqlGetStockId($strLev);
-				return StockCalcLeverageHedge($fCal, $fPos, floatval($cal_sql->GetClose($strLevId, $record['date'])), $pos_sql->ReadVal($strLevId));
+				return StockCalcLeverageHedge($fCal, $fPos, floatval($cal_sql->GetCloseFrom($strLevId, $record['date'])), $pos_sql->ReadVal($strLevId));
 			}
    			return StockCalcHedge($fCal, $fPos);
    		}

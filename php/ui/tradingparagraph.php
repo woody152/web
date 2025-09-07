@@ -136,6 +136,9 @@ function EchoFundTradingParagraph($fund, $callback = false)
 		if (!$_SESSION['mobile'])	$iLen = min($iLen, LayoutGetDisplayWidth() - TableColumnGetTotalWidth($arColumn));
     	$arColumn[] = new TableColumn($strText, $iLen);
     }
+    
+    $strSymbol = $ref->GetSymbol();
+    if (in_arrayXopQdii($strSymbol))	$str .= ' '.GetRotationTradingLink($strSymbol);
 	
     _echoTradingParagraph($str, $arColumn, $ref, $strOfficial, $strFair, $strRealtime, $callback); 
 }

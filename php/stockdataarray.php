@@ -8,7 +8,7 @@ function _addIndexArray(&$ar, $strIndex, $strEtf, $strDate, $cal_sql)
 		$arData = array();
 		
 		$strEtfId = SqlGetStockId($strEtf);
-		$arData['calibration'] = $cal_sql->GetClose($strEtfId, $strDate);
+		$arData['calibration'] = $cal_sql->GetCloseFrom($strEtfId, $strDate);
 		$arData['netvalue'] = SqlGetNetValueByDate($strEtfId, $strDate);
 
 		$pos_sql = GetPositionSql();
@@ -35,8 +35,6 @@ function GetStockDataArray($strSymbols)
 			if ($ref->IsFundA())
 			{
 				$fund_ref = StockGetFundReference($strSymbol);
-				$cny_ref = $fund_ref->GetCnyRef();
-				
 				$strStockId = $ref->GetStockId();
 				$cal_sql = GetCalibrationSql();
 				if ($record = $cal_sql->GetRecordNow($strStockId))
@@ -47,6 +45,7 @@ function GetStockDataArray($strSymbols)
 				
 					if (method_exists($fund_ref, 'GetEstRef'))
 					{	
+						$cny_ref = $fund_ref->GetForexRef();
 						if ($est_ref = $fund_ref->GetEstRef())
 						{
 							$strIndex = $est_ref->GetSymbol();
@@ -59,16 +58,14 @@ function GetStockDataArray($strSymbols)
 					}
 					else
 					{
+						$cny_ref = $fund_ref->GetCnyRef();
 						$strIndex = SqlGetFundPair($strSymbol);
 					}
-/*					else if ($strSymbol == 'SZ164906')
-					{
-						$strIndex = 'KWEB';
-					}*/
 					if ($strIndex)	$arData['symbol_hedge'] = $strIndex;
 				}
 				else
 				{
+					$cny_ref = $fund_ref->GetCnyRef();
 					$arData['netvalue'] = $fund_ref->GetNetValue();
 					$strDate = $fund_ref->GetHoldingsDate();
 					$arData['CNYholdings'] = $cny_ref->GetClose($strDate);
@@ -86,18 +83,6 @@ function GetStockDataArray($strSymbols)
 					}
 					if (count($arSymbolHedge) > 0)	$arData['symbol_hedge'] = $arSymbolHedge;
 				}
-/*				else if ($strSymbol == 'SZ164701')
-				{
-					$strIndex = 'GLD';
-					$net_sql = GetNetValueHistorySql();
-					if ($record = $net_sql->GetRecordNow($strStockId))
-					{
-						$strNetValue = $record['close'];
-						$strDate = $record['date'];
-						$arData['calibration'] = strval(round(floatval(SqlGetHistoryByDate(SqlGetStockId($strIndex), $strDate)) * floatval($cny_ref->GetPrice()) / floatval($strNetValue), 6));
-						$arData['netvalue'] = $strNetValue;
-					}
-				}*/
 				$arData['CNY'] = $cny_ref->GetPrice();
 				$arData['position'] = strval($fund_ref->GetPosition());
 			}

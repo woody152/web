@@ -121,14 +121,44 @@ function GetCsindexUrl($strSymbol)
 	return 'https://www.csindex.com.cn/#/indices/family/detail?indexCode='.$strSymbol;
 }
 
-function GetSzseUrl()
+function GetSzseUrl($strSubDomain = 'www')
 {
-	return 'https://www.szse.cn/';
+	return 'https://'.$strSubDomain.'.szse.cn/';
 }
 
-function GetSseUrl()
+// https://reportdocs.static.szse.cn/files/text/etf/ETF15960520220315.txt?random=0.12210692394619271
+function GetSzseEtfFileName($strDigitA, $strDate)
 {
-	return 'http://www.sse.com.cn/';
+    return 'ETF'.$strDigitA.str_replace('-', '', $strDate).'.txt';
+}
+
+function GetSzseHoldingsUrl($strFileName)
+{
+	return GetSzseUrl('reportdocs.static').'files/text/etf/'.$strFileName.'?random='.strval(1.0 * rand() / getrandmax());
+}
+
+function GetSseUrl($strSubDomain = 'www')
+{
+	return 'https://'.$strSubDomain.'.sse.com.cn/';
+}
+
+// https://www.sse.com.cn/disclosure/fund/etflist/
+function GetSseDisclosureUrl()
+{
+	return GetSseUrl().'disclosure/fund/etflist/';
+}
+
+function GetSseEtfType($strSymbol)
+{
+	$ar = array('SH513050' => '087', 'SH513090' => '254', 'SH513220' => '509', 'SH513230' => '459', 'SH513350' => '634', 'SH513360' => '395', 'SH513750' => '607', 'SH513850' => '577', 'SH513990' => '244');
+	if (isset($ar[$strSymbol]))		return $ar[$strSymbol];
+	return false;
+}
+
+// https://www.sse.com.cn/disclosure/fund/etflist/detail.shtml?type=087&fundid=513050&etfClass=33
+function GetSseDisclosureDetailUrl($sym, $strEtfType)
+{
+	return GetSseDisclosureUrl().'detail.shtml?type='.$strEtfType.'&fundid='.$sym->GetDigitA().'&etfClass=33';
 }
 
 function GetProsharesUrl()

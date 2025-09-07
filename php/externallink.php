@@ -91,9 +91,11 @@ function GetCsindexOfficialLink($strSymbol)
 	return GetOfficialLink($str, $strSymbol);
 }
 
-function GetShangHaiEtfListLink()
+function GetShangHaiEtfListLink($sym)
 {
-    return GetExternalLink(GetSseUrl().'disclosure/fund/etflist/', '上交所ETF申购赎回清单');
+	if ($strEtfType = GetSseEtfType($sym->GetSymbol()))		$strUrl = GetSseDisclosureDetailUrl($sym, $strEtfType);
+	else													$strUrl = GetSseDisclosureUrl();
+    return GetExternalLink($strUrl, '上交所ETF申购赎回清单');
 }
 
 function GetShangHaiEtfShareLink()
@@ -111,9 +113,11 @@ function GetShenZhenLofLink()
     return GetExternalLink(GetSzseUrl().'market/product/list/lofFundList/index.html', '深交所LOF数据');
 }
 
-function GetShenZhenEtfListLink()
+function GetShenZhenEtfListLink($ref)
 {
-    return GetExternalLink(GetSzseUrl().'disclosure/fund/currency/index.html', '深交所申购赎回清单');
+	//$strUrl = GetSzseUrl().'disclosure/fund/currency/index.html'
+	$strUrl = GetSzseHoldingsUrl(GetSzseEtfFileName($ref->GetDigitA(), $ref->GetDate()));
+    return GetExternalLink($strUrl, '深交所申购赎回清单');
 }
 
 function GetEastMoneyFundLink($sym)

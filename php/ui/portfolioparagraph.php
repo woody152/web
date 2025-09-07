@@ -71,7 +71,7 @@ function _getArbitrageTestStr($iShares, $strGroupId, $strStockId, $strSymbol)
     if ($record)
     {
     	$iQuantity = _getPortfolioTestVal($iShares, $strSymbol); 
-    	return strval($iArbitrageQuantity + $iQuantity * intval(GetStockHedge(SqlGetStockSymbol($record['stock_id']), $record['stock_id'])));
+    	return number_format($iArbitrageQuantity + $iQuantity * GetStockHedge(SqlGetStockSymbol($record['stock_id']), $record['stock_id']));
     }
     return '';
 }

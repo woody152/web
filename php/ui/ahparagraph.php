@@ -9,7 +9,7 @@ function _echoPairItem($ref, $pos_sql, $bWide)
 {
 	$ar = array($ref->GetMyStockLink());
 	
-	if ($bWide)		$ar = array_merge($ar, GetStockReferenceArray($ref));
+	if ($bWide)		$ar = array_merge($ar, GetStockReferenceArray($ref, $bWide));
 	if ($pair_ref = $ref->GetPairRef())
 	{
 		$ar[] = $pair_ref->GetMyStockLink();

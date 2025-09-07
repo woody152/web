@@ -46,13 +46,13 @@ function GetMetaDescription()
 
 class _TransAccount extends GroupIdAccount
 {
-	var $strSymbol;
+	var $strSymbol = false;
 	
     public function __construct() 
     {
         parent::__construct();
         
-        $this->strSymbol = $this->StockCheckSymbol(UrlGetQueryValue('symbol'));
+        if ($strSymbol = UrlGetQueryValue('symbol'))	$this->strSymbol = $this->StockCheckSymbol($strSymbol);
     }
     
     function GetSymbol()

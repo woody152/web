@@ -319,9 +319,11 @@ function Echo20250101($strHead)
 	$strFuturesPremium = GetBlogLink(20200424);
 	$strXueqiu = GetXueqiuIdLink('2747564710', '磨刀霍霍向猪羊01');
 	$strImage = ImgAutoQuote(PATH_BLOG_PHOTO.'20250101.jpg', '2024年最终持仓亏损24万人民币');
-	$strList = GetListElement(array('@Gamestonk分组合并了2023年底清仓的@CHU分组，然后增加了几十条今年的TLT交易，总体上差不多亏了1万人民币。TLT在2024年下跌了8%，雪球上因为美元降息而做多它亏钱的人应该很多。',
+	
+	$strUSDCNH = GetMyStockLink('fx_susdcnh', 'USDCNH');
+	$strList = GetListElement(array('@Gamestonk分组合并了2023年底清仓的@CHU分组，然后增加了几十条本年的TLT交易，总体上差不多亏了1万人民币。TLT在2024年下跌了8%，雪球上因为美元降息而做多它亏钱的人应该很多。',
 								  '@HSCE分组赚了不到5000人民币，4月底时在布林上轨赎回SZ160717后相当于卖飞了, 最终它全年涨了30%，拍断大腿。不过它的流动性实在太差了，申购赎回的灵活性也不好，以后打算彻底放弃了。',
-								  '@LOTTERY分组原来是记录打新的，2024年11月开始我终于说服自己开始对冲汇率，把USDCNH的交易放在了好几年都没有更新的这里，亏了接近2万人民币。',
+								  '@LOTTERY分组原来是记录打新的，2024年11月开始我终于说服自己开始对冲汇率，把'.$strUSDCNH.'的交易放在了好几年都没有更新的这里，亏了接近2万人民币。',
 								  '@OILPAIR分组基本上没有交易，主要是把2023年底清仓的@SNP分组合并进来了，看上去似乎赚了好多。回过头看，2023年底因为不满港交所而清仓港股中石化和联通真是跟自己的钱过不去。',
 								  _groupUnchanged('@OILQDII'),
 								  '@TICKET分组依旧是SH600104的独角戏，上汽这一年涨了58%，我赚了23万。',
@@ -359,9 +361,39 @@ $strImage
 END;
 }
 
-	Echo20221231('昨夜三更雨 浮生一日凉 - '.GetNameTag('2022').'年交易总结');
-	Echo20231231('青衫白马慢 似是故人来 - '.GetNameTag('2023').'年交易总结');
-	Echo20250101('愁边动寒角 夜久意难平 - '.GetNameTag('2024').'年交易总结');
+function Echo20260101($strHead)
+{
+	$strHead = GetHeadElement($strHead);
+	$strTitleImage = ImgAutoQuote(PATH_BLOG_PHOTO.'10years.jpg', '桃李春风一杯酒，江湖夜雨十年灯。');
+	$str2016 = GetNameLink('2016');
+	$strXueqiu = GetXueqiuIdLink('1865006408', '公子是长安');
+	
+	$strXLV = GetMyStockLink('XLV');
+	$strList = GetListElement(array('@Gamestonk分组现在成了垃圾回收站，除了依旧新记录本年的TLT交易外，合并了2024年不完全对冲套利的SH501225分组，以及本年度用错误的方式极其煎熬地盈利了接近4000人民币的SZ161126和'.$strXLV.'假对冲，又一年发誓赌咒再也不做估值不准的套利了。',
+								  ), false);
+	
+    echo <<<END
+	$strHead
+<p>2026年1月1日
+$strTitleImage
+<br />从2015年开始在网站记录交易，一晃已经十年。{$str2016}年至今十年总盈利205万。比股市盈亏更重要的是，雪球大V{$strXueqiu}成了我最成功的托，让之前一直赔本赚吆喝的网站都把这十年的Yahoo网站服务费用赚了回来。上一次靠软件赚钱已经是十多年前的事情，一下子让人生看到了新的希望。
+</p>
+	$strList
+END;
+}
+
+function _getTradingSummary()
+{
+	static $iYear = 2021;
+	
+	$iYear ++;
+	return ' - '.GetNameTag(strval($iYear)).'年交易总结';
+}
+
+	Echo20221231('昨夜三更雨 浮生一日凉'._getTradingSummary());
+	Echo20231231('青衫白马慢 似是故人来'._getTradingSummary());
+	Echo20250101('愁边动寒角 夜久意难平'._getTradingSummary());
+//	Echo20260101('套利一杯酒 江湖十年灯'._getTradingSummary());
 ?>
 
 </div>

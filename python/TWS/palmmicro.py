@@ -17,6 +17,7 @@ from _tgprivate import WECHAT_SPY_KEY
 from _tgprivate import WECHAT_XBI_KEY
 from _tgprivate import WECHAT_XLY_KEY
 from _tgprivate import WECHAT_XOP_KEY
+from _tgprivate import WECHAT_XOP_ETF_KEY
 
 def convert_fake_symbol(symbol):
     if symbol.startswith('^'):
@@ -84,6 +85,7 @@ class Palmmicro:
         self.arSendMsg['XBI'] = GetSendMsgArray(WECHAT_XBI_KEY)
         self.arSendMsg['XLY'] = GetSendMsgArray(WECHAT_XLY_KEY)
         self.arSendMsg['XOP'] = GetSendMsgArray(WECHAT_XOP_KEY)
+        self.arSendMsg['XOPETF'] = GetSendMsgArray(WECHAT_XOP_ETF_KEY)
 
     def _getTelegramChatId(self):
         return 992671436
@@ -318,7 +320,7 @@ class Palmmicro:
 
     def SendSymbolMsg(self, strMsg, strSymbol):
         if strSymbol in self.arSendMsg:
-            self.SendMsg(strMsg.replace(' ' + strSymbol, ''), strSymbol)
+            self.SendMsg(strMsg.replace(' ' + strSymbol.rstrip('ETF'), ''), strSymbol)
 
     def SendOldMsg(self):
         for group, value in self.arSendMsg.items():

@@ -80,13 +80,12 @@ class _SzseHoldingsFile extends _EtfHoldingsFile
     }
 }
 
-// http://reportdocs.static.szse.cn/files/text/etf/ETF15960520220315.txt?random=0.12210692394619271
+// https://www.szse.cn/modules/report/views/eft_download_new.html?path=%2Ffiles%2Ftext%2FETFDown%2F&filename=pcf_159605_20250901%3B159605ETF20250901&opencode=ETF15960520250901.txt
 function ReadSzseHoldingsFile($strSymbol, $strStockId, $strDate)
 {
     $strDigit = substr($strSymbol, 2);
-    $strDate = str_replace('-', '', $strDate);
-    $strFileName = 'ETF'.$strDigit.$strDate.'.txt';
-	$strUrl = 'http://reportdocs.static.szse.cn/files/text/etf/'.$strFileName.'?random='.strval(1.0 * rand() / getrandmax());
+    $strFileName = GetSzseEtfFileName($strDigit, $strDate);
+	$strUrl = GetSzseHoldingsUrl($strFileName);
 	if (StockSaveDebugCsv($strFileName, $strUrl))
 	{
 		$csv = new _SzseHoldingsFile($strFileName, $strStockId);

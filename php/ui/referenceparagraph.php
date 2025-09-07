@@ -1,7 +1,7 @@
 <?php
 require_once('stocktable.php');
 
-function GetStockReferenceArray($ref)
+function GetStockReferenceArray($ref, $bWide = false)
 {
 	$ar = array();
 	
@@ -19,7 +19,10 @@ function GetStockReferenceArray($ref)
     	$ar[] = '';
     	$ar[] = '';
     }
-    $ar[] = SqlGetStockName($ref->GetSymbol());
+    
+    $strName = SqlGetStockName($ref->GetSymbol());
+    if ($bWide)	$strName = GetXueqiuLink($ref, $strName);
+    $ar[] = $strName;
     
     return $ar;
 }

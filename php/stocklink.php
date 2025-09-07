@@ -239,6 +239,12 @@ function GetExhaustiveHoldingsLink($strSymbol)
     return GetStockSymbolLink('exhaustiveholdings', $strSymbol, EXHAUSTIVE_HOLDINGS_DISPLAY);
 }
 
+define('ROTATION_TRADING_DISPLAY', '轮动交易');
+function GetRotationTradingLink($strSymbol)
+{
+    return GetStockSymbolLink('rotationtrading', $strSymbol, ROTATION_TRADING_DISPLAY);
+}
+
 function GetStockOptionArray()
 {
     $ar = array(

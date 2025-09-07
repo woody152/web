@@ -33,14 +33,24 @@ class DailyCloseSql extends KeySql
     	return _SqlOrderByDate();
     }
     
-    function GetFromDate($strKeyId, $strDate, $iNum = 0)
-    {
-    	return $this->GetData($this->BuildWhere_key($strKeyId)." AND date <= '$strDate'", $this->BuildOrderBy(), _SqlBuildLimit(0, $iNum));
-    }
-    
     function GetToDate($strKeyId, $strDate, $iNum = 0)
     {
     	return $this->GetData($this->BuildWhere_key($strKeyId)." AND date > '$strDate'", $this->BuildOrderBy(), _SqlBuildLimit(0, $iNum));
+    }
+    
+    function _buildWhereFromDate($strKeyId, $strDate)
+    {
+    	return $this->BuildWhere_key($strKeyId)." AND date <= '$strDate'";
+    }
+    
+    function GetFromDate($strKeyId, $strDate, $iNum = 0)
+    {
+    	return $this->GetData($this->_buildWhereFromDate($strKeyId, $strDate), $this->BuildOrderBy(), _SqlBuildLimit(0, $iNum));
+    }
+
+    function GetRecordFromDate($strKeyId, $strDate)
+    {
+    	return $this->GetSingleData($this->_buildWhereFromDate($strKeyId, $strDate), $this->BuildOrderBy());
     }
     
     function GetRecordPrev($strKeyId, $strDate)
@@ -80,6 +90,11 @@ class DailyCloseSql extends KeySql
     	return $this->_getCloseString('GetRecordPrev', $strKeyId, $strDate);
     }
 
+    function GetCloseFrom($strKeyId, $strDate)
+    {
+    	return $this->_getCloseString('GetRecordFromDate', $strKeyId, $strDate);
+    }
+
     function GetCloseNow($strKeyId = false)
     {
     	return $this->_getCloseString('GetRecordNow', $strKeyId);
@@ -97,6 +112,11 @@ class DailyCloseSql extends KeySql
     function GetDatePrev($strKeyId, $strDate)
     {
     	return $this->_getDateString('GetRecordPrev', $strKeyId, $strDate);
+    }
+
+    function GetDateFrom($strKeyId, $strDate)
+    {
+    	return $this->_getDateString('GetRecordFromDate', $strKeyId, $strDate);
     }
 
     function GetDateNow($strKeyId = false)
