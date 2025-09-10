@@ -50,6 +50,7 @@ function QdiiGetEstSymbol($strSymbol)
     else if ($strSymbol == 'SZ161128')   			return 'XLK';
     else if ($strSymbol == 'SZ163208')   			return 'XLE';
     else if ($strSymbol == 'SZ164824')   			return 'INDA';
+    else if ($strSymbol == 'SZ164906')   			return 'KWEB';
     else if (in_arrayCommodityQdii($strSymbol))		return 'GSG';
     else if (in_arraySpyQdii($strSymbol))			return '^GSPC';	// 'SPY';
     else if (in_arrayQqqQdii($strSymbol))			return '^NDX';	// 'QQQ';
@@ -114,6 +115,8 @@ class _QdiiReference extends FundReference
         }
         
        	$est_ref = $this->GetEstRef();
+       	if (method_exists($est_ref, 'GetHoldingsDate'))		return $est_ref->_estNetValue();
+       	
         $str = $est_ref->GetPrice();
 //        DebugString($est_ref->GetSymbol().' '.$str);
         if (empty($str))
@@ -246,7 +249,8 @@ class QdiiReference extends _QdiiReference
         
         if ($strEstSymbol = QdiiGetEstSymbol($strSymbol))
         {
-        	$this->est_ref = new FundPairReference($strEstSymbol);
+        	if (SqlCountHoldings($strEstSymbol) > 0)	$this->est_ref = new HoldingsReference($strEstSymbol);	// KWEB
+        	else										$this->est_ref = new FundPairReference($strEstSymbol);
         }
         $this->forex_ref = new MyStockReference('fx_susdcny');
         $this->EstNetValue();

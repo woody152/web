@@ -213,10 +213,6 @@ function _getStockOptionCalibration($strSymbol, $strDate)
     {
        	$est_ref = $fund->GetEstRef();
     }
-	else if ($strSymbol == 'SZ164906')
-	{
-		$est_ref = new MyStockReference('KWEB');
-	}
 	else if ($strSymbol == 'INDA')
 	{
 		$est_ref = new MyStockReference('znb_SENSEX');

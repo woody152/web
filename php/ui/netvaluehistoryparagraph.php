@@ -4,7 +4,8 @@ require_once('stocktable.php');
 function _echoNetValueItem($csv, $net_sql, $strStockId, $est_sql, $strEstId, $strNetValue, $strDate, $ref, $est_ref, $cny_ref)
 {
 	$bWritten = false;
-	$ar = array($strDate, $strNetValue);
+	$ar = array($strDate);
+	$ar[] = number_format(floatval($strNetValue), 4);
 	if ($record = $net_sql->GetRecordPrev($strStockId, $strDate))
     {
     	$strPrevDate = $record['date'];
@@ -26,7 +27,7 @@ function _echoNetValueItem($csv, $net_sql, $strStockId, $est_sql, $strEstId, $st
 		
 			if ($strEst = $est_sql->GetClose($strEstId, $strDate))
 			{
-				$ar[] = $strEst;
+				$ar[] = number_format(floatval($strEst), 2);
 				if ($strEstPrev = $est_sql->GetClose($strEstId, $strPrevDate))
 				{
 					$ar[] = $est_ref->GetPercentageDisplay($strEstPrev, $strEst);
@@ -71,7 +72,7 @@ function _echoNetValueData($csv, $ref, $est_ref, $cny_ref, $iStart, $iNum)
     {
         while ($record = mysqli_fetch_assoc($result)) 
         {
-			_echoNetValueItem($csv, $net_sql, $strStockId, $est_sql, $strEstId, rtrim0($record['close']), $record['date'], $ref, $est_ref, $cny_ref);
+			_echoNetValueItem($csv, $net_sql, $strStockId, $est_sql, $strEstId, $record['close'], $record['date'], $ref, $est_ref, $cny_ref);
         }
         mysqli_free_result($result);
     }
@@ -99,11 +100,6 @@ function EchoNetValueHistoryParagraph($ref, $csv = false, $iStart = 0, $iNum = T
    	{
    		$cny_ref = $fund_ref->GetCnyRef();
    		$est_ref = $fund_ref->GetEstRef();
-   	}
-   	else if ($strSymbol == 'SZ164906')
-   	{
-   		$cny_ref = new CnyReference('USCNY');
-   		$est_ref = new MyStockReference('KWEB');
    	}
     else
     {

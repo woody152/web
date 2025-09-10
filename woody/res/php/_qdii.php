@@ -1,5 +1,7 @@
 <?php
 require_once('_qdiigroup.php');
+require_once('_kraneholdingscsv.php');
+require_once('../../php/stock/kraneshares.php');
 
 class QdiiAccount extends QdiiGroupAccount
 {
@@ -11,20 +13,41 @@ class QdiiAccount extends QdiiGroupAccount
 //        $strUSD = 'DINIW';
         $strCNH = 'fx_susdcnh';
         $strSymbol = $this->GetName();
-        $this->GetLeverageSymbols(QdiiGetEstSymbol($strSymbol));
+        $strEstSymbol = QdiiGetEstSymbol($strSymbol);
+        $arLev = $this->GetLeverageSymbols($strEstSymbol);
 		$ar = array($strSymbol, $strCNH);
-		if ($bOil = in_arrayOilQdii($strSymbol))
+		if (in_arrayOilQdii($strSymbol))
 		{
 			$strOil = 'hf_OIL';
 			$ar[] = $strOil; 
 		}
-        StockPrefetchArrayExtendedData(array_merge($this->GetLeverage(), $ar));
+		else if (in_arrayXopQdii($strSymbol))
+		{
+			$strOil = 'hf_CL';
+			$ar[] = $strOil; 
+		}
+		else
+		{
+			$strOil = false;
+		}
+        StockPrefetchArrayExtendedData(array_merge($arLev, $ar));
         
         $this->ref = new QdiiReference($strSymbol);
         $this->cnh_ref = new MyStockReference($strCNH);
-        if ($bOil)		$this->oil_ref = new MyStockReference($strOil);
+        if ($strOil)	$this->oil_ref = new MyStockReference($strOil);
         
-		$this->QdiiCreateGroup();
+        if ($strEstSymbol == 'KWEB')
+        {
+        	$est_ref = $this->ref->GetEstRef();
+        	if ($strDate = NeedOfficialWebData($est_ref))
+        	{
+				$strNetValue = GetKraneNetValue($est_ref);
+				if ($strNetValue === false)	$strNetValue = $est_ref->GetNetValue();
+				ReadKraneHoldingsCsvFile($strEstSymbol, $est_ref->GetStockId(), $strDate, $strNetValue);
+        	}
+        }
+
+		$this->QdiiCreateGroup($arLev);
     }
 } 
 
@@ -32,8 +55,11 @@ function EchoAll()
 {
    	global $acct;
    	$ref = $acct->GetRef();
+   	$est_ref = $ref->GetEstRef();
     
     EchoFundEstParagraph($ref);
+    if (method_exists($est_ref, 'GetHoldingsDate'))		EchoHoldingsEstParagraph($est_ref);
+    
     EchoReferenceParagraph(array_merge($acct->GetStockRefArray(), array($acct->oil_ref, $acct->cnh_ref), $ref->GetForexRefArray()), $acct->IsAdmin());
     $acct->EchoCommonParagraphs();
     if ($group = $acct->EchoTransaction()) 

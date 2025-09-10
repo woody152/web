@@ -73,7 +73,7 @@ class MyEWrapper(EWrapper):
         #self.arQQQ = {'SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941'}
         self.arXOPETF = {'SH513350', 'SZ159518'}
         self.arOrder = {}
-        self.arOrder['KWEB'] = GetOrderArray([21.22, 30.4, 30.65, 34.71, 35.46, 37.44, 38.11, 38.15, 39.41, 39.58], 200, 7, -1)
+        self.arOrder['KWEB'] = GetOrderArray([21.22, 30.4, 30.83, 35.05, 36.18, 37.95, 38.34, 38.85, 39.73], 200, 8, -1)
         if IsChinaMarketOpen():
             self.arOrder['GLD'] = GetOrderArray()
             self.arOrder['IEO'] = GetOrderArray()
@@ -83,12 +83,12 @@ class MyEWrapper(EWrapper):
             self.arOrder['XBI'] = GetOrderArray()
             self.arOrder['XLY'] = GetOrderArray()
             self.arOrder['XOP'] = GetOrderArray()
-        else:
-        #if IsMarketOpen():
+        #else:
+        if IsMarketOpen():
             #self.arOrder['TLT'] = GetOrderArray([80.42, 83.53, 83.65, 85.44, 85.81, 87.11, 90.57, 92.68, 98.05], 100, 0, 2)
-            self.arOrder['SPX'] = GetOrderArray([4822.05, 5438.7, 6099.57, 6353.3, 6442.19, 6456.53, 6464.62, 6531.08, 6760.44])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0012, 2, -1)
-            self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0098, -1, 7)
+            self.arOrder['SPX'] = GetOrderArray([4822.05, 5540.33, 6149.9, 6371.87, 6456.96, 6477.63, 6497.83, 6542.05, 6759.48])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.001, 2, -1)
+            self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0095, -1, 7)
         self.palmmicro = Palmmicro()
         self.client.StartStreaming(orderId)
         self.arMkt = {}
@@ -121,19 +121,20 @@ class MyEWrapper(EWrapper):
         print('Error:', reqId, errorCode, errorString)
 
     def tickPrice(self, reqId, tickType, price, attrib):
-        arMktData = self.arMkt[reqId]
-        if tickType == 1:  # Bid price
-            arMktData['BUY_price'] = price
-            self.BidPriceTrade(arMktData)
-            self._CheckPriceAndSize(arMktData)
-        elif tickType == 2:  # Ask price
-            arMktData['SELL_price'] = price
-            self.AskPriceTrade(arMktData)
-            self._CheckPriceAndSize(arMktData)
-        elif tickType == 4:
-            if IsMarketOpen():
-                arMktData['last_price'] = price
-                self.LastPriceTrade(arMktData)
+        if price > 0.0:
+            arMktData = self.arMkt[reqId]
+            if tickType == 1:  # Bid price
+                arMktData['BUY_price'] = price
+                self.BidPriceTrade(arMktData)
+                self._CheckPriceAndSize(arMktData)
+            elif tickType == 2:  # Ask price
+                arMktData['SELL_price'] = price
+                self.AskPriceTrade(arMktData)
+                self._CheckPriceAndSize(arMktData)
+            elif tickType == 4:
+                if IsMarketOpen():
+                    arMktData['last_price'] = price
+                    self.LastPriceTrade(arMktData)
 
     def tickSize(self, reqId, tickType, size):
         arMktData = self.arMkt[reqId]
@@ -257,13 +258,13 @@ class MyEWrapper(EWrapper):
 
     def __debugPriceAndSize(self, strMsgSymbol, arSymData, strSymbol, strType, strDebug):
         iSize = arSymData['quantity']
-        if iSize > 0:
+        if iSize >= 10:
             fRatio = arSymData['discount']
             strDebug = str(round(fRatio * 100.0, 2)) + '% | ' + strDebug
             strSymbolType = strSymbol + strType
             if strSymbolType not in self.arDebug or self.arDebug[strSymbolType] != strDebug:
                 self.arDebug[strSymbolType] = strDebug
-                if iSize >= 1 and ((fRatio > 0.001 and strType == 'SELL') or (fRatio < -0.001 and strType == 'BUY')):
+                if (fRatio > 0.001 and strType == 'SELL') or (fRatio < -0.001 and strType == 'BUY'):
                     print(strDebug)
                     self.palmmicro.SendSymbolMsg(strDebug, strMsgSymbol)
                 if strSymbol in self.arQDII and iSize >= 100 and ((fRatio > 0.01 and strType == 'SELL') or (fRatio < -0.005 and strType == 'BUY')):

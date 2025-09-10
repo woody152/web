@@ -43,25 +43,17 @@ function GetStockDataArray($strSymbols)
 					$strDate = $record['date'];
 					$arData['netvalue'] = SqlGetNetValueByDate($strStockId, $strDate);
 				
-					if (method_exists($fund_ref, 'GetEstRef'))
-					{	
-						$cny_ref = $fund_ref->GetForexRef();
-						if ($est_ref = $fund_ref->GetEstRef())
+					$cny_ref = $fund_ref->GetForexRef();
+					if ($est_ref = $fund_ref->GetEstRef())
+					{
+						$strIndex = $est_ref->GetSymbol();
+						if ($strEtf = GetLeverageHedgeSymbol($strSymbol))
 						{
-							$strIndex = $est_ref->GetSymbol();
-							if ($strEtf = GetLeverageHedgeSymbol($strSymbol))
-							{
-								_addIndexArray($ar, $strIndex, $strEtf, $strDate, $cal_sql);
-								$strIndex = $strEtf;
-							}
+							_addIndexArray($ar, $strIndex, $strEtf, $strDate, $cal_sql);
+							$strIndex = $strEtf;
 						}
 					}
-					else
-					{
-						$cny_ref = $fund_ref->GetCnyRef();
-						$strIndex = SqlGetFundPair($strSymbol);
-					}
-					if ($strIndex)	$arData['symbol_hedge'] = $strIndex;
+					$arData['symbol_hedge'] = $strIndex;
 				}
 				else
 				{

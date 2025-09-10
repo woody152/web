@@ -151,9 +151,9 @@ function TableColumnGetPremium()
 
 class TableColumnPrice extends TableColumn
 {
-	public function __construct($strPrefix = false)
+	public function __construct($strPrefix = false, $iWidth = 70)
 	{
-        parent::__construct(STOCK_DISP_PRICE, 70, 'blue', $strPrefix);
+        parent::__construct(STOCK_DISP_PRICE, $iWidth, 'blue', $strPrefix);
 	}
 }
 

@@ -21,8 +21,7 @@ function _echoOverNightCnhItem($strSymbol, $fCnh, $bSell)
    	else
    	{
    		$stock_ref = $ref;
-   		if ($strSymbol == 'SZ164906')	$est_ref = new MyStockReference('KWEB');
-   		else							$est_ref = false;
+		$est_ref = false;
    	}
    	
    	if ($strQuantity = $stock_ref->GetAvailableQuantity($bSell))

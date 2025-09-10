@@ -11,7 +11,7 @@ function _echoFundEstTableItem($ref, $bFair, $bWide = false)
     $ar = array($ref->GetStockLink());
     if ($bWide)
     {
-    	$stock_ref = method_exists($ref, 'GetStockRef') ? $ref->GetStockRef() : $ref;
+    	$stock_ref = GetStockRef($ref);
     	$ar = array_merge($ar, GetStockReferenceArray($stock_ref, $bWide));
     }
     

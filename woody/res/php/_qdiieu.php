@@ -6,12 +6,11 @@ class _QdiiEuAccount extends QdiiGroupAccount
     function Create() 
     {
         $strSymbol = $this->GetName();
-
-        $this->GetLeverageSymbols(QdiiEuGetEstSymbol($strSymbol));
-        StockPrefetchArrayExtendedData(array_merge($this->GetLeverage(), array($strSymbol)));
+        $arLev = $this->GetLeverageSymbols(QdiiEuGetEstSymbol($strSymbol));
+        StockPrefetchArrayExtendedData(array_merge($arLev, array($strSymbol)));
 
         $this->ref = new QdiiEuReference($strSymbol);
-		$this->QdiiCreateGroup();
+		$this->QdiiCreateGroup($arLev);
     } 
 } 
 

@@ -7,7 +7,8 @@ require_once('../../php/ui/editinputform.php');
 function _echoFundPositionItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue, $strPrevDate, $net_sql, $strStockId, $est_sql, $strEstId, $strInput, $bAdmin)
 {
 	$bWritten = false;
-	$ar = array($strDate, $strNetValue);
+	$ar = array($strDate);
+	$ar[] = number_format(floatval($strNetValue), 4);
 	
    	$strPrev = $net_sql->GetClose($strStockId, $strPrevDate);
 	$ar[] = $ref->GetPercentageDisplay($strPrev, $strNetValue);
@@ -19,7 +20,7 @@ function _echoFundPositionItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNet
 		
 	if ($strEst = $est_sql->GetClose($strEstId, $strDate))
 	{
-		$ar[] = $strEst;
+		$ar[] = number_format(floatval($strEst), 2);
 		if ($strEstPrev = $est_sql->GetClose($strEstId, $strPrevDate))
 		{
 			$ar[] = $est_ref->GetPercentageDisplay($strEstPrev, $strEst);
@@ -107,7 +108,7 @@ function _echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $strInput, $bAdmi
         while ($record = mysqli_fetch_assoc($result)) 
         {
        		$strDate = $record['date'];
-       		$strNetValue = rtrim0($record['close']);
+       		$strNetValue = $record['close'];
        		if ($strDate == $arDate[$iIndex])
        		{
    				$iIndex ++;
@@ -170,12 +171,6 @@ function EchoAll()
     		{
     			$cny_ref = $fund->GetCnyRef();
     			$est_ref = $fund->GetEstRef();
-    		}
-    		else if ($strSymbol == 'SZ164906')
-    		{
-    			$fund = $ref;
-    			$cny_ref = new CnyReference('USCNY');
-    			$est_ref = new MyStockReference('KWEB');
     		}
     		if ($fund)		_echoFundPositionParagraph($fund, $cny_ref, $est_ref, $strSymbol, $strInput, $acct->IsAdmin());
     	}

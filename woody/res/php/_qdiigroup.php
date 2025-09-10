@@ -62,10 +62,9 @@ function _callbackFundListHedge($fPos, $fFactor, $strDate, $strStockId)
 
 class QdiiGroupAccount extends FundGroupAccount 
 {
-    var $arLeverage;
     var $ar_leverage_ref = array();
     
-    function QdiiCreateGroup()
+    function QdiiCreateGroup($arLev)
     {
     	$ref = $this->GetRef();
     	$stock_ref = $ref->GetStockRef();
@@ -81,13 +80,13 @@ class QdiiGroupAccount extends FundGroupAccount
         GetChinaMoney($stock_ref);
         SzseGetLofShares($stock_ref);
         
-    	foreach ($this->arLeverage as $strSymbol)
+    	foreach ($arLev as $strSymbol)
     	{
     		$leverage_ref = new FundPairReference($strSymbol);
     		$this->ar_leverage_ref[] = $leverage_ref;
     		if ($strSymbol == 'QQQ')
     		{
-    			if (NeedOfficialNetValue($leverage_ref))	UpdateInvescoNetValue($strSymbol);
+    			if (NeedOfficialWebData($leverage_ref))		UpdateInvescoNetValue($strSymbol);
     		}
     		else
     		{
@@ -98,11 +97,6 @@ class QdiiGroupAccount extends FundGroupAccount
         $this->CreateGroup(array_merge($arRef, $this->ar_leverage_ref));
     }
     
-    function GetLeverage()
-    {
-        return $this->arLeverage;
-    }
-
     function GetLeverageRef()
     {
     	return $this->ar_leverage_ref;
@@ -133,7 +127,7 @@ class QdiiGroupAccount extends FundGroupAccount
     function GetLeverageSymbols($strEstSymbol)
     {
    		$pair_sql = GetFundPairSql();
-        $this->arLeverage = $pair_sql->GetSymbolArray($strEstSymbol);
+        return $pair_sql->GetSymbolArray($strEstSymbol);
     }
     
     function EchoDebugParagraph()

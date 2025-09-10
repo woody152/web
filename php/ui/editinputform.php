@@ -29,7 +29,7 @@ function EchoEditInputForm($strPage, $strInput = '', $bChinese = true)
 	<form id="inputForm" name="inputForm" method="post" action="$strCur">
         <div>
 		<p>$strPage
-	        <br /><input name="$strName" value="$strInput" type="text" style="width:640px;" maxlength="1024" class="textfield" id="$strName" />
+	        <br /><input name="$strName" value="$strInput" type="text" style="width:630px;" maxlength="1024" class="textfield" id="$strName" />
 	        <br /><input type="submit" name="submit" value="$strSubmit" /> <input type="submit" name="clear" value="$strClear" />
 	    </p>
         </div>

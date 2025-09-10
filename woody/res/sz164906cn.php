@@ -1,9 +1,9 @@
 <?php 
-require('php/_qdiimix.php');
+require('php/_qdii.php');
 
-function GetQdiiMixRelated($strDigitA)
+function GetQdiiRelated($strDigitA)
 {
-	$str = GetHtmlNewLine().GetKraneOfficialLink('KWEB').' '.GetCsindexOfficialLink('H11136');
+	$str = GetKraneOfficialLink('KWEB').' '.GetCsindexOfficialLink('H11136');
 	$str .= GetJiaoYinSchroderSoftwareLinks($strDigitA);
 	return $str;
 }

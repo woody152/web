@@ -175,7 +175,7 @@ function RefGetTableColumnNetValue($ref)
 {
 	$strStockDisplay = TableColumnGetStock($ref);
 	if ($ref->CountNetValue() > 0)		return new TableColumnNetValue($strStockDisplay);	
-	return 								   new TableColumnPrice($strStockDisplay);
+	return 								   	   new TableColumnPrice($strStockDisplay, 90);
 }
 
 function StockPrefetchArrayData($arSymbol)
@@ -217,11 +217,14 @@ function _getAllSymbolArray($strSymbol)
         if (in_arrayQdiiMix($strSymbol))
         {
         	_addHoldingsSymbol($ar, $strSymbol);
-        	if ($strSymbol == 'SZ164906')			$ar[] = 'KWEB';
         }
         else if (in_arrayQdii($strSymbol))
         {
-        	if ($strEstSymbol = QdiiGetEstSymbol($strSymbol))		_addFundPairSymbol($ar, $strEstSymbol);
+        	if ($strEstSymbol = QdiiGetEstSymbol($strSymbol))		
+        	{
+        		_addFundPairSymbol($ar, $strEstSymbol);
+        		_addHoldingsSymbol($ar, $strEstSymbol);		// KWEB
+        	}
         	$ar[] = 'fx_susdcny';
         }
         else if (in_arrayQdiiHk($strSymbol))

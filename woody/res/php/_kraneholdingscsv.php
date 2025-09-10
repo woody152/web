@@ -38,7 +38,7 @@ class _KraneHoldingsCsvFile extends _HoldingsCsvFile
     	return true;
     }
 }
-
+/*
 function CopyHoldings($date_sql, $strStockId, $strDstId)
 {
 	$strDate = $date_sql->ReadDate($strStockId);
@@ -70,7 +70,7 @@ function CopyHoldings($date_sql, $strStockId, $strDstId)
     $holdings_sql->InsertHoldingsArray($strDstId, $ar);
     return true;
 }
-
+*/
 function ReadKraneHoldingsCsvFile($strSymbol, $strStockId, $strDate, $strNetValue)
 {
 	$arYMD = explode('-', $strDate);
@@ -88,7 +88,7 @@ function ReadKraneHoldingsCsvFile($strSymbol, $strStockId, $strDate, $strNetValu
 			{
 				$shares_sql = new SharesHistorySql();
 				$shares_sql->WriteDaily($strStockId, $strDate, strval_round($fMarketValue / floatval($strNetValue) / 10000.0));
-				if ($strSymbol == 'KWEB')		CopyHoldings(new HoldingsDateSql(), $strStockId, SqlGetStockId('SZ164906'));
+				// if ($strSymbol == 'KWEB')		CopyHoldings(new HoldingsDateSql(), $strStockId, SqlGetStockId('SZ164906'));
 			}
 		}
 		else	DebugString(__FUNCTION__.' failed');

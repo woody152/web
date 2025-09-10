@@ -122,7 +122,7 @@ function in_arrayXbiQdii($strSymbol)
 
 function QdiiGetSymbolArray()
 {
-    $ar = array_merge(array('SH501300', 'SH513290', 'SH513400', 'SZ160140', 'SZ161126', 'SZ161128', 'SZ162415', 'SZ164824') 
+    $ar = array_merge(array('SH501300', 'SH513290', 'SH513400', 'SZ160140', 'SZ161126', 'SZ161128', 'SZ162415', 'SZ164824', 'SZ164906') 
     				   , QdiiGetOilSymbolArray()
     				   , QdiiGetXbiSymbolArray()
     				   , QdiiGetXopSymbolArray()
@@ -237,7 +237,7 @@ function in_arrayQdiiEu($strSymbol)
 
 function GetChinaInternetSymbolArray()
 {
-	return array('SH513050', 'SH513220', 'SZ159605', 'SZ159607', 'SZ164906');
+	return array('SH513050', 'SH513220', 'SZ159605', 'SZ159607');
 }
 
 function GetMsciUs50SymbolArray()
@@ -663,11 +663,11 @@ class StockSymbol
         return false;
     }
     
-    function IsNewSinaForex()
+    function IsSinaForex()
     {
     	return strtoupper(StrHasPrefix($this->strSymbol, SINA_FOREX_PREFIX)); 
     }
-    
+/*    
     function IsOldSinaForex()
     {
         switch ($this->strSymbol)
@@ -680,11 +680,11 @@ class StockSymbol
     
     function IsSinaForex()
     {
-    	if ($this->IsNewSinaForex())	return true;
+    	if ($this->IsSinaForex())	return true;
     	if ($this->IsOldSinaForex())	return true;
     	return false;
     }
-    
+*/    
     function IsForex()
     {
     	if ($this->IsEastMoneyForex())	return true;
@@ -830,7 +830,7 @@ class StockSymbol
 				return $str.$strFutureSuffix;	// CL=F
 			}
         }
-        else if ($str = $this->IsNewSinaForex())
+        else if ($str = $this->IsSinaForex())
         {
         	switch ($str)
         	{
@@ -1046,7 +1046,7 @@ class StockSymbol
     {
         if ($str = $this->IsSinaFutureUs())		return $str;
         if ($str = $this->IsSinaFutureCn())		return $str;
-        if ($str = $this->IsNewSinaForex())		return $str;
+        if ($str = $this->IsSinaForex())		return $str;
 		if ($str = $this->IsSinaGlobalIndex())	return $str;
 		return $this->GetSymbol();
     }

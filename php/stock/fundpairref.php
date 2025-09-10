@@ -1,11 +1,5 @@
 <?php
 
-function GetEuropeMarketCloseTick($strDate)
-{
-	date_default_timezone_set('Europe/Berlin');
-	return strtotime($strDate.' 17:30:00');
-}
-
 function PairNetValueGetClose($ref, $strDate)
 {
 	if ($ref->IsFund())
@@ -37,7 +31,7 @@ class MyPairReference extends MyStockReference
         	{
         		if ($this->IsSymbolA())
         		{
-        			if ($this->pair_ref->IsShangHaiB())			$strCNY = 'USCNY';
+        			if ($this->pair_ref->IsShangHaiB())				$strCNY = 'USCNY';
 					else if ($this->pair_ref->IsShenZhenB())		$strCNY = 'HKCNY';
         		}
 //      		else if ($this->IsSymbolH())		$strCNY = 'HKCNY';
@@ -169,11 +163,16 @@ class FundPairReference extends MyPairReference
 		if ($this->pair_ref)
 		{
 			$this->realtime_callback = $callback;
-			$strPair = $this->pair_ref->GetSymbol();
+//			$strPair = $this->pair_ref->GetSymbol();
 			if ($this->pair_ref->IsSinaFuture())
 			{
         		if ($this->pair_ref->CheckAdjustFactorTime($this))	$this->AverageCalibraion();
-        		if ($strSymbol == 'GLD' || $strSymbol == 'USO')		$this->_buildForeignMarketData();
+/*        		if ($strSymbol == 'GLD' || $strSymbol == 'USO')		$this->BuildForeignMarketData($strSymbol);
+        		if ($this->pair_ref->GetSymbol() == 'hf_CL')
+        		{
+        			$this->pair_ref->BuildForeignMarketData($strSymbol, 'JP', $this->GetFactor());
+        			$this->pair_ref->BuildForeignMarketData($strSymbol, 'HK', $this->GetFactor());
+        		}*/
        		}
         	
 			if ($this->IsSinaFuture())
@@ -185,31 +184,6 @@ class FundPairReference extends MyPairReference
         }
     }
     
-    function _buildForeignMarketData()
-    {
-		$strSymbolEu = BuildEuropeSymbol($this->GetSymbol());
-		$strStockIdEu = SqlGetStockId($strSymbolEu);
-		
-		$iCurTick = $this->ConvertTick();
-		$strDate = $this->GetDate();
-		$iCloseTick = GetEuropeMarketCloseTick($strDate);
-		
-		$tick_sql = new StockTickSql();
-		$iTick = $tick_sql->ReadInt($strStockIdEu);
-		if (($iTick === false) || (abs($iCurTick - $iCloseTick) < abs($iTick - $iCloseTick)))
-		{
-			$his_sql = GetStockHistorySql();
-			if ($record = $his_sql->GetRecord($this->GetStockId(), $strDate))
-    		{
-    			if ($his_sql->WriteHistory($strStockIdEu, $strDate, $record['close'], $record['volume']))
-    			{
-    				$tick_sql->WriteInt($strStockIdEu, $iCurTick);
-    				DebugString(__CLASS__.'->'.__FUNCTION__.': '.$strSymbolEu.' updated history on '.$strDate);
-    			}
-    		}
-		}
-    }
-
     function AverageCalibraion()
     {
 		$strStockId = $this->GetStockId();

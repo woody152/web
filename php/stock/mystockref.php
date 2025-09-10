@@ -1,5 +1,33 @@
 <?php
 
+function GetForeignMarketCloseTick($strDate, $strType)
+{
+	switch ($strType)
+	{
+	case 'EU':
+		$strTimezone = 'Europe/Berlin';
+		$strCloseTime = '17:30:00';
+		break;
+	
+	case 'JP':
+		$strTimezone = 'Asia/Tokyo';
+		$strCloseTime = '15:00:00';
+		break;
+	
+	case 'HK':
+		$strTimezone = 'Asia/Hong_Kong';
+		$strCloseTime = '16:08:00';
+		break;
+	}
+	
+	$strOldTimezone = date_default_timezone_get();
+//	DebugString(__FUNCTION__.' '.$strOldTimezone, true);
+	date_default_timezone_set($strTimezone);
+	$iTick = strtotime($strDate.' '.$strCloseTime);
+	date_default_timezone_set($strOldTimezone);
+	return $iTick;
+}
+
 class MyStockReference extends MysqlReference
 {
     public function __construct($strSymbol) 
@@ -33,6 +61,17 @@ class MyStockReference extends MysqlReference
 					}
 				}
    			}
+   			
+       		if ($strSymbol == 'GLD' || $strSymbol == 'USO')		$this->BuildForeignMarketData($strSymbol);
+        	else if ($strSymbol == 'hf_CL')
+        	{
+        		$cal_sql = GetCalibrationSql();
+        		$fFactor = floatval($cal_sql->GetCloseNow(SqlGetStockId('USO')));
+//        		DebugVal($fFactor, __CLASS__.'->'.__FUNCTION__, true);
+
+        		$this->BuildForeignMarketData('USO', 'JP', $fFactor);
+        		$this->BuildForeignMarketData('USO', 'HK', $fFactor);
+        	}
    		}
     }
     
@@ -85,6 +124,36 @@ class MyStockReference extends MysqlReference
         $this->_updateStockEmaDays($strStockId, $strDate, 50);
         $this->_updateStockEmaDays($strStockId, $strDate, 200);
     }
+    
+    function BuildForeignMarketData($strSymbol, $strType = 'EU', $fCalibration = false)
+    {
+    	$strSymbol = BuildYahooNetValueSymbol($strSymbol, $strType);
+    	$strDate = $this->GetDate();
+    	$iCloseTick = GetForeignMarketCloseTick($strDate, $strType);
+    	$iCurTick = $this->ConvertTick();
+		
+    	$tick_sql = new StockTickSql();
+    	$strStockId = SqlGetStockId($strSymbol);
+    	$iTick = $tick_sql->ReadInt($strStockId);
+    	if (($iTick === false) || (abs($iCurTick - $iCloseTick) < abs($iTick - $iCloseTick)))
+    	{
+    		$his_sql = GetStockHistorySql();
+    		if ($record = $his_sql->GetRecord($this->GetStockId(), $strDate))
+    		{
+    			$strClose = $record['close'];
+    			if ($fCalibration)
+    			{
+    				$fClose = floatval($strClose) / $fCalibration;
+    				$strClose = strval(round($fClose, 2));
+    			}
+    			if ($his_sql->WriteHistory($strStockId, $strDate, $strClose, $record['volume']))
+    			{
+    				$tick_sql->WriteInt($strStockId, $iCurTick);
+    				DebugString(__CLASS__.'->'.__FUNCTION__.': '.$strSymbol.' updated history on '.$strDate.': '.$strClose);
+    			}
+    		}
+    	}
+    }
 }
-
+// 6543.25，6534
 ?>

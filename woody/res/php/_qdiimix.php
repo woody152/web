@@ -1,9 +1,7 @@
 <?php
 require_once('_fundgroup.php');
-require_once('_kraneholdingscsv.php');
 require_once('_sseholdings.php');
 require_once('_szseholdings.php');
-require_once('../../php/stock/kraneshares.php');
 
 // SH501225 全球芯片LOF SOXX*75%+SH516640*15%
 // SH501312 海外科技LOF ARKW*19.56;ARKK*19.66;ARKF*16.75;ARKG*11.86;ARKQ*5.37;QQQ*8.88;SOXX*7.44;XLK*5.2
@@ -11,8 +9,6 @@ require_once('../../php/stock/kraneshares.php');
 
 class _QdiiMixAccount extends FundGroupAccount
 {
-    var $us_ref;
-    var $pair_ref;
     var $cnh_ref;
 
     function Create()
@@ -23,34 +19,9 @@ class _QdiiMixAccount extends FundGroupAccount
 
         $this->cnh_ref = new MyStockReference($strCNH);
         $this->ref = new HoldingsReference($strSymbol);
-        switch ($strSymbol)
-        {
-        case 'SZ164906':
-        	$strSymbolUs = 'KWEB';
-        	$this->us_ref = new HoldingsReference($strSymbolUs);
-        	if ($strDate = NeedOfficialNetValue($this->us_ref))
-        	{
-        		if ($strNetValue = GetKraneNetValue($this->us_ref))
-        		{
-        			$net_sql = GetNetValueHistorySql();
-        			$strStockIdUs = $this->us_ref->GetStockId();
-					if ($net_sql->ModifyDaily($strStockIdUs, $strDate, $strNetValue))		ReadKraneHoldingsCsvFile($strSymbolUs, $strStockIdUs, $strDate, $strNetValue);
-        		}
-        	}
-        	$this->pair_ref = new FundPairReference($strSymbol);
-        	break;
-        	
-		default:
-        	$this->us_ref = false;
-        	$this->pair_ref = false;
-        	break;
-        }
-
         $this->_updateStockHoldings($strSymbol);
-		if ($this->pair_ref)	$this->pair_ref->DailyCalibration();
 
         $arRef = array($this->ref);
-        if ($this->us_ref)	$arRef[] = $this->us_ref; 
         if ($this->ref->UseRealtimeEst())
         {
         	$ar_realtime_ref = $this->ref->GetRealtimeRefArray();
@@ -99,12 +70,6 @@ class _QdiiMixAccount extends FundGroupAccount
         	}
         	break;
 		
-		case 'SZ164906':
-			$us_ref = $this->us_ref;
-			$strUsId = $us_ref->GetStockId();
-			if ($strHoldingsDate != $date_sql->ReadDate($strUsId))		$bUpdated = CopyHoldings($date_sql, $strUsId, $strStockId);
-			break;
-			
 		default:
     		$fund_est_sql = GetFundEstSql();
     		$strEstDate = $fund_est_sql->GetDateNow($strStockId);
@@ -132,41 +97,6 @@ class _QdiiMixAccount extends FundGroupAccount
 //    		DebugString('Holdings updated');
     	}
     }
-    
-    function GetUsRef()
-    {
-    	return $this->us_ref;
-    }
-    
-    function GetPairRef()
-    {
-    	return $this->pair_ref;
-    }
-}
-
-function _callbackQdiiMixSma($ref, $strEst = false)
-{
-	if ($strEst)	return strval_round($ref->EstFromPair(floatval($strEst)));
-	return $ref;
-}
-
-function _callbackQdiiMixTrading($strVal = false)
-{
-	global $acct;
-    
-	$ref = $acct->GetPairRef();
-	$us_ref = $ref->GetPairRef();
-    if ($strVal)
-    {
-    	if ($strVal == '0')	return '';
-    	else		    	return $us_ref->GetPriceDisplay(strval($ref->EstToPair(floatval($strVal))));
-    }
-   	return TableColumnGetStock($us_ref).TableColumnGetPrice();
-}
-
-function _callbackFundListHedge($fPos, $fFactor, $strDate, $strStockId)
-{
-   	return StockCalcHedge($fFactor, $fPos);
 }
 
 function EchoAll()
@@ -174,7 +104,6 @@ function EchoAll()
     global $acct;
     
     $ref = $acct->GetRef();
-    $us_ref = $acct->GetUsRef();
     $uscny_ref = $ref->GetCnyRef();
     $hkcny_ref = $ref->GetHkcnyRef();
     $arForex = array($acct->cnh_ref);
@@ -194,30 +123,15 @@ function EchoAll()
     									//$ref->GetHoldingsRefArray(), 
     									$arForex), $acct->IsAdmin());
     
-	if ($ref->GetSymbol() == 'SZ164906')
-	{
-		EchoFundTradingParagraph($ref, '_callbackQdiiMixTrading');
-		EchoHoldingsEstParagraph($us_ref);
-		$pair_ref = $acct->GetPairRef();
-		EchoFundListParagraph(array($pair_ref), '_callbackFundListHedge');
-		EchoSmaParagraph($us_ref, false, $pair_ref, '_callbackQdiiMixSma');
-	}
-	else	
-	{
-		EchoFundTradingParagraph($ref);
-		if ($us_ref)	EchoSmaParagraph($us_ref);
-        if ($ref->UseRealtimeEst())		EchoFundListParagraph($ref->GetRealtimeRefArray());
-	}
+	EchoFundTradingParagraph($ref);
+    if ($ref->UseRealtimeEst())		EchoFundListParagraph($ref->GetRealtimeRefArray());
 
     EchoFundHistoryParagraph($ref);
    	EchoFundShareParagraph($ref);
-	if ($us_ref)	EchoNetValueCloseParagraph($us_ref);
-
     if ($group = $acct->EchoTransaction()) 
     {
     	$acct->EchoMoneyParagraph($group, $uscny_ref, $hkcny_ref);
 	}
-
     $acct->EchoLinks('qdiimix', 'GetQdiiMixLinks');
 }
 

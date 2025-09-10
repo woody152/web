@@ -29,7 +29,7 @@ function GetCategoryArray($strItem)
         break;
         
     case 'chinainternet':
-        $ar = GetChinaInternetSymbolArray();
+        $ar = array_merge(GetChinaInternetSymbolArray(), array('SZ164906'));
         break;
         
     case 'commodity':

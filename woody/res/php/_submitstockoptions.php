@@ -323,12 +323,12 @@ function _updateStockOptionCalibration($strSymbol, $strStockId, $strDate, $strVa
 		}
 		else
 		{
-			if (in_arrayChinaIndex($strSymbol))									return;
-			else if (in_arrayQdii($strSymbol) || $strSymbol == 'SZ164906')		$strCNY = SqlGetNetValueByDate(SqlGetStockId('USCNY'), $strDate);
-			else if (in_arrayQdiiHk($strSymbol))									$strCNY = SqlGetNetValueByDate(SqlGetStockId('HKCNY'), $strDate);
-			else if (in_arrayQdiiJp($strSymbol))									$strCNY = SqlGetNetValueByDate(SqlGetStockId('JPCNY'), $strDate);
-			else if (in_arrayQdiiEu($strSymbol))									$strCNY = SqlGetNetValueByDate(SqlGetStockId('EUCNY'), $strDate);
-			else 																	return;
+			if (in_arrayChinaIndex($strSymbol))		return;
+			else if (in_arrayQdii($strSymbol))		$strCNY = SqlGetNetValueByDate(SqlGetStockId('USCNY'), $strDate);
+			else if (in_arrayQdiiHk($strSymbol))	$strCNY = SqlGetNetValueByDate(SqlGetStockId('HKCNY'), $strDate);
+			else if (in_arrayQdiiJp($strSymbol))	$strCNY = SqlGetNetValueByDate(SqlGetStockId('JPCNY'), $strDate);
+			else if (in_arrayQdiiEu($strSymbol))	$strCNY = SqlGetNetValueByDate(SqlGetStockId('EUCNY'), $strDate);
+			else 									return;
 
 			if ($strCNY == false)	return;
 			$strVal = strval(QdiiGetCalibration($strVal, $strCNY, $strNetValue));
@@ -441,7 +441,6 @@ class _SubmitOptionsAccount extends Account
 				{
 				case 'KWEB':
 					ReadKraneHoldingsCsvFile($strSymbol, $strStockId, $strDate, $strVal);
-//					_updateStockOptionCalibration('SZ164906', SqlGetStockId('SZ164906'), $strDate, $strVal);
 					break;
 				}
 			}

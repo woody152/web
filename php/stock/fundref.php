@@ -152,7 +152,8 @@ class FundReference extends MysqlReference
 
     function GetRealtimeRef()
     {
-    	return $this->est_ref->GetPairRef();
+    	if (method_exists($this->est_ref, 'GetPairRef'))	return $this->est_ref->GetPairRef();
+    	return false;
     }
 
     function GetCnyRef()

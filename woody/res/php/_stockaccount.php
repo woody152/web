@@ -139,13 +139,14 @@ class StockAccount extends TitleAccount
     	{
     		if ($ref = $this->GetRef())
     		{
-    			$str .= ' '.$this->_getStockExchangeLinks(method_exists($ref, 'GetStockRef') ? $ref->GetStockRef() : $ref);
+    			$str .= ' '.$this->_getStockExchangeLinks(GetStockRef($ref));
     			$str .= ' '.call_user_func($callback, $ref);
     		}
     	}
     	else
     	{
-    		$str .= $strNewLine.GetCategoryLinks(GetStockCategoryArray());
+    		if ($strSymbol = UrlGetQueryValue('symbol'))	$str .= GetStockCategoryLinks($this->StockCheckSymbol($strSymbol));
+			else								    		$str .= $strNewLine.GetCategoryLinks(GetStockCategoryArray());
     	}
 	
 		$strHead = GetHeadElement('相关链接');

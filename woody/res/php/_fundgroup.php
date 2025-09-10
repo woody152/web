@@ -10,7 +10,7 @@ require_once('../../php/ui/fundlistparagraph.php');
 require_once('../../php/ui/fundshareparagraph.php');
 require_once('../../php/ui/netvaluecloseparagraph.php');
 
-function NeedOfficialNetValue($ref)
+function NeedOfficialWebData($ref)
 {
 	if ($ref->HasData() == false)	return false;
 	
@@ -19,15 +19,22 @@ function NeedOfficialNetValue($ref)
 	$his_sql = GetStockHistorySql();
 	if ($strPrevDate = $his_sql->GetDatePrev($strStockId, $strDate))
 	{
-		$net_sql = GetNetValueHistorySql();
-		if ($net_sql->GetRecord($strStockId, $strPrevDate))	return false;	// already have previous trading day's data
+		if (method_exists($ref, 'GetHoldingsDate'))
+		{
+			if ($strPrevDate == $ref->GetHoldingsDate())		return false;	// already have previous trading day's holdings
+		}
+		else
+		{
+			$net_sql = GetNetValueHistorySql();
+			if ($net_sql->GetRecord($strStockId, $strPrevDate))	return false;	// already have previous trading day's data
+		}
 	
 		$ref->SetTimeZone();
 		$now_ymd = GetNowYMD();
 		$iHourMinute = $now_ymd->GetHourMinute();
 		if ($now_ymd->GetYMD() == $strDate)
 		{
-			if ($iHourMinute < 930)	return false;		
+			if ($iHourMinute < 930)								return false;	// too early		
 		}
 	}
     return $strPrevDate;
