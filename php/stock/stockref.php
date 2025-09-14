@@ -227,7 +227,7 @@ class StockReference extends StockSymbol
     {
         if ($etf_ref == false)					return false;
         if ($etf_ref->HasData() == false)		return false;
-        if ($etf_ref->IsExtendedMarket())				return false;
+        if ($etf_ref->IsExtendedMarket())		return false;
         
         $strTimeZone = $etf_ref->GetTimeZone();
         if ($this->GetTimeZone() == $strTimeZone)
@@ -240,7 +240,7 @@ class StockReference extends StockSymbol
         	$iTime = $this->ConvertTick();
             $strDate = DebugGetDate($iTime, $strTimeZone);
             $strTime = DebugGetTime($iTime, $strTimeZone);
-//            DebugString(__FUNCTION__.': '.$strTimeZone.' '.$etf_ref->GetSymbol().' '.$etf_ref->GetDate().' '.$etf_ref->GetTimeHM().' vs '.$strDate.' '.$strTime);
+//            DebugString(__FUNCTION__.': '.$strTimeZone.' '.$etf_ref->GetSymbol().' '.$etf_ref->GetDate().' '.$etf_ref->GetTimeHM().' vs '.$strDate.' '.$strTime, true);
         }
         if ($strDate != $etf_ref->GetDate())			return false;
         if (GetHM($strTime) != $etf_ref->GetTimeHM())	return false;

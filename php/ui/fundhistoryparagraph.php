@@ -7,7 +7,7 @@ function _echoFundHistoryTableItem($csv, $strNetValue, $arHistory, $arFundEst, $
 	$strDate = $arHistory['date'];
     if ($csv)		$csv->Write($strDate, $strNetValue, $ref->GetPercentageString($strNetValue, $strClose));
 
-   	$ar = array($strDate, $ref->GetPriceDisplay($strClose, $strNetValue), $strNetValue, $ref->GetPercentageDisplay($strNetValue, $strClose));
+   	$ar = array($strDate, $ref->GetPriceDisplay($strClose, $strNetValue), number_format(floatval($strNetValue), 4), $ref->GetPercentageDisplay($strNetValue, $strClose));
     if ($arFundEst)
     {
     	if ($strEstValue = $arFundEst['close'])

@@ -62,15 +62,13 @@ class MyStockReference extends MysqlReference
 				}
    			}
    			
-       		if ($strSymbol == 'GLD' || $strSymbol == 'USO')		$this->BuildForeignMarketData($strSymbol);
+       		if ($strSymbol == 'GLD' || $strSymbol == 'USO')		$this->_buildForeignMarketData($strSymbol);
         	else if ($strSymbol == 'hf_CL')
         	{
-        		$cal_sql = GetCalibrationSql();
-        		$fFactor = floatval($cal_sql->GetCloseNow(SqlGetStockId('USO')));
-//        		DebugVal($fFactor, __CLASS__.'->'.__FUNCTION__, true);
-
-        		$this->BuildForeignMarketData('USO', 'JP', $fFactor);
-        		$this->BuildForeignMarketData('USO', 'HK', $fFactor);
+        		$strBase = 'USO';
+        		$strBaseId = SqlGetStockId('USO');
+        		$this->_buildForeignMarketData($strBase, 'JP', $strBaseId);
+        		$this->_buildForeignMarketData($strBase, 'HK', $strBaseId);
         	}
    		}
     }
@@ -125,7 +123,7 @@ class MyStockReference extends MysqlReference
         $this->_updateStockEmaDays($strStockId, $strDate, 200);
     }
     
-    function BuildForeignMarketData($strSymbol, $strType = 'EU', $fCalibration = false)
+    function _buildForeignMarketData($strSymbol, $strType = 'EU', $strBaseId = false)
     {
     	$strSymbol = BuildYahooNetValueSymbol($strSymbol, $strType);
     	$strDate = $this->GetDate();
@@ -140,13 +138,25 @@ class MyStockReference extends MysqlReference
     		$his_sql = GetStockHistorySql();
     		if ($record = $his_sql->GetRecord($this->GetStockId(), $strDate))
     		{
+    			$strVolume = $record['volume'];
     			$strClose = $record['close'];
-    			if ($fCalibration)
+    			if ($strBaseId)
     			{
-    				$fClose = floatval($strClose) / $fCalibration;
-    				$strClose = strval(round($fClose, 2));
+    				$cal_sql = GetCalibrationSql();
+    				if (($strFactor = $cal_sql->GetClose($strStockId, $strDate)) === false)
+    				{
+    					$strFactor = $cal_sql->GetCloseNow($strBaseId);
+    					$cal_sql->InsertDaily($strStockId, $strDate, $strFactor);
+    				
+    					$last_sql = new LastCalibrationSql();
+    					$fLast = $last_sql->ReadVal($strBaseId);
+    					$last_sql->WriteVal($strStockId, $fLast);
+    				}
+//    				DebugString(__CLASS__.'->'.__FUNCTION__.' '.$strFactor, true);
+    				$strClose = strval(round(floatval($strClose) / floatval($strFactor), 2));
+    				$strVolume = '100';
     			}
-    			if ($his_sql->WriteHistory($strStockId, $strDate, $strClose, $record['volume']))
+    			if ($his_sql->WriteHistory($strStockId, $strDate, $strClose, $strVolume))
     			{
     				$tick_sql->WriteInt($strStockId, $iCurTick);
     				DebugString(__CLASS__.'->'.__FUNCTION__.': '.$strSymbol.' updated history on '.$strDate.': '.$strClose);

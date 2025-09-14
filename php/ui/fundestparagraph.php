@@ -53,12 +53,11 @@ function _callbackSortFundEst($ref)
 
 function _getFundEstTableColumn($arRef, &$bFair, $bWide = false)
 {
-	$premium_col = new TableColumnPremium();
 	$ar = array(new TableColumnSymbol());
 	if ($bWide)	$ar = array_merge($ar, GetStockReferenceColumn());
 	$ar[] = new TableColumnOfficalEst();
-	$ar[] = new TableColumnDate();
-	$ar[] = $premium_col;
+	$ar[] = new TableColumnDate(STOCK_DISP_EST);
+	$ar[] = new TableColumnPremium(STOCK_DISP_OFFICIAL);
 	
 	$bFair = false;
     foreach ($arRef as $ref)
@@ -67,7 +66,7 @@ function _getFundEstTableColumn($arRef, &$bFair, $bWide = false)
         {
         	$bFair = true;
         	$ar[] = new TableColumnFairEst();
-        	$ar[] = $premium_col;
+        	$ar[] = new TableColumnPremium(STOCK_DISP_FAIR);
         	break;
         }
     }
@@ -77,7 +76,7 @@ function _getFundEstTableColumn($arRef, &$bFair, $bWide = false)
    		if ($ref->GetRealtimeNetValue())
    		{
    			$ar[] = new TableColumnRealtimeEst();
-   			$ar[] = $premium_col;
+   			$ar[] = new TableColumnPremium(STOCK_DISP_REALTIME);
    			break;
     	}
     }

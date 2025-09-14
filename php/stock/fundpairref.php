@@ -163,16 +163,9 @@ class FundPairReference extends MyPairReference
 		if ($this->pair_ref)
 		{
 			$this->realtime_callback = $callback;
-//			$strPair = $this->pair_ref->GetSymbol();
 			if ($this->pair_ref->IsSinaFuture())
 			{
         		if ($this->pair_ref->CheckAdjustFactorTime($this))	$this->AverageCalibraion();
-/*        		if ($strSymbol == 'GLD' || $strSymbol == 'USO')		$this->BuildForeignMarketData($strSymbol);
-        		if ($this->pair_ref->GetSymbol() == 'hf_CL')
-        		{
-        			$this->pair_ref->BuildForeignMarketData($strSymbol, 'JP', $this->GetFactor());
-        			$this->pair_ref->BuildForeignMarketData($strSymbol, 'HK', $this->GetFactor());
-        		}*/
        		}
         	
 			if ($this->IsSinaFuture())
