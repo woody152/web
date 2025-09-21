@@ -8,14 +8,14 @@ function _echoNetValueCloseItem($csv, $his_sql, $shares_sql, $arHistory, $arFund
 	if (($strClosePrev = $his_sql->GetClosePrev($strStockId, $strDate)) === false)		return;
 	
 	$strNetValue = $arFundNetValue['close'];
-   	if ($csv)	$csv->Write($strDate, $ref->GetPercentageString($strClosePrev, $strClose), $ref->GetPercentageString($strNetValue, $strClose), $strNetValue);
+   	if ($csv)	$csv->Write($strDate, $ref->GetPercentageString(floatval($strClosePrev), floatval($strClose)), $ref->GetPercentageString(floatval($strNetValue), floatval($strClose)), $strNetValue);
 
-   	$ar = array($strDate, $ref->GetPriceDisplay($strClose, $strNetValue));
+   	$ar = array($strDate, $ref->GetPriceDisplay(floatval($strClose), floatval($strNetValue)));
    	
-   	$strNetValueDisplay = number_format(floatval($strNetValue), 2);
+   	$strNetValueDisplay = number_format(floatval($strNetValue), 4);
    	$ar[] = $bAdmin ? GetOnClickLink('/php/_submitdelete.php?'.'netvaluehistory'.'='.$arFundNetValue['id'], '确认删除净值记录'.$strNetValueDisplay.'？', $strNetValueDisplay) : $strNetValueDisplay;
-	$ar[] = $ref->GetPercentageDisplay($strNetValue, $strClose);
-   	$ar[] = $ref->GetPercentageDisplay($strClosePrev, $strClose);
+	$ar[] = $ref->GetPercentageDisplay(floatval($strNetValue), floatval($strClose));
+   	$ar[] = $ref->GetPercentageDisplay(floatval($strClosePrev), floatval($strClose));
     if ($strShare = $shares_sql->GetClose($strStockId, $strDate))
     {
     	$ar[] = rtrim0($strShare);

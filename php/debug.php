@@ -10,6 +10,7 @@ define('SECONDS_IN_DAY', 86400);
 // 13.6 in MySQL
 define('MIN_FLOAT_VAL', 0.0000005);
 define('FLOAT_PRECISION', 6);
+define('NETVALUE_PRECISION', 4);
 
 function IsZeroString($strZero)
 {
@@ -224,7 +225,7 @@ function DebugGetSymbolFile($strSection, $strSymbol)
 {
     $strPath = DebugGetPath($strSection);
     $str = strtolower($strSymbol);
-    $str = str_replace(array('+', ',', '^', '.', ':'), '_', $str);
+    $str = str_replace(array('/', '+', ',', '^', '.', ':', '%'), '_', $str);
     return "$strPath/$str.txt";
 }
 

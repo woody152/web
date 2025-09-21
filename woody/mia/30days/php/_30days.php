@@ -37,7 +37,7 @@ function _LayoutTopLeft($bChinese = true, $bAdsense = true)
 function _LayoutBottom($bChinese = true, $bAdsense = true)
 {
 	LayoutBegin();
-	EchoHtmlElement(GetPhotoDirLink(20141211, $bChinese, false).' '.GetMia30DaysLink($bChinese).' '.GetCategoryLinks(Get30DaysMenuArray($bChinese), PATH_MIA_30DAYS, $bChinese));
+	EchoHtmlElement(GetPhotoDirLink(20141211, $bChinese, false).' '.GetMia30DaysLink($bChinese).GetCategoryLinks(Get30DaysMenuArray($bChinese), PATH_MIA_30DAYS, $bChinese));
 	LayoutEnd();
 
 	LayoutMiaPhotoArray($bChinese);

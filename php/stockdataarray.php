@@ -58,7 +58,7 @@ function GetStockDataArray($strSymbols)
 				else
 				{
 					$cny_ref = $fund_ref->GetCnyRef();
-					$arData['netvalue'] = $fund_ref->GetNetValue();
+					$arData['netvalue'] = $fund_ref->GetNetValueString();
 					$strDate = $fund_ref->GetHoldingsDate();
 					$arData['CNYholdings'] = $cny_ref->GetClose($strDate);
 

@@ -38,39 +38,7 @@ class _KraneHoldingsCsvFile extends _HoldingsCsvFile
     	return true;
     }
 }
-/*
-function CopyHoldings($date_sql, $strStockId, $strDstId)
-{
-	$strDate = $date_sql->ReadDate($strStockId);
-	if (SqlGetNetValueByDate($strDstId, $strDate) === false)	return false;
-	$date_sql->WriteDate($strDstId, $strDate);
-	
-    $holdings_sql = GetHoldingsSql();
-   	$ar = $holdings_sql->GetHoldingsArray($strStockId);
-   	$arStrict = GetSecondaryListingArray();    	
-   	foreach ($ar as $strHoldingId => $strRatio)
-   	{
-		$strHoldingSymbol = SqlGetStockSymbol($strHoldingId);
-		if (isset($arStrict[$strHoldingSymbol]))
-		{	// Hong Kong secondary listings
-			$strStrictId = SqlGetStockId($arStrict[$strHoldingSymbol]);
-			if (isset($ar[$strStrictId]))
-			{
-				$ar[$strStrictId] = strval(floatval($strRatio) + floatval($ar[$strStrictId]));
-			}
-			else
-			{
-				$ar[$strStrictId] = $strRatio;
-			}
-			unset($ar[$strHoldingId]);
-		}
-   	}
 
-	$holdings_sql->DeleteAll($strDstId);
-    $holdings_sql->InsertHoldingsArray($strDstId, $ar);
-    return true;
-}
-*/
 function ReadKraneHoldingsCsvFile($strSymbol, $strStockId, $strDate, $strNetValue)
 {
 	$arYMD = explode('-', $strDate);
@@ -87,11 +55,15 @@ function ReadKraneHoldingsCsvFile($strSymbol, $strStockId, $strDate, $strNetValu
 			if ($csv->UpdateHoldingsDate())
 			{
 				$shares_sql = new SharesHistorySql();
-				$shares_sql->WriteDaily($strStockId, $strDate, strval_round($fMarketValue / floatval($strNetValue) / 10000.0));
-				// if ($strSymbol == 'KWEB')		CopyHoldings(new HoldingsDateSql(), $strStockId, SqlGetStockId('SZ164906'));
+				$strShares = number_format($fMarketValue / floatval($strNetValue) / 10000.0, 2, '.', ''); 
+				DebugString(__FUNCTION__.' shares on '.$strDate.': '.$strShares);
+				$shares_sql->WriteDaily($strStockId, $strDate, $strShares);
 			}
 		}
-		else	DebugString(__FUNCTION__.' failed');
+		else
+		{
+			DebugString(__FUNCTION__.' failed');
+		}
 	}
 }
 

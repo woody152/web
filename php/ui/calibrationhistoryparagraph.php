@@ -5,7 +5,7 @@ function _echoCalibrationHistoryItem($fPosition, $net_sql, $strStockId, $record)
 {
 	$fCalibration = floatval($record['close']);
 	$strDate = $record['date'];
-	$ar = array($strDate, strval_round($fCalibration, 4), GetHM($record['time']), $record['num']);
+	$ar = array($strDate, number_format($fCalibration, 4), GetHM($record['time']), $record['num']);
 	if ($fPosition)
 	{
 		$ar[] = $net_sql->GetClose($strStockId, $strDate);

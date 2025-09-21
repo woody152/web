@@ -3,7 +3,8 @@ require('php/_qdii.php');
 
 function GetQdiiRelated($strDigitA)
 {
-	$str = GetSpdrOfficialLink('XLY');
+	$str = GetHtmlNewLine();
+	$str .= GetSpdrOfficialLink('XLY');
 	$str .= GetHuaBaoSoftwareLinks($strDigitA);
 	return $str;
 }

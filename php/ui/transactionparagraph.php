@@ -8,9 +8,10 @@ function _echoTransactionTableItem($ref, $record, $bReadOnly, $bAdmin)
     
     $ar = array($strDate, $ref->GetDisplay(), $strQuantity);
     $strPrice = $record['price'];
-//    $ar[] = $ref->GetPriceDisplay($strPrice);
-    $ar[] = strval_round($strPrice, 4);
-    $ar[] = strval_round(floatval($record['fees']), 2);
+	$iPrecision = $ref->GetPrecision();
+	if ($ref->IsFundA())	$iPrecision = 4;
+    $ar[] = number_format(floatval($strPrice), $iPrecision);
+    $ar[] = number_format(floatval($record['fees']), 2);
 
     $strId = $record['id'];
     $strRemark = $record['remark'];
@@ -25,7 +26,7 @@ function _echoTransactionTableItem($ref, $record, $bReadOnly, $bAdmin)
 				$strStockId = $ref->GetStockId();
 				$strSymbol = $ref->GetSymbol();
 				if (in_arrayQdii($strSymbol) || in_arrayQdiiMix($strSymbol))		$strNetValue = $net_sql->GetClosePrev($strStockId, $strDate);
-				else																	$strNetValue = $net_sql->GetClose($strStockId, $strDate);
+				else																$strNetValue = $net_sql->GetClose($strStockId, $strDate);
 				
 				if ($strNetValue != $strPrice)
 				{

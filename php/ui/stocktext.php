@@ -52,28 +52,28 @@ function TextPairRatio($ref, $strName, $strPairName, $strRatio)
    	return $str;
 }
 
-function _textPremium($ref, $strEst)
+function _textPremium($ref, $fEst)
 {
     if ($ref->HasData())
     {
-        return STOCK_DISP_PREMIUM.':'.$ref->GetPercentageText($strEst);
+        return STOCK_DISP_PREMIUM.':'.$ref->GetPercentageText($fEst);
     }
     return '';
 }
 
-function _textEstPremium($ref, $strEst)
+function _textEstPremium($ref, $fEst)
 {
-    $str = STOCK_DISP_EST.':'.strval_round(floatval($strEst), $ref->GetPrecision());	//	$ref->GetPriceText($strEst);
-    $str .= ' '._textPremium($ref, $strEst);
+    $str = STOCK_DISP_EST.':'.number_format($fEst, $ref->GetPrecision());	
+    $str .= ' '._textPremium($ref, $fEst);
     return $str;
 }
 
 function _textEstNetValue($fund, $ref)
 {
 	$str = '';
-	if ($strNetValue = $fund->GetOfficialNetValue())		$str .= STOCK_DISP_OFFICIAL._textEstPremium($ref, $strNetValue).' '.$fund->GetOfficialDate().BOT_EOL;
-	if ($strNetValue = $fund->GetFairNetValue())			$str .= STOCK_DISP_FAIR._textEstPremium($ref, $strNetValue).BOT_EOL;
-   	if ($strNetValue = $fund->GetRealtimeNetValue())		$str .= STOCK_DISP_REALTIME._textEstPremium($ref, $strNetValue).BOT_EOL;
+	if ($fNetValue = $fund->GetOfficialNetValue())		$str .= STOCK_DISP_OFFICIAL._textEstPremium($ref, $fNetValue).' '.$fund->GetOfficialDate().BOT_EOL;
+	if ($fNetValue = $fund->GetFairNetValue())			$str .= STOCK_DISP_FAIR._textEstPremium($ref, $fNetValue).BOT_EOL;
+   	if ($fNetValue = $fund->GetRealtimeNetValue())		$str .= STOCK_DISP_REALTIME._textEstPremium($ref, $fNetValue).BOT_EOL;
 	return $str;
 }
 
@@ -115,7 +115,7 @@ function TextFromFundReference($ref)
     $str .= STOCK_DISP_NETVALUE.STOCK_DISP_CHANGE.':'.$strPercentage.BOT_EOL;
     if ($stock_ref)
     {
-    	if ($stock_ref->GetDate() == $strDate)	$str .= _textPremium($stock_ref, $strNetValue).BOT_EOL;
+    	if ($stock_ref->GetDate() == $strDate)	$str .= _textPremium($stock_ref, floatval($strNetValue)).BOT_EOL;
     	$str .= _textEstNetValue($ref, $stock_ref);
     }
     return $str;

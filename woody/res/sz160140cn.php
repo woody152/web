@@ -3,7 +3,8 @@ require('php/_qdii.php');
 
 function GetQdiiRelated($strDigitA)
 {
-	$str = GetNanFangSoftwareLinks($strDigitA);
+	$str = GetHtmlNewLine();
+	$str .= GetNanFangSoftwareLinks($strDigitA);
 	return $str;
 }
 

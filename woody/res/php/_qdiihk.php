@@ -33,7 +33,12 @@ function EchoAll()
 
 function GetQdiiHkLinks($sym)
 {
-	$str = GetJisiluQdiiLink(true);	// .' '.GetExternalLink('https://www.hkex.com.hk/market-data/securities-prices/exchange-traded-products', '港股ETF汇总');
+   	global $acct;
+   	
+   	$str = '';
+   	if ($acct->IsAdmin())	$str .= ' '.GetJisiluQdiiLink(true);
+	// .' '.GetExternalLink('https://www.hkex.com.hk/market-data/securities-prices/exchange-traded-products', '港股ETF汇总');
+
 	$str .= GetStockCategoryLinks($sym->GetSymbol());
 	return $str.GetQdiiHkRelated($sym->GetDigitA());
 }

@@ -41,9 +41,17 @@ class QdiiAccount extends QdiiGroupAccount
         	$est_ref = $this->ref->GetEstRef();
         	if ($strDate = NeedOfficialWebData($est_ref))
         	{
-				$strNetValue = GetKraneNetValue($est_ref);
-				if ($strNetValue === false)	$strNetValue = $est_ref->GetNetValue();
-				ReadKraneHoldingsCsvFile($strEstSymbol, $est_ref->GetStockId(), $strDate, $strNetValue);
+        		$strEstId = $est_ref->GetStockId();
+				if ($strNetValue = GetKraneNetValue($est_ref, $strDate))
+				{
+					$net_sql = GetNetValueHistorySql();
+					$net_sql->ModifyDaily($strEstId, $strDate, $strNetValue);
+				}
+				else
+				{
+					$strNetValue = $est_ref->GetNetValueString();
+				}
+				ReadKraneHoldingsCsvFile($strEstSymbol, $strEstId, $strDate, $strNetValue);
         	}
         }
 
@@ -82,7 +90,8 @@ function GetQdiiLinks($sym)
    	if ($realtime_ref = $ref->GetRealtimeRef())		$strRealtimeSymbol = $realtime_ref->GetSymbol();
    	else											$strRealtimeSymbol = false;
 
-	$str = GetJisiluQdiiLink();
+   	$str = '';
+   	if ($acct->IsAdmin())	$str .= ' '.GetJisiluQdiiLink();
 	
 	if (in_arrayOilQdii($strSymbol))
 	{

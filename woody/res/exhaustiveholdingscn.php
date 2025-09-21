@@ -18,12 +18,12 @@ function _echoExhaustiveHoldingsItem($ref, $arNew, $arOrg, $strDate, $strNetValu
 	}
 	$ref->SetHoldingsRatioArray($ar);
 	$ref->SetHoldingsDate($strPrevDate);
-	$ref->SetNetValue($strPrevNetValue);
+	$ref->SetNetValueString($strPrevNetValue);
 	
 	$fEst = $ref->_estNetValue($strDate);
 	$strEst = strval($fEst);
 
-	if (abs($ref->GetPercentage($strNetValue, $strEst)) < $fLimit)
+	if (abs($ref->GetPercentage(floatval($strNetValue), floatval($strEst))) < $fLimit)
 	{
 		if ($strPrevDate != $strOldDate)
 		{
@@ -37,14 +37,17 @@ function _echoExhaustiveHoldingsItem($ref, $arNew, $arOrg, $strDate, $strNetValu
 			$ar[] = '';
 		}
 	
-		$ar[] = strval_round($fEst, 3);
-		$bHit = ($ref->GetPercentageString($strNetValue, $strEst) == '0') ? true : false;
+		$ar[] = number_format($fEst, 3);
+		$bHit = ($ref->GetPercentageString(floatval($strNetValue), floatval($strEst)) == '0') ? true : false;
 		if ($bAdmin && ($bMatch == false) && $bHit)
 		{
 			$strHoldings = $ref->GetHoldingsDisplay();
 			$ar[] = GetOnClickLink(PATH_STOCK.'submitholdings.php?symbol='.$ref->GetSymbol().'&holdings='.$strHoldings, '确认更新持仓：'.$strHoldings.'？', '0');
 		}	
-		else	$ar[] = $ref->GetPercentageDisplay($strNetValue, $strEst);
+		else
+		{
+			$ar[] = $ref->GetPercentageDisplay(floatval($strNetValue), floatval($strEst));
+		}
 		EchoTableColumn($ar, $bMatch ? 'yellow' : false);
 		return $bHit;
 	}
@@ -139,7 +142,7 @@ function _echoExhaustiveHoldingsParagraph($strSymbol, $fLimit, $bAdmin)
     	$iCount = count($arHoldingRef);
     	if ($iCount <= 3)
     	{
-    		$strNetValue = $ref->GetNetValue();
+    		$strNetValue = $ref->GetNetValueString();
 			$str = GetXueqiuLink($ref).' '.$strDate.'最新公布净值'.$strNetValue;
 			$ar = array();
 			foreach ($arHoldingRef as $holding_ref)	$ar[] = new TableColumnStock($holding_ref);

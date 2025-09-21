@@ -4,7 +4,7 @@ require_once('stocktable.php');
 function GetDiffDisplay($fDiff)
 {
 	$strColor = ($fDiff > MIN_FLOAT_VAL) ? 'green' : 'red';
-	$strDisp = strval_round($fDiff, 2);
+	$strDisp = number_format($fDiff, 2);
 	if ($strDisp == '0')		$strColor = 'gray';
 
    	return GetFontElement($strDisp, $strColor);

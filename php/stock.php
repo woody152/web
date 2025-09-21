@@ -42,19 +42,6 @@ function GetInputSymbolArray($strSymbols)
     return $arSymbol;
 }
 
-function BuildYahooNetValueSymbol($strSymbol, $strSurFix = 'IV')
-{
-    if (empty($strSymbol))   return false;
-    return YAHOO_INDEX_CHAR.$strSymbol.'-'.$strSurFix;
-}
-
-function BuildEuropeSymbol($strSymbol)
-{
-	return BuildYahooNetValueSymbol($strSymbol, 'EU');
-}
-
-// ****************************** Stock data functions *******************************************************
-
 function RemoveDoubleQuotationMarks($str)
 {
     $str = strstr($str, '"');
@@ -101,43 +88,40 @@ function GetSinaQuotes($arSymbol)
     return false;
 }
 
-// ****************************** Stock display functions *******************************************************
-
-function StockGetPriceDisplay($strDisp, $strPrev, $iPrecision = false)
+function StockGetPriceDisplay($fDisp, $fPrev, $iPrecision)
 {
-    if ($strDisp)
+    if ($fDisp)
     {
-    	$fDisp = floatval($strDisp);
-    	$fPrev = floatval($strPrev);
-        
-        if ($fDisp > $fPrev + MIN_FLOAT_VAL)         $strColor = 'red';
-        else if ($fDisp < $fPrev - MIN_FLOAT_VAL)   $strColor = 'green';
-        else                                         $strColor = 'black';
-
-        $strDisp = strval_round($fDisp, $iPrecision);
-        return GetFontElement($strDisp, $strColor);
+    	$iDiff = 0.5;
+    	$iCur = $iPrecision;
+    	while ($iCur > 0)
+    	{
+    		$iDiff /= 10.0;
+    		$iCur --;
+    	}
+    	
+        if ($fDisp > $fPrev + $iDiff)         $strColor = 'red';
+        else if ($fDisp < $fPrev - $iDiff)    $strColor = 'green';
+        else                                  $strColor = 'black';
+        return GetFontElement(number_format($fDisp, $iPrecision, '.', ''), $strColor);
     }
     return '';
 }
 
-function GetNumberDisplay($fVal)
+function GetNumberDisplay($fVal, $iPrecision = 2)
 {
-    return StockGetPriceDisplay(strval($fVal), '0');
+    return StockGetPriceDisplay($fVal, 0.0, $iPrecision);
 }
 
-function GetRatioDisplay($fVal)
+function GetRatioDisplay($fVal, $iPrecision = 4)
 {
-    return StockGetPriceDisplay(strval($fVal), '1');
+    return StockGetPriceDisplay($fVal, 1.0, $iPrecision);
 }
 
-function StockGetPercentage($strDivisor, $strDividend)
+function StockGetPercentage($fDivisor, $fDividend)
 {
-	$f = floatval($strDivisor);
-	if ($f == 0.0)
-	{
-		return false;
-	}
-    return (floatval($strDividend)/$f - 1.0) * 100.0;
+	if (abs($fDivisor) > MIN_FLOAT_VAL)		return ($fDividend/$fDivisor - 1.0) * 100.0;
+	return false;
 }
 
 function StockCompareEstResult($strStockId, $strNetValue, $strDate, $strSymbol)
@@ -148,7 +132,7 @@ function StockCompareEstResult($strStockId, $strNetValue, $strDate, $strSymbol)
     	$fund_est_sql = GetFundEstSql();
        	if ($strEstValue = $fund_est_sql->GetClose($strStockId, $strDate))
        	{
-       		$fPercentage = StockGetPercentage($strNetValue, $strEstValue);
+       		$fPercentage = StockGetPercentage(floatval($strNetValue), floatval($strEstValue));
        		if (($fPercentage !== false) && (abs($fPercentage) > 1.0))
        		{
        			$strLink = GetNetValueHistoryLink($strSymbol);
@@ -161,13 +145,13 @@ function StockCompareEstResult($strStockId, $strNetValue, $strDate, $strSymbol)
     return false;
 }
 
-function StockUpdateEstResult($strStockId, $strNetValue, $strDate)
+function StockUpdateEstResult($strStockId, $fNetValue, $strDate)
 {
 	$net_sql = GetNetValueHistorySql();
 	if ($net_sql->GetRecord($strStockId, $strDate) == false)
     {   // Only update when net value is NOT ready
     	$fund_est_sql = GetFundEstSql();
-		$fund_est_sql->WriteDaily($strStockId, $strDate, $strNetValue);
+		$fund_est_sql->WriteDaily($strStockId, $strDate, strval($fNetValue));
 	}
 }
 

@@ -19,20 +19,20 @@ function EchoAll()
 	$strImage = ImgWoodyHomepage();
 	
     echo <<<END
-<p>我的股票软件
-<br />$strStock
+<p>我的股票软件：
+$strStock
 </p>
 
-<p>我的工具软件
-<br />$strAccount
+<p>我的工具软件：
+$strAccount
 </p>
 
-<p>家人和朋友们开的公司
+<p>家人和朋友们开的公司：
 <br />受<a href="res/btbondcn.php">Btbond</a>创始人之托在这里展示它的产品。
 <br />娃妈的<a href="res/cateyescn.php">西雅图夜猫眼</a>店，我未来的Borsheim珠宝店。 
 </p>
 
-<p>友情链接
+<p>友情链接：
 <br /><a href="http://www.kancaibao.com" target=_blank>看财报</a>
 <br /><a href="http://www.haoetf.com" target=_blank>HaoETF</a>
 </p>

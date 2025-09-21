@@ -3,7 +3,8 @@ require('php/_qdii.php');
 
 function GetQdiiRelated($strDigitA)
 {
-	$str = GetSpindicesOfficialLink('DJI');
+	$str = GetHtmlNewLine();
+	$str .= GetSpindicesOfficialLink('DJI');
 	$str .= GetPenghuaSoftwareLinks($strDigitA);
 	return $str;
 }

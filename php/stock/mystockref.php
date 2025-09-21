@@ -21,7 +21,6 @@ function GetForeignMarketCloseTick($strDate, $strType)
 	}
 	
 	$strOldTimezone = date_default_timezone_get();
-//	DebugString(__FUNCTION__.' '.$strOldTimezone, true);
 	date_default_timezone_set($strTimezone);
 	$iTick = strtotime($strDate.' '.$strCloseTime);
 	date_default_timezone_set($strOldTimezone);
@@ -66,9 +65,10 @@ class MyStockReference extends MysqlReference
         	else if ($strSymbol == 'hf_CL')
         	{
         		$strBase = 'USO';
-        		$strBaseId = SqlGetStockId('USO');
-        		$this->_buildForeignMarketData($strBase, 'JP', $strBaseId);
-        		$this->_buildForeignMarketData($strBase, 'HK', $strBaseId);
+    			$cal_sql = GetCalibrationSql();
+				$strFactor = $cal_sql->GetCloseNow(SqlGetStockId($strBase));
+        		$this->_buildForeignMarketData($strBase, 'JP', $strFactor);
+        		$this->_buildForeignMarketData($strBase, 'HK', $strFactor);
         	}
    		}
     }
@@ -123,7 +123,7 @@ class MyStockReference extends MysqlReference
         $this->_updateStockEmaDays($strStockId, $strDate, 200);
     }
     
-    function _buildForeignMarketData($strSymbol, $strType = 'EU', $strBaseId = false)
+    function _buildForeignMarketData($strSymbol, $strType = 'EU', $strFactor = false)
     {
     	$strSymbol = BuildYahooNetValueSymbol($strSymbol, $strType);
     	$strDate = $this->GetDate();
@@ -140,21 +140,10 @@ class MyStockReference extends MysqlReference
     		{
     			$strVolume = $record['volume'];
     			$strClose = $record['close'];
-    			if ($strBaseId)
+    			if ($strFactor)
     			{
-    				$cal_sql = GetCalibrationSql();
-    				if (($strFactor = $cal_sql->GetClose($strStockId, $strDate)) === false)
-    				{
-    					$strFactor = $cal_sql->GetCloseNow($strBaseId);
-    					$cal_sql->InsertDaily($strStockId, $strDate, $strFactor);
-    				
-    					$last_sql = new LastCalibrationSql();
-    					$fLast = $last_sql->ReadVal($strBaseId);
-    					$last_sql->WriteVal($strStockId, $fLast);
-    				}
-//    				DebugString(__CLASS__.'->'.__FUNCTION__.' '.$strFactor, true);
     				$strClose = strval(round(floatval($strClose) / floatval($strFactor), 2));
-    				$strVolume = '100';
+    				$strVolume = '1000';
     			}
     			if ($his_sql->WriteHistory($strStockId, $strDate, $strClose, $strVolume))
     			{
@@ -165,5 +154,5 @@ class MyStockReference extends MysqlReference
     	}
     }
 }
-// 6543.25，6534
+
 ?>

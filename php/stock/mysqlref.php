@@ -60,6 +60,17 @@ class MysqlReference extends StockReference
 		}
 		return floatval($this->GetPrice());
 	}
+	
+	public function GetNetValue($strDate)
+	{
+		if ($this->iNetValueCount > 0)	return floatval(SqlGetNetValueByDate($this->strSqlId, $strDate));
+		return $this->GetVal($strDate);
+	}
+	
+	function GetNetValueDisplay($fNetValue)
+	{
+		return $this->GetPriceDisplay($fNetValue, false, ($this->iNetValueCount > 0 ? NETVALUE_PRECISION : $this->GetPrecision()));
+	}
 
     function _loadSqlId($strSymbol)
     {

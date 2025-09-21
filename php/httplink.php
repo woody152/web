@@ -180,12 +180,12 @@ function GetPageLink($strPath, $strPage, $strQuery, $strDisplay, $bChinese = tru
 
 function GetCategoryLinks($arCategory, $strPath = PATH_STOCK, $bChinese = true)
 {
-    $str = '';
+    $str = GetHtmlNewLine();
     foreach ($arCategory as $strCategory => $strDisplay)
     {
     	$str .= GetPageLink($strPath, $strCategory, false, $strDisplay, $bChinese).' ';
     }
-    return $str;
+    return rtrim($str, ' ');
 }
 
 ?>

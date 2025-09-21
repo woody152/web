@@ -16,7 +16,7 @@ function _echoPairItem($ref, $pos_sql, $bWide)
 		$ar[] = $pair_ref->GetPriceDisplay();
 		
 		$cny_ref = $ref->GetCnyRef();
-		$ar[] = $ref->GetPriceDisplay(strval($ref->EstFromPair(floatval($pair_ref->GetPrice()), $cny_ref->GetVal())));
+		$ar[] = $ref->GetPriceDisplay($ref->EstFromPair(floatval($pair_ref->GetPrice()), $cny_ref->GetVal()));
     
 		if ($fRatio = $ref->GetPriceRatio())
 		{
@@ -30,7 +30,10 @@ function _echoPairItem($ref, $pos_sql, $bWide)
 
 function _echoPairParagraph($ar, $strId, $str, $arRef, $bWide)
 {
-	if (count($arRef) > 2)	$arRef = RefSortByNumeric($arRef, '_callbackSortPair');
+	$iCount = count($arRef);
+	if ($iCount == 0)	return;
+	
+	if ($iCount > 2)	$arRef = RefSortByNumeric($arRef, '_callbackSortPair');
 	$pos_sql = GetPositionSql();
 
 	EchoTableParagraphBegin($ar, $strId, $str);

@@ -30,7 +30,7 @@ function _echoFundListItem($ref, $sql, $last_sql, $callback)
     }
     else
     {
-    	if ($strVal = $last_sql->ReadVal($strStockId, true))	$ar[] = $ref->GetPriceDisplay($strVal);
+    	if ($strVal = $last_sql->ReadVal($strStockId, true))	$ar[] = $ref->GetPriceDisplay(floatval($strVal));
     }
     RefEchoTableColumn($ref, $ar);
 }

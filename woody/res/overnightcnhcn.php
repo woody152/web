@@ -75,7 +75,7 @@ function _echoOverNightCnhItem($strSymbol, $fCnh, $bSell)
    		else
    		{
    			$strDate = $ref->GetHoldingsDate();
-			$fCny = floatval($ref->GetNetValue()) * $fHintQuantity * $fPos;
+			$fCny = floatval($ref->GetNetValueString()) * $fHintQuantity * $fPos;
 			$sql = GetStockSql();
 			$his_sql = GetStockHistorySql();
 			$cny_ref = $ref->GetCnyRef();

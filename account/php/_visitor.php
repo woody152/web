@@ -131,7 +131,7 @@ function EchoAll($bChinese = true)
     _echoVisitorParagraph($strIp, $strId, $visitor_sql, $contents_sql, $acct->GetStart(), $acct->GetNum(), $acct->IsAdmin(), $bChinese);
     
 	$str = GetAccountToolLinks($bChinese);
-	if ($bChinese)	$str .= GetHtmlNewLine().GetStockMenuLinks();
+	if ($bChinese)	$str .= GetStockMenuLinks();
 	EchoHtmlElement($str);
 }
 

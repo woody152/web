@@ -1,7 +1,5 @@
 <?php
 
-define('POSITION_EST_LEVEL', '4.0');
-
 function QdiiGetCalibration($strEst, $strCNY, $strNetValue)
 {
 	return floatval($strEst) * floatval($strCNY) / floatval($strNetValue);
@@ -15,25 +13,6 @@ function QdiiGetVal($fEst, $fCny, $fFactor)
 function QdiiGetPeerVal($fQdii, $fCny, $fFactor)
 {
 	return $fQdii * $fFactor / $fCny;
-}
-
-// (est * cny / estPrev * cnyPrev - 1) * position = (nv / nvPrev - 1) 
-function QdiiGetStockPosition($strEstPrev, $strEst, $strPrev, $strNetValue, $strCnyPrev, $strCny, $strInput = POSITION_EST_LEVEL)
-{
-	$fEst = StockGetPercentage($strEstPrev, $strEst);
-	if (($fEst !== false) && (abs($fEst) > floatval($strInput)))
-	{
-		$f = StockGetPercentage(strval(floatval($strEstPrev) * floatval($strCnyPrev)), strval(floatval($strEst) * floatval($strCny)));
-		if (($f !== false) && ($f != 0.0))
-		{
-			$fVal = StockGetPercentage($strPrev, $strNetValue) / $f;
-			if ($fVal > 0.1)
-			{
-				return number_format($fVal, 2);
-			}
-		}
-	}
-	return false;
 }
 
 // https://markets.ft.com/data/indices/tearsheet/charts?s=SPGOGUP:REU
@@ -219,11 +198,10 @@ class _QdiiReference extends FundReference
     
     function GetEstValue($strQdii)
     {
-       	$cny_ref = $this->GetCnyRef();
+       	$cny_ref = $this->GetForexRef();
        	$strCNY = $cny_ref->GetPrice();
        	$fQdii = $this->ReverseAdjustPosition(floatval($strQdii));
-       	return strval(QdiiGetPeerVal($fQdii, floatval($strCNY), $this->fFactor));
-//        return strval($this->ReverseAdjustPosition(floatval($strQdii)) * $this->fFactor / floatval($strCNY));
+       	return QdiiGetPeerVal($fQdii, floatval($strCNY), $this->fFactor);
     }
     
     function GetEstQuantity($iQdiiQuantity)

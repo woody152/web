@@ -102,7 +102,7 @@ function _callbackCnhSma($ref, $strEst = false)
 	if ($strEst)
 	{
 		$f = round(2000.0 * floatval($strEst) * GetFutureInterestPremium(-0.0190, '2025-01-13'));
-		return strval_round($f / 2000.0, 4);
+		return number_format($f / 2000.0, 4);
 	}
 	return $ref;
 }
@@ -194,16 +194,19 @@ function GetMyStockLinks($ref)
 
 			$netvalue_ref = new NetValueReference($strSymbol);
 			$strName = $netvalue_ref->GetChineseName();
-			if (stripos($strName, '博时') !== false)				$str .= GetBoShiSoftwareLinks($strDigitA);
-			else if (stripos($strName, '易方达') !== false)		$str .= GetEFundSoftwareLinks($strDigitA);
-			else if (stripos($strName, '招商') !== false)		$str .= GetCmfSoftwareLinks($strDigitA);
-			else if (stripos($strName, '广发') !== false)		$str .= GetGuangFaSoftwareLinks($strDigitA);
-			else if (stripos($strName, '华安') !== false)		$str .= GetHuaAnSoftwareLinks($strDigitA);
-			else if (stripos($strName, '华宝') !== false)		$str .= GetHuaBaoSoftwareLinks($strDigitA);
-			else if (stripos($strName, '华泰') !== false)		$str .= GetHuaTaiSoftwareLinks($strDigitA);
-			else if (stripos($strName, '华夏') !== false)		$str .= GetHuaXiaSoftwareLinks($strDigitA);
-			else if (stripos($strName, '南方') !== false)		$str .= GetNanFangSoftwareLinks($strDigitA);
-			else if (stripos($strName, '添富') !== false)		$str .= GetUniversalSoftwareLinks($strDigitA);
+			if (stripos($strName, '博时') !== false)				$strFund = GetBoShiSoftwareLinks($strDigitA);
+			else if (stripos($strName, '易方达') !== false)		$strFund = GetEFundSoftwareLinks($strDigitA);
+			else if (stripos($strName, '招商') !== false)		$strFund = GetCmfSoftwareLinks($strDigitA);
+			else if (stripos($strName, '广发') !== false)		$strFund = GetGuangFaSoftwareLinks($strDigitA);
+			else if (stripos($strName, '华安') !== false)		$strFund = GetHuaAnSoftwareLinks($strDigitA);
+			else if (stripos($strName, '华宝') !== false)		$strFund = GetHuaBaoSoftwareLinks($strDigitA);
+			else if (stripos($strName, '华泰') !== false)		$strFund = GetHuaTaiSoftwareLinks($strDigitA);
+			else if (stripos($strName, '华夏') !== false)		$strFund = GetHuaXiaSoftwareLinks($strDigitA);
+			else if (stripos($strName, '南方') !== false)		$strFund = GetNanFangSoftwareLinks($strDigitA);
+			else if (stripos($strName, '添富') !== false)		$strFund = GetUniversalSoftwareLinks($strDigitA);
+			else												$strFund = false;
+			
+			if ($strFund)	$str .= GetHtmlNewLine().$strFund;
 		}
 	}
 	return $str;

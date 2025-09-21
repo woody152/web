@@ -18,14 +18,14 @@ function _tradingUserDefined($strVal = false)
     	}
     	else
     	{
-    		$strEst = $fund->GetEstValue($strVal);
+    		$fEst = $fund->GetEstValue($strVal);
     		$strLev = '';
     		foreach ($arLev as $leverage_ref)
     		{
-   				$fLev = $leverage_ref->EstFromPair(floatval($strEst));
-   				$strLev .= '|'.$leverage_ref->GetPriceDisplay(strval($fLev));
+   				$fLev = $leverage_ref->EstFromPair($fEst);
+   				$strLev .= '|'.$leverage_ref->GetPriceDisplay($fLev);
     		}
-    		return $est_ref->GetPriceDisplay($strEst).$strLev;
+    		return $est_ref->GetPriceDisplay($fEst).$strLev;
     	}
     }
 

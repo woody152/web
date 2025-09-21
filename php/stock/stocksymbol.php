@@ -411,7 +411,11 @@ function BuildHongkongStockSymbol($strDigit)
 	return $strDigit;
 }
 
-// ****************************** StockSymbol Class *******************************************************
+function BuildYahooNetValueSymbol($strSymbol, $strSurFix = 'IV')
+{
+    if (empty($strSymbol))   return false;
+    return YAHOO_INDEX_CHAR.$strSymbol.'-'.$strSurFix;
+}
 
 class StockSymbol
 {
@@ -451,6 +455,15 @@ class StockSymbol
             return true;
         }
         return false;
+    }
+    
+    function IsYahooNetValue()
+    {
+    	if ($this->IsIndex())
+    	{
+    		if (($iPos = strpos($this->strOthers, '-')) !== false)	return substr($this->strOthers, 0, $iPos);
+    	}
+    	return false;
     }
     
     function IsSymbolUS()
@@ -878,7 +891,7 @@ class StockSymbol
     
     function GetPrecision()
     {
-    	if ($this->IsSinaFund() || $this->IsFundA() || $this->IsStockB())   	return 3;
+    	if ($this->IsFundA() || $this->IsSinaFund() || $this->IsStockB())   	return 3;
     	else if ($this->IsForex())   											return 4;
     	return 2;
     }

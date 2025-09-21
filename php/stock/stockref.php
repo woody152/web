@@ -110,29 +110,29 @@ class StockReference extends StockSymbol
     	$this->strExternalLink = $strLink;
     }
     
-    function GetPercentage($strDivisor = false, $strDividend = false)
+    function GetPercentage($fDivisor = false, $fDividend = false)
     {
-    	if ($strDivisor == false)	$strDivisor = $this->strPrevPrice;
-    	if ($strDividend == false)	$strDividend = $this->strPrice;
+    	if ($fDivisor == false)		$fDivisor = floatval($this->strPrevPrice);
+    	if ($fDividend == false)	$fDividend = floatval($this->strPrice);
     	
-   		return StockGetPercentage($strDivisor, $strDividend);
+   		return StockGetPercentage($fDivisor, $fDividend);
     }
 
-    function GetPercentageString($strDivisor = false, $strDividend = false)
+    function GetPercentageString($fDivisor = false, $fDividend = false)
     {
-   		$fPercentage = $this->GetPercentage($strDivisor, $strDividend);
+   		$fPercentage = $this->GetPercentage($fDivisor, $fDividend);
    		if ($fPercentage === false)		return '';
    		
-    	if ($strDivisor == false)	$strDivisor = $this->strPrevPrice;
-		if (abs($fPercentage * floatval($strDivisor)) < (50.0 / pow(10, $this->GetPrecision())))	return '0';
+    	if ($fDivisor == false)		$fDivisor = floatval($this->strPrevPrice);
+		if (abs($fPercentage * $fDivisor) < (50.0 / pow(10, $this->GetPrecision())))	return '0';
 
    		return strval($fPercentage);
     }
 
     // for display
-    function GetPercentageText($strDivisor = false, $strDividend = false)
+    function GetPercentageText($fDivisor = false, $fDividend = false)
     {
-   		$str = $this->GetPercentageString($strDivisor, $strDividend);
+   		$str = $this->GetPercentageString($fDivisor, $fDividend);
    		if ($str != '' && $str != '0')
    		{
    			$str = number_format(floatval($str), 2).'%';
@@ -140,26 +140,26 @@ class StockReference extends StockSymbol
    		return $str;
    	}
    	
-    function GetPercentageDisplay($strDivisor = false, $strDividend = false)
+    function GetPercentageDisplay($fDivisor = false, $fDividend = false)
     {
-   		$strDisp = $this->GetPercentageText($strDivisor, $strDividend);
+   		$strDisp = $this->GetPercentageText($fDivisor, $fDividend);
    		if (str_ends_with($strDisp, '%'))		$strColor = str_starts_with($strDisp, '-') ? 'red' : 'black';
    		else							   		$strColor = 'gray';
     	return GetFontElement($strDisp, $strColor);
     }
     
-    function GetPriceDisplay($strDisp = false, $strPrev = false)
+    function GetPriceDisplay($fDisp = false, $fPrev = false, $iPrecision = false)
     {
-    	if ($strDisp == false)
+    	if ($fDisp == false)
     	{
-    		$strDisp = $this->strPrice;
-    		$strPrev = $this->strPrevPrice;
+    		$fDisp = floatval($this->strPrice);
+    		$fPrev = floatval($this->strPrevPrice);
     	}
-    	else if ($strPrev == false)
+    	else if ($fPrev == false)
     	{
-    		$strPrev = $this->strPrice;
+    		$fPrev = floatval($this->strPrice);
     	}
-        return StockGetPriceDisplay($strDisp, $strPrev, $this->GetPrecision());
+        return StockGetPriceDisplay($fDisp, $fPrev, ($iPrecision ? $iPrecision : $this->GetPrecision()));
     }
 
     function DebugLink()

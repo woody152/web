@@ -625,7 +625,7 @@ function EchoAll($bChinese = true)
     _echoInputRelated($strPage, $bChinese);
 
 	$str = GetAccountToolLinks($bChinese);
-	if ($bChinese)	$str .= ' '.GetDevLink('entertainment/20100905cn.php#'.$strPage).'<br />'.GetStockMenuLinks();
+	if ($bChinese)	$str .= ' '.GetDevLink('entertainment/20100905cn.php#'.$strPage).GetStockMenuLinks();
     EchoHtmlElement($str);
 }
 

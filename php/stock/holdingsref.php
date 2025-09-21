@@ -39,10 +39,11 @@ class HoldingsReference extends MyStockReference
     var $arHoldingsRatio = array();
     
     var $strEstDate;
+    var $fOfficialEstAdjust = 0.0;
     
-    var $strOfficialNetValue = false;
-    var $strFairNetValue = false;
-    var $strRealtimeNetValue = false;
+    var $fOfficialNetValue = false;
+    var $fFairNetValue = false;
+    var $fRealtimeNetValue = false;
     
     var $fRatioCN = false;
     var $fRatioHK = false;
@@ -114,12 +115,12 @@ class HoldingsReference extends MyStockReference
     	}
     }
 
-    function GetNetValue()
+    function GetNetValueString()
     {
     	return $this->strNetValue;
     }
     
-    function SetNetValue($strVal)
+    function SetNetValueString($strVal)
     {
     	$this->strNetValue = $strVal;
     }
@@ -368,13 +369,19 @@ class HoldingsReference extends MyStockReference
     
     public function GetOfficialNetValue()
     {
-    	if ($this->strOfficialNetValue === false)
+    	if ($this->fOfficialNetValue === false)
     	{
+    		$strStockId = $this->GetStockId();
     		$strDate = $this->GetOfficialDate();
-    		$this->strOfficialNetValue = strval($this->_estNetValue($strDate));
-    		StockUpdateEstResult($this->GetStockId(), $this->strOfficialNetValue, $strDate);
+    		$this->fOfficialNetValue = $this->_estNetValue($strDate);
+    		if ($strNetValue = SqlGetNetValueByDate($strStockId, $strDate))
+    		{
+    			$this->fOfficialEstAdjust = floatval($strNetValue) - $this->fOfficialNetValue;
+//    			DebugVal($this->fOfficialEstAdjust, __FUNCTION__, true);
+    		}
+    		StockUpdateEstResult($strStockId, $this->fOfficialNetValue, $strDate);
     	}
-   		return $this->strOfficialNetValue;
+   		return $this->fOfficialNetValue;
     }
     
     function _needFairNetValue()
@@ -396,20 +403,28 @@ class HoldingsReference extends MyStockReference
 
     public function GetFairNetValue()
     {
-    	if ($this->strFairNetValue === false)
+    	if ($this->fFairNetValue === false)
     	{
-    		if ($this->_needFairNetValue())		$this->strFairNetValue = strval($this->_estNetValue());
+    		if ($this->_needFairNetValue())
+    		{
+    			$this->GetOfficialNetValue();
+    			$this->fFairNetValue = $this->_estNetValue() + $this->fOfficialEstAdjust;
+    		}
     	}
-		return $this->strFairNetValue;
+		return $this->fFairNetValue;
     }
 
     public function GetRealtimeNetValue()
     {
-    	if ($this->strRealtimeNetValue === false)
+    	if ($this->fRealtimeNetValue === false)
     	{
-    		if ($this->UseRealtimeEst())	$this->strRealtimeNetValue = strval($this->_estNetValue(false, true));
+    		if ($this->UseRealtimeEst())
+    		{
+    			$this->GetOfficialNetValue();
+    			$this->fRealtimeNetValue = $this->_estNetValue(false, true) + $this->fOfficialEstAdjust;
+    		}
     	}
-   		return $this->strRealtimeNetValue;
+   		return $this->fRealtimeNetValue;
     }
 }
 

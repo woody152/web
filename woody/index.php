@@ -17,11 +17,11 @@ function EchoAll($bChinese)
 	$strImage = ImgWoodyHomepage($bChinese);
 	
     echo <<<END
-<p>My Tool Software
-<br />$strAccount
+<p>My Tool Software:
+$strAccount
 </p>
 
-<p>Companies Founded by Family and Friends
+<p>Companies Founded by Family and Friends:
 <br />Products of <a href="res/btbond.php">Btbond</a> are displayed here with the request of its founder.
 <br /><a href="res/cateyes.php">Cat Eyes in Seattle</a> store runs by my wife, my future Borsheim jewelry store.
 </p>

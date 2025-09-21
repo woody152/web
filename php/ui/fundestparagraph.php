@@ -15,15 +15,15 @@ function _echoFundEstTableItem($ref, $bFair, $bWide = false)
     	$ar = array_merge($ar, GetStockReferenceArray($stock_ref, $bWide));
     }
     
-    $strOfficialPrice = $ref->GetOfficialNetValue();
-    $ar[] = $ref->GetPriceDisplay($strOfficialPrice);
+    $fOfficialPrice = $ref->GetOfficialNetValue();
+    $ar[] = $ref->GetPriceDisplay($fOfficialPrice);
     $ar[] = $ref->GetOfficialDate();
-	$ar[] = $ref->GetPercentageDisplay($strOfficialPrice);
+	$ar[] = $ref->GetPercentageDisplay($fOfficialPrice);
     
-    if ($strFairPrice = $ref->GetFairNetValue())
+    if ($fFairPrice = $ref->GetFairNetValue())
     {
-    	$ar[] = $ref->GetPriceDisplay($strFairPrice);
-    	$ar[] = $ref->GetPercentageDisplay($strFairPrice);
+    	$ar[] = $ref->GetPriceDisplay($fFairPrice);
+    	$ar[] = $ref->GetPercentageDisplay($fFairPrice);
     }
     else if ($bFair)
     {
@@ -31,10 +31,10 @@ function _echoFundEstTableItem($ref, $bFair, $bWide = false)
     	$ar[] = '';
     }
     
-   	if ($strRealtimePrice = $ref->GetRealtimeNetValue())
+   	if ($fRealtimePrice = $ref->GetRealtimeNetValue())
    	{
-   		$ar[] = $ref->GetPriceDisplay($strRealtimePrice);
-   		$ar[] = $ref->GetPercentageDisplay($strRealtimePrice);
+   		$ar[] = $ref->GetPriceDisplay($fRealtimePrice);
+   		$ar[] = $ref->GetPercentageDisplay($fRealtimePrice);
     }
     
 	RefEchoTableColumn($ref, $ar, $bWide);
@@ -42,13 +42,13 @@ function _echoFundEstTableItem($ref, $bFair, $bWide = false)
 
 function _callbackSortFundEst($ref)
 {
-	$strNetValue = $ref->GetOfficialNetValue();
+	$fNetValue = $ref->GetOfficialNetValue();
 	if (method_exists($ref, 'GetStockRef'))
 	{
     	$stock_ref = $ref->GetStockRef();
-    	return $stock_ref->GetPercentage($strNetValue);
+    	return $stock_ref->GetPercentage($fNetValue);
 	}
-	return $ref->GetPercentage($strNetValue);
+	return $ref->GetPercentage($fNetValue);
 }
 
 function _getFundEstTableColumn($arRef, &$bFair, $bWide = false)

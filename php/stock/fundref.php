@@ -59,7 +59,7 @@ class FundReference extends MysqlReference
     {
     	if ($this->fOfficialNetValue)
     	{
-    		return strval($this->fOfficialNetValue);
+    		return $this->fOfficialNetValue;
     	}
     	return false;
     }
@@ -68,7 +68,7 @@ class FundReference extends MysqlReference
     {
     	if ($this->fFairNetValue)
     	{
-    		return strval($this->fFairNetValue);
+    		return $this->fFairNetValue;
     	}
     	return false;
     }
@@ -77,7 +77,7 @@ class FundReference extends MysqlReference
     {
     	if ($this->fRealtimeNetValue)
     	{
-    		return strval($this->fRealtimeNetValue);
+    		return $this->fRealtimeNetValue;
     	}
     	return false;
     }
@@ -122,22 +122,22 @@ class FundReference extends MysqlReference
         return parent::GetStockId();
     }
 
-    public function GetPriceDisplay($strDisp = false, $strPrev = false)
+    public function GetPriceDisplay($fDisp = false, $fPrev = false, $iPrecision = false)
     {
    		if ($this->stock_ref)
    		{
-   			return $this->stock_ref->GetPriceDisplay($strDisp, $strPrev);
+   			return $this->stock_ref->GetPriceDisplay($fDisp, $fPrev, $iPrecision);
    		}
-   		return parent::GetPriceDisplay($strDisp, $strPrev);
+   		return parent::GetPriceDisplay($fDisp, $fPrev, $iPrecision);
     }
     
-    public function GetPercentageDisplay($strDivisor = false, $strDividend = false)
+    public function GetPercentageDisplay($fDivisor = false, $fDividend = false)
     {
    		if ($this->stock_ref)
    		{
-   			return $this->stock_ref->GetPercentageDisplay($strDivisor, $strDividend);
+   			return $this->stock_ref->GetPercentageDisplay($fDivisor, $fDividend);
    		}
-   		return parent::GetPercentageDisplay($strDivisor, $strDividend);
+   		return parent::GetPercentageDisplay($fDivisor, $fDividend);
     }
     
     function GetStockRef()

@@ -9,9 +9,9 @@ function _echoStockHistoryItem($record, $ref, $csv, $bAdmin)
    	$ar[] = $bAdmin ? GetOnClickLink('/php/_submitdelete.php?'.'stockhistory'.'='.$record['id'], '确认删除'.$strDate.STOCK_HISTORY_DISPLAY.'？', $strDate) : $strDate;
    	
 	$strPrev = $ref->GetPrevPrice();
- 	$ar[] = $ref->GetPriceDisplay($record['close'], $strPrev);
+ 	$ar[] = $ref->GetPriceDisplay(floatval($record['close']), floatval($strPrev));
     $ar[] = $record['volume'];
-	$ar[] = $ref->GetPriceDisplay($record['adjclose'], $strPrev);
+	$ar[] = $ref->GetPriceDisplay(floatval($record['adjclose']), floatval($strPrev));
 	
  	EchoTableColumn($ar);
 }

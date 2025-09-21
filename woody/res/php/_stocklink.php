@@ -112,7 +112,6 @@ function _getCategorySoftwareLinks($arTitle, $strCategory)
 
 function GetStockCategoryLinks($strSymbol)
 {
-	$strNewLine = GetHtmlNewLine();
 	$str = '';
    	$ar = GetStockCategoryArray();
    	foreach ($ar as $strItem => $strDisplay)
@@ -124,7 +123,7 @@ function GetStockCategoryLinks($strSymbol)
 			break;
 		}
 	}
-	$str .= $strNewLine.GetCategoryLinks($ar).$strNewLine;
+	$str .= GetCategoryLinks($ar);
 	return $str;
 }
 

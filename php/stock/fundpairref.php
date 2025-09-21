@@ -53,7 +53,7 @@ class MyPairReference extends MyStockReference
     
     function LoadCalibration()
     {
-		$strStockId = $this->GetStockId();
+    	$strStockId = ($str = $this->IsYahooNetValue()) ? SqlGetStockId($str) : $this->GetStockId();
 		$cal_sql = GetCalibrationSql();
 		if ($record = $cal_sql->GetRecordNow($strStockId))
     	{
@@ -253,9 +253,9 @@ class FundPairReference extends MyPairReference
 			$strEst = $this->pair_ref->GetPrice();
 		}
 		
-   		$strVal = strval($this->EstFromPair(floatval($strEst), $fCny));
-   		StockUpdateEstResult($this->GetStockId(), $strVal, $strOfficialDate);
-        return $strVal;
+   		$fVal = $this->EstFromPair(floatval($strEst), $fCny);
+   		StockUpdateEstResult($this->GetStockId(), $fVal, $strOfficialDate);
+        return $fVal;
     }
 
     public function GetFairNetValue()
@@ -263,9 +263,9 @@ class FundPairReference extends MyPairReference
         $strOfficialDate = $this->GetOfficialDate();
         if ($this->cny_ref)
         {
-        	if ($strOfficialDate != $this->cny_ref->GetDate())		return strval($this->EstFromPair($this->pair_ref->GetVal(), $this->cny_ref->GetVal()));
+        	if ($strOfficialDate != $this->cny_ref->GetDate())		return $this->EstFromPair($this->pair_ref->GetVal(), $this->cny_ref->GetVal());
         }
-       	if ($strOfficialDate != $this->pair_ref->GetDate())			return strval($this->EstFromPair($this->pair_ref->GetVal()));
+       	if ($strOfficialDate != $this->pair_ref->GetDate())			return $this->EstFromPair($this->pair_ref->GetVal());
     	return false;
     }
 
@@ -274,7 +274,7 @@ class FundPairReference extends MyPairReference
 		if ($this->realtime_callback)
 		{
 			$fCny = $this->cny_ref ? $this->cny_ref->GetVal() : false;
-			return strval($this->EstFromPair(call_user_func($this->realtime_callback), $fCny));
+			return $this->EstFromPair(call_user_func($this->realtime_callback), $fCny);
 		}
    		return false;
     }

@@ -29,7 +29,7 @@ function _echoHoldingItem($ref, $arRatio, $fNetValueChange, $arHistory, $fAdjust
 	
 	if ($ref == false)
 	{
-		$ar = array(DISP_ALL_CN, strval_round($fTotalOld, 2), '', strval_round(($fNetValueChange - 1.0) * 100, 2).'%', strval_round($fTotalNew, 2), strval_round($fTotalChange * $fAdjust, 2));
+		$ar = array(DISP_ALL_CN, number_format($fTotalOld, 2), '', number_format(($fNetValueChange - 1.0) * 100, 2).'%', number_format($fTotalNew, 2), number_format($fTotalChange * $fAdjust, 2));
 	    EchoTableColumn($ar);
 	    return;
 	}
@@ -40,7 +40,6 @@ function _echoHoldingItem($ref, $arRatio, $fNetValueChange, $arHistory, $fAdjust
 	
 	$strPrice = $ref->GetPrice();
 	$fRatio = floatval($arRatio[$strStockId]);
-//	$fChange = $ref->GetPercentage($strClose, $strPrice) / 100.0;
 	$fChange = ($fClose > MIN_FLOAT_VAL) ? floatval($strPrice) / $fClose : 0.0;
 	$fChange /= $fAdjust;
 	
@@ -48,20 +47,20 @@ function _echoHoldingItem($ref, $arRatio, $fNetValueChange, $arHistory, $fAdjust
 	$ar[] = RefGetMyStockLink($ref);
 	
 	$fTotalOld += $fRatio;
-    $ar[] = strval_round($fRatio, 2);
+    $ar[] = number_format($fRatio, 2);
     
     $ar[] = mysql_round($strClose, 2);
-    $ar[] = $ref->GetPercentageDisplay($strClose, $strPrice);
+    $ar[] = $ref->GetPercentageDisplay(floatval($strClose), floatval($strPrice));
     
     $fNewRatio = $fRatio * $fChange / $fNetValueChange;
 	$fTotalNew += $fNewRatio;
-    $ar[] = strval_round($fNewRatio, 2);
+    $ar[] = number_format($fNewRatio, 2);
     
     $fRatioChange = $fRatio * ($fChange - 1.0);
 	$fTotalChange += $fRatioChange;
-    $ar[] = strval_round($fRatioChange, 4);
+    $ar[] = number_format($fRatioChange, 4);
     
-    $ar[] = strval_round($fAdjust, 4);
+    $ar[] = number_format($fAdjust, 4);
     
     RefEchoTableColumn($ref, $ar);
 }

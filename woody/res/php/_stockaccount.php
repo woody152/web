@@ -112,18 +112,13 @@ class StockAccount extends TitleAccount
     
     function EchoLinks($strVer = false, $callback = false)
     {
-    	$strNewLine = GetHtmlNewLine();
-    	$strWechatPay = GetHtmlElement(GetWechatPay());
-    	$bAdmin = $this->IsAdmin();
-    	
-    	$strPage = $this->GetPage();
-    	$str = GetStockMenuLinks();
-    	$str .= $strNewLine.GetAllLofLink().' '.GetOvernightLink().' '.GetOvernightCnhLink().' '.GetAhCompareLink().' '.GetAutoTractorLink().' '.GetAccountToolLink('simpletest').' '.GetDevLink('entertainment/20150818cn.php#'.($strVer ? $strVer : $strPage));
-    	$str .= $strNewLine;
+   		$strNewLine = GetHtmlNewLine();
+    	$str = GetAllLofLink().' '.GetOvernightLink().' '.GetOvernightCnhLink().' '.GetAhCompareLink().' '.GetAutoTractorLink().' '.GetAccountToolLink('simpletest').' '.GetDevLink('entertainment/20150818cn.php#'.($strVer ? $strVer : $this->GetPage()));
+    	$str .= GetStockMenuLinks();
 		if ($strLoginId = $this->GetLoginId())
     	{
-    		$str .= GetMyPortfolioLink().$this->_getPersonalLinks($strLoginId);
-    		if ($bAdmin)
+    		$str .= $strNewLine.GetMyPortfolioLink().$this->_getPersonalLinks($strLoginId);
+    		if ($this->IsAdmin())
     		{
     			$strWechatPay = GetEmptyElement();
 				$strMemberId = $this->GetMemberId();
@@ -139,18 +134,19 @@ class StockAccount extends TitleAccount
     	{
     		if ($ref = $this->GetRef())
     		{
-    			$str .= ' '.$this->_getStockExchangeLinks(GetStockRef($ref));
+    			$str .= $strNewLine.$this->_getStockExchangeLinks(GetStockRef($ref));
     			$str .= ' '.call_user_func($callback, $ref);
     		}
     	}
     	else
     	{
     		if ($strSymbol = UrlGetQueryValue('symbol'))	$str .= GetStockCategoryLinks($this->StockCheckSymbol($strSymbol));
-			else								    		$str .= $strNewLine.GetCategoryLinks(GetStockCategoryArray());
+			else								    		$str .= GetCategoryLinks(GetStockCategoryArray());
     	}
 	
 		$strHead = GetHeadElement('相关链接');
 		$str = GetHtmlElement($str);
+    	$strWechatPay = GetHtmlElement(GetWechatPay());
 		echo <<<END
 			
 	$strHead
@@ -182,7 +178,7 @@ END;
 					if ($strGroupItemId = SqlGetStockGroupItemId($strGroupId, $strStockId))
 					{
 						$strAmount = $amount_sql->ReadAmount($strGroupItemId);
-						$strQuery = sprintf('groupid=%s&fundid=%s&amount=%s&netvalue=%.3f', $strGroupId, $strStockId, $strAmount, floatval($ref->GetOfficialNetValue()));
+						$strQuery = sprintf('groupid=%s&fundid=%s&amount=%s&netvalue=%.3f', $strGroupId, $strStockId, $strAmount, $ref->GetOfficialNetValue());
 						$str = GetOnClickLink(PATH_STOCK.'submittransaction.php?'.$strQuery, '确认添加对冲申购记录?', STOCK_DISP_ORDER).$strSymbol.'人民币'.$strAmount.'元';
 						$str .= ' '.GetStockOptionLink(STOCK_OPTION_AMOUNT, $strSymbol);
 						EchoHtmlElement($str);

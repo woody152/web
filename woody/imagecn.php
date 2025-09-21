@@ -14,7 +14,7 @@ function GetMetaDescription()
 function EchoAll()
 {
 	$strMyPhoto = GetMyPhotoLinks();
-	$strMiaPhoto = GetMia30DaysLink().' '.GetMiaPhotoLinks();
+	$strMiaPhoto = GetMia30DaysLink().GetMiaPhotoLinks();
 	$strBlogPhoto = GetBlogPhotoLinks();
 	$strImage = ImgWoodyBike();
 	

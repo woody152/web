@@ -114,12 +114,12 @@ function _echoFundAccountItem($csv, $strDate, $strSharesDiff, $ref, $strSymbol, 
     	{
     		$strNetValue = $net_sql->GetClose($strStockId, $strNetValueDate);
     	
-    		$ar[] = $ref->GetPriceDisplay($strClose, $strNetValue);
+    		$ar[] = $ref->GetPriceDisplay(floatval($strClose), floatval($strNetValue));
     		$ar[] = $strNetValue;
-    		$ar[] = $ref->GetPercentageDisplay($strNetValue, $strClose);
-    		if ($fAccount > MIN_FLOAT_VAL && $ref->GetPercentage($strNetValue, $strClose) > MIN_FLOAT_VAL)
+    		$ar[] = $ref->GetPercentageDisplay(floatval($strNetValue), floatval($strClose));
+    		if ($fAccount > MIN_FLOAT_VAL && $ref->GetPercentage(floatval($strNetValue), floatval($strClose)) > MIN_FLOAT_VAL)
     		{	// 平价和折价数据不参与线性回归
-    			$csv->Write($strDate, $strSharesDiff, $strAccount, $strClose, $strNetValue, $ref->GetPercentageString($strNetValue, $strClose));
+    			$csv->Write($strDate, $strSharesDiff, $strAccount, $strClose, $strNetValue, $ref->GetPercentageString(floatval($strNetValue), floatval($strClose)));
     		}
     	}
     	else
@@ -207,15 +207,15 @@ function _echoFundAccountPredictData($ref, $strSymbol, $strStockId, $his_sql, $n
    		{
    			$fPurchaseValue = floatval($net_sql->GetClose($strStockId, $strPurchaseDate));
    			$strNetValue = $net_sql->GetClose($strStockId, $strNetValueDate);
-   			$fAccount = $jpg->GetY($ref->GetPercentage($strNetValue, $strClose));
+   			$fAccount = $jpg->GetY($ref->GetPercentage(floatval($strNetValue), floatval($strClose)));
    			$fAmount = _getFundAmount($strSymbol, $strPurchaseDate);
    			$fSharesDiff = ($fPurchaseValue == 0.0) ? 0.0 : $fAccount * ($fAmount / $fPurchaseValue) / 10000.0;
    			$ar[] = intval($fSharesDiff);
    			$ar[] = intval($fAccount);
     		$ar[] = $strPurchaseDate;
-    		$ar[] = $ref->GetPriceDisplay($strClose, $strNetValue);
+    		$ar[] = $ref->GetPriceDisplay(floatval($strClose), floatval($strNetValue));
     		$ar[] = $strNetValue;
-    		$ar[] = $ref->GetPercentageDisplay($strNetValue, $strClose);
+    		$ar[] = $ref->GetPercentageDisplay(floatval($strNetValue), floatval($strClose));
     	}
     	else
     	{

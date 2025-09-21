@@ -14,7 +14,7 @@ function _echoEtfDividendData($sql, $his_sql, $ref)
        		{
        			$strDividend = rtrim0($arDividend['close']);
        			$ar = array($strDate, $strDividend, $strClose);
-       			$ar[] = strval_round(floatval($strDividend) / floatval($strClose) * 100.0, 2);
+       			$ar[] = number_format(floatval($strDividend) / floatval($strClose) * 100.0, 2);
        			EchoTableColumn($ar);
        		}
         }

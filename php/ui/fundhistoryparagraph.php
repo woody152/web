@@ -1,30 +1,26 @@
 <?php
 require_once('stocktable.php');
 
-function _echoFundHistoryTableItem($csv, $strNetValue, $arHistory, $arFundEst, $ref, $est_ref, $his_sql, $bAdmin)
+function _echoFundHistoryTableItem($csv, $strNetValue, $arHistory, $arFundEst, $ref, $est_ref, $bAdmin)
 {
-	$strClose = $arHistory['close'];
+	$fNetValue = floatval($strNetValue);
+	$fClose = floatval($arHistory['close']);
 	$strDate = $arHistory['date'];
-    if ($csv)		$csv->Write($strDate, $strNetValue, $ref->GetPercentageString($strNetValue, $strClose));
+    if ($csv)		$csv->Write($strDate, $strNetValue, $ref->GetPercentageString($fNetValue, $fClose));
 
-   	$ar = array($strDate, $ref->GetPriceDisplay($strClose, $strNetValue), number_format(floatval($strNetValue), 4), $ref->GetPercentageDisplay($strNetValue, $strClose));
+   	$ar = array($strDate);
+   	$ar[] = $ref->GetPriceDisplay($fClose, $fNetValue);
+   	$ar[] = $ref->GetNetValueDisplay($fNetValue);
+   	$ar[] = $ref->GetPercentageDisplay($fNetValue, $fClose);
     if ($arFundEst)
     {
     	if ($strEstValue = $arFundEst['close'])
     	{
-    		$ar[] = $ref->GetPriceDisplay($strEstValue, $strNetValue);
+    		$ar[] = $ref->GetPriceDisplay(floatval($strEstValue), floatval($strNetValue));
     		$strTime = GetHM($arFundEst['time']); 
     		$ar[] = $bAdmin ? GetOnClickLink('/php/_submitdelete.php?'.'fundest'.'='.$arFundEst['id'], '确认删除估值记录'.$strEstValue.'？', $strTime) : $strTime;
-    		$ar[] = $ref->GetPercentageDisplay($strNetValue, $strEstValue);
-		
-    		if ($est_ref)
-    		{
-    			$strEstDate = $arFundEst['date'];
-    			$strEstStockId = $est_ref->GetStockId();
-    			$strEstClose = $his_sql->GetClose($strEstStockId, $strEstDate);
-    			$strEstClosePrev = $his_sql->GetClosePrev($strEstStockId, $strEstDate);
-    			if ($strEstClose && $strEstClosePrev)		$ar[] = $est_ref->GetPriceDisplay($strEstClose, $strEstClosePrev);
-    		}
+    		$ar[] = $ref->GetPercentageDisplay(floatval($strNetValue), floatval($strEstValue));
+    		if ($est_ref)	$ar[] = $est_ref->GetNetValueDisplay($est_ref->GetNetValue($arFundEst['date']));
     	}
     }
     
@@ -35,9 +31,6 @@ function _echoHistoryTableData($his_sql, $fund_est_sql, $csv, $ref, $strStockId,
 {
 	$bSameDay = UseSameDayNetValue($ref);
 	$net_sql = GetNetValueHistorySql();
-	if ($est_ref)		$est_sql = ($est_ref->CountNetValue() > 0) ? $net_sql : $his_sql;
-	else				$est_sql = false;
-	
     if ($result = $his_sql->GetAll($strStockId, $iStart, $iNum)) 
     {
         while ($arHistory = mysqli_fetch_assoc($result)) 
@@ -46,7 +39,7 @@ function _echoHistoryTableData($his_sql, $fund_est_sql, $csv, $ref, $strStockId,
         	if ($strNetValue = $net_sql->GetClose($strStockId, $strDate))
         	{
    				$arFundEst = $fund_est_sql ? $fund_est_sql->GetRecord($strStockId, $strDate) : false;
-        		_echoFundHistoryTableItem($csv, $strNetValue, $arHistory, $arFundEst, $ref, $est_ref, $est_sql, $bAdmin);
+        		_echoFundHistoryTableItem($csv, $strNetValue, $arHistory, $arFundEst, $ref, $est_ref, $bAdmin);
         	}
         }
         mysqli_free_result($result);
@@ -55,6 +48,8 @@ function _echoHistoryTableData($his_sql, $fund_est_sql, $csv, $ref, $strStockId,
 
 function _echoFundHistoryParagraph($ref, $est_ref, $csv, $iStart, $iNum, $bAdmin)
 {
+	if ($ref->IsYahooNetValue())	return;
+	
 	$close_col = new TableColumnPrice();
 	$netvalue_col = new TableColumnNetValue();
 	$premium_col = new TableColumnPremium();

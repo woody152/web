@@ -542,7 +542,7 @@ class StockHistory
     	$ar = array();
     	foreach ($arVal as $fVal)
     	{
-    		$ar[] = strval_round($fVal);
+    		$ar[] = number_format($fVal, 2, '.', '');
     	}	
     	$this->arOrder = array_unique($ar);
 	}

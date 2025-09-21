@@ -135,6 +135,12 @@ class TableColumnPosition extends TableColumn
 	}
 }
 
+function TableColumnGetPosition()
+{
+	$col = new TableColumnPosition();
+	return $col->GetDisplay();
+}
+
 class TableColumnPremium extends TableColumn
 {
 	public function __construct($strPrefix = false)

@@ -21,7 +21,7 @@ function _getSmaCallbackPriceDisplay($callback, $ref, $strVal)
 	if ($strVal)
 	{
 		$display_ref = call_user_func($callback, $ref);
-		return $display_ref->GetPriceDisplay(strval(call_user_func($callback, $ref, $strVal)));
+		return $display_ref->GetPriceDisplay(call_user_func($callback, $ref, $strVal));
 	}
 	return '';
 }
@@ -32,12 +32,12 @@ function _echoSmaTableItem($his, $strKey, $strVal, $cb_ref, $callback, $callback
 
     $ar = array();
     $ar[] = _getSmaRow($strKey);
-    $ar[] = $stock_ref->GetPriceDisplay($strVal);
-    $ar[] = $stock_ref->GetPercentageDisplay($strVal);
+    $ar[] = $stock_ref->GetPriceDisplay(floatval($strVal));
+    $ar[] = $stock_ref->GetPercentageDisplay(floatval($strVal));
    	if ($strNext = $his->arNext[$strKey])
    	{
-   		$ar[] = $stock_ref->GetPriceDisplay($strNext);
-   		$ar[] = $stock_ref->GetPercentageDisplay($strNext);
+   		$ar[] = $stock_ref->GetPriceDisplay(floatval($strNext));
+   		$ar[] = $stock_ref->GetPercentageDisplay(floatval($strNext));
    	}
    	else
    	{
@@ -46,7 +46,7 @@ function _echoSmaTableItem($his, $strKey, $strVal, $cb_ref, $callback, $callback
    	}
    	if ($bAfterHour)
    	{
-   		if ($strAfterHour = $his->arAfterHour[$strKey])	$ar[] = $stock_ref->GetPriceDisplay($strAfterHour);
+   		if ($strAfterHour = $his->arAfterHour[$strKey])	$ar[] = $stock_ref->GetPriceDisplay(floatval($strAfterHour));
    		else									   				$ar[] = '';
    	}
    	
@@ -86,7 +86,7 @@ function _getSmaParagraphWarning($ref)
 			if (abs($fDiff) > 0.0005)
 			{
 				$strSymbol = $ref->GetSymbol();
-				$str = '<br />'.GetFontElement($strSymbol.' '.$record['date'].'收盘价冲突：').$record['adjclose'].' - '.$ref->GetPrevPrice().' = '.strval_round($fDiff, 6);
+				$str = '<br />'.GetFontElement($strSymbol.' '.$record['date'].'收盘价冲突：').$record['adjclose'].' - '.$ref->GetPrevPrice().' = '.number_format($fDiff, 6);
 				if (DebugIsAdmin())
 				{
 					$str .= ' '.GetStockOptionLink(STOCK_OPTION_CLOSE, $strSymbol);
@@ -211,7 +211,7 @@ function EchoFutureSmaParagraph($ref, $callback2 = false)
 		if ($fPremium = RefGetFuturePremium($realtime_ref))
 		{
 			EchoCalibrationHistoryParagraph($ref->GetEstRef(), 0, 1);
-			$str = '理论溢价：'.strval_round($fPremium, 4).' '.GetStockOptionLink(STOCK_OPTION_PREMIUM, $realtime_ref->GetSymbol());
+			$str = '理论溢价：'.number_format($fPremium, 4).' '.GetStockOptionLink(STOCK_OPTION_PREMIUM, $realtime_ref->GetSymbol());
 			EchoSmaParagraph($ref->GetEstRef(), $str, $realtime_ref, '_callbackFutureSma', $callback2);
 		}
 	}

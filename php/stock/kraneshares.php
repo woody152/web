@@ -11,16 +11,16 @@ Array
 )
 */
 
-function GetKraneNetValue($ref)
+function GetKraneNetValue($ref, $strPrevDate)
 {
 	$strStockId = $ref->GetStockId();
-	$strDate = $ref->GetDate();
-	$net_sql = GetNetValueHistorySql();
- 	$strNetValueDate = $net_sql->GetDateNow($strStockId);	
-	if ($strNetValueDate == $strDate)	return false;		// already have current net value
+//	$strDate = $ref->GetDate();
+//	$net_sql = GetNetValueHistorySql();
+// 	$strNetValueDate = $net_sql->GetDateNow($strStockId);	
+//	if ($strNetValueDate == $strDate)	return false;		// already have current net value
 	$his_sql = GetStockHistorySql();
-	$strPrevDate = $his_sql->GetDatePrev($strStockId, $strDate);
-	if ($strNetValueDate == $strPrevDate)	return false;		// already up to date
+//	$strPrevDate = $his_sql->GetDatePrev($strStockId, $strDate);
+//	if ($strNetValueDate == $strPrevDate)	return false;		// already up to date
 	
 //	$ref->SetTimeZone();
 	date_default_timezone_set('Europe/London');
@@ -48,8 +48,9 @@ function GetKraneNetValue($ref)
         	DebugPrint(localtime($iTick, true));
         	return false;
         }
-//		return strval_round(floatval($his_sql->GetClose($strStockId, $strPrevDate)) * (1.0 - floatval($ar0[1])), 4);
-		return strval_round(floatval($his_sql->GetClose($strStockId, $strPrevDate)) / (1.0 + floatval($ar0[1])), 4);
+        $fNetValue = floatval($his_sql->GetClose($strStockId, $strPrevDate)) / (1.0 + floatval($ar0[1]));
+        DebugVal($fNetValue, __FUNCTION__);
+		return number_format($fNetValue, NETVALUE_PRECISION, '.', '');
    	}
     return false;
 }
