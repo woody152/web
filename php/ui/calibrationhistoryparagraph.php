@@ -1,14 +1,14 @@
 <?php
 require_once('stocktable.php');
 
-function _echoCalibrationHistoryItem($fPosition, $net_sql, $strStockId, $record)
+function _echoCalibrationHistoryItem($fPosition, $ref, $record)
 {
 	$fCalibration = floatval($record['close']);
 	$strDate = $record['date'];
 	$ar = array($strDate, number_format($fCalibration, 4), GetHM($record['time']), $record['num']);
 	if ($fPosition)
 	{
-		$ar[] = $net_sql->GetClose($strStockId, $strDate);
+		$ar[] = $ref->GetNetValueDisplay($ref->GetNetValue($strDate));
 		$ar[] = number_format(StockCalcHedge($fCalibration, $fPosition));
 	}
 	EchoTableColumn($ar);
@@ -34,14 +34,12 @@ function EchoCalibrationHistoryParagraph($ref, $iStart = 0, $iNum = TABLE_COMMON
    	if ($ref->IsFundA())
    	{
     	$fPosition = $ref->GetPosition();
-    	$net_sql = GetNetValueHistorySql();
     	$ar[] = new TableColumnNetValue();
     	$ar[] = new TableColumnHedge();
    	}
    	else
 	{
 		$fPosition = false;
-		$net_sql = false;
 	}
 
 	EchoTableParagraphBegin($ar, $strSymbol.'calibrationhistory', $strLink);
@@ -49,7 +47,7 @@ function EchoCalibrationHistoryParagraph($ref, $iStart = 0, $iNum = TABLE_COMMON
     {
         while ($record = mysqli_fetch_assoc($result)) 
         {
-			_echoCalibrationHistoryItem($fPosition, $net_sql, $strStockId, $record);
+			_echoCalibrationHistoryItem($fPosition, $ref, $record);
         }
         mysqli_free_result($result);
     }

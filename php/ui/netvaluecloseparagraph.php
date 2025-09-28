@@ -1,47 +1,46 @@
 <?php
 require_once('stocktable.php');
 
-function _echoNetValueCloseItem($csv, $his_sql, $shares_sql, $arHistory, $arFundNetValue, $ref, $strStockId, $bAdmin)
+function _echoNetValueCloseItem($csv, $his_sql, $shares_sql, $arHistory, $fNetValue, $ref, $strStockId)
 {
-	$strClose = $arHistory['close'];
+	$fClose = floatval($arHistory['close']);
 	$strDate = $arHistory['date'];
 	if (($strClosePrev = $his_sql->GetClosePrev($strStockId, $strDate)) === false)		return;
 	
-	$strNetValue = $arFundNetValue['close'];
-   	if ($csv)	$csv->Write($strDate, $ref->GetPercentageString(floatval($strClosePrev), floatval($strClose)), $ref->GetPercentageString(floatval($strNetValue), floatval($strClose)), $strNetValue);
+	$fClosePrev = floatval($strClosePrev);
+   	if ($csv)	$csv->Write($strDate, $ref->GetPercentageString($fClosePrev, $fClose), $ref->GetPercentageString($fNetValue, $fClose), strval($fNetValue));
 
-   	$ar = array($strDate, $ref->GetPriceDisplay(floatval($strClose), floatval($strNetValue)));
-   	
-   	$strNetValueDisplay = number_format(floatval($strNetValue), 4);
-   	$ar[] = $bAdmin ? GetOnClickLink('/php/_submitdelete.php?'.'netvaluehistory'.'='.$arFundNetValue['id'], '确认删除净值记录'.$strNetValueDisplay.'？', $strNetValueDisplay) : $strNetValueDisplay;
-	$ar[] = $ref->GetPercentageDisplay(floatval($strNetValue), floatval($strClose));
-   	$ar[] = $ref->GetPercentageDisplay(floatval($strClosePrev), floatval($strClose));
+   	$ar = array($strDate);
+   	$ar[] = $ref->GetPriceDisplay($fClose, $fNetValue);
+   	$ar[] = $ref->GetNetValueDisplay($fNetValue);
+	$ar[] = $ref->GetPercentageDisplay($fNetValue, $fClose);
+   	$ar[] = $ref->GetPercentageDisplay($fClosePrev, $fClose);
     if ($strShare = $shares_sql->GetClose($strStockId, $strDate))
     {
-    	$ar[] = rtrim0($strShare);
-    	$ar[] = GetTurnoverDisplay(floatval($his_sql->GetVolume($strStockId, $strDate)), floatval($strShare));
+    	$fShare = floatval($strShare);
+    	$ar[] = number_format($fShare, 2);
+    	$ar[] = GetTurnoverDisplay(floatval($his_sql->GetVolume($strStockId, $strDate)), $fShare);
     }
     
     EchoTableColumn($ar);
 }
 
-function _echoNetValueCloseData($his_sql, $ref, $strStockId, $csv, $iStart, $iNum, $bAdmin)
+function _echoNetValueCloseData($his_sql, $ref, $strStockId, $csv, $iStart, $iNum)
 {
 	$bSameDay = UseSameDayNetValue($ref);
-	$net_sql = GetNetValueHistorySql();
 	$shares_sql = new SharesHistorySql();
     if ($result = $his_sql->GetAll($strStockId, $iStart, $iNum)) 
     {
         while ($arHistory = mysqli_fetch_assoc($result)) 
         {
        		$strDate = $bSameDay ? $arHistory['date'] : $his_sql->GetDatePrev($strStockId, $arHistory['date']);
-        	if ($arFundNetValue = $net_sql->GetRecord($strStockId, $strDate))	_echoNetValueCloseItem($csv, $his_sql, $shares_sql, $arHistory, $arFundNetValue, $ref, $strStockId, $bAdmin);
+        	if ($fNetValue = $ref->GetNetValue($strDate))	_echoNetValueCloseItem($csv, $his_sql, $shares_sql, $arHistory, $fNetValue, $ref, $strStockId);
         }
         mysqli_free_result($result);
     }
 }
 
-function EchoNetValueCloseParagraph($ref, $str = false, $csv = false, $iStart = 0, $iNum = TABLE_COMMON_DISPLAY, $bAdmin = false)
+function EchoNetValueCloseParagraph($ref, $str = false, $csv = false, $iStart = 0, $iNum = TABLE_COMMON_DISPLAY)
 {
     if ($ref->CountNetValue() == 0)	return;
 
@@ -59,7 +58,7 @@ function EchoNetValueCloseParagraph($ref, $str = false, $csv = false, $iStart = 
 								   new TableColumnShare(),
 								   new TableColumnTurnover()
 								   ), $strSymbol.'netvalueclose', $str.' '.$strMenuLink);
-    _echoNetValueCloseData($his_sql, $ref, $strStockId, $csv, $iStart, $iNum, $bAdmin);
+    _echoNetValueCloseData($his_sql, $ref, $strStockId, $csv, $iStart, $iNum);
     EchoTableParagraphEnd($strMenuLink);
 }
 

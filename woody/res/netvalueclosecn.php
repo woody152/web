@@ -41,10 +41,10 @@ function EchoAll()
    		$strSymbol = $ref->GetSymbol();
    		$strLinks = GetFundLinks($strSymbol);
    		$strLinks .= ' '.GetEtfNetValueLink($strSymbol);
-   		if ($bAdmin = $acct->IsAdmin())	$strLinks .= '<br />'.StockGetAllLink($strSymbol).' '.GetOnClickLink(PATH_STOCK.'submitnetvalue.php?symbol='.$strSymbol, '确认更新'.$strSymbol.NETVALUE_HISTORY_DISPLAY.'？', '更新净值');
+   		if ($acct->IsAdmin())	$strLinks .= '<br />'.StockGetAllLink($strSymbol).' '.GetOnClickLink(PATH_STOCK.'submitnetvalue.php?symbol='.$strSymbol, '确认更新'.$strSymbol.NETVALUE_HISTORY_DISPLAY.'？', '更新净值');
     		
    		$csv = new PageCsvFile();
-		EchoNetValueCloseParagraph($ref, $strLinks.'<br />', $csv, $acct->GetStart(), $acct->GetNum(), $bAdmin);
+		EchoNetValueCloseParagraph($ref, $strLinks.'<br />', $csv, $acct->GetStart(), $acct->GetNum());
 		$csv->Close();
 
 		if ($csv->HasFile())

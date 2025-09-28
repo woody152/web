@@ -129,7 +129,8 @@ function GetSzseUrl($strSubDomain = 'www')
 // https://reportdocs.static.szse.cn/files/text/etf/ETF15960520220315.txt?random=0.12210692394619271
 function GetSzseEtfFileName($strDigitA, $strDate)
 {
-    return 'ETF'.$strDigitA.str_replace('-', '', $strDate).'.txt';
+    if ($strDate)	return 'ETF'.$strDigitA.str_replace('-', '', $strDate).'.txt';
+    return '';
 }
 
 function GetSzseHoldingsUrl($strFileName)

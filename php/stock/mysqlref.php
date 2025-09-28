@@ -57,13 +57,18 @@ class MysqlReference extends StockReference
 		if ($strDate)
 		{
 			if ($strClose = $this->GetClose($strDate))		return floatval($strClose);
+			return false;
 		}
 		return floatval($this->GetPrice());
 	}
 	
 	public function GetNetValue($strDate)
 	{
-		if ($this->iNetValueCount > 0)	return floatval(SqlGetNetValueByDate($this->strSqlId, $strDate));
+		if ($this->iNetValueCount > 0)
+		{
+			if ($strClose = SqlGetNetValueByDate($this->strSqlId, $strDate))	return floatval($strClose);
+			return false;
+		}
 		return $this->GetVal($strDate);
 	}
 	

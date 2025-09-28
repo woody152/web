@@ -118,7 +118,6 @@ class _AdminDeleteAccount extends Account
     	else
     	{
 			if (_deleteTableDataById('fundest'))				return;			
-			if (_deleteTableDataById('netvaluehistory'))		return;			
 			if (_deleteTableDataById('stockhistory'))			return;			
 		}
     }

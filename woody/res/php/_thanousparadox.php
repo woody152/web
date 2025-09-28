@@ -40,14 +40,18 @@ function _echoThanousParadoxItem($csv, $strNetValue, $strClose, $strDate, $ref, 
 	$strEstClosePrev = $his_sql->GetClosePrev($strEstStockId, $strDate);
 	if (($strEstClose == false) || ($strEstClosePrev == false))		return;
 	
-   	$csv->Write($strDate, $est_ref->GetPercentageString(floatval($strEstClosePrev), floatval($strEstClose)), $ref->GetPercentageString(floatval($strNetValue), floatval($strClose)), $strNetValue);
+	$fNetValue = floatval($strNetValue);
+	$fClose = floatval($strClose);
+	$fEstClose = floatval($strEstClose);
+	$fEstClosePrev = floatval($strEstClosePrev);
+   	$csv->Write($strDate, $est_ref->GetPercentageString($fEstClosePrev, $fEstClose), $ref->GetPercentageString($fNetValue, $fClose), $strNetValue);
    	
    	$ar = array($strDate);
-   	$ar[] = $ref->GetPriceDisplay(floatval($strClose), floatval($strNetValue));
-   	$ar[] = $strNetValue;
-	$ar[] = $ref->GetPercentageDisplay(floatval($strNetValue), floatval($strClose));
-    $ar[] = $est_ref->GetPriceDisplay(floatval($strEstClose), floatval($strEstClosePrev));
-    $ar[] = $est_ref->GetPercentageDisplay(floatval($strEstClosePrev), floatval($strEstClose));
+   	$ar[] = $ref->GetPriceDisplay($fClose, $fNetValue);
+   	$ar[] = $ref->GetNetValueDisplay($fNetValue);
+	$ar[] = $ref->GetPercentageDisplay($fNetValue, $fClose);
+    $ar[] = $est_ref->GetPriceDisplay($fEstClose, $fEstClosePrev);
+    $ar[] = $est_ref->GetPercentageDisplay($fEstClosePrev, $fEstClose);
 	EchoTableColumn($ar);
 }
 
