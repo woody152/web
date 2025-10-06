@@ -74,7 +74,7 @@ class MyEWrapper(EWrapper):
         #self.arQQQ = {'SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941'}
         self.arXOPETF = {'SH513350', 'SZ159518'}
         self.arOrder = {}
-        self.arOrder['KWEB'] = GetOrderArray([21.22, 30.10, 35.88, 36.89, 40.27, 41.33, 41.55, 43.66], 200, 4, 7)
+        self.arOrder['KWEB'] = GetOrderArray([20.93, 29.94, 36.24, 38.44, 39.05, 41.29, 41.75, 42.34, 43.54], 200, 4, 8)
         if IsChinaMarketOpen():
             self.arOrder['GLD'] = GetOrderArray()
             self.arOrder['IEO'] = GetOrderArray()
@@ -86,9 +86,10 @@ class MyEWrapper(EWrapper):
             self.arOrder['XOP'] = GetOrderArray()
         else:
         #if IsMarketOpen():
-            #self.arOrder['XOP'] = GetOrderArray([110.27, 116.73, 126.32, 130.93, 131.40, 131.98, 135.54, 136.47, 155.47], 100, 6, -1)
-            self.arOrder['SPX'] = GetOrderArray([4822.05, 5686.31, 6250.01, 6381.84, 6564.80, 6634.67, 6648.34, 6747.77, 6813.72])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0081, 4, 7)
+            #self.arOrder['TLT'] = GetOrderArray([88.81, 88.91], 100, 0, -1)
+            #self.arOrder['XOP'] = GetOrderArray([137.64, 138.46], 100, -1, 1)
+            self.arOrder['SPX'] = GetOrderArray([4845.59, 5711.23, 6286.08, 6481.79, 6623.34, 6668.14, 6694.06, 6764.90, 6860.94])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0073, 3, 7)
             self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0187, -1, -1)
         self.palmmicro = Palmmicro()
         self.client.StartStreaming(orderId)
@@ -275,7 +276,7 @@ class MyEWrapper(EWrapper):
                     self.client.CallPlaceOrder(strSymbol, fPrice, iSize, 'SELL', arOrder['SELL_id'])
                     arOrder['SELL_pos'] = iPos
 
-    def __debugPriceAndSize(self, strMsgSymbol, arSymData, strSymbol, strType, strDebug):
+    def __debugPriceAndSize(self, arSymData, strSymbol, strType, strDebug):
         iSize = arSymData['quantity']
         if iSize >= 10:
             fRatio = arSymData['discount']
@@ -285,11 +286,11 @@ class MyEWrapper(EWrapper):
                 self.arDebug[strSymbolType] = strDebug
                 if (fRatio > 0.001 and strType == 'SELL') or (fRatio < -0.001 and strType == 'BUY'):
                     print(strDebug)
-                    self.palmmicro.SendSymbolMsg(strDebug, strMsgSymbol)
+                    self.palmmicro.SendSymbolMsg(strDebug, strSymbol)
                 if strSymbol in self.arQDII and iSize >= 100 and ((fRatio > 0.01 and strType == 'SELL') or (fRatio < -0.005 and strType == 'BUY')):
                     self.palmmicro.SendMsg(strDebug)
                 elif strType == 'BUY' and fRatio > -0.005:
-                    self.palmmicro.SendSymbolMsg(strDebug, strMsgSymbol)
+                    self.palmmicro.SendSymbolMsg(strDebug, strSymbol)
 
     def _processPriceAndSize(self, arMktData, arSym):
         strMktSymbol = arMktData['symbol']
@@ -308,14 +309,18 @@ class MyEWrapper(EWrapper):
                         if strMktSymbol in arSymData['symbol_hedge']:
                             strDebug = self.palmmicro.CalcHoldingsArbitrage(self.arMkt, strMktSymbol, strMktType, arMktData[strMktType + '_size'], strSymbol, strType)
                     if strDebug:
-                        strMsgSymbol = strMktSymbol
-                        if strMktSymbol == 'GLD' and strSymbol == 'SZ164701':
-                            strMsgSymbol = 'SLV'
-                        elif strMktSymbol == 'XOP' and strSymbol in self.arXOPETF:
-                            strMsgSymbol = 'XOPETF'
-                        self.__debugPriceAndSize(strMsgSymbol, arSymData, strSymbol, strType, strDebug)
+                        self.__debugPriceAndSize(arSymData, strSymbol, strType, strDebug)
             else:
-                self.palmmicro.SendSymbolMsg(strMktType + ' streaming missing', strMktSymbol)
+                for strSymbol, arSymData in arSym.items():
+                    strDebug = strMktSymbol + ' ' + strMktType + ' streaming missing'
+                    if 'calibration' in arSymData:
+                        if arSymData['symbol_hedge'] != strMktSymbol:
+                            strDebug = False
+                    else:
+                        if strMktSymbol not in arSymData['symbol_hedge']:
+                            strDebug = False
+                    if strDebug:
+                        self.palmmicro.SendSymbolMsg(strDebug, strSymbol)
 
     def _CheckPriceAndSize(self, arMktData):
         if IsChinaMarketOpen():
@@ -380,7 +385,7 @@ class MyEClient(EClient):
         order.totalQuantity = iSize
         order.orderType = 'LMT'
         order.lmtPrice = price
-        if strSymbol.startswith('MES') or strSymbol == 'XOP':
+        if strSymbol.startswith('MES') or strSymbol == 'TLT' or strSymbol == 'XOP':
             if IsMarketOpen() == False:
                 return -1
         else:

@@ -8,16 +8,18 @@ from nyc_time import GetBeijingTimeDisplay
 
 from _tgprivate import TG_TOKEN
 from _tgprivate import WECHAT_KEY
-from _tgprivate import WECHAT_GLD_KEY
-from _tgprivate import WECHAT_IEO_KEY
-from _tgprivate import WECHAT_KWEB_KEY
-from _tgprivate import WECHAT_QQQ_KEY
-from _tgprivate import WECHAT_SLV_KEY
-from _tgprivate import WECHAT_SPY_KEY
-from _tgprivate import WECHAT_XBI_KEY
-from _tgprivate import WECHAT_XLY_KEY
-from _tgprivate import WECHAT_XOP_KEY
-from _tgprivate import WECHAT_XOP_ETF_KEY
+from _tgprivate import WECHAT_SH513350_KEY
+from _tgprivate import WECHAT_SZ159518_KEY
+from _tgprivate import WECHAT_SZ160719_KEY
+from _tgprivate import WECHAT_SZ161116_KEY
+from _tgprivate import WECHAT_SZ161125_KEY
+from _tgprivate import WECHAT_SZ161127_KEY
+from _tgprivate import WECHAT_SZ161130_KEY
+from _tgprivate import WECHAT_SZ162411_KEY
+from _tgprivate import WECHAT_SZ162415_KEY
+from _tgprivate import WECHAT_SZ162719_KEY
+from _tgprivate import WECHAT_SZ164701_KEY
+from _tgprivate import WECHAT_SZ164906_KEY
 
 def convert_fake_symbol(symbol):
     if symbol.startswith('^'):
@@ -76,16 +78,18 @@ class Palmmicro:
         self.bNewSinaData = False
         self.arSendMsg = {}
         self.arSendMsg['telegram'] = GetSendMsgArray(WECHAT_KEY)
-        self.arSendMsg['GLD'] = GetSendMsgArray(WECHAT_GLD_KEY)
-        self.arSendMsg['IEO'] = GetSendMsgArray(WECHAT_IEO_KEY)
-        self.arSendMsg['KWEB'] = GetSendMsgArray(WECHAT_KWEB_KEY)
-        self.arSendMsg['QQQ'] = GetSendMsgArray(WECHAT_QQQ_KEY)
-        self.arSendMsg['SLV'] = GetSendMsgArray(WECHAT_SLV_KEY)
-        self.arSendMsg['SPY'] = GetSendMsgArray(WECHAT_SPY_KEY)
-        self.arSendMsg['XBI'] = GetSendMsgArray(WECHAT_XBI_KEY)
-        self.arSendMsg['XLY'] = GetSendMsgArray(WECHAT_XLY_KEY)
-        self.arSendMsg['XOP'] = GetSendMsgArray(WECHAT_XOP_KEY)
-        self.arSendMsg['XOPETF'] = GetSendMsgArray(WECHAT_XOP_ETF_KEY)
+        self.arSendMsg['SH513350'] = GetSendMsgArray(WECHAT_SH513350_KEY)
+        self.arSendMsg['SZ159518'] = GetSendMsgArray(WECHAT_SZ159518_KEY)
+        self.arSendMsg['SZ160719'] = GetSendMsgArray(WECHAT_SZ160719_KEY)
+        self.arSendMsg['SZ161116'] = GetSendMsgArray(WECHAT_SZ161116_KEY)
+        self.arSendMsg['SZ161125'] = GetSendMsgArray(WECHAT_SZ161125_KEY)
+        self.arSendMsg['SZ161127'] = GetSendMsgArray(WECHAT_SZ161127_KEY)
+        self.arSendMsg['SZ161130'] = GetSendMsgArray(WECHAT_SZ161130_KEY)
+        self.arSendMsg['SZ162411'] = GetSendMsgArray(WECHAT_SZ162411_KEY)
+        self.arSendMsg['SZ162415'] = GetSendMsgArray(WECHAT_SZ162415_KEY)
+        self.arSendMsg['SZ162719'] = GetSendMsgArray(WECHAT_SZ162719_KEY)
+        self.arSendMsg['SZ164701'] = GetSendMsgArray(WECHAT_SZ164701_KEY)
+        self.arSendMsg['SZ164906'] = GetSendMsgArray(WECHAT_SZ164906_KEY)
 
     def _getTelegramChatId(self):
         return 992671436
