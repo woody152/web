@@ -22,7 +22,7 @@ function _echoFundListItem($ref, $sql, $last_sql, $callback)
 	$ar[] = SymCalibrationHistoryLink($ref);
     $ar[] = _getFundPairLink($ref->GetPairRef());
     $ar[] = GetNumberDisplay($fPos);
-    $ar[] = GetNumberDisplay($fFactor);
+    $ar[] = number_format($fFactor, NETVALUE_PRECISION);
     $ar[] = $strDate;
     if ($callback)
     {

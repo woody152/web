@@ -72,7 +72,7 @@ function _echoOverNightCnhItem($strSymbol, $fCnh, $bSell)
 				}
 			}
    		}
-   		else
+   		else if (method_exists($ref, 'GetHoldingsDate'))
    		{
    			$strDate = $ref->GetHoldingsDate();
 			$fCny = floatval($ref->GetNetValueString()) * $fHintQuantity * $fPos;

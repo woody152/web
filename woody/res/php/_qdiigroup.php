@@ -86,7 +86,7 @@ class QdiiGroupAccount extends FundGroupAccount
     		$this->ar_leverage_ref[] = $leverage_ref;
     		if ($strSymbol == 'QQQ')
     		{
-    			if (NeedOfficialWebData($leverage_ref))		UpdateInvescoNetValue($strSymbol);
+//    			if (NeedOfficialWebData($leverage_ref))		UpdateInvescoNetValue($strSymbol);
     		}
     		else
     		{

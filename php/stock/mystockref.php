@@ -42,7 +42,13 @@ class MyStockReference extends MysqlReference
    				$strDate = $this->GetDate();
    				if ($now_ymd->GetYMD() == $strDate)
    				{
-   					$this->_updateStockHistory($strStockId, $strDate);
+   					$iHourMinute = $now_ymd->GetHourMinute();
+//   					DebugVal($iHourMinute, __FUNCTION__.' '.$strSymbol, true);
+   					if ($iHourMinute < 2100)
+   					{
+//   						DebugString(__FUNCTION__.' update history '.$strSymbol.' on '.$strDate, true);
+   						$this->_updateStockHistory($strStockId, $strDate);
+   					}
    					if ($now_ymd->IsStockTradingHourEnd())	$this->_updateStockEma($strStockId, $strDate);
    				}
    			}
@@ -97,7 +103,7 @@ class MyStockReference extends MysqlReference
         if ($this->_invalidHistoryData($strClose))  return;
         
         $his_sql = GetStockHistorySql();
-        return $his_sql->WriteHistory($strStockId, $strDate, $strClose, $this->GetVolume());
+        return $his_sql->WriteHistory($strStockId, $strDate, $strClose, $this->GetVolume(), $this->strSettlePrice);
     }
     
     // En = k * X0 + (1 - k) * Em; 其中m = n - 1; k = 2 / (n + 1)

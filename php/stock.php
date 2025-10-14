@@ -316,9 +316,9 @@ function StockGetQdiiReference($strSymbol)
 
 function StockGetFundReference($strSymbol)
 {
-	if ($ref = StockGetQdiiReference($strSymbol))	return $ref;
-	else if (in_arrayQdiiMix($strSymbol))			return new HoldingsReference($strSymbol);
-	else if (in_arrayChinaIndex($strSymbol))		return new FundPairReference($strSymbol);
+	if ($ref = StockGetQdiiReference($strSymbol))									return $ref;
+	else if (in_arrayQdiiMix($strSymbol))											return new HoldingsReference($strSymbol);
+	else if (in_arrayChinaIndex($strSymbol) || in_arrayChinaFuture($strSymbol))		return new FundPairReference($strSymbol);
 	return new FundReference($strSymbol);
 }
 

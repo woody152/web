@@ -18,6 +18,7 @@ define('OVERNIGHT_DISPLAY', '义工群对比');
 define('OVERNIGHT_CNH_DISPLAY', '义工群对冲计算器');
 
 define('CHINA_INDEX_DISPLAY', 'A股指数');
+define('CHINA_FUTURE_DISPLAY', 'A股商品');
 define('QDII_DISPLAY', '美股QDII');
 define('QDII_MIX_DISPLAY', '混合QDII');
 define('QDII_HK_DISPLAY', '港股QDII');
@@ -27,7 +28,7 @@ define('QDII_EU_DISPLAY', '欧洲QDII');
 define('STOCK_OPTION_ADR', '修改H股对应ADR代码');
 define('STOCK_OPTION_AH', '修改A股对应H股代码');
 define('STOCK_OPTION_AMOUNT', '基金申购金额');
-define('STOCK_OPTION_CALIBRATION', '手工校准');
+define('STOCK_OPTION_CALIBRATION', '手工'.STOCK_DISP_CALIBRATION);
 define('STOCK_OPTION_CLOSE', '更新收盘价');
 define('STOCK_OPTION_DIVIDEND', '分红');
 define('STOCK_OPTION_EDIT', '修改股票说明');
@@ -43,26 +44,28 @@ define('STOCK_OPTION_SPLIT', '拆股或合股');
 function GetStockCategoryArray()
 {
     return array('biotech' => BIOTECH_GROUP_DISPLAY,
-                   'chinainternet' => CHINAINTERNET_GROUP_DISPLAY,
-                   'commodity' => COMMODITY_GROUP_DISPLAY,
-                   'hangseng' => HANGSENG_GROUP_DISPLAY,
-                   'hshares' => HSHARES_GROUP_DISPLAY,
-                   'hstech' => HSTECH_GROUP_DISPLAY,
-                   'mscius50' => MSCIUS50_GROUP_DISPLAY,
-                   'oilfund' => OIL_GROUP_DISPLAY,
-                   'qqqfund' => QQQ_GROUP_DISPLAY,
-                   'spyfund' => SPY_GROUP_DISPLAY,
-                   );
+                 'chinainternet' => CHINAINTERNET_GROUP_DISPLAY,
+                 'commodity' => COMMODITY_GROUP_DISPLAY,
+                 'hangseng' => HANGSENG_GROUP_DISPLAY,
+                 'hshares' => HSHARES_GROUP_DISPLAY,
+                 'hstech' => HSTECH_GROUP_DISPLAY,
+                 'mscius50' => MSCIUS50_GROUP_DISPLAY,
+                 'oilfund' => OIL_GROUP_DISPLAY,
+                 'qqqfund' => QQQ_GROUP_DISPLAY,
+                 'spyfund' => SPY_GROUP_DISPLAY
+                 );
 }
 
 function GetStockMenuArray()
 {
     return array('chinaindex' => CHINA_INDEX_DISPLAY,
-                   'qdii' => QDII_DISPLAY,
-                   'qdiimix' => QDII_MIX_DISPLAY,
-                   'qdiihk' => QDII_HK_DISPLAY,
-                   'qdiijp' => QDII_JP_DISPLAY,
-                   'qdiieu' => QDII_EU_DISPLAY);
+    			 'chinafuture' => CHINA_FUTURE_DISPLAY,
+                 'qdii' => QDII_DISPLAY,
+                 'qdiimix' => QDII_MIX_DISPLAY,
+                 'qdiihk' => QDII_HK_DISPLAY,
+                 'qdiijp' => QDII_JP_DISPLAY,
+                 'qdiieu' => QDII_EU_DISPLAY
+                 );
 }
 
 function GetStockMenuLinks()
@@ -123,7 +126,7 @@ function GetMyStockLink($strSymbol = false, $strDisplay = false)
 	return GetStockPageLink($strPage, ALL_STOCK_DISPLAY);
 }
 
-define('CALIBRATION_HISTORY_DISPLAY', '校准记录');
+define('CALIBRATION_HISTORY_DISPLAY', STOCK_DISP_CALIBRATION.'记录');
 function GetCalibrationHistoryLink($strSymbol, $strDisplay = CALIBRATION_HISTORY_DISPLAY)
 {
     return GetStockSymbolLink('calibrationhistory', $strSymbol, ($strDisplay ? $strDisplay : $strSymbol));
@@ -180,6 +183,7 @@ function GetEtfDividendLink($strSymbol)
 
 function GetFundLinks($strSymbol)
 {
+	$bChinaFuture = in_arrayChinaFuture($strSymbol);
 	$bChinaIndex = in_arrayChinaIndex($strSymbol);
     $bQdii = in_arrayQdii($strSymbol);
 	$bQdiiHk = in_arrayQdiiHk($strSymbol);
@@ -188,7 +192,7 @@ function GetFundLinks($strSymbol)
 	$bQdiiMix = in_arrayQdiiMix($strSymbol);
 
 	$str = GetStockHistoryLink($strSymbol).' '.GetFundHistoryLink($strSymbol).' '.GetNetValueHistoryLink($strSymbol).' '.GetNetValueCloseLink($strSymbol).' '.GetFundShareLink($strSymbol);
-	if ($bChinaIndex || $bQdii || $bQdiiHk || $bQdiiJp || $bQdiiEu || $bQdiiMix)
+	if ($bChinaFuture || $bChinaIndex || $bQdii || $bQdiiHk || $bQdiiJp || $bQdiiEu || $bQdiiMix)
 	{
 		$str .= ' '.GetCalibrationHistoryLink($strSymbol);
 		if ($bQdii || $bQdiiHk || $bQdiiJp || $bQdiiEu)		$str .= ' '.GetFundPositionLink($strSymbol);

@@ -50,6 +50,16 @@ function in_arrayChinaIndex($strSymbol)
     return in_array($strSymbol, ChinaIndexGetSymbolArray());
 }
 
+function ChinaFutureGetSymbolArray()
+{
+    return array('SH518800', 'SH518880', 'SZ159934', 'SZ159937', 'SZ159985', 'SZ161226');
+}
+
+function in_arrayChinaFuture($strSymbol)
+{
+    return in_array($strSymbol, ChinaFutureGetSymbolArray());
+}
+
 function QdiiGetOilSymbolArray()
 {
     return array('SH501018', 'SZ160723', 'SZ161129'); 
@@ -284,6 +294,7 @@ function GetAllSymbolArray()
 			            , QdiiJpGetSymbolArray()
 			            , QdiiEuGetSymbolArray()
 					    , ChinaIndexGetSymbolArray()
+					    , ChinaFutureGetSymbolArray()
 					    );
 }
 
@@ -294,7 +305,7 @@ function in_arrayAll($strSymbol)
 
 function GetOverNightSymbolArray()
 {
-	return array_merge(QdiiGetXopSymbolArray(), GetQdiiGoldSymbolArray(), array('SZ161125', 'SZ161127', 'SZ161130', 'SZ162415', 'SZ162719', 'SZ164906'));
+	return array_merge(QdiiGetXopSymbolArray(), GetQdiiGoldSymbolArray(), array('SZ161125', 'SZ161127', 'SZ161130', 'SZ161226', 'SZ162415', 'SZ162719', 'SZ164906'));
 }
 
 function IsChinaStockDigit($strDigit)
@@ -720,20 +731,20 @@ class StockSymbol
     	return StrHasPrefix($this->strSymbol, SINA_INDEX_PREFIX); 
     }
     
-    function IsSinaFutureCn()
+    function IsSinaFutureCN()
     {
     	return StrHasPrefix($this->strSymbol, SINA_CN_FUTURE_PREFIX); 
     }
 
-    function IsSinaFutureUs()
+    function IsSinaFutureUS()
     {
     	return StrHasPrefix($this->strSymbol, SINA_FUTURE_PREFIX); 
     }
     
     function IsSinaFuture()
     {
-        if ($this->IsSinaFutureCn())	return true;
-        if ($this->IsSinaFutureUs())	return true;
+        if ($this->IsSinaFutureCN())	return true;
+        if ($this->IsSinaFutureUS())	return true;
         return false;
     }
     
@@ -832,7 +843,7 @@ class StockSymbol
     	$strHK = '.hk';
     	
         $strSymbol = str_replace('.', '-', $this->strSymbol);
-        if ($str = $this->IsSinaFutureUs())
+        if ($str = $this->IsSinaFutureUS())
         {
         	switch ($str)
         	{
@@ -1024,7 +1035,7 @@ class StockSymbol
         if ($this->IsSinaFund())								{}
         else if ($this->IsSinaFuture())
         {
-        	if ($this->IsSinaFutureUs())						return $strEDT;
+        	if ($this->IsSinaFutureUS())						return $strEDT;
         }
         else if ($this->IsSinaForex())						return $strEDT;
         else if ($this->IsEastMoneyForex())					{}
@@ -1057,8 +1068,8 @@ class StockSymbol
     
     function GetDisplay()
     {
-        if ($str = $this->IsSinaFutureUs())		return $str;
-        if ($str = $this->IsSinaFutureCn())		return $str;
+        if ($str = $this->IsSinaFutureUS())		return $str;
+        if ($str = $this->IsSinaFutureCN())		return $str;
         if ($str = $this->IsSinaForex())		return $str;
 		if ($str = $this->IsSinaGlobalIndex())	return $str;
 		return $this->GetSymbol();

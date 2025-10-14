@@ -7,6 +7,8 @@ from ibapi.order import Order
 
 from palmmicro import Palmmicro
 from palmmicro import Calibration
+from palmmicro import GetMktDataArray
+
 from nyc_time import GetExchangeTime
 
 def IsChinaMarketOpen():
@@ -50,17 +52,6 @@ def AdjustPriceArray(arPrice, fAdjust):
 def AdjustOrderArray(arOrder, fAdjust, iBuyPos = -1, iSellPos = -1):
     return GetOrderArray(AdjustPriceArray(arOrder['price'], fAdjust), arOrder['size'], iBuyPos, iSellPos)
 
-def GetMktDataArray(strSymbol):
-    ar = {'symbol': strSymbol,
-          'LAST_price': None,
-          'VWAP_price': None,
-          'BUY_price': None,
-          'SELL_price': None,
-          'BUY_size': None,
-          'SELL_size': None
-         }
-    return ar
-
 
 class MyEWrapper(EWrapper):
     def __init__(self, client):
@@ -70,11 +61,11 @@ class MyEWrapper(EWrapper):
         self.arDebug = {}
 
     def nextValidId(self, orderId: int):
-        self.arQDII = {'SZ160719', 'SZ161116', 'SZ161125', 'SZ161127', 'SZ161130', 'SZ162411', 'SZ162415', 'SZ162719', 'SZ164701', 'SZ164906'}
+        self.arQDII = {'SZ160719', 'SZ161116', 'SZ161125', 'SZ161127', 'SZ161130', 'SZ161226', 'SZ162411', 'SZ162415', 'SZ162719', 'SZ164701', 'SZ164906'}
         #self.arQQQ = {'SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941'}
         self.arXOPETF = {'SH513350', 'SZ159518'}
         self.arOrder = {}
-        self.arOrder['KWEB'] = GetOrderArray([20.93, 29.94, 36.24, 38.44, 39.05, 41.29, 41.75, 42.34, 43.54], 200, 4, 8)
+        self.arOrder['KWEB'] = GetOrderArray([20.93, 30.34, 37.00, 39.19, 40.48, 41.66, 44.13], 200, 2, 6)
         if IsChinaMarketOpen():
             self.arOrder['GLD'] = GetOrderArray()
             self.arOrder['IEO'] = GetOrderArray()
@@ -86,10 +77,10 @@ class MyEWrapper(EWrapper):
             self.arOrder['XOP'] = GetOrderArray()
         else:
         #if IsMarketOpen():
-            #self.arOrder['TLT'] = GetOrderArray([88.81, 88.91], 100, 0, -1)
+            self.arOrder['TLT'] = GetOrderArray([90.57, 91.06], 100, -1, 1)
             #self.arOrder['XOP'] = GetOrderArray([137.64, 138.46], 100, -1, 1)
-            self.arOrder['SPX'] = GetOrderArray([4845.59, 5711.23, 6286.08, 6481.79, 6623.34, 6668.14, 6694.06, 6764.90, 6860.94])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0073, 3, 7)
+            self.arOrder['SPX'] = GetOrderArray([4845.59, 5808.49, 5856.35, 6367.86, 6552.33, 6672.46, 6674.02, 6699.25, 6792.59, 6879.37])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0063, 4, 8)
             self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0187, -1, -1)
         self.palmmicro = Palmmicro()
         self.client.StartStreaming(orderId)
@@ -330,6 +321,7 @@ class MyEWrapper(EWrapper):
                 for reqId, arOtherMktData in self.arMkt.items():
                     if arOtherMktData['symbol'] != arMktData['symbol']:
                         self._processPriceAndSize(arOtherMktData, arSym)
+                self._processPriceAndSize(self.palmmicro.GetAG0(), arSym)
             #for strHedge in self.arQQQ:
                 #self.palmmicro.SendMsg(strDebug, 'qqq')
             self.palmmicro.SendOldMsg()

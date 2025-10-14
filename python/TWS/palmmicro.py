@@ -15,6 +15,7 @@ from _tgprivate import WECHAT_SZ161116_KEY
 from _tgprivate import WECHAT_SZ161125_KEY
 from _tgprivate import WECHAT_SZ161127_KEY
 from _tgprivate import WECHAT_SZ161130_KEY
+from _tgprivate import WECHAT_SZ161226_KEY
 from _tgprivate import WECHAT_SZ162411_KEY
 from _tgprivate import WECHAT_SZ162415_KEY
 from _tgprivate import WECHAT_SZ162719_KEY
@@ -70,6 +71,17 @@ def GetSendMsgArray(strKey):
          }
     return ar
 
+def GetMktDataArray(strSymbol):
+    ar = {'symbol': strSymbol,
+          'LAST_price': None,
+          'VWAP_price': None,
+          'BUY_price': None,
+          'SELL_price': None,
+          'BUY_size': None,
+          'SELL_size': None
+         }
+    return ar
+
 
 class Palmmicro:
     def __init__(self):
@@ -85,17 +97,22 @@ class Palmmicro:
         self.arSendMsg['SZ161125'] = GetSendMsgArray(WECHAT_SZ161125_KEY)
         self.arSendMsg['SZ161127'] = GetSendMsgArray(WECHAT_SZ161127_KEY)
         self.arSendMsg['SZ161130'] = GetSendMsgArray(WECHAT_SZ161130_KEY)
+        self.arSendMsg['SZ161226'] = GetSendMsgArray(WECHAT_SZ161226_KEY)
         self.arSendMsg['SZ162411'] = GetSendMsgArray(WECHAT_SZ162411_KEY)
         self.arSendMsg['SZ162415'] = GetSendMsgArray(WECHAT_SZ162415_KEY)
         self.arSendMsg['SZ162719'] = GetSendMsgArray(WECHAT_SZ162719_KEY)
         self.arSendMsg['SZ164701'] = GetSendMsgArray(WECHAT_SZ164701_KEY)
         self.arSendMsg['SZ164906'] = GetSendMsgArray(WECHAT_SZ164906_KEY)
+        self.arAG0 = GetMktDataArray('nf_AG0')
+
+    def GetAG0(self):
+        return self.arAG0
 
     def _getTelegramChatId(self):
         return 992671436
 
     def _fetchSinaData(self, strSymbols):
-        strUrl = f'http://hq.sinajs.cn/list={strSymbols.lower()}'
+        strUrl = f'http://hq.sinajs.cn/list=nf_AG0,{strSymbols.lower()}'
         try:
             response = requests.get(strUrl, headers={'Referer': 'https://finance.sina.com.cn'})
             if response.status_code == 200:
@@ -104,16 +121,22 @@ class Palmmicro:
                 iLen = len('var hq_str_')
                 for strLine in arLine:
                     if len(strLine) > iLen + len('="";'):
+                        arItem = strLine.split(',')
                         strSymbol = strLine[iLen:].split('"')[0]
                         strSymbol = strSymbol.rstrip('=')
-                        strSymbol = strSymbol.upper()
-                        if strSymbol in self.arSym:
-                            arItem = strLine.split(',')
-                            arSymData = self.arSym[strSymbol]
-                            arSymData['BUY_price'] = arItem[6]
-                            arSymData['SELL_price'] = arItem[7]
-                            arSymData['BUY_size'] = int(arItem[10])
-                            arSymData['SELL_size'] =  int(arItem[20])
+                        if strSymbol == 'nf_AG0':
+                            self.arAG0['BUY_price'] = float(arItem[6])
+                            self.arAG0['SELL_price'] = float(arItem[7])
+                            self.arAG0['BUY_size'] = int(arItem[11])
+                            self.arAG0['SELL_size'] = int(arItem[12])
+                        else:
+                            strSymbol = strSymbol.upper()
+                            if strSymbol in self.arSym:
+                                arSymData = self.arSym[strSymbol]
+                                arSymData['BUY_price'] = arItem[6]
+                                arSymData['SELL_price'] = arItem[7]
+                                arSymData['BUY_size'] = int(arItem[10])
+                                arSymData['SELL_size'] = int(arItem[20])
             else:
                 print('Failed to send request. Status code:', response.status_code)
         except requests.exceptions.RequestException as e:
@@ -191,6 +214,8 @@ class Palmmicro:
                 else:
                     fHedgePos = False
                     fHedge = _get_hedge(arSymData)
+                    if strSymbol == 'SZ161226':
+                        fHedge *= 1.0
                     fHedgePrice = _ref_get_peer_val(strType, arSymData)
                 iHedgeSize = _get_hedge_quantity(strType, arSymData, fHedge)
                 fRatio = fMktPrice / fHedgePrice - 1.0

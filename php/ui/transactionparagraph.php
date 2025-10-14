@@ -30,7 +30,7 @@ function _echoTransactionTableItem($ref, $record, $bReadOnly, $bAdmin)
 				
 				if ($strNetValue != $strPrice)
 				{
-					$strRemark .= GetOnClickLink(PATH_STOCK.'submittransaction.php?adjust='.$strId.'&netvalue='.$strNetValue, '确认校准到净值: '.$strNetValue.'？', '校准');
+					$strRemark .= GetOnClickLink(PATH_STOCK.'submittransaction.php?adjust='.$strId.'&netvalue='.$strNetValue, '确认'.STOCK_DISP_CALIBRATION.'到净值: '.$strNetValue.'？', STOCK_DISP_CALIBRATION);
 				}
    			}
    		}

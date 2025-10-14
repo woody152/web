@@ -28,9 +28,10 @@ class StockHistorySql extends DailyCloseSql
     	if ($strAdjClose == false)	$strAdjClose = $strClose;
     	
     	$ar = array('date' => $strDate,
-    				   'close' => $strClose,
-    				   'volume' => $strVolume,
-    				   'adjclose' => $strAdjClose);
+    				'close' => $strClose,
+    				'volume' => $strVolume,
+    				'adjclose' => $strAdjClose
+    			   );
     	
     	if ($record = $this->GetRecord($strStockId, $strDate))
     	{

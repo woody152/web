@@ -288,6 +288,8 @@ function GetSpdrNetValueUrl($strSymbol)
 	return GetSpdrEtfUrl().'library-content/products/fund-data/etfs/us/navhist-us-en-'.strtolower($strSymbol).'.xlsx';
 }
 
+// https://dng-api.invesco.com/cache/v1/accounts/en_US/shareclasses/46090E103/prices?idType=cusip&variationType=priceListing&productType=ETF
+// https://www.invesco.com/us/en/financial-products/etfs/invesco-qqq-trust-series-1.html
 // https://www.invesco.com/us/financial-products/etfs/product-detail?audienceType=Investor&productId=ETF-QQQ
 function GetInvescoUrl()
 {

@@ -3,6 +3,7 @@
 
 define('STOCK_DISP_ASHARES', 'A股');
 define('STOCK_DISP_BSHARES', 'B股');
+define('STOCK_DISP_CALIBRATION', '校准');
 define('STOCK_DISP_CHANGE', '涨幅');
 define('STOCK_DISP_EST', '估值');		// magenta
 define('STOCK_DISP_FAIR', '参考');

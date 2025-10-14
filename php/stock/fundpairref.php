@@ -2,6 +2,12 @@
 
 function PairNetValueGetClose($ref, $strDate)
 {
+	if ($ref->IsSinaFutureCN())
+	{
+		$his_sql = GetStockHistorySql();
+		return $his_sql->GetAdjClose($ref->GetStockId(), $strDate);
+	}
+	
 	if ($ref->IsFund())
 	{
 		$sql = GetNetValueHistorySql();
@@ -27,7 +33,10 @@ class MyPairReference extends MyStockReference
         {
         	$this->pair_ref = new MyStockReference($strPair);
         	$strCNY = false;
-        	if ($this->pair_ref->IsSymbolA())
+        	if ($this->pair_ref->IsSinaFutureCN())
+        	{
+        	}
+        	else if ($this->pair_ref->IsSymbolA())
         	{
         		if ($this->IsSymbolA())
         		{
@@ -35,7 +44,7 @@ class MyPairReference extends MyStockReference
 					else if ($this->pair_ref->IsShenZhenB())		$strCNY = 'HKCNY';
         		}
 //      		else if ($this->IsSymbolH())		$strCNY = 'HKCNY';
-        		else if ($this->IsSymbolUS() || $this->IsSinaFuture())	$this->cny_ref = new MyStockReference('fx_susdcnh');		//$strCNY = 'USCNY';
+        		else if ($this->IsSymbolUS() || $this->IsSinaFutureUS())	$this->cny_ref = new MyStockReference('fx_susdcnh');		//$strCNY = 'USCNY';
         	}
         	else if ($this->pair_ref->IsSymbolH())
         	{
@@ -163,12 +172,12 @@ class FundPairReference extends MyPairReference
 		if ($this->pair_ref)
 		{
 			$this->realtime_callback = $callback;
-			if ($this->pair_ref->IsSinaFuture())
+			if ($this->pair_ref->IsSinaFutureUS())
 			{
         		if ($this->pair_ref->CheckAdjustFactorTime($this))	$this->AverageCalibraion();
        		}
         	
-			if ($this->IsSinaFuture())
+			if ($this->IsSinaFutureUS())
 			{
 				// $this->netvalue_ref = $this; Can NOT do this in __construct
         		if ($this->CheckAdjustFactorTime($this->pair_ref))	$this->AverageCalibraion();
@@ -248,7 +257,12 @@ class FundPairReference extends MyPairReference
     {
         $strOfficialDate = $this->GetOfficialDate();
         $fCny = $this->cny_ref ? $this->cny_ref->GetVal($strOfficialDate) : false;
-		if (($strEst = PairNetValueGetClose($this->pair_ref, $strOfficialDate)) == false)
+		if ($this->pair_ref->IsSinaFutureCN())
+		{
+			$strEst = $this->pair_ref->strVWAP;
+//			DebugString(__FUNCTION__.' VWAP '.$strEst, true);
+		}
+		else if (($strEst = PairNetValueGetClose($this->pair_ref, $strOfficialDate)) == false)
 		{
 			$strEst = $this->pair_ref->GetPrice();
 		}
@@ -265,7 +279,7 @@ class FundPairReference extends MyPairReference
         {
         	if ($strOfficialDate != $this->cny_ref->GetDate())		return $this->EstFromPair($this->pair_ref->GetVal(), $this->cny_ref->GetVal());
         }
-       	if ($strOfficialDate != $this->pair_ref->GetDate())			return $this->EstFromPair($this->pair_ref->GetVal());
+       	if ($this->pair_ref->IsSinaFutureCN() || ($strOfficialDate != $this->pair_ref->GetDate()))			return $this->EstFromPair($this->pair_ref->GetVal());
     	return false;
     }
 

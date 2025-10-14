@@ -43,14 +43,25 @@ function GetStockDataArray($strSymbols)
 					$strDate = $record['date'];
 					$arData['netvalue'] = SqlGetNetValueByDate($strStockId, $strDate);
 				
-					$cny_ref = $fund_ref->GetForexRef();
-					if ($est_ref = $fund_ref->GetEstRef())
+					if (method_exists($fund_ref, 'GetEstRef'))
 					{
-						$strIndex = $est_ref->GetSymbol();
-						if ($strEtf = GetLeverageHedgeSymbol($strSymbol))
+						$cny_ref = $fund_ref->GetForexRef();
+						if ($est_ref = $fund_ref->GetEstRef())
 						{
-							_addIndexArray($ar, $strIndex, $strEtf, $strDate, $cal_sql);
-							$strIndex = $strEtf;
+							$strIndex = $est_ref->GetSymbol();
+							if ($strEtf = GetLeverageHedgeSymbol($strSymbol))
+							{
+								_addIndexArray($ar, $strIndex, $strEtf, $strDate, $cal_sql);
+								$strIndex = $strEtf;
+							}
+						}
+					}
+					else
+					{
+						$cny_ref = $fund_ref->GetCnyRef();
+						if ($pair_ref = $fund_ref->GetPairRef())
+						{
+							$strIndex = $pair_ref->GetSymbol();
 						}
 					}
 					$arData['symbol_hedge'] = $strIndex;
@@ -75,7 +86,7 @@ function GetStockDataArray($strSymbols)
 					}
 					if (count($arSymbolHedge) > 0)	$arData['symbol_hedge'] = $arSymbolHedge;
 				}
-				$arData['CNY'] = $cny_ref->GetPrice();
+				$arData['CNY'] = $cny_ref ? $cny_ref->GetPrice() : '1.0';
 				$arData['position'] = strval($fund_ref->GetPosition());
 			}
 		}

@@ -332,7 +332,7 @@ function _getPrimeNumber($callback, $strNumber)
 function _getPrimeNumberString($strNumber, $bChinese)
 {
 	$str = $bChinese ? '直接野蛮算' : 'Direct Computation';
-	$str .= ': '._getPrimeNumber('OnePassPrimeNumber', $strNumber).'<br />';
+	$str .= ': '._getPrimeNumber('OnePassPrimeNumber', $strNumber).GetHtmlNewLine();
 	$str .= $bChinese ? '数据库查找' : 'Database Lookup';
 	$str .= ': '._getPrimeNumber('LookUpPrimeNumber', $strNumber);
 	return $str;
@@ -365,7 +365,7 @@ function _getSinaJsAmericanArray($bChinese)
 function _getSinaJsFutureArray($bChinese)
 {
 	if ($bChinese)	return	 array('当前价格', '相对昨日结算价的变化百分比', '当前买价', '当前卖价', STOCK_DISP_HIGH, STOCK_DISP_LOW, '时间', '昨日结算价', STOCK_DISP_OPEN, '持仓量', '当前买量？', '当前卖量？', '日期', 'GB2312编码的名字');
-	return	 array('Current price', 'The percentage of current price change', 'Bid price', 'Ask price', 'Today high', 'Today low', 'Time', 'Last adjusted close', 'Open price', 'Volume', 'Bid quantity?', 'Ask quantity?', 'Date', 'GB2312 coded name');
+	return	 array('Current price', 'The percentage of current price change', 'Bid price', 'Ask price', 'Today high', 'Today low', 'Time', 'Last settlement price', 'Open price', 'Volume', 'Bid quantity?', 'Ask quantity?', 'Date', 'GB2312 coded name');
 }
 
 function _getSinaJsForexArray($bChinese)
@@ -384,8 +384,8 @@ function _getSinaJsHongkongArray($bChinese)
 
 function _getSinaJsChineseFutureArray($bChinese)
 {
-	if ($bChinese)	return	 array('名字', '时间HH:MM:SS', STOCK_DISP_OPEN, STOCK_DISP_HIGH, STOCK_DISP_LOW, '昨日收盘价', '买价', '卖价', '最新价', '结算价', '昨日结算价', '买量', '卖量', '持仓量', '成交'.STOCK_DISP_QUANTITY, '商品交易所简称', '品种名简称', '日期');
-	return	 array('Name', 'Time HH:MM:SS', 'Open price', 'Today high', 'Today low', 'Last close', 'Bid', 'Ask', 'Current price', 'Adjusted close', 'Last adjusted close', 'Bid quantity', 'Ask quantity', 'Volume', 'Total quantity', 'Exchange short name', 'Short name', 'Date');
+	if ($bChinese)	return	 array('名字', '时间HH:MM:SS', STOCK_DISP_OPEN, STOCK_DISP_HIGH, STOCK_DISP_LOW, '昨日收盘价', '买价', '卖价', '最新价', '结算价', '昨日结算价', '买量', '卖量', '持仓量', '成交'.STOCK_DISP_QUANTITY, '商品交易所简称', '品种名简称', '日期', '?', '?', '?', '?', '?', '?', '?', '?', '?', '当日均价VWAP');
+	return	 array('Name', 'Time HH:MM:SS', 'Open price', 'Today high', 'Today low', 'Last close', 'Bid', 'Ask', 'Current price', 'Settlement price', 'Last settlement price', 'Bid quantity', 'Ask quantity', 'Volume', 'Total quantity', 'Exchange short name', 'Short name', 'Date', '?', '?', '?', '?', '?', '?', '?', '?', '?', 'VWAP');
 }
 
 function _getSinaSymbol($strFirst)

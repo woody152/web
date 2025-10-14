@@ -179,7 +179,11 @@ function _updateStockOptionFund($strSymbol, $strStockId, $strVal)
 	}
 	else
 	{
-		if ($strIndex)	$pair_sql->WritePairSymbol($strSymbol, StockGetSymbol($strIndex));
+		if ($strIndex)
+		{
+			$strPairSymbol = StockGetSymbol($strIndex);
+			if ($pair_sql->WritePairSymbol($strSymbol, $strPairSymbol) === false)	DebugString(__FUNCTION__.' write pair symbol failed: '.$strPairSymbol);
+		}
 		if ($strPos)	$pos_sql->WriteVal($strStockId, $strPos); 
 	}
 }
@@ -307,7 +311,12 @@ function _updateStockOptionDividend($ref, $strSymbol, $strStockId, $his_sql, $st
 function _updateStockOptionCalibration($strSymbol, $strStockId, $strDate, $strVal)
 {
 	DebugString($strSymbol.' '.$strDate.' '.$strVal);
-	if (!empty($strVal))
+	if (empty($strVal))
+	{
+		$last_sql = new LastCalibrationSql();
+		$last_sql->DeleteById($strStockId);
+	}
+	else
 	{
 		$strNetValue = SqlGetNetValueByDate($strStockId, $strDate);
 		if ($strSymbol == 'INDA' || $strSymbol == 'ASHR')
@@ -323,12 +332,25 @@ function _updateStockOptionCalibration($strSymbol, $strStockId, $strDate, $strVa
 		}
 		else
 		{
-			if (in_arrayChinaIndex($strSymbol))		return;
+			if (in_arrayChinaFuture($strSymbol))	
+			{
+				DebugString(__FUNCTION__.' unhandled China future symbol: '.$strSymbol);
+				return;
+			}
+			else if (in_arrayChinaIndex($strSymbol))	
+			{
+				DebugString(__FUNCTION__.' unhandled China index symbol: '.$strSymbol);
+				return;
+			}
 			else if (in_arrayQdii($strSymbol))		$strCNY = SqlGetNetValueByDate(SqlGetStockId('USCNY'), $strDate);
 			else if (in_arrayQdiiHk($strSymbol))	$strCNY = SqlGetNetValueByDate(SqlGetStockId('HKCNY'), $strDate);
 			else if (in_arrayQdiiJp($strSymbol))	$strCNY = SqlGetNetValueByDate(SqlGetStockId('JPCNY'), $strDate);
 			else if (in_arrayQdiiEu($strSymbol))	$strCNY = SqlGetNetValueByDate(SqlGetStockId('EUCNY'), $strDate);
-			else 									return;
+			else
+			{
+				DebugString(__FUNCTION__.' unhandled other symbol: '.$strSymbol);
+				return;
+			}
 
 			if ($strCNY == false)	return;
 			$strVal = strval(QdiiGetCalibration($strVal, $strCNY, $strNetValue));

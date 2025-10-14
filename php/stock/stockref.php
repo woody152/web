@@ -21,6 +21,9 @@ class StockReference extends StockSymbol
     var $strLow;
     var $strVolume = '0';
     
+    var $strSettlePrice = false;
+    var $strVWAP;
+    
     var $arBidPrice = array();
     var $arBidQuantity = array();
     var $arAskPrice = array();
@@ -409,7 +412,6 @@ class StockReference extends StockSymbol
     function _onSinaFutureCN($ar)
     {
         $this->strPrice = $ar[8];
-//        $this->strPrice = $ar[9];
         $this->strTime = substr($ar[1], 0, 2).':'.substr($ar[1], 2, 2).':'.substr($ar[1], 4, 2);
         $this->strPrevPrice = $ar[10];
         $this->strDate = $ar[17];
@@ -419,6 +421,9 @@ class StockReference extends StockSymbol
         $this->strHigh = $ar[3];
         $this->strLow = $ar[4];
         $this->strVolume = $ar[14];
+        
+        $this->strSettlePrice = IsZeroString($ar[9]) ? false : $ar[9];
+        $this->strVWAP = $ar[27];
     }
     
     function LoadSinaFutureData()
@@ -431,7 +436,7 @@ class StockReference extends StockSymbol
 			$ar = explodeQuote($str);
 			if (count($ar) >= 13)
 			{
-				if ($this->IsSinaFutureUs())
+				if ($this->IsSinaFutureUS())
 				{
 					$this->_onSinaFuture($ar);
 				}
