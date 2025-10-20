@@ -26,7 +26,7 @@ def IsMarketOpen():
         return True
     return False
 
-def GetOrderArray(arPrice = [], iSize = 1, iBuyPos = -1, iSellPos = -1):
+def GetOrderArray(arPrice = [], iSize = 1, iBuyPos = -1, iSellPos = -1, iAvgPos = -1):
     iLen = len(arPrice)
     if iSellPos >= iLen or iSellPos < -1:
         iSellPos = -1
@@ -39,6 +39,7 @@ def GetOrderArray(arPrice = [], iSize = 1, iBuyPos = -1, iSellPos = -1):
           'SELL_pos': iSellPos,
           'BUY_org_pos': iBuyPos,
           'SELL_org_pos': iSellPos,
+          'VWAP_pos': iAvgPos,
           'size': iSize
          }
     return ar
@@ -65,7 +66,7 @@ class MyEWrapper(EWrapper):
         #self.arQQQ = {'SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941'}
         self.arXOPETF = {'SH513350', 'SZ159518'}
         self.arOrder = {}
-        self.arOrder['KWEB'] = GetOrderArray([20.93, 30.34, 37.00, 39.19, 40.48, 41.66, 44.13], 200, 2, 6)
+        self.arOrder['KWEB'] = GetOrderArray([20.93, 30.34, 37.00, 38.23, 39.55, 40.58, 41.24, 44.26], 200, 2, 7)
         if IsChinaMarketOpen():
             self.arOrder['GLD'] = GetOrderArray()
             self.arOrder['IEO'] = GetOrderArray()
@@ -77,10 +78,9 @@ class MyEWrapper(EWrapper):
             self.arOrder['XOP'] = GetOrderArray()
         else:
         #if IsMarketOpen():
-            self.arOrder['TLT'] = GetOrderArray([90.57, 91.06], 100, -1, 1)
-            #self.arOrder['XOP'] = GetOrderArray([137.64, 138.46], 100, -1, 1)
-            self.arOrder['SPX'] = GetOrderArray([4845.59, 5808.49, 5856.35, 6367.86, 6552.33, 6672.46, 6674.02, 6699.25, 6792.59, 6879.37])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0063, 4, 8)
+            self.arOrder['TLT'] = GetOrderArray([91.46, 93.86], 100, -1, 1, 0)
+            self.arOrder['SPX'] = GetOrderArray([4845.59, 5808.49, 5856.35, 6367.86, 6557.68, 6560.03, 6789.91, 6879.37])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0059, 4, 6)
             self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0187, -1, -1)
         self.palmmicro = Palmmicro()
         self.client.StartStreaming(orderId)
@@ -155,8 +155,12 @@ class MyEWrapper(EWrapper):
                     arMktData['VWAP_price'] = fPrice
                     print(strSymbol, 'VWAP', fPrice)
 
+    def _debugUnexpectedStatus(self, strStatus, strType):
+        if strStatus != 'Submitted' and strStatus != 'PreSubmitted':
+            print('Unexpected ' + strType + ' status: ' + strStatus)
+
     def orderStatus(self, orderId, status, filled, remaining, avgFillPrice, permId, parentId, lastFillPrice, clientId, whyHeld, mktCapPrice):
-        print('Order Status - OrderId:', orderId, 'Status:', status, 'Filled:', filled, 'Remaining:', remaining, 'AvgFillPrice:', avgFillPrice)
+        print('Order Status - OrderId:', orderId, '| Filled:', filled, '| Remaining:', remaining, '| AvgFillPrice:', avgFillPrice, '| Status:', status)
         for strSymbol in self.arOrder.keys():
             arOrder = self.arOrder[strSymbol]
             iLen = len(arOrder['price'])
@@ -177,8 +181,8 @@ class MyEWrapper(EWrapper):
                     arOrder['BUY_pos'] = -1
                     arOrder['BUY_org_pos'] = -1
                     #print('BUY order cancelled ' + str(orderId))
-                elif status != 'Submitted':
-                    print('Unexpected BUY status ' + status)
+                else:
+                    self._debugUnexpectedStatus(status, 'BUY')
             elif arOrder['SELL_id'] == orderId:
                 if status == 'Filled' and remaining == 0:
                     arOrder['SELL_id'] = -1
@@ -195,8 +199,8 @@ class MyEWrapper(EWrapper):
                     arOrder['SELL_id'] = -1
                     arOrder['SELL_pos'] = -1
                     arOrder['SELL_org_pos'] = -1
-                elif status != 'Submitted':
-                    print('Unexpected SELL status ' + status)
+                else:
+                    self._debugUnexpectedStatus(status, 'SELL')
 
     def IncSellPos(self, arOrder, iFrom, iLen):
         arOrder['SELL_pos'] = iFrom + 1
@@ -377,12 +381,12 @@ class MyEClient(EClient):
         order.totalQuantity = iSize
         order.orderType = 'LMT'
         order.lmtPrice = price
-        if strSymbol.startswith('MES') or strSymbol == 'TLT' or strSymbol == 'XOP':
-            if IsMarketOpen() == False:
-                return -1
-        else:
+        if strSymbol == 'KWEB':
             if contract.exchange != 'OVERNIGHT':
                 order.outsideRth = True
+        else:
+            if IsMarketOpen() == False:
+                return -1
         if iOrderId == -1:
             iOrderId = self.iOrderId
             self.iOrderId += 1

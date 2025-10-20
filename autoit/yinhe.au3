@@ -511,15 +511,15 @@ EndFunc
 Func _getFundAmount($strSymbol)
 	Switch $strSymbol
 		Case '160216'
-			$strAmount = '10000'
+			$strAmount = '300000'
 		Case '160416'
-			$strAmount = '50'
-		Case '161226'
-			$strAmount = '6000'
-		Case '162411'
-			$strAmount = '50'
-		Case '164906'
 			$strAmount = '10000'
+		Case '162411'
+			$strAmount = '1000'
+		Case '164906'
+			$strAmount = '1000000'
+		Case '501018'
+			$strAmount = '1000'
 		Case '501225'
 			$strAmount = '1000'
 		Case Else
@@ -849,7 +849,7 @@ Func _addOtherAccount($hWnd, $iSoftware, $idDebug, $strAccount, $strPassword)
 	Send('{ENTER}')
 	Sleep(1000)
 	_closeNewDlg($idDebug)
-	_loginDlg($iSoftware, $idDebug, '添加账号', $strAccount, $strPassword)
+	_loginDlg($iSoftware, $idDebug, '加账号', $strAccount, $strPassword)
 EndFunc
 
 Func RunLoginOnly($hWnd, $idProgress, $iSoftware, $idDebug, Const ByRef $arAccountNumber, Const ByRef $arAccountPassword, Const ByRef $arAccountChecked, $iMax, $iCur)
@@ -1085,7 +1085,7 @@ Func _loadListViewAccount($iSoftware, $idListViewAccount, ByRef $arCheckboxAccou
 EndFunc
 
 Func AppMain()
-	$idFormMain = GUICreate("通达信单独委托版全自动拖拉机0.89", 803, 506, 289, 0)
+	$idFormMain = GUICreate("通达信单独委托版全自动拖拉机0.90", 803, 506, 289, 0)
 
 	$idListViewAccount = GUICtrlCreateListView("客户号", 24, 24, 146, 454, BitOR($GUI_SS_DEFAULT_LISTVIEW,$WS_VSCROLL), BitOR($WS_EX_CLIENTEDGE,$LVS_EX_CHECKBOXES))
 	GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 0, 118)
@@ -1096,7 +1096,7 @@ Func AppMain()
 
 	$idLabelSymbol = GUICtrlCreateLabel("基金代码", 192, 24, 52, 17)
 	$idListSymbol = GUICtrlCreateList("", 192, 48, 121, 97)
-	GUICtrlSetData(-1, '160216|160416|160717|160719|160723|161116|161124|161125|161126|161127|161128|161129|161130|161226|162411|162415|163208|164701|164824|164906|501225|510300', _getProfileString('Symbol', '161128'))
+	GUICtrlSetData(-1, '160216|160416|160717|160719|160723|161116|161124|161125|161126|161127|161128|161129|161130|161226|162411|162415|163208|164701|164824|164906|501018|501225', _getProfileString('Symbol', '161128'))
 
 	$idLabelSellPrice = GUICtrlCreateLabel("卖出价格", 192, 160, 52, 17)
 	$idInputSellPrice = GUICtrlCreateInput("", 192, 184, 121, 21)
@@ -1115,7 +1115,7 @@ Func AppMain()
 
 	$GroupSoftware = GUICtrlCreateGroup("软件", 336, 400, 225, 81)
 	$iSoftware = 0
-	$RadioYinhe = GUICtrlCreateRadio("银河证券海王星单独委托版3.28", 352, 424, 193, 17)
+	$RadioYinhe = GUICtrlCreateRadio("银河证券海王星单独委托版3.29", 352, 424, 193, 17)
 	GUICtrlSetState(-1, _getRadioState($RadioYinhe, $iSoftware, 'Yinhe', $GUI_CHECKED))
 	$RadioHuabao = GUICtrlCreateRadio("华宝证券通达信版独立交易8.28", 352, 448, 193, 17)
 	GUICtrlSetState(-1, _getRadioState($RadioHuabao, $iSoftware, 'Huabao', $GUI_UNCHECKED))

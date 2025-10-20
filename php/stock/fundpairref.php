@@ -268,7 +268,7 @@ class FundPairReference extends MyPairReference
 		}
 		
    		$fVal = $this->EstFromPair(floatval($strEst), $fCny);
-   		StockUpdateEstResult($this->GetStockId(), $fVal, $strOfficialDate);
+   		if ($this->pair_ref->GetHourMinute() < 2055)	StockUpdateEstResult($this->GetStockId(), $fVal, $strOfficialDate);
         return $fVal;
     }
 
