@@ -2,7 +2,7 @@
 require_once('_stock.php');
 require_once('../../php/ui/imagedisp.php');
 
-define('YINHE_AU3_VER', '89');
+define('YINHE_AU3_VER', '91');
 
 function EchoAll()
 {
@@ -10,7 +10,7 @@ function EchoAll()
     
     EchoHtmlElement(GetRemarkElement('完整软件安装步骤：'));
     $strNepturnLink = GetExternalLink('https://www.chinastock.com.cn/newsite/online/downloadCenterDetail.html?softName=neptune', '银河证券官网');
-    $strNepturn = GetBoldElement('海王星单独委托版3.28');
+    $strNepturn = GetBoldElement('海王星单独委托版3.29');
     $strHuabaoLink = GetExternalLink('https://www.cnhbstock.com/view/software/software.html?col=0', '华宝证券官网');
     $strHuabao = GetBoldElement('通达信版独立交易8.28');
     $strAutoIt =  GetBoldElement('AutoIt3.exe');
