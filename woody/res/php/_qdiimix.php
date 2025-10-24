@@ -57,8 +57,11 @@ class _QdiiMixAccount extends FundGroupAccount
     	case 'SZ160216':
 		case 'SZ160644':
 		case 'SZ160719':
+		case 'SZ160723':
 		case 'SZ161116':
+		case 'SZ161129':
 		case 'SZ164701':
+		case 'SH501018':
 		case 'SH501225':
 		case 'SH501312':
         	if ($strNetValueDate != $strHoldingsDate)		

@@ -326,7 +326,7 @@ class HoldingsReference extends MyStockReference
 			}
 		}
 		
-		$fTotalChange /= $fTotalRatio;
+		if ($fTotalRatio > MIN_FLOAT_VAL)	$fTotalChange /= $fTotalRatio;
 		$fTotalChange -= 1.0;
 		$fTotalChange *= RefAdjustForex($this, $fAdjustHKD, $fAdjustUSD);
 		$fTotalChange *= $this->GetPosition();

@@ -66,7 +66,7 @@ function GetCategoryArray($strItem)
         break;
         
     case 'oilfund':
-    	$ar = array_merge(QdiiGetXopSymbolArray(), QdiiGetOilEtfSymbolArray(), QdiiGetOilSymbolArray());
+    	$ar = array_merge(QdiiGetXopSymbolArray(), QdiiGetOilEtfSymbolArray(), GetQdiiOilSymbolArray());
         break;
         
     case 'overnight':

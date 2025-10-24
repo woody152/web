@@ -23,7 +23,7 @@ class StockGroup
     function OnStockTransaction($trans)
     {
         $sym = $trans->ref;
-        if ($sym->IsSymbolA() || $sym->GetSymbol() == 'fx_susdcnh')
+        if ($sym->IsSymbolA() || $sym->IsSinaFutureCN() || $sym->GetSymbol() == 'fx_susdcnh')
         {
             $this->multi_amount->fCNY += $trans->GetValue();
             $this->multi_profit->fCNY += $trans->GetProfit();

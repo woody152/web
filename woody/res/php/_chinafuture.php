@@ -33,7 +33,7 @@ function EchoAll()
 
     if ($group = $acct->EchoTransaction()) 
     {
-    	$acct->EchoMoneyParagraph($group, $cnh_ref);
+    	$acct->EchoMoneyParagraph($group);
 	}
 	
     $acct->EchoLinks('chinafuture', 'GetChinaFutureLinks');

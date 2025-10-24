@@ -21,7 +21,6 @@ function QdiiGetEstSymbol($strSymbol)
     if (in_arrayXopQdii($strSymbol))				return 'XOP';	// '^SPSIOP'
     else if ($strSymbol == 'SZ162719')   			return 'IEO'; // '^DJSOEP'
     else if ($strSymbol == 'SZ162415')   			return 'XLY';	// '^IXY'
-    else if (in_arrayOilQdii($strSymbol)) 			return 'USO';
     else if ($strSymbol == 'SZ160140')   			return 'VNQ';	// SCHH
     else if ($strSymbol == 'SZ160416')   			return 'IXC';	// '^SPGOGUP'
     else if ($strSymbol == 'SZ161126')   			return 'RSPH';

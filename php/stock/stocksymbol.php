@@ -60,16 +60,6 @@ function in_arrayChinaFuture($strSymbol)
     return in_array($strSymbol, ChinaFutureGetSymbolArray());
 }
 
-function QdiiGetOilSymbolArray()
-{
-    return array('SH501018', 'SZ160723', 'SZ161129'); 
-}
-
-function in_arrayOilQdii($strSymbol)
-{
-    return in_array($strSymbol, QdiiGetOilSymbolArray());
-}
-
 function QdiiGetOilEtfSymbolArray()
 {
     return array('SZ160416', 'SZ162719', 'SZ163208'); 
@@ -133,7 +123,6 @@ function in_arrayXbiQdii($strSymbol)
 function QdiiGetSymbolArray()
 {
     $ar = array_merge(array('SH501300', 'SH513290', 'SH513400', 'SZ160140', 'SZ161126', 'SZ161128', 'SZ162415', 'SZ164824', 'SZ164906') 
-    				   , QdiiGetOilSymbolArray()
     				   , QdiiGetXbiSymbolArray()
     				   , QdiiGetXopSymbolArray()
     				   , QdiiGetOilEtfSymbolArray()
@@ -270,10 +259,23 @@ function GetQdiiGoldSymbolArray()
 	return array('SZ160719', 'SZ161116', 'SZ164701');
 }
 
+function GetQdiiOilSymbolArray()
+{
+	return array('SH501018', 'SZ160723', 'SZ161129');
+}
+
+/*
+function in_arrayOilQdii($strSymbol)
+{
+    return in_array($strSymbol, GetQdiiOilSymbolArray());
+}
+*/
+
 function QdiiMixGetSymbolArray()
 {
     $ar = array_merge(array('SH501225', 'SH501312', 'SH513360', 'SZ159509', 'SZ159529', 'SZ160216', 'SZ160644') 
     				   , GetQdiiGoldSymbolArray()
+    				   , GetQdiiOilSymbolArray()
     				   , GetChinaInternetSymbolArray()
     				   , GetHkMixSymbolArray()
     				   , GetMsciUs50SymbolArray());
@@ -305,7 +307,7 @@ function in_arrayAll($strSymbol)
 
 function GetOverNightSymbolArray()
 {
-	return array_merge(QdiiGetXopSymbolArray(), GetQdiiGoldSymbolArray(), array('SZ161125', 'SZ161127', 'SZ161130', 'SZ161226', 'SZ162415', 'SZ162719', 'SZ164906'));
+	return array_merge(QdiiGetXopSymbolArray(), GetQdiiGoldSymbolArray(), GetQdiiOilSymbolArray(), array('SZ161125', 'SZ161127', 'SZ161130', 'SZ161226', 'SZ162415', 'SZ162719', 'SZ164906'));
 }
 
 function IsChinaStockDigit($strDigit)

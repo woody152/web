@@ -8,12 +8,15 @@ from nyc_time import GetBeijingTimeDisplay
 
 from _tgprivate import TG_TOKEN
 from _tgprivate import WECHAT_KEY
+from _tgprivate import WECHAT_SH501018_KEY
 from _tgprivate import WECHAT_SH513350_KEY
 from _tgprivate import WECHAT_SZ159518_KEY
 from _tgprivate import WECHAT_SZ160719_KEY
+from _tgprivate import WECHAT_SZ160723_KEY
 from _tgprivate import WECHAT_SZ161116_KEY
 from _tgprivate import WECHAT_SZ161125_KEY
 from _tgprivate import WECHAT_SZ161127_KEY
+from _tgprivate import WECHAT_SZ161129_KEY
 from _tgprivate import WECHAT_SZ161130_KEY
 from _tgprivate import WECHAT_SZ161226_KEY
 from _tgprivate import WECHAT_SZ162411_KEY
@@ -90,12 +93,15 @@ class Palmmicro:
         self.bNewSinaData = False
         self.arSendMsg = {}
         self.arSendMsg['telegram'] = GetSendMsgArray(WECHAT_KEY)
+        self.arSendMsg['SH501018'] = GetSendMsgArray(WECHAT_SH501018_KEY)
         self.arSendMsg['SH513350'] = GetSendMsgArray(WECHAT_SH513350_KEY)
         self.arSendMsg['SZ159518'] = GetSendMsgArray(WECHAT_SZ159518_KEY)
         self.arSendMsg['SZ160719'] = GetSendMsgArray(WECHAT_SZ160719_KEY)
+        self.arSendMsg['SZ160723'] = GetSendMsgArray(WECHAT_SZ160723_KEY)
         self.arSendMsg['SZ161116'] = GetSendMsgArray(WECHAT_SZ161116_KEY)
         self.arSendMsg['SZ161125'] = GetSendMsgArray(WECHAT_SZ161125_KEY)
         self.arSendMsg['SZ161127'] = GetSendMsgArray(WECHAT_SZ161127_KEY)
+        self.arSendMsg['SZ161129'] = GetSendMsgArray(WECHAT_SZ161129_KEY)
         self.arSendMsg['SZ161130'] = GetSendMsgArray(WECHAT_SZ161130_KEY)
         self.arSendMsg['SZ161226'] = GetSendMsgArray(WECHAT_SZ161226_KEY)
         self.arSendMsg['SZ162411'] = GetSendMsgArray(WECHAT_SZ162411_KEY)

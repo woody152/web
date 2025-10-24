@@ -16,12 +16,12 @@ class QdiiAccount extends QdiiGroupAccount
         $strEstSymbol = QdiiGetEstSymbol($strSymbol);
         $arLev = $this->GetLeverageSymbols($strEstSymbol);
 		$ar = array($strSymbol, $strCNH);
-		if (in_arrayOilQdii($strSymbol))
+/*		if (in_arrayOilQdii($strSymbol))
 		{
 			$strOil = 'hf_OIL';
 			$ar[] = $strOil; 
 		}
-		else if (in_arrayXopQdii($strSymbol))
+		else*/ if (in_arrayXopQdii($strSymbol))
 		{
 			$strOil = 'hf_CL';
 			$ar[] = $strOil; 
@@ -92,12 +92,12 @@ function GetQdiiLinks($sym)
 
    	$str = '';
    	if ($acct->IsAdmin())	$str .= ' '.GetJisiluQdiiLink();
-	
+/*	
 	if (in_arrayOilQdii($strSymbol))
 	{
 		$str .= ' '.GetUscfLink();
 	}
-	
+*/	
 	if (in_arrayQqqQdii($strSymbol))
 	{
 		$str .= ' '.GetInvescoOfficialLink('QQQ').' '.GetProsharesOfficialLink('TQQQ');
