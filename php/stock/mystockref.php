@@ -68,6 +68,13 @@ class MyStockReference extends MysqlReference
    			}
    			
        		if ($strSymbol == 'GLD' || $strSymbol == 'USO')		$this->_buildForeignMarketData($strSymbol);
+        	else if ($strSymbol == 'hf_GC')
+        	{
+        		$strBase = 'GLD';
+    			$cal_sql = GetCalibrationSql();
+				$strFactor = $cal_sql->GetCloseNow(SqlGetStockId($strBase));
+        		$this->_buildForeignMarketData($strBase, 'JP', $strFactor);
+        	}
         	else if ($strSymbol == 'hf_CL')
         	{
         		$strBase = 'USO';

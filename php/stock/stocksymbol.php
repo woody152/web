@@ -72,7 +72,7 @@ function in_arrayOilEtfQdii($strSymbol)
 
 function QdiiGetCommoditySymbolArray()
 {
-    return array('SZ161815', 'SZ165513'); 
+    return array('SZ161815'); 
 }
 
 function in_arrayCommodityQdii($strSymbol)
@@ -256,7 +256,7 @@ function in_arrayHkMix($strSymbol)
 
 function GetQdiiGoldSymbolArray()
 {
-	return array('SZ160719', 'SZ161116', 'SZ164701');
+	return array('SZ160719', 'SZ161116', 'SZ164701', 'SZ165513');
 }
 
 function GetQdiiOilSymbolArray()

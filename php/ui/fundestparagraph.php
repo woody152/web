@@ -129,7 +129,8 @@ function _getFundPositionStr($ref)
 {
 	$str = '';
 	$fPosition = $ref->GetPosition();
-	if ($fPosition < 1.0)									$str .= GetFundPositionLink($ref->GetSymbol()).'值使用'.strval($fPosition).'。';
+	//if ($fPosition < 1.0)									
+	$str .= GetFundPositionLink($ref->GetSymbol()).'值使用'.strval($fPosition).'。';
 	return $str;
 }
 

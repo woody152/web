@@ -61,6 +61,7 @@ class _QdiiMixAccount extends FundGroupAccount
 		case 'SZ161116':
 		case 'SZ161129':
 		case 'SZ164701':
+		case 'SZ165513':
 		case 'SH501018':
 		case 'SH501225':
 		case 'SH501312':
