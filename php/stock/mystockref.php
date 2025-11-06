@@ -11,7 +11,7 @@ function GetForeignMarketCloseTick($strDate, $strType)
 	
 	case 'JP':
 		$strTimezone = 'Asia/Tokyo';
-		$strCloseTime = '15:00:00';
+		$strCloseTime = '15:30:00';
 		break;
 	
 	case 'HK':
@@ -58,12 +58,12 @@ class MyStockReference extends MysqlReference
 				{
 					$tick_sql = new StockTickSql();
 					$ymd = new TickYMD($tick_sql->ReadInt($strStockId));
-					if ($ymd->GetYMD() == $this->GetDate())
-					{
+					//if ($ymd->GetYMD() == $this->GetDate())
+					//{
 						$this->SetTime($ymd->GetHMS());
 						$this->SetExternalLink($strSymbol);
 						$this->SetHasData();
-					}
+					//}
 				}
    			}
    			

@@ -514,12 +514,14 @@ Func _getFundAmount($strSymbol)
 			$strAmount = '300000'
 		Case '160416'
 			$strAmount = '10000'
+		Case '161125'
+			$strAmount = '10'
 		Case '161128'
-			$strAmount = '50'
+			$strAmount = '10'
 		Case '161129'
 			$strAmount = '20'
 		Case '161130'
-			$strAmount = '50'
+			$strAmount = '10'
 		Case '164906'
 			$strAmount = '1000000'
 		Case '501018'
@@ -1089,7 +1091,7 @@ Func _loadListViewAccount($iSoftware, $idListViewAccount, ByRef $arCheckboxAccou
 EndFunc
 
 Func AppMain()
-	$idFormMain = GUICreate("通达信单独委托版全自动拖拉机0.93", 803, 506, 289, 0)
+	$idFormMain = GUICreate("通达信单独委托版全自动拖拉机0.94", 803, 506, 289, 0)
 
 	$idListViewAccount = GUICtrlCreateListView("客户号", 24, 24, 146, 454, BitOR($GUI_SS_DEFAULT_LISTVIEW,$WS_VSCROLL), BitOR($WS_EX_CLIENTEDGE,$LVS_EX_CHECKBOXES))
 	GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 0, 118)

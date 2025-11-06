@@ -408,7 +408,8 @@ class HoldingsReference extends MyStockReference
     		if ($this->_needFairNetValue())
     		{
     			$this->GetOfficialNetValue();
-    			$this->fFairNetValue = $this->_estNetValue() + $this->fOfficialEstAdjust;
+    			$this->fFairNetValue = $this->_estNetValue();
+    			$this->fFairNetValue += $this->fOfficialEstAdjust;
     		}
     	}
 		return $this->fFairNetValue;
@@ -421,7 +422,8 @@ class HoldingsReference extends MyStockReference
     		if ($this->UseRealtimeEst())
     		{
     			$this->GetOfficialNetValue();
-    			$this->fRealtimeNetValue = $this->_estNetValue(false, true) + $this->fOfficialEstAdjust;
+    			$this->fRealtimeNetValue = $this->_estNetValue(false, true);
+    			$this->fRealtimeNetValue += $this->fOfficialEstAdjust;
     		}
     	}
    		return $this->fRealtimeNetValue;

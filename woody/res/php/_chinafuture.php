@@ -1,6 +1,8 @@
 <?php
 require_once('_fundgroup.php');
 
+//https://81.futsseapi.eastmoney.com/sse/113_ag2602_qt
+
 class _ChinaFutureAccount extends FundGroupAccount
 {
     function Create() 
