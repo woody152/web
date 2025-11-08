@@ -682,7 +682,12 @@ Func YinheRedeemFund($hWnd, $idDebug, $strSymbol, $strSellQuantity, ByRef $iRema
 EndFunc
 
 Func _sendSellSymbol($hWnd, $iSoftware, $idDebug, $strSymbol)
-	If _CtlSendString($hWnd, $idDebug, 'AfxWnd421', $strSymbol) Then _addSymbolSpecialKey($iSoftware, $idDebug, $strSymbol)
+	If ($iSoftware == $YINHE)	Then
+		$strControl = 'AfxWnd421'
+	Else
+		$strControl = 'AfxWnd423'
+	EndIf
+	If _CtlSendString($hWnd, $idDebug, $strControl, $strSymbol) Then _addSymbolSpecialKey($iSoftware, $idDebug, $strSymbol)
 EndFunc
 
 Func _getSellStaticIndex($iSoftware, $iIndex)
@@ -1091,7 +1096,7 @@ Func _loadListViewAccount($iSoftware, $idListViewAccount, ByRef $arCheckboxAccou
 EndFunc
 
 Func AppMain()
-	$idFormMain = GUICreate("通达信单独委托版全自动拖拉机0.95", 803, 506, 289, 0)
+	$idFormMain = GUICreate("通达信单独委托版全自动拖拉机0.97", 803, 506, 289, 0)
 
 	$idListViewAccount = GUICtrlCreateListView("客户号", 24, 24, 146, 454, BitOR($GUI_SS_DEFAULT_LISTVIEW,$WS_VSCROLL), BitOR($WS_EX_CLIENTEDGE,$LVS_EX_CHECKBOXES))
 	GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 0, 118)

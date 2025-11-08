@@ -66,7 +66,7 @@ class MyEWrapper(EWrapper):
         #self.arQQQ = {'SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941'}
         self.arXOPETF = {'SH513350', 'SZ159518'}
         self.arOrder = {}
-        self.arOrder['KWEB'] = GetOrderArray([21.33, 31.77, 37.97, 38.49, 39.46, 39.99, 40.18, 41.50, 44.18], 200, 3, -1)
+        self.arOrder['KWEB'] = GetOrderArray([21.33, 31.77, 37.97, 38.49, 39.46, 39.99, 40.18, 41.50, 44.18], 200, 3, -1, 4)
         if IsChinaMarketOpen():
             self.arOrder['GLD'] = GetOrderArray()
             self.arOrder['IEO'] = GetOrderArray()
@@ -155,6 +155,13 @@ class MyEWrapper(EWrapper):
                 if arMktData['VWAP_price'] == None or abs(fPrice - arMktData['VWAP_price']) > 0.005:
                     arMktData['VWAP_price'] = fPrice
                     print(strSymbol, 'VWAP', fPrice)
+                    arOrder = self.arOrder[strSymbol]
+                    arPrice = arOrder['price']
+                    if arOrder['VWAP_pos'] != -1:
+                        iSellPos = arOrder['SELL_pos']
+                        if arOrder['SELL_id'] != -1 and arOrder['VWAP_pos'] == iSellPos:
+                            if fPrice < arPrice[iSellPos] and fPrice > arPrice[iSellPos - 1]:
+                                self.client.CallPlaceOrder(strSymbol, fPrice, arOrder['size'], 'SELL', arOrder['SELL_id'])
 
     def _debugUnexpectedStatus(self, strStatus, strType):
         if strStatus != 'Submitted' and strStatus != 'PreSubmitted':
@@ -172,11 +179,14 @@ class MyEWrapper(EWrapper):
                     arSellOrder = self.arOrder[strSellSymbol]
                     iOldSellPos = arSellOrder['SELL_pos']
                     self.IncSellPos(arSellOrder, arOrder['BUY_pos'], iLen)
-                    arSellOrder['SELL_org_pos'] = arSellOrder['SELL_pos']
+                    iSellPos = arSellOrder['SELL_pos']
+                    arSellOrder['SELL_org_pos'] = iSellPos
                     arOrder['BUY_pos'] -= 1
                     arOrder['BUY_org_pos'] = arOrder['BUY_pos']
-                    if arSellOrder['SELL_id'] != -1 and arSellOrder['SELL_pos'] > -1 and arSellOrder['SELL_pos'] != iOldSellPos:
-                        self.client.CallPlaceOrder(strSellSymbol, arSellOrder['price'][arSellOrder['SELL_pos']], arSellOrder['size'], 'SELL', arSellOrder['SELL_id'])
+                    if arSellOrder['SELL_id'] != -1 and iSellPos > -1 and iSellPos != iOldSellPos:
+                        fPrice = arSellOrder['price'][iSellPos]
+                        #if arSellOrder['VWAP_pos'] == iSellPos:
+                        self.client.CallPlaceOrder(strSellSymbol, fPrice, arSellOrder['size'], 'SELL', arSellOrder['SELL_id'])
                 elif status == 'Cancelled':
                     arOrder['BUY_id'] = -1
                     arOrder['BUY_pos'] = -1
