@@ -64,7 +64,7 @@ class StockTransactionSql extends TableSql
     	return array('groupitem_id' => $strGroupItemId, 'quantity' => $strQuantity, 'price' => $strPrice, 'fees' => $strFees, 'filled' => $strDateTime, 'remark' => $strRemark);
     }
 
-    function Insert($strGroupItemId, $strQuantity, $strPrice, $strFees = '', $strRemark = '')
+    function Insert($strGroupItemId, $strQuantity, $strPrice, $strFees = '0.0', $strRemark = '')
     {
     	return $this->InsertArray($this->_makePrivateFieldArray($strGroupItemId, $strQuantity, $strPrice, $strFees, $strRemark));
     }

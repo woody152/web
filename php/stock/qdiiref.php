@@ -15,10 +15,47 @@ function QdiiGetPeerVal($fQdii, $fCny, $fFactor)
 	return $fQdii * $fFactor / $fCny;
 }
 
-// https://markets.ft.com/data/indices/tearsheet/charts?s=SPGOGUP:REU
+// https://markets.ft.com/data/indices/tearsheet/charts?s=SPGOGUP:
+function QdiiGetEstArray()
+{
+	$ar = array('SH501300' => 'AGG',
+                'SH513290' => 'IBB',
+                'SH513400' => '^DJI',
+                'SZ160140' => 'VNQ',	// SCHH
+                'SZ160416' => 'IXC',	// '^SPGOGUP'
+                'SZ161126' => 'RSPH',
+                'SZ161128' => 'XLK',
+                'SZ162415' => 'XLY',	// '^IXY'
+                'SZ162719' => 'IEO',	// '^DJSOEP'
+                'SZ163208' => 'XLE',
+                'SZ164824' => 'INDA',
+                'SZ164906' => 'KWEB',
+               );
+    foreach (QdiiGetXopSymbolArray() as $strSymbol)			$ar[$strSymbol] = 'XOP';	// '^SPSIOP'
+    foreach (QdiiGetXbiSymbolArray() as $strSymbol)			$ar[$strSymbol] = 'XBI';
+    foreach (QdiiGetCommoditySymbolArray() as $strSymbol)	$ar[$strSymbol] = 'GSG';
+    foreach (QdiiGetSpySymbolArray() as $strSymbol)			$ar[$strSymbol] = '^GSPC';	// 'SPY'
+    foreach (QdiiGetQqqSymbolArray() as $strSymbol)			$ar[$strSymbol] = '^NDX';	// 'QQQ'
+    return $ar;
+}
+
+function QdiiGetArray($strEst)
+{
+	$ar = array();
+	foreach (QdiiGetEstArray() as $strSymbol => $str)
+	{
+		if ($str == $strEst)	$ar[] = $strSymbol;
+	}
+	return $ar;
+}
+
 function QdiiGetEstSymbol($strSymbol)
 {
-    if (in_arrayXopQdii($strSymbol))				return 'XOP';	// '^SPSIOP'
+	$ar = QdiiGetEstArray();
+	if (isset($ar[$strSymbol]))		return $ar[$strSymbol];
+	return false;
+	
+/*    if (in_arrayXopQdii($strSymbol))				return 'XOP';	// '^SPSIOP'
     else if ($strSymbol == 'SZ162719')   			return 'IEO'; // '^DJSOEP'
     else if ($strSymbol == 'SZ162415')   			return 'XLY';	// '^IXY'
     else if ($strSymbol == 'SZ160140')   			return 'VNQ';	// SCHH
@@ -36,7 +73,7 @@ function QdiiGetEstSymbol($strSymbol)
     else if ($strSymbol == 'SH513290')   			return 'IBB';
     else if ($strSymbol == 'SH513400')   			return '^DJI';
     else 
-        return false;
+        return false;*/
 }
 
 function QdiiHkGetEstSymbol($strSymbol)

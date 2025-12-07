@@ -6,15 +6,33 @@ require_once('_sseholdings.php');
 require_once('_szseholdings.php');
 require_once('_updateholdings.php');
 
+function _updateStockHistoryAdjCloseBySplit($ref, $strSymbol, $strStockId, $his_sql, $strYMD, $fRatio)
+{
+    $ar = array();
+    if ($result = $his_sql->GetFromDate($strStockId, $strYMD)) 
+    {
+        while ($record = mysqli_fetch_assoc($result)) 
+        {
+            $ar[$record['id']] = floatval($record['adjclose']);
+        }
+        mysqli_free_result($result);
+    }
+
+    foreach ($ar as $strId => $fAdjClose)
+    {
+        $fAdjClose /= $fRatio;
+        $his_sql->UpdateAdjClose($strId, strval($fAdjClose));
+    }
+    unlinkConfigFile($strSymbol);
+}
+
 function _updateStockHistoryAdjCloseByDividend($ref, $strSymbol, $strStockId, $his_sql, $strYMD, $strDividend)
 {
     $ar = array();
     if ($result = $his_sql->GetFromDate($strStockId, $strYMD)) 
     {
-//    	DebugString('START: '.$strYMD);
         while ($record = mysqli_fetch_assoc($result)) 
         {
-//        	DebugString($record['date']);
             $ar[$record['id']] = floatval($record['adjclose']);
         }
         mysqli_free_result($result);
@@ -24,7 +42,6 @@ function _updateStockHistoryAdjCloseByDividend($ref, $strSymbol, $strStockId, $h
     foreach ($ar as $strId => $fAdjClose)
     {
         $fAdjClose -= $fDividend;
-//        $fAdjClose *= 4;
         $his_sql->UpdateAdjClose($strId, strval($fAdjClose));
     }
     unlinkConfigFile($strSymbol);
@@ -245,6 +262,33 @@ function _updateStockOptionSplit($ref, $strSymbol, $strStockId, $his_sql, $strDa
 		{
 			_updateStockOptionSplitTransactions($ref, $strStockId, $his_sql, $strDate, $fRatio);
 		}
+		
+       	$cal_sql = GetCalibrationSql();
+		// $net_sql = GetNetValueHistorySql();
+  		if ($strClosePrev = $cal_sql->GetClosePrev($strStockId, $strDate))
+  		{	// SPY, TQQQ
+  			$strDatePrev = $cal_sql->GetDatePrev($strStockId, $strDate);
+  			DebugString($strSymbol.' Change calibaration on '.$strDatePrev);
+  			$fFactor = floatval($strClosePrev) * $fRatio;
+  			$cal_sql->WriteDaily($strStockId, $strDatePrev, strval($fFactor));
+  		}
+  		else
+  		{
+  			$arQdii = QdiiGetArray($strSymbol);
+			foreach ($arQdii as $strQdii)
+			{
+				$strQdiiId = SqlGetStockId($strQdii);
+				if ($strClosePrev = $cal_sql->GetClosePrev($strQdiiId, $strDate))
+				{
+					$strDatePrev = $cal_sql->GetDatePrev($strQdiiId, $strDate);
+					DebugString(__FUNCTION__.' '.$strQdii.' Change calibaration on '.$strDatePrev);
+					$fFactor = floatval($strClosePrev) / $fRatio;
+					$cal_sql->WriteDaily($strQdiiId, $strDatePrev, strval($fFactor));
+				}
+  			}
+  		}
+ 		// if ($strClosePrev)	$net_sql->WriteDaily($strStockId, $strDatePrev, strval($fNewNetValue));
+		_updateStockHistoryAdjCloseBySplit($ref, $strSymbol, $strStockId, $his_sql, $strDate, $fRatio);
 	}
 }
 
@@ -267,7 +311,7 @@ function _updateStockOptionDividend($ref, $strSymbol, $strStockId, $his_sql, $st
   		}
   		else
   		{
-  			switch ($strSymbol)
+/*  			switch ($strSymbol)
   			{
   			case 'KWEB':
   				$arQdii = array('SZ164906');
@@ -288,7 +332,8 @@ function _updateStockOptionDividend($ref, $strSymbol, $strStockId, $his_sql, $st
   			default:
   				$arQdii = array();
   				break;
-  			}
+  			}*/
+  			$arQdii = QdiiGetArray($strSymbol);
 			foreach ($arQdii as $strQdii)
 			{
 				$strQdiiId = SqlGetStockId($strQdii);
