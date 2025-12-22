@@ -144,7 +144,10 @@ function StockGetFundFeeRatio($strSymbol)
    	case 'SZ160416':
    	case 'SZ161116':
 		return 0.0;
-    		
+	
+   	case 'SZ161226':
+		return 0.01;
+		
 	case 'SH501018':
 	case 'SZ161125':
 	case 'SZ161126':

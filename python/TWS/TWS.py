@@ -57,8 +57,8 @@ def AdjustOrderArray(arOrder, fAdjust, iBuyPos = -1, iSellPos = -1):
 class MyEWrapper(EWrapper):
     def __init__(self, client):
         self.client = client
-        self.strCurFuture = '202512'
-        self.strNextFuture = '202603'
+        self.strCurFuture = '202603'
+        self.strNextFuture = '202606'
         self.arDebug = {}
 
     def nextValidId(self, orderId: int):
@@ -66,9 +66,10 @@ class MyEWrapper(EWrapper):
         #self.arQQQ = {'SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941'}
         self.arXOPETF = {'SH513350', 'SZ159518'}
         self.arOrder = {}
-        self.arOrder['KWEB'] = GetOrderArray([21.92, 32.65, 33.90, 35.71, 37.40, 37.46], 200, 4, -1, 0)
-        self.arOrder['TLT'] = GetOrderArray([81.68, 83.76, 88.00, 88.81, 89.20, 89.36], 100, 2, 5)
+        self.arOrder['KWEB'] = GetOrderArray([21.92, 32.65, 34.70, 35.68, 36.11, 36.68, 37.07, 38.46, 38.85, 43.01, 43.38], 200, 4, 6, 0)
+        #self.arOrder['TLT'] = GetOrderArray([81.71, 84.44, 86.76, 87.70], 100, 2, -1)
         #self.arOrder['SPY'] = GetOrderArray([612.11, 653.01, 653.17], 50, 1, -1)
+        #self.arOrder['XOP'] = GetOrderArray([135.08, 135.15, 138.48, 139.43, 150.32], 100, -1, 3)
         if IsChinaMarketOpen():
             self.arOrder['GLD'] = GetOrderArray()
             self.arOrder['IEO'] = GetOrderArray()
@@ -81,10 +82,9 @@ class MyEWrapper(EWrapper):
             self.arOrder['XOP'] = GetOrderArray()
         else:
         #if IsMarketOpen():
-            self.arOrder['XOP'] = GetOrderArray([137.47, 138.10], 100, -1, 1)
-            self.arOrder['SPX'] = GetOrderArray([4936.03, 5987.40, 6213.62, 6529.45, 6751.87, 6787.17, 6837.21, 6974.29, 7038.77])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0015, 3, -1)
-            self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.01, -1, 7)
+            self.arOrder['SPX'] = GetOrderArray([4936.03, 5987.40, 6274.99, 6306.62, 6648.28, 6649.04, 6778.24, 6808.95, 6823.90, 6968.85, 6989.94, 7038.77])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0083, 3, 9)
+            self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0188, -1, -1)
         self.palmmicro = Palmmicro()
         self.client.StartStreaming(orderId)
         self.arMkt = {}
@@ -108,8 +108,8 @@ class MyEWrapper(EWrapper):
 
     def __get_sell_symbol(self, strSymbol):
         if strSymbol.startswith('MES'):
-            return 'MES' + self.strNextFuture
-            #return 'MES' + self.strCurFuture
+            #return 'MES' + self.strNextFuture
+            return 'MES' + self.strCurFuture
         else:
             return strSymbol
 
@@ -394,7 +394,7 @@ class MyEClient(EClient):
         order.totalQuantity = iSize
         order.orderType = 'LMT'
         order.lmtPrice = price
-        if strSymbol == 'KWEB' or strSymbol == 'TLT' or strSymbol == 'SPY':
+        if strSymbol == 'KWEB' or strSymbol == 'TLT' or strSymbol == 'XOP':
             if contract.exchange != 'OVERNIGHT':
                 order.outsideRth = True
         else:

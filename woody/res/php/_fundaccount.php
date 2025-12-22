@@ -29,7 +29,7 @@ function _getFundAmount($strSymbol, $strDate)
 		
 	case 'SZ160719':
    	case 'SZ161116':
-//	case 'SZ161124':
+	case 'SZ161226':
 	case 'SZ162415':
 	case 'SZ164701':
 	case 'SZ164824':
@@ -78,22 +78,34 @@ function _getFundAmount($strSymbol, $strDate)
 	return $iAmount * (1.0 - StockGetFundFeeRatio($strSymbol));
 }
 
-function _echoFundAccountItem($csv, $strDate, $strSharesDiff, $ref, $strSymbol, $strStockId, $his_sql)
+function _echoFundAccountItem($csv, $strDate, $strSharesDiff, $ref, $strSymbol, $strStockId, $his_sql, $iDays)
 {
     $iCount = 0;
-    if ($result = $his_sql->GetFromDate($strStockId, $strDate, 5)) 
+    if ($result = $his_sql->GetFromDate($strStockId, $strDate, $iDays)) 
     {
         while ($record = mysqli_fetch_assoc($result)) 
         {
-            if ($iCount == 3)
-            {
-            	$fClose = floatval($record['close']);
-            	$strPurchaseDate = $record['date'];
-            }
-            else if ($iCount == 4)
-            {
-            	$strNetValueDate = $record['date'];
-            }
+        	if ($iDays == 5)
+        	{
+        		if ($iCount == 3)
+        		{
+        			$fClose = floatval($record['close']);
+        			$strPurchaseDate = $record['date'];
+        		}
+        		else if ($iCount == 4)
+        		{
+        			$strNetValueDate = $record['date'];
+        		}
+        	}
+        	else
+        	{
+        		if ($iCount == 2)
+        		{
+        			$fClose = floatval($record['close']);
+        			$strPurchaseDate = $record['date'];
+        			$strNetValueDate = $record['date'];
+        		}
+        	}
             
             $iCount ++;
         }
@@ -101,7 +113,7 @@ function _echoFundAccountItem($csv, $strDate, $strSharesDiff, $ref, $strSymbol, 
     }
 
    	$ar = array($strDate, $strSharesDiff);
-    if ($iCount == 5)
+    if ($iCount == $iDays)
     {
     	$fPurchaseValue = $ref->GetNetValue($strPurchaseDate);
        	$fAmount = _getFundAmount($strSymbol, $strPurchaseDate);
@@ -110,7 +122,7 @@ function _echoFundAccountItem($csv, $strDate, $strSharesDiff, $ref, $strSymbol, 
     	$ar[] = ($fAccount > MIN_FLOAT_VAL) ? $strAccount : '';
     	$ar[] = $strPurchaseDate;
     	
-    	if ($strPurchaseDate == GetNextTradingDayYMD($strNetValueDate))
+    	if (($iDays == 5 && $strPurchaseDate == GetNextTradingDayYMD($strNetValueDate)) || $iDays == 3)
     	{
     		$fNetValue = $ref->GetNetValue($strNetValueDate);
     		$ar[] = $ref->GetPriceDisplay($fClose, $fNetValue);
@@ -130,7 +142,7 @@ function _echoFundAccountItem($csv, $strDate, $strSharesDiff, $ref, $strSymbol, 
 	EchoTableColumn($ar);
 }
 
-function _echoFundAccountData($csv, $ref, $strSymbol, $strStockId, $his_sql)
+function _echoFundAccountData($csv, $ref, $strSymbol, $strStockId, $his_sql, $iDays)
 {
 	$sql = new SharesDiffSql();
     if ($result = $sql->GetAll($strStockId)) 
@@ -138,7 +150,7 @@ function _echoFundAccountData($csv, $ref, $strSymbol, $strStockId, $his_sql)
         while ($record = mysqli_fetch_assoc($result)) 
         {
        		$strDate = $record['date'];
-       		_echoFundAccountItem($csv, $strDate, rtrim0($record['close']), $ref, $strSymbol, $strStockId, $his_sql);
+       		_echoFundAccountItem($csv, $strDate, rtrim0($record['close']), $ref, $strSymbol, $strStockId, $his_sql, $iDays);
         }
         mysqli_free_result($result);
     }
@@ -156,24 +168,25 @@ function _getFundAccountTableColumnArray()
 				   );
 }
 
-function _echoFundAccountParagraph($csv, $ref, $strSymbol, $strStockId, $his_sql, $bAdmin)
+function _echoFundAccountParagraph($csv, $ref, $strSymbol, $strStockId, $his_sql, $iDays, $bAdmin)
 {
  	$str = GetFundLinks($strSymbol);
 	if ($bAdmin)	$str .= ' '.GetStockOptionLink(STOCK_OPTION_SHARE_DIFF, $strSymbol);
 	
 	EchoTableParagraphBegin(_getFundAccountTableColumnArray(), 'fundaccount', $str);
-	_echoFundAccountData($csv, $ref, $strSymbol, $strStockId, $his_sql);
+	_echoFundAccountData($csv, $ref, $strSymbol, $strStockId, $his_sql, $iDays);
     EchoTableParagraphEnd();
 }
 
-function _echoFundAccountPredictData($ref, $strSymbol, $strStockId, $his_sql, $jpg)
+function _echoFundAccountPredictData($ref, $strSymbol, $strStockId, $his_sql, $iDays, $jpg)
 {
 //    date_default_timezone_set('PRC');
 	$ref->SetTimeZone();
     $now_ymd = GetNowYMD();
 
     $iCount = 0;
-    if ($result = $his_sql->GetFromDate($strStockId, $now_ymd->GetYMD(), 4)) 
+    $iDays --;
+    if ($result = $his_sql->GetFromDate($strStockId, $now_ymd->GetYMD(), $iDays)) 
     {
         while ($record = mysqli_fetch_assoc($result)) 
         {
@@ -181,15 +194,28 @@ function _echoFundAccountPredictData($ref, $strSymbol, $strStockId, $his_sql, $j
         	{
         		$strDate = GetNextTradingDayYMD($record['date']);
         	}
-            else if ($iCount == 2)
-            {
-            	$fClose = floatval($record['close']);
-            	$strPurchaseDate = $record['date'];
-            }
-            else if ($iCount == 3)
-            {
-            	$strNetValueDate = $record['date'];
-            }
+        	
+        	if ($iDays == 4)
+        	{
+        		if ($iCount == 2)
+        		{
+        			$fClose = floatval($record['close']);
+        			$strPurchaseDate = $record['date'];
+        		}
+        		else if ($iCount == 3)
+        		{
+        			$strNetValueDate = $record['date'];
+        		}
+        	}
+        	else
+        	{
+        		if ($iCount == 1)
+        		{
+        			$fClose = floatval($record['close']);
+        			$strPurchaseDate = $record['date'];
+        			$strNetValueDate = $record['date'];
+        		}
+        	}
             
             $iCount ++;
         }
@@ -197,9 +223,9 @@ function _echoFundAccountPredictData($ref, $strSymbol, $strStockId, $his_sql, $j
     }
     
    	$ar = array($strDate);
-   	if ($iCount == 4)
+   	if ($iCount == $iDays)
    	{
-   		if ($strPurchaseDate == GetNextTradingDayYMD($strNetValueDate))
+   		if (($iDays == 4 && $strPurchaseDate == GetNextTradingDayYMD($strNetValueDate)) || $iDays == 2)
    		{
    			$fPurchaseValue = $ref->GetNetValue($strPurchaseDate);
    			$fNetValue = $ref->GetNetValue($strNetValueDate);
@@ -225,7 +251,7 @@ function _echoFundAccountPredictData($ref, $strSymbol, $strStockId, $his_sql, $j
 	EchoTableColumn($ar);
 }
 
-function _echoLinearRegressionGraph($csv, $ref, $strSymbol, $strStockId, $his_sql)
+function _echoLinearRegressionGraph($csv, $ref, $strSymbol, $strStockId, $his_sql, $iDays)
 {
     $jpg = new LinearImageFile();
     if ($jpg->Draw($csv->ReadColumn(5), $csv->ReadColumn(2)))
@@ -235,7 +261,7 @@ function _echoLinearRegressionGraph($csv, $ref, $strSymbol, $strStockId, $his_sq
     	$str .= '<br />下一交易日'.STOCK_OPTION_SHARE_DIFF.'预测';
 
     	EchoTableParagraphBegin(_getFundAccountTableColumnArray(), 'predict'.'fundaccount', $str);
-    	_echoFundAccountPredictData($ref, $strSymbol, $strStockId, $his_sql, $jpg);
+    	_echoFundAccountPredictData($ref, $strSymbol, $strStockId, $his_sql, $iDays, $jpg);
     	EchoTableParagraphEnd();
     }
 }
@@ -248,15 +274,24 @@ function EchoAll()
     if ($ref = $acct->EchoStockGroup())
     {
    		$strSymbol = $ref->GetSymbol();
-        if (in_arrayQdii($strSymbol) || in_arrayQdiiMix($strSymbol))
+        if (in_arrayQdii($strSymbol))			$iDays = 5;
+        else if (in_arrayQdiiMix($strSymbol))
+        {
+        	if (in_arrayHkMix($strSymbol))		$iDays = 3;
+        	else								$iDays = 5;
+        }
+        else if ($strSymbol == 'SZ161226')		$iDays = 3;
+        else									$iDays = 0;
+        
+        if ($iDays > 0)
         {
         	$strStockId = $ref->GetStockId();
         	$his_sql = GetStockHistorySql();
         	
         	$csv = new PageCsvFile();
-            _echoFundAccountParagraph($csv, $ref, $strSymbol, $strStockId, $his_sql, $bAdmin);
+            _echoFundAccountParagraph($csv, $ref, $strSymbol, $strStockId, $his_sql, $iDays, $bAdmin);
             $csv->Close();
-            if ($csv->HasFile())	_echoLinearRegressionGraph($csv, $ref, $strSymbol, $strStockId, $his_sql);
+            if ($csv->HasFile())	_echoLinearRegressionGraph($csv, $ref, $strSymbol, $strStockId, $his_sql, $iDays);
             EchoRemarks($strSymbol);
         }
     }
