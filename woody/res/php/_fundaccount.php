@@ -29,7 +29,6 @@ function _getFundAmount($strSymbol, $strDate)
 		
 	case 'SZ160719':
    	case 'SZ161116':
-	case 'SZ161226':
 	case 'SZ162415':
 	case 'SZ164701':
 	case 'SZ164824':
@@ -45,6 +44,11 @@ function _getFundAmount($strSymbol, $strDate)
 	case 'SZ161127':
 	case 'SZ161130':
 		if ($iTick < strtotime('2024-12-10'))			$iAmount = 300;
+		else											$iAmount = 100;
+		break;
+
+	case 'SZ161226':
+		if ($iTick >= strtotime('2025-12-22'))			$iAmount = 500;
 		else											$iAmount = 100;
 		break;
 		
@@ -75,7 +79,7 @@ function _getFundAmount($strSymbol, $strDate)
 		$iAmount = 500;
 		break;
 	}
-	return $iAmount * (1.0 - StockGetFundFeeRatio($strSymbol));
+	return $iAmount / (1.0 + StockGetFundFeeRatio($strSymbol));
 }
 
 function _echoFundAccountItem($csv, $strDate, $strSharesDiff, $ref, $strSymbol, $strStockId, $his_sql, $iDays)

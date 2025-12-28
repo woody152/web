@@ -142,10 +142,13 @@ function EchoFundEstParagraph($ref)
 	$str = _getFundPositionStr($ref);
     if ($ref->GetRealtimeNetValue())
     {
-    	$col = $bFair ? $arColumn[6] : $arColumn[4]; 
-    	$est_ref = $ref->GetEstRef();
-    	$realtime_ref = $ref->GetRealtimeRef();
-    	$str .= $col->GetDisplay().$realtime_ref->GetMyStockLink().'和'.SymCalibrationHistoryLink($est_ref).'关联程度按照100%估算。';
+   		if (method_exists($ref, 'GetEstRef'))
+   		{
+   			$col = $bFair ? $arColumn[6] : $arColumn[4]; 
+   			$est_ref = $ref->GetEstRef();
+   			$realtime_ref = $ref->GetRealtimeRef();
+   			$str .= $col->GetDisplay().$realtime_ref->GetMyStockLink().'和'.SymCalibrationHistoryLink($est_ref).'关联程度按照100%估算。';
+   		}
     }
     
 	_echoFundEstParagraph($arColumn, $bFair, $arRef, $str);
