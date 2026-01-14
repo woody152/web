@@ -307,7 +307,7 @@ function in_arrayAll($strSymbol)
 
 function GetOverNightSymbolArray()
 {
-	return array_merge(QdiiGetXopSymbolArray(), GetQdiiGoldSymbolArray(), GetQdiiOilSymbolArray(), array('SZ161125', 'SZ161127', 'SZ161130', 'SZ161226', 'SZ162415', 'SZ162719', 'SZ164906'));
+	return array_merge(QdiiGetXopSymbolArray(), GetQdiiGoldSymbolArray(), GetQdiiOilSymbolArray(), array('SZ161125', 'SZ161126', 'SZ161127', 'SZ161130', 'SZ161226', 'SZ162415', 'SZ162719', 'SZ164906'));
 }
 
 function IsChinaStockDigit($strDigit)

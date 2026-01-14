@@ -44,6 +44,7 @@ class _SseHoldingsFile extends _EtfHoldingsFile
     }
 }
 
+// https://query.sse.com.cn/etfDownload/downloadETF2Bulletin.do?fundCode=513050
 // https://query.sse.com.cn/etfDownload/downloadETF2Bulletin.do?etfType=087
 function ReadSseHoldingsFile($strSymbol, $strStockId)
 {

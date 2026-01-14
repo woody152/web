@@ -62,11 +62,11 @@ class MyEWrapper(EWrapper):
         self.arDebug = {}
 
     def nextValidId(self, orderId: int):
-        self.arQDII = {'SH501018', 'SZ160719', 'SZ160723', 'SZ161116', 'SZ161125', 'SZ161127', 'SZ161129', 'SZ161130', 'SZ161226', 'SZ162411', 'SZ162415', 'SZ162719', 'SZ164701', 'SZ164906'}
+        self.arQDII = {'SH501018', 'SZ160719', 'SZ160723', 'SZ161116', 'SZ161125', 'SZ161127', 'SZ161129', 'SZ161130', 'SZ161226', 'SZ162411', 'SZ162415', 'SZ164701', 'SZ164906', 'SZ165513'}
         #self.arQQQ = {'SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941'}
         self.arXOPETF = {'SH513350', 'SZ159518'}
         self.arOrder = {}
-        self.arOrder['KWEB'] = GetOrderArray([19.82, 30.55, 32.76, 33.53, 34.35, 34.56, 34.84, 36.15, 36.79, 40.82, 41.28], 200, 4, -1, 0)
+        self.arOrder['KWEB'] = GetOrderArray([20.38, 30.97, 32.62, 32.68, 35.17, 36.04], 200, 4, -1, 0)
         #self.arOrder['TLT'] = GetOrderArray([81.71, 84.44, 86.76, 87.70], 100, 2, -1)
         #self.arOrder['SPY'] = GetOrderArray([612.11, 653.01, 653.17], 50, 1, -1)
         #self.arOrder['XOP'] = GetOrderArray([135.08, 135.15, 138.48, 139.43, 150.32], 100, -1, 3)
@@ -82,8 +82,8 @@ class MyEWrapper(EWrapper):
             self.arOrder['XOP'] = GetOrderArray()
         else:
         #if IsMarketOpen():
-            self.arOrder['SPX'] = GetOrderArray([4936.03, 5987.40, 6274.99, 6348.08, 6671.70, 6733.82, 6832.80, 6844.12, 6888.71, 6954.41, 6995.33, 7038.77])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0074, 3, 9)
+            self.arOrder['SPX'] = GetOrderArray([5004.90, 6069.93, 6412.07, 6441.86, 6728.85, 6880.87, 6914.78, 6946.49, 7032.88, 7046.57, 7134.95])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0056, 3, 8)
             self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0188, -1, -1)
         self.palmmicro = Palmmicro()
         self.client.StartStreaming(orderId)

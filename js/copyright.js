@@ -14,11 +14,11 @@ function CopyRightDisplay()
     
     if (FileIsEnglish())
     {
-        str = _BuildCopyRight("Copyright &copy; 2006-2025 Palmmicro Communications Inc. All Rights Reserved.");
+        str = _BuildCopyRight("Copyright &copy; 2006-2026 Palmmicro Communications Inc. All Rights Reserved.");
     }
     else
     {
-        str = _BuildCopyRight("2006-2025 Palmmicro版权所有&copy;, 保留所有权利.");
+        str = _BuildCopyRight("2006-2026 Palmmicro版权所有&copy;, 保留所有权利.");
     }
    	document.write(str);
 }
@@ -29,11 +29,11 @@ function CopyRightDisplayWoody()
     
     if (FileIsEnglish())
     {
-        str = _BuildCopyRight("Copyright &copy; 1973-2025 Woody. All Rights Reserved.");
+        str = _BuildCopyRight("Copyright &copy; 1973-2026 Woody. All Rights Reserved.");
     }
     else
     {
-        str = _BuildCopyRight("1973-2025 林蓉榕版权所有&copy;, 保留所有权利.");
+        str = _BuildCopyRight("1973-2026 林蓉榕版权所有&copy;, 保留所有权利.");
     }
    	document.write(str);
 }

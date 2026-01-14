@@ -41,7 +41,9 @@ function _getTradingIndex($i)
 
 function _echoTradingTableData($ref, $fEstPrice, $fEstPrice2, $fEstPrice3, $callback)
 {
-   	$fPrice = floatval($ref->IsStockMarketTrading(GetNowYMD(), false) ? $ref->GetPrevPrice() : $ref->GetPrice());
+	$now_ymd = GetNowYMD();
+	//DebugString(__FUNCTION__.' '.$now_ymd->GetYMD().' '.$ref->GetDate(), true);
+   	$fPrice = floatval(($ref->IsStockMarketTrading($now_ymd, false) && ($now_ymd->GetYMD() == $ref->GetDate())) ? $ref->GetPrevPrice() : $ref->GetPrice());
    	$iPrecision = $ref->GetPrecision();
    	$strColor = 'orange';
 	_echoTradingTableItem($strColor, '涨停', number_format($fPrice * 1.1, $iPrecision, '.', ''), '', $ref, $fEstPrice, $fEstPrice2, $fEstPrice3, $callback);
@@ -180,5 +182,6 @@ function EchoTradingParagraph($ref, $ah_ref = false, $adr_ref = false)
     }
     _echoTradingParagraph($str, $arColumn, $ref, $fValH, $fValAdr); 
 }
+
 
 ?>

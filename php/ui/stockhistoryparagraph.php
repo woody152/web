@@ -16,8 +16,8 @@ function _echoStockHistoryItem($record, $ref, $compare_ref, $forex_ref, $csv, $h
 	
 	if ($compare_ref)
 	{
-//		if ($strCompare = $his_sql->GetAdjClose($strCompareId, $strDate))
-		if ($strCompare = $his_sql->GetClosePrev($strCompareId, $strDate))
+		if ($strCompare = $his_sql->GetAdjClose($strCompareId, $strDate))
+		//if ($strCompare = $his_sql->GetClosePrev($strCompareId, $strDate))
 		{
 			$fCompare = floatval($strCompare);
 			$ar[] = $compare_ref->GetPriceDisplay($fCompare);

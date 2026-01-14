@@ -27,9 +27,6 @@ def GetExchangeTime(strName = 'NYSE'):
     return iTime
 
 def GetBeijingTimeDisplay():
-    # 创建 UTC+8 时区
     utc8 = timezone(timedelta(hours=8))
-    # 获取 UTC+8 时间
     beijing_time = datetime.now(utc8)
-    # 格式化为 HH:MM:SS
     return beijing_time.strftime("%H:%M:%S")

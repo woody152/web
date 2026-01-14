@@ -21,9 +21,9 @@ from _tgprivate import WECHAT_SZ161130_KEY
 from _tgprivate import WECHAT_SZ161226_KEY
 from _tgprivate import WECHAT_SZ162411_KEY
 from _tgprivate import WECHAT_SZ162415_KEY
-from _tgprivate import WECHAT_SZ162719_KEY
 from _tgprivate import WECHAT_SZ164701_KEY
 from _tgprivate import WECHAT_SZ164906_KEY
+from _tgprivate import WECHAT_SZ165513_KEY
 
 def convert_fake_symbol(symbol):
     if symbol.startswith('^'):
@@ -106,9 +106,9 @@ class Palmmicro:
         self.arSendMsg['SZ161226'] = GetSendMsgArray(WECHAT_SZ161226_KEY)
         self.arSendMsg['SZ162411'] = GetSendMsgArray(WECHAT_SZ162411_KEY)
         self.arSendMsg['SZ162415'] = GetSendMsgArray(WECHAT_SZ162415_KEY)
-        self.arSendMsg['SZ162719'] = GetSendMsgArray(WECHAT_SZ162719_KEY)
         self.arSendMsg['SZ164701'] = GetSendMsgArray(WECHAT_SZ164701_KEY)
         self.arSendMsg['SZ164906'] = GetSendMsgArray(WECHAT_SZ164906_KEY)
+        self.arSendMsg['SZ165513'] = GetSendMsgArray(WECHAT_SZ165513_KEY)
         self.arAG0 = GetMktDataArray('nf_AG0')
 
     def GetAG0(self):

@@ -16,7 +16,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 中文(简体，中国) resources
+// Chinese (Simplified, China) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
@@ -82,12 +82,12 @@ BEGIN
     VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT
 END
 
-#endif    // 中文(简体，中国) resources
+#endif    // Chinese (Simplified, China) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// 英语(美国) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
@@ -250,8 +250,8 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,242,40,50,14,WS_GROUP
     ICON            IDR_MAINFRAME,IDC_STATIC,14,14,20,20
-    LTEXT           "Woody's Web Tool, Version 4.1",IDC_STATIC,42,14,114,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) 2010-2024 Palmmicro Communications Inc. All Rights Reserved.",IDC_STATIC,41,25,254,8
+    LTEXT           "Woody's Web Tool, Version 4.2",IDC_STATIC,42,14,114,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2010-2026 Palmmicro Communications Inc. All Rights Reserved.",IDC_STATIC,41,25,254,8
 END
 
 IDD_ITERATEBOX DIALOGEX 0, 0, 625, 207
@@ -619,7 +619,7 @@ BEGIN
     ID_TOOLS_ADD_IMAGE      "Add image .jpg file\nAdd image"
 END
 
-#endif    // 英语(美国) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

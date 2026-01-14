@@ -52,7 +52,7 @@ function _callbackFundListHedge($fPos, $fFactor, $strDate, $strStockId)
 		if ($strQdiiDate != $strDate)
 		{
 			if ($strFactor = $cal_sql->GetCloseFrom($strStockId, $strQdiiDate))		$fFactor = floatval($strFactor);
-			else																		return '';
+//			else																		return '';
 			// DebugString(__FUNCTION__.' Reload calibration factor because of difference date: '.$strQdiiDate.' '.$strDate);
 		}
 		return StockCalcLeverageHedge($fQdiiCalibration, $fQdiiPos, $fFactor, $fPos);

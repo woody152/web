@@ -48,7 +48,7 @@ function _getFundAmount($strSymbol, $strDate)
 		break;
 
 	case 'SZ161226':
-		if ($iTick >= strtotime('2025-12-22'))			$iAmount = 500;
+		if ($iTick >= strtotime('2025-12-22') && $iTick < strtotime('2025-12-27'))			$iAmount = 500;
 		else											$iAmount = 100;
 		break;
 		

@@ -63,7 +63,7 @@ function _echoMoneyItem($strGroup, $fValue, $fProfit, $fConvertValue, $fConvertP
 				switch ($strEmail)
 				{
 				case ADMIN_EMAIL:
-					$ar[] = GetNumberDisplay($fConvertProfit - 2074742.95);
+					$ar[] = GetNumberDisplay($fConvertProfit - 1679328.22);
 					break;
 				
 				case 'mix@palmmicro.com':
