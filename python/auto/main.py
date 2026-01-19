@@ -19,6 +19,6 @@ def main():
     result = calculate_annualized_return(principal, total_return, years)
     
     print("\n" + "=" * 50)
-    print(f"总结：无敌哥10年赚168万，本金350万，年化收益率为：{result:.4f}%")
+    print(f"总结：无敌哥10年赚168万，本金350万，年化收益率为：{result:.2f}%")
 
 main()
