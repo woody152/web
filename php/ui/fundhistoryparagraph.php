@@ -20,7 +20,11 @@ function _echoFundHistoryTableItem($csv, $strNetValue, $arHistory, $arFundEst, $
     		$strTime = GetHM($arFundEst['time']); 
     		$ar[] = $bAdmin ? GetOnClickLink('/php/_submitdelete.php?'.'fundest'.'='.$arFundEst['id'], '确认删除估值记录'.$strEstValue.'？', $strTime) : $strTime;
     		$ar[] = $ref->GetPercentageDisplay(floatval($strNetValue), floatval($strEstValue));
-    		if ($est_ref)	$ar[] = $est_ref->GetNetValueDisplay($est_ref->GetNetValue($arFundEst['date']));
+    		if ($est_ref)	
+			{
+				$strEstDate = $arFundEst['date'];
+				$ar[] = $est_ref->GetNetValueDisplay($est_ref->IsSinaFutureExceptGoldCN() ? SqlGetAdjCloseByDate($est_ref->GetStockId(), $strEstDate): $est_ref->GetNetValue($strEstDate));
+			}
     	}
     }
     

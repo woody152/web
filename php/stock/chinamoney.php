@@ -33,7 +33,11 @@ function GetChinaMoney($ref)
    		DebugString($strFileName.': Save new file');
    		file_put_contents($strFileName, $str);
    	}
-   	else																return;	//	$str = file_get_contents($strFileName);
+   	else
+   	{
+		file_put_failed($strFileName);
+   		return;
+   	}
 	
 	$ar = json_decode($str, true);
     $arData = $ar['data'];

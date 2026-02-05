@@ -80,18 +80,18 @@ function _echoOverNightCnhItem($strSymbol, $fCnh, $bSell)
 			$his_sql = GetStockHistorySql();
 			$cny_ref = $ref->GetCnyRef();
 			$fUsd = $fCny / $cny_ref->GetVal($strDate);
-			$iTotalQuantity = 0;
+			$fTotalQuantity = 0.0;
 			foreach ($ref->GetHoldingsRatioArray() as $strHoldingId => $strRatio)
 			{
 				if ($strClose = $his_sql->GetClose($strHoldingId, $strDate))
    				{
-					$fHoldingQuantity = round($fUsd * floatval($strRatio) / 100.0 / floatval($strClose));
-					$iTotalQuantity += intval($fHoldingQuantity);
+					$fHoldingQuantity = round($fUsd * floatval($strRatio) / 100.0 / floatval($strClose), 1);
+					$fTotalQuantity += $fHoldingQuantity;
 					$strMemo .= _buildHedgeString($fHoldingQuantity, $sql->GetStockSymbol($strHoldingId)).'、';
 				}
 			}
 			$strMemo = rtrim($strMemo, '、');
-			if ($strSymbol != 'SZ164701')	$strMemo .= '，共'.strval($iTotalQuantity).'股。';
+			if ($strSymbol != 'SZ164701')	$strMemo .= '，共'.strval(round($fTotalQuantity)).'股。';
    		}
 		$fHintQuantity = round($fHintQuantity / 100.0) * 100.0;
 		$strHintQuantity = strval($fHintQuantity);

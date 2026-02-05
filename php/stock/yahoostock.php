@@ -307,6 +307,9 @@ function _getYahooChartData($strYahooSymbol, $strFileName, $strRange = '2y')
 		}
 		return $arResult;
 	}
+   	else
+		file_put_failed($strFileName);
+   	
 	return false;
 }
 

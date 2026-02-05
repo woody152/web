@@ -155,13 +155,6 @@ function StockUpdateEstResult($strStockId, $fNetValue, $strDate)
 	}
 }
 
-function RefGetTableColumnNetValue($ref)
-{
-	$strStockDisplay = TableColumnGetStock($ref);
-	if ($ref->CountNetValue() > 0)		return new TableColumnNetValue($strStockDisplay);	
-	return 								   	   new TableColumnPrice($strStockDisplay, 90);
-}
-
 function StockPrefetchArrayData($arSymbol)
 {
     PrefetchSinaStockData(array_unique($arSymbol));

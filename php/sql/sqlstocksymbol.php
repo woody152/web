@@ -262,6 +262,12 @@ function SqlGetHistoryByDate($strStockId, $strDate)
 	return $his_sql->GetClose($strStockId, $strDate);
 }
 
+function SqlGetAdjCloseByDate($strStockId, $strDate)
+{
+	$his_sql = GetStockHistorySql();
+	return $his_sql->GetAdjClose($strStockId, $strDate);
+}
+
 function GetStockEmaSql($iDays)
 {
 	global $g_stock_sql;

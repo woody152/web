@@ -257,7 +257,7 @@ class FundPairReference extends MyPairReference
     {
         $strOfficialDate = $this->GetOfficialDate();
         $fCny = $this->cny_ref ? $this->cny_ref->GetVal($strOfficialDate) : false;
-		if ($this->pair_ref->IsSinaFutureCN())
+		if ($this->pair_ref->IsSinaFutureExceptGoldCN())
 		{
 			$strEst = $this->pair_ref->strVWAP;
 //			DebugString(__FUNCTION__.' VWAP '.$strEst, true);
@@ -279,7 +279,7 @@ class FundPairReference extends MyPairReference
         {
         	if ($strOfficialDate != $this->cny_ref->GetDate())		return $this->EstFromPair($this->pair_ref->GetVal(), $this->cny_ref->GetVal());
         }
-       	if ($this->pair_ref->IsSinaFutureCN() || ($strOfficialDate != $this->pair_ref->GetDate()))			return $this->EstFromPair($this->pair_ref->GetVal());
+       	if ($this->pair_ref->IsSinaFutureExceptGoldCN() || ($strOfficialDate != $this->pair_ref->GetDate()))			return $this->EstFromPair($this->pair_ref->GetVal());
     	return false;
     }
 

@@ -12,7 +12,7 @@ function EchoHead($bChinese = true)
 }
 
 	$acct = false;
-	$strRetry = 'Retry-After: '.strval(SECONDS_IN_DAY);
+	$strRetry = 'Retry-After: '.strval(SECONDS_IN_DAY/2);
 	
 	http_response_code(429);
 	header($strRetry);

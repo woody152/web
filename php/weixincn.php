@@ -47,6 +47,7 @@ class WeixinStock extends WeixinCallback
 		LogBotVisit(TABLE_WECHAT_BOT, $strText, $strUserName);
 	    
         if (strpos($strText, '商务合作') !== false)	return '请把具体合作内容和方式'._wxEmailInfo();
+        if (stripos($strText, 'Q群') !== false)		return 'QQ群已经在2020年停用。'.BOT_EOL;
         
         if ($str = StockBotGetStr($strText, $this->GetVersion()))		return $str;
 		return $this->GetUnknownText($strText, $strUserName);

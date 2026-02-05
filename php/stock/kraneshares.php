@@ -52,6 +52,9 @@ function GetKraneNetValue($ref, $strPrevDate)
         DebugVal($fNetValue, __FUNCTION__);
 		return number_format($fNetValue, NETVALUE_PRECISION, '.', '');
    	}
+   	else
+		file_put_failed($strFileName);
+   	
     return false;
 }
 

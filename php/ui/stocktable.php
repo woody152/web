@@ -213,6 +213,15 @@ function TableColumnGetRemark()
 	return $col->GetDisplay();
 }
 
+class TableColumnSettlePrice extends TableColumn
+{
+	public function __construct($strPrefix = false, $iWidth = 90)
+	{
+        parent::__construct('结算价', $iWidth, 'blue', $strPrefix);
+	}
+}
+
+
 class TableColumnShare extends TableColumn
 {
 	public function __construct()
@@ -287,6 +296,14 @@ class TableColumnUSD extends TableColumn
 	{
         parent::__construct('美元$', 100, 'blue', $strPrefix);
 	}
+}
+
+function RefGetTableColumnNetValue($ref)
+{
+	$strStockDisplay = TableColumnGetStock($ref);
+	if ($ref->CountNetValue() > 0)			return new TableColumnNetValue($strStockDisplay);
+	if ($ref->IsSinaFutureExceptGoldCN())	return new TableColumnSettlePrice($strStockDisplay);
+	return new TableColumnPrice($strStockDisplay, 90);						   	   
 }
 
 ?>

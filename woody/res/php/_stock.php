@@ -116,6 +116,9 @@ function StockSaveDebugCsv($strFileName, $strUrl, $arExtraHeaders = false)
 		DebugString('Saved '.$strUrl.' to '.$strFileName);
 		return true;
 	}
+   	else
+		file_put_failed($strFileName);
+   	
 	return false;
 }
 

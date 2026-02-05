@@ -106,7 +106,11 @@ function SzseGetLofShares($ref)
 //    date_default_timezone_set('PRC');
 	$ref->SetTimeZone();
 	$strFileName = DebugGetSymbolFile('szse', $ref->GetSymbol());
-	if (StockNeedFile($strFileName, 2 * SECONDS_IN_MIN) == false)	return;	// updates on every 2 minutes
+	if (StockNeedFile($strFileName, 20 * SECONDS_IN_MIN) === false)	
+	{
+//		DebugString(__FUNCTION__.' too many request of '.$strFileName, true);
+		return;	// updates on every 20 minutes
+	}
 
 	$strUrl = GetSzseUrl().'api/report/ShowReport/data?SHOWTYPE=JSON&CATALOGID=1945_LOF&txtQueryKeyAndJC='.$ref->GetDigitA();
    	if ($str = url_get_contents($strUrl))
@@ -135,6 +139,8 @@ function SzseGetLofShares($ref)
    			else	DebugString(__FUNCTION__.' no metadata');
    		}
    	}
+   	else
+		file_put_failed($strFileName);
 }
 
 ?>

@@ -78,7 +78,7 @@ function GetNetValueXlsStr($sym, $bAutoCheck = false)
    	if ($strUrl = GetEtfNetValueUrl($strSymbol))
 	{
 		$bIshares = (stripos($strUrl, 'ishares') !== false) ? true : false;
-		$strPathName = DebugGetPathName('netvalue_'.$strSymbol.'.xls');
+		$strFileName = DebugGetPathName('netvalue_'.$strSymbol.'.xls');
 		
 		if ($bAutoCheck)	
 		{
@@ -88,15 +88,16 @@ function GetNetValueXlsStr($sym, $bAutoCheck = false)
 		
 		if ($str = url_get_contents($strUrl))
 		{
-			file_put_contents($strPathName, $str);
+			file_put_contents($strFileName, $str);
 			$sym->SetTimeZone();
 			$strStockId = SqlGetStockId($strSymbol);
 			$net_sql = GetNetValueHistorySql();
 			$shares_sql = new SharesHistorySql();
-			return _readXlsFile($bIshares, $strPathName, $net_sql, $shares_sql, $strStockId);
+			return _readXlsFile($bIshares, $strFileName, $net_sql, $shares_sql, $strStockId);
 		}
 		else
 		{
+			file_put_failed($strFileName);
 			return '没读到数据';
 		}
 	}

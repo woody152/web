@@ -37,6 +37,8 @@ function _updateSpdrEtfDividend($strStockId, $strSymbol, $strFileName, $sql)
 			}
 		}
    	}
+   	else
+        file_put_failed($strFileName);
 }
 
 /*
@@ -128,6 +130,8 @@ function _updateProsharesEtfDividend($strStockId, $strSymbol, $strFileName, $sql
 			}
 		}
    	}
+   	else
+        file_put_failed($strFileName);
 }
 
 class _AdminDividendAccount extends SymbolAccount

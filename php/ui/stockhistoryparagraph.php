@@ -62,7 +62,8 @@ function EchoStockHistoryParagraph($ref, $compare_ref = false, $forex_ref = fals
 	$his_sql = GetStockHistorySql();
     $strMenuLink = IsTableCommonDisplay($iStart, $iNum) ? '' : StockGetMenuLink($strSymbol, $his_sql->Count($strStockId), $iStart, $iNum);
     
-    $ar = array(new TableColumnDate(), new TableColumnPrice(), new TableColumnQuantity(false, 120), new TableColumnPrice('复权'));
+    $ar = array(new TableColumnDate(), new TableColumnPrice(), new TableColumnQuantity(false, 120));
+	$ar[] = $ref->IsSinaFuture() ? new TableColumnSettlePrice() : new TableColumnPrice('复权');
     if ($compare_ref)
     {
     	$ar[] = new TableColumnStock($compare_ref);

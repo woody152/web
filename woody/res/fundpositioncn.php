@@ -5,7 +5,58 @@ require_once('../../php/dateimagefile.php');
 require_once('../../php/ui/editinputform.php');
 require_once('../../php/ui/netvaluehistoryparagraph.php');
 
-function _getSwitchDateArray($net_sql, $strStockId, $est_sql, $strEstId)
+function _getSwitchDates($net_sql, $strStockId)
+{
+	$arDate = array();
+	$bFirst = true;
+    if ($result = $net_sql->GetAll($strStockId)) 
+    {
+        while ($record = mysqli_fetch_assoc($result)) 
+        {
+       		$strDate = $record['date'];
+			$fCur = floatval($record['close']);
+   			if ($bFirst)
+   			{
+   				$arDate[] = $strDate;
+   				$bSecond = true;
+   				$bFirst = false;
+   			}
+   			else
+   			{
+   				if ($bSecond)
+   				{
+   					$bUp = ($fOld > $fCur) ? true : false;
+   					$bSecond = false;
+   				}
+   				else
+   				{
+   					if ($bUp)
+   					{
+   						if ($fOld < $fCur)
+   						{
+   							$bUp = false;
+   							$arDate[] = $strOldDate;
+   						}
+   					}
+   					else
+   					{
+   						if ($fOld > $fCur)
+   						{
+   							$bUp = true;
+   							$arDate[] = $strOldDate;
+   						}
+   					}
+       			}
+       		}
+			$fOld = $fCur;
+			$strOldDate = $strDate;
+        }
+        mysqli_free_result($result);
+    }
+    return $arDate;
+}
+
+/*function _getSwitchDateArray($net_sql, $strStockId, $est_sql, $strEstId)
 {
 	$arDate = array();
 	$bFirst = true;
@@ -58,15 +109,16 @@ function _getSwitchDateArray($net_sql, $strStockId, $est_sql, $strEstId)
     }
     return $arDate;
 }
-	
+*/	
 function _echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $strInput, $bAdmin)
 {
    	$strStockId = $ref->GetStockId();
-	$strEstId = $est_ref->GetStockId();
+//	$strEstId = $est_ref->GetStockId();
 	$net_sql = GetNetValueHistorySql();
-	$est_sql = ($est_ref->CountNetValue() > 0) ? $net_sql : GetStockHistorySql(); 
+//	$est_sql = ($est_ref->CountNetValue() > 0) ? $net_sql : GetStockHistorySql(); 
 
-	$arDate = _getSwitchDateArray($net_sql, $strStockId, $est_sql, $strEstId);
+//	$arDate = _getSwitchDateArray($net_sql, $strStockId, $est_sql, $strEstId);
+	$arDate = _getSwitchDates($net_sql, $strStockId);
 	if (count($arDate) == 0)		return;
  
  	$iIndex = 0;
@@ -129,6 +181,12 @@ function EchoAll()
     			$cny_ref = $fund->GetCnyRef();
     			$est_ref = $fund->GetEstRef();
     		}
+			else if (in_array($strSymbol, GetQdiiGoldOilSymbolArray()))
+			{
+				$fund = new HoldingsReference($strSymbol);
+				$cny_ref = $fund->GetCnyRef();
+				$est_ref = false;				
+			}
     		if ($fund)		_echoFundPositionParagraph($fund, $cny_ref, $est_ref, $strSymbol, $strInput, $acct->IsAdmin());
     	}
     }
