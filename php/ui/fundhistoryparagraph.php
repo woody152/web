@@ -18,13 +18,9 @@ function _echoFundHistoryTableItem($csv, $strNetValue, $arHistory, $arFundEst, $
     	{
     		$ar[] = $ref->GetPriceDisplay(floatval($strEstValue), floatval($strNetValue));
     		$strTime = GetHM($arFundEst['time']); 
-    		$ar[] = $bAdmin ? GetOnClickLink('/php/_submitdelete.php?'.'fundest'.'='.$arFundEst['id'], '确认删除估值记录'.$strEstValue.'？', $strTime) : $strTime;
+    		$ar[] = $bAdmin ? GetOnClickLink('/php/_submitdelete.php?'.'fundest'.'='.$arFundEst['id'], '确认删除'.STOCK_DISP_EST.'记录'.$strEstValue.'？', $strTime) : $strTime;
     		$ar[] = $ref->GetPercentageDisplay(floatval($strNetValue), floatval($strEstValue));
-    		if ($est_ref)	
-			{
-				$strEstDate = $arFundEst['date'];
-				$ar[] = $est_ref->GetNetValueDisplay($est_ref->IsSinaFutureExceptGoldCN() ? SqlGetAdjCloseByDate($est_ref->GetStockId(), $strEstDate): $est_ref->GetNetValue($strEstDate));
-			}
+    		if ($est_ref)	$ar[] = $est_ref->GetNetValueDisplay($est_ref->GetNetValue($arFundEst['date']));
     	}
     }
     
@@ -75,7 +71,7 @@ function _echoFundHistoryParagraph($ref, $est_ref, $csv, $iStart, $iNum, $bAdmin
 	$fund_est_sql = GetFundEstSql();
 	if ($fund_est_sql->Count($strStockId) > 0)
 	{
-		$ar[] = new TableColumnOfficalEst();
+		$ar[] = new TableColumnOfficialEst();
 		$ar[] = new TableColumnTime();
 		$ar[] = new TableColumnError();
 		if ($est_ref)		$ar[] = RefGetTableColumnNetValue($est_ref);

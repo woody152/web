@@ -288,27 +288,26 @@ function GetSpdrNetValueUrl($strSymbol)
 	return GetSpdrEtfUrl().'library-content/products/fund-data/etfs/us/navhist-us-en-'.strtolower($strSymbol).'.xlsx';
 }
 
-// https://dng-api.invesco.com/cache/v1/accounts/en_US/shareclasses/46090E103/prices?idType=cusip&variationType=priceListing&productType=ETF
+// https://dng-api.invesco.com/cache/v1/accounts/en_US/shareclasses/46090E103/prices?idType=cusip&variationType=priceListing&productType=ETF&productSubType=ETF
+function GetInvescoUrl($strSubDomain = 'www')
+{
+	return 'https://'.$strSubDomain.'.invesco.com/';
+}
+
 // https://www.invesco.com/us/en/financial-products/etfs/invesco-qqq-trust-series-1.html
-// https://www.invesco.com/us/financial-products/etfs/product-detail?audienceType=Investor&productId=ETF-QQQ
-function GetInvescoUrl()
-{
-	return 'https://www.invesco.com/';
-}
-
-function GetInvescoEtfUrl()
-{
-	return GetInvescoUrl().'us/financial-products/etfs/product-detail';
-}
-
 function GetInvescoOfficialUrl($strSymbol)
 {
 	switch ($strSymbol)
 	{
 	case 'QQQ':
-		return GetInvescoEtfUrl().'?audienceType=Investor&productId=ETF-'.$strSymbol;
+		return GetInvescoUrl().'us/en/financial-products/etfs/invesco-qqq-trust-series-1.html';
 	}
 	return false;
+}
+
+function GetInvescoEtfUrl()
+{
+	return GetInvescoUrl().'us/financial-products/etfs/product-detail';
 }
 
 // https://www.invesco.com/us/financial-products/etfs/product-detail/main/sidebar/0?audienceType=Investor&action=download&ticker=QQQ

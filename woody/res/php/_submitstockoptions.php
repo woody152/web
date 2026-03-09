@@ -311,28 +311,6 @@ function _updateStockOptionDividend($ref, $strSymbol, $strStockId, $his_sql, $st
   		}
   		else
   		{
-/*  			switch ($strSymbol)
-  			{
-  			case 'KWEB':
-  				$arQdii = array('SZ164906');
-  				break;
-  				
-  			case 'XBI':
-  				$arQdii = QdiiGetXbiSymbolArray();
-  				break;
-  				
-  			case 'XLY':
-  				$arQdii = array('SZ162415');
-  				break;
-  				
-  			case 'XOP':
-  				$arQdii = QdiiGetXopSymbolArray();
-  				break;
-  				
-  			default:
-  				$arQdii = array();
-  				break;
-  			}*/
   			$arQdii = QdiiGetArray($strSymbol);
 			foreach ($arQdii as $strQdii)
 			{
@@ -368,12 +346,12 @@ function _updateStockOptionCalibration($strSymbol, $strStockId, $strDate, $strVa
 		{
 			$ref = new FundPairReference($strSymbol);
 			YahooGetNetValue($ref);
-			$strVal = strval($ref->CalcFactor($strVal, SqlGetNetValueByDate($strStockId, $strDate), $strDate));
+			$strVal = strval($ref->CalcFactor(floatval($strVal), $ref->GetNetValue($strDate), $strDate));
 		}
 		else if ($strSymbol == 'hf_CHA50CFD')
 		{
 			$ref = new FundPairReference($strSymbol);
-			$strVal = strval($ref->CalcFactor($strVal, $ref->GetPrice(), $strDate));
+			$strVal = strval($ref->CalcFactor(floatval($strVal), $ref->GetVal(), $strDate));
 		}
 		else
 		{
@@ -387,7 +365,7 @@ function _updateStockOptionCalibration($strSymbol, $strStockId, $strDate, $strVa
 				DebugString(__FUNCTION__.' unhandled China index symbol: '.$strSymbol);
 				return;
 			}
-			else if (in_arrayQdii($strSymbol))		$strCNY = SqlGetNetValueByDate(SqlGetStockId('USCNY'), $strDate);
+			else if (in_arrayQdii($strSymbol))	$strCNY = SqlGetNetValueByDate(SqlGetStockId('USCNY'), $strDate);
 			else if (in_arrayQdiiHk($strSymbol))	$strCNY = SqlGetNetValueByDate(SqlGetStockId('HKCNY'), $strDate);
 			else if (in_arrayQdiiJp($strSymbol))	$strCNY = SqlGetNetValueByDate(SqlGetStockId('JPCNY'), $strDate);
 			else if (in_arrayQdiiEu($strSymbol))	$strCNY = SqlGetNetValueByDate(SqlGetStockId('EUCNY'), $strDate);

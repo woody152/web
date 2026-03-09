@@ -49,12 +49,18 @@ function TableColumnGetEst()
 	return $col->GetDisplay();
 }
 
-class TableColumnOfficalEst extends TableColumnEst
+class TableColumnOfficialEst extends TableColumnEst
 {
 	public function __construct()
 	{
         parent::__construct(STOCK_DISP_OFFICIAL);
 	}
+}
+
+function TableColumnGetOfficialEst()
+{
+	$col = new TableColumnOfficialEst();
+	return $col->GetDisplay();
 }
 
 class TableColumnFairEst extends TableColumnEst
@@ -65,12 +71,25 @@ class TableColumnFairEst extends TableColumnEst
 	}
 }
 
+function TableColumnGetFairEst()
+{
+	$col = new TableColumnFairEst();
+	return $col->GetDisplay();
+}
+
+
 class TableColumnRealtimeEst extends TableColumnEst
 {
 	public function __construct()
 	{
         parent::__construct(STOCK_DISP_REALTIME);
 	}
+}
+
+function TableColumnGetRealtimeEst()
+{
+	$col = new TableColumnRealtimeEst();
+	return $col->GetDisplay();
 }
 
 class TableColumnHedge extends TableColumn

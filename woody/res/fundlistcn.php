@@ -24,7 +24,7 @@ function EchoAll()
 
 function GetMetaDescription()
 {
-  	$str = '各个估值页面中用到的基金和指数对照表，包括杠杆倍数('.STOCK_DISP_POSITION.')和校准值快照，同时提供链接查看具体校准情况。有些指数不容易拿到数据，就用1倍ETF代替指数给其它杠杆ETF做对照。';
+  	$str = '各个'.STOCK_DISP_EST.'页面中用到的基金和指数对照表，包括杠杆倍数('.STOCK_DISP_POSITION.')和校准值快照，同时提供链接查看具体校准情况。有些指数不容易拿到数据，就用1倍ETF代替指数给其它杠杆ETF做对照。';
     return CheckMetaDescription($str);
 }
 

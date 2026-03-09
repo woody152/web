@@ -59,6 +59,11 @@ class MysqlReference extends StockReference
 	
 	public function GetNetValue($strDate)
 	{
+		if ($this->IsSinaFutureExceptGoldCN())
+		{
+			if ($strClose = SqlGetAdjCloseByDate($this->strSqlId, $strDate))	return floatval($strClose);
+			return false;
+		}
 		if ($this->iNetValueCount > 0)
 		{
 			if ($strClose = SqlGetNetValueByDate($this->strSqlId, $strDate))	return floatval($strClose);

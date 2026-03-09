@@ -202,15 +202,20 @@ function Echo20210624($strHead)
 	$strAdr = GetNameLink('adrhcompare', 'ADR');
 	$strSource = GetSecondListingLink();
 	$strUpdate = DebugIsAdmin() ? GetInternalLink('/php/test/updatesecondlisting.php', '更新二次回港上市数据') : '';
+
+	$strOfficialEst = TableColumnGetOfficialEst();
+	$strFairEst = TableColumnGetFairEst();
 	
     echo <<<END
 	$strHead
 <p>2021年6月24日
 <br />虽然原则上来说XOP也可以使用这个页面，但是它其实是为同时有港股和美股的{$strKWEB}持仓准备的。
-<br />{$strQDII}基金总是越跌规模越大，流动性越好，前些年是华宝油气，而今年最热门的变成了中概互联。按SZ162411对应XOP的模式，中概互联的小弟SZ164906之前是用KWEB估值的。
-不过因为有1/3的港股持仓，它的净值在港股交易时段会继续变化，所以原来的{$strSZ164906}页面其实没有什么实际用处。唯一的好处是在{$strFundHistory}中累积了几年的官方估值误差数据，帮我确认了用KWEB持仓估值的可行性。
-<br />跟A股{$strLof}基金每个季度才公布一次前10大持仓不同，美股ETF每天都会公布自己的净值和详细持仓比例。因为KWEB和SZ164906跟踪同一个中证海外中国互联网指数H11136，这样可以从KWEB官网下载持仓文件后，根据它的实际持仓估算出净值。然后SZ164906的参考估值也就可以跟随白天的港股交易变动了。
-<br />写了快6年的估值软件终于从{$strElementary}水平进化到了初中生水平，还是有些成就感的。暑假即将来到，了不起的狐狸爸爸要开始教已经读了一年小学的娃在Roblox上编程了。
+<br />{$strQDII}基金总是越跌规模越大，流动性越好，前些年是华宝油气，而今年最热门的变成了中概互联。按SZ162411对应XOP的模式，中概互联的小弟SZ164906之前对应的是KWEB。
+不过因为有1/3的港股持仓，它的净值在港股交易时段会继续变化，所以原来的{$strSZ164906}页面其实没有什么实际用处。
+唯一的好处是在{$strFundHistory}中累积了几年的{$strOfficialEst}误差数据，帮我确认了KWEB和SZ164906持仓的一致性。
+<br />跟A股{$strLof}基金每个季度才公布一次前10大持仓不同，美股ETF每天都会公布自己的净值和详细持仓比例。
+因为KWEB和SZ164906跟踪同一个中证海外中国互联网指数H11136，这样可以从KWEB官网下载持仓文件后，根据它的实际持仓估算出净值。然后SZ164906的{$strFairEst}也就可以跟随白天的港股交易变动了。
+<br />写了快六年的软件终于从{$strElementary}水平进化到了初中生水平，还是有些成就感的。暑假即将来到，了不起的狐狸爸爸要开始教已经读了一年小学的娃在Roblox上编程了。
 $strImage
 <br />KWEB的持仓中混合了部分二次回港上市的股票，需要单独处理一下。虽然它们跟港股在美股的{$strAdr}是不同的概念，但是在数据结构上是一致的，犹豫了一分钟后，我就把这两者合并了。
 <br />数据来源：{$strSource}	{$strUpdate}
@@ -224,26 +229,27 @@ END;
 	Echo20220914('qdiimix');
 	Echo20230521('qdiijp');
 	Echo20230525('qdiieu');
-	Echo20230530('增加全球芯片LOF和海外科技LOF的估值');
+	Echo20230530('增加全球芯片LOF和海外科技LOF的页面');
 	EchoPage20240419('qqqfund');
-	Echo20240606('印度基金LOF的实时估值');
+	Echo20240606('印度基金LOF的实时'.STOCK_DISP_EST);
 	
 function Echo20250316($strHead)
 {
 	$strHead = GetHeadElement($strHead);
 	$strQdii = _getStockMenuLink('qdii');
+	$strRealtimeEst = TableColumnGetRealtimeEst();
 	$strOvernightTrading = GetBlogLink(20250223);
 	
     echo <<<END
 	$strHead
 <p>2025年3月16日
-<br />在{$strQdii}中写过，实时估值用于做美油期货CL和SZ162411的对冲交易。这本身其实是一个很模糊的对冲，SZ162411和XOP一样同时受美股大盘的影响，不光是跟油价，而且天然气价格对它们的一些成分股价格也有很大的影响。
-随着从去年开始的美股OVERNIGHT夜盘交易的流动性越来越好，用夜盘XOP实时对冲SZ162411显然是更好更正确的选择，因此我新写了{$strOvernightTrading}工具，然后今天减掉了华宝油气等四个原油股票基金在老的网页和公众号上的实时估值部分。
+<br />在{$strQdii}中写过，{$strRealtimeEst}用于做美油期货CL和SZ162411的对冲交易。这本身其实是一个很模糊的对冲，SZ162411和XOP一样同时受美股大盘的影响，不光是跟油价，而且天然气价格对它们的一些成分股价格也有很大的影响。
+随着从去年开始的美股OVERNIGHT夜盘交易的流动性越来越好，用夜盘XOP实时对冲SZ162411显然是更好更正确的选择，因此我新写了{$strOvernightTrading}工具，然后今天减掉了华宝油气等四个原油股票基金在老的网页和公众号上的{$strRealtimeEst}部分。
 </p>
 END;
 }
 
-	Echo20250316('华宝油气不再需要实时估值');
+	Echo20250316('华宝油气不再需要实时'.STOCK_DISP_EST);
 ?>
 
 </div>

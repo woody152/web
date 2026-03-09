@@ -55,7 +55,7 @@ function _getFundEstTableColumn($arRef, &$bFair, $bWide = false)
 {
 	$ar = array(new TableColumnSymbol());
 	if ($bWide)	$ar = array_merge($ar, GetStockReferenceColumn());
-	$ar[] = new TableColumnOfficalEst();
+	$ar[] = new TableColumnOfficialEst();
 	$ar[] = new TableColumnDate(STOCK_DISP_EST);
 	$ar[] = new TableColumnPremium();	// STOCK_DISP_OFFICIAL
 		

@@ -164,7 +164,7 @@ function EchoAll()
     if ($ref = $acct->EchoStockGroup())
     {
     	if (($strInput = GetEditInput()) === false)		$strInput = '0.1';
-    	EchoEditInputForm('显示估值差异的阈值', $strInput);
+    	EchoEditInputForm('显示'.STOCK_DISP_EST.'差异的阈值', $strInput);
     	if ($strInput != '')	_echoExhaustiveHoldingsParagraph($ref->GetSymbol(), floatval($strInput), $acct->IsAdmin());
     }
     $acct->EchoLinks();
@@ -175,7 +175,7 @@ function GetMetaDescription()
 	global $acct;
 	
   	$str = $acct->GetStockDisplay().EXHAUSTIVE_HOLDINGS_DISPLAY;
-    $str .= '。仅用于只有2到3个持仓用来估值的美股QDII基金，使用穷举法来计算这些持仓最可能的实际比例。';
+    $str .= '。仅用于只有2到3个持仓用来'.STOCK_DISP_EST.'的美股QDII基金，使用穷举法来计算这些持仓最可能的实际比例。';
     return CheckMetaDescription($str);
 }
 

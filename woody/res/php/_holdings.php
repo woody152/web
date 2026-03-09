@@ -122,7 +122,7 @@ function GetMetaDescription()
 	global $acct;
 	
   	$str = $acct->GetStockDisplay().HOLDINGS_DISPLAY;
-    $str .= '页面. 用于显示ETF基金的成分股持仓情况, 以及各个成分股最新的价格. 基于成分股价格测算基金的官方估值和实时估值.';
+    $str .= '页面. 用于显示ETF基金的成分股持仓情况, 以及各个成分股最新的价格. 基于成分股价格测算基金的官方'.STOCK_DISP_EST.'和实时'.STOCK_DISP_EST.'.';
     return CheckMetaDescription($str);
 }
 

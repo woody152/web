@@ -11,6 +11,13 @@ def main():
     print(f"Hello, World! {sys.version}")
     result = calculate_annualized_return(350, 168, 10)
     print(f"总结：无敌哥10年赚168万，本金350万，年化收益率为：{result:.2f}%")
-    tdx_auto()
+    #tdx_auto()
+
+    file = open("mia.py", "w", encoding="utf-8")
+    file.write("print(\"Hello, Mia!\")")
+    file.close()
+
+    print("Hello, world!")
+    print("\"Hello, world!\"")
 
 main()

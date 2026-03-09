@@ -136,7 +136,7 @@ function StockCompareEstResult($strStockId, $strNetValue, $strDate, $strSymbol)
        		if (($fPercentage !== false) && (abs($fPercentage) > 1.0))
        		{
        			$strLink = GetNetValueHistoryLink($strSymbol);
-       			$str = sprintf('%s%s 实际值%s 估值%s 误差:%.2f%%', $strSymbol, $strLink, $strNetValue, $strEstValue, $fPercentage); 
+       			$str = sprintf('%s%s 实际值%s %s%s 误差:%.2f%%', $strSymbol, $strLink, $strNetValue, STOCK_DISP_EST, $strEstValue, $fPercentage); 
        			trigger_error('Net value estimation error '.$str);
        		}
        	}
@@ -200,7 +200,7 @@ function _getAllSymbolArray($strSymbol)
         	if ($strEstSymbol = QdiiGetEstSymbol($strSymbol))		
         	{
         		_addFundPairSymbol($ar, $strEstSymbol);
-        		_addHoldingsSymbol($ar, $strEstSymbol);		// KWEB
+        		_addHoldingsSymbol($ar, $strEstSymbol);
         	}
         	$ar[] = 'fx_susdcny';
         }

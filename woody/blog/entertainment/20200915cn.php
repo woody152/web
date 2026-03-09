@@ -25,6 +25,10 @@ function EchoAll()
 	$strVideo = VidAboutSZ161130();
 	$strSZ162411Link = GetGroupStockLink('SZ162411');
 
+	$strOfficialEst = TableColumnGetOfficialEst();
+	$strFairEst = TableColumnGetFairEst();
+	$strRealtimeEst = TableColumnGetRealtimeEst();
+
 	EchoBlogDate();
     echo <<<END
 <br />跟上次{$strXueqiu}一样，雪球运营人员总是在我的{$strSZ162411Blog}和XOP亏得不能自理的时候让我做直播。不过常年卖惨这种人设只有元卫南才能乐此不疲的坚持下来，于是建议聊聊最近自己袖手旁观没有参与的{$strSZ161130}溢价申购套利。
@@ -35,7 +39,7 @@ $strImgQqq
 $strImgMnq
 <br />芝商所对应的期货有NQ和MNQ等。NQ货值是MNQ的十倍。说起来MNQ也是芝商所今年跟负油价一起搞出来的创新，这样能有更多散户参与股指期货的交易。一手MNQ按当前一万多点的指数乘以2美元计算，目前货值2万多美元，20倍左右的杠杆。
 <br />A股市场上跟踪的基金也不少。除了不能套利的160213等场外基金，场内的{$strSH513100}长期关门，{$strSZ159941}每次一百万份起步每天限购一百万份，也就是每天一个幸运儿，这样每天每账户限购五百人民币的SZ161130成了套利党的香馍馍。
-这些基金的官方估值和参考估值都是直接延续{$strSZ162411Link}估值方式，实时估值则是在参考估值的基础上，叠加了NQ期货实时数据的影响。
+这些基金的{$strOfficialEst}和{$strFairEst}都是直接延续{$strSZ162411Link}的方式，{$strRealtimeEst}则是在{$strFairEst}的基础上，叠加了NQ期货实时数据的影响。
 $strImgNdx
 <br />NDX八月份进入连续创历史新高的模式，除了在8月10日那周回调了一次二十日SMA，也就是布林中轨，其它时间一直在沿布林上轨上涨不停新高。目前这一轮回调到了号称是美股小牛熊分界线五十日EMA，有可能会继续跌到布林下轨附近。
 <br />SZ161130对上涨一开始是犹豫的，8月21日之前都是折价。8月24日开始，追高的来了，把它拉到了溢价，然后溢价一路上涨，9月3日最高值为7.99%。

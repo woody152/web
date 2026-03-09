@@ -3,22 +3,20 @@ require_once('stocktable.php');
 
 define('POSITION_EST_LEVEL', '4.0');
 
-function _CheckPositionEstLevel($fPrev, $fNetValue, $strInput = POSITION_EST_LEVEL)
-{
-	$f = StockGetPercentage($fPrev, $fNetValue);
-	return (($f !== false) && (abs($f) > floatval($strInput))) ? true : false;
-}
-
 // (est * cny / estPrev * cnyPrev - 1) * position = (nv / nvPrev - 1) 
-function _QdiiGetStockPosition($fEstPrev, $fEst, $fPrev, $fNetValue, $fCnyPrev, $fCny)
+function _QdiiGetStockPosition($fEstPrev, $fEst, $fPrev, $fNetValue, $fCnyPrev, $fCny, $strInput = POSITION_EST_LEVEL)
 {
-	$f = StockGetPercentage($fEstPrev * $fCnyPrev, $fEst * $fCny);
-	if (($f !== false) && (abs($f) > MIN_FLOAT_VAL))
+	$f = StockGetPercentage($fEstPrev, $fEst);
+	if (($f !== false) && (abs($f) > floatval($strInput)))
 	{
-		$fVal = StockGetPercentage($fPrev, $fNetValue) / $f;
-		if ($fVal > 0.1)
+		$f = StockGetPercentage($fEstPrev * $fCnyPrev, $fEst * $fCny);
+		if (($f !== false) && (abs($f) > MIN_FLOAT_VAL))
 		{
-			return number_format($fVal, 2);
+			$fVal = StockGetPercentage($fPrev, $fNetValue) / $f;
+			if ($fVal > 0.1)
+			{
+				return number_format($fVal, 2);
+			}
 		}
 	}
 	return false;
@@ -42,13 +40,13 @@ function _QdiiMixCalcEstValue($arRatio, $strDate)
 	return $fEst;
 }
 
-function _QdiiMixGetPosition($ref, $strDate, $strPrevDate, $fPrev, $fNetValue, $fCnyPrev, $fCny)
+function _QdiiMixGetPosition($ref, $strDate, $strPrevDate, $fPrev, $fNetValue, $fCnyPrev, $fCny, $strInput)
 {
 	$arRatio = $ref->GetHoldingsRatioArray();
 	// DebugPrint($arRatio);
 	$fEst = _QdiiMixCalcEstValue($arRatio, $strDate);
 	$fEstPrev = _QdiiMixCalcEstValue($arRatio, $strPrevDate);
-	if ($fEst !== false && $fEstPrev !== false)		return  _QdiiGetStockPosition($fEstPrev, $fEst, $fPrev, $fNetValue, $fCnyPrev, $fCny);
+	if ($fEst !== false && $fEstPrev !== false)		return  _QdiiGetStockPosition($fEstPrev, $fEst, $fPrev, $fNetValue, $fCnyPrev, $fCny, $strInput);
 	return false;
 }
 
@@ -72,7 +70,7 @@ function GetNetValueTableColumn($est_ref, $cny_ref)
 
 function _adjustAdminPositionDisplay($ref, $strPosition)
 {
-	return GetOnClickLink('/php/_submitoperation.php?stockid='.$ref->GetStockId().'&fundposition='.$strPosition, "确认使用{$strPosition}作为估值仓位？", $strPosition);
+	return GetOnClickLink('/php/_submitoperation.php?stockid='.$ref->GetStockId().'&fundposition='.$strPosition, "确认使用{$strPosition}作为".STOCK_DISP_EST.'仓位？', $strPosition);
 }
 
 function EchoNetValueItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue, $strPrevDate, $strInput = POSITION_EST_LEVEL, $bAdmin = false)
@@ -102,30 +100,24 @@ function EchoNetValueItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue
 			if ($fEstPrev = $est_ref->GetNetValue($strPrevDate))
 			{
 				$ar[] = $est_ref->GetPercentageDisplay($fEstPrev, $fEst);
-				if (_CheckPositionEstLevel($fPrev, $fNetValue, $strInput))
+				if ($strPosition = _QdiiGetStockPosition($fEstPrev, $fEst, $fPrev, $fNetValue, $fCnyPrev, $fCny, $strInput))
 				{
-					if ($strPosition = _QdiiGetStockPosition($fEstPrev, $fEst, $fPrev, $fNetValue, $fCnyPrev, $fCny))
-					{
-						$bWritten = true;
-						if ($csv)	$csv->Write($strDate, $strNetValue, $strPosition);
-						if ($bAdmin)	$strPosition = _adjustAdminPositionDisplay($ref, $strPosition);
-						$ar[] = $strPosition;
-					}
+					$bWritten = true;
+					if ($csv)	$csv->Write($strDate, $strNetValue, $strPosition);
+					if ($bAdmin)	$strPosition = _adjustAdminPositionDisplay($ref, $strPosition);
+					$ar[] = $strPosition;
 				}
 			}
 		}
 	}
 	else if ($cny_ref)
 	{
-		if (_CheckPositionEstLevel($fPrev, $fNetValue, $strInput))
+		if ($strPosition = _QdiiMixGetPosition($ref, $strDate, $strPrevDate, $fPrev, $fNetValue, $fCnyPrev, $fCny, $strInput))
 		{
-			if ($strPosition = _QdiiMixGetPosition($ref, $strDate, $strPrevDate, $fPrev, $fNetValue, $fCnyPrev, $fCny))
-			{
-				$bWritten = true;
-				if ($csv)	$csv->Write($strDate, $strNetValue, $strPosition);
-				if ($bAdmin)	$strPosition = _adjustAdminPositionDisplay($ref, $strPosition);
-				$ar[] = $strPosition;
-			}
+			$bWritten = true;
+			if ($csv)	$csv->Write($strDate, $strNetValue, $strPosition);
+			if ($bAdmin)	$strPosition = _adjustAdminPositionDisplay($ref, $strPosition);
+			$ar[] = $strPosition;
 		}
 	}
 

@@ -129,7 +129,6 @@ function QdiiGetSymbolArray()
     				   , QdiiGetCommoditySymbolArray()
     				   , QdiiGetQqqSymbolArray()
     				   , QdiiGetSpySymbolArray());
-//    sort($ar);
     return $ar;
 }
 
@@ -256,7 +255,7 @@ function in_arrayHkMix($strSymbol)
 
 function GetQdiiGoldSymbolArray()
 {
-	return array('SZ160719', 'SZ161116', 'SZ164701', 'SZ165513');
+	return array('SZ160216', 'SZ160719', 'SZ161116', 'SZ164701', 'SZ165513');
 }
 
 function GetQdiiOilSymbolArray()
@@ -271,7 +270,7 @@ function GetQdiiGoldOilSymbolArray()
 
 function QdiiMixGetSymbolArray()
 {
-    $ar = array_merge(array('SH501225', 'SH501312', 'SH513360', 'SZ159509', 'SZ159529', 'SZ160216', 'SZ160644') 
+    $ar = array_merge(array('SH501225', 'SH501312', 'SH513360', 'SZ159509', 'SZ159529', 'SZ160644') 
     				   , GetQdiiGoldOilSymbolArray()
     				   , GetChinaInternetSymbolArray()
     				   , GetHkMixSymbolArray()
