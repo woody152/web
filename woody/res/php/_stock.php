@@ -103,23 +103,34 @@ function _EchoMoneyGroupData($acct, $group, $strUSDCNY, $strHKDCNY)
     }
 }
 
-// ****************************** Misc *******************************************************
-function StockSaveDebugCsv($strFileName, $strUrl, $arExtraHeaders = false)
+function StockSaveDebugFile($strPathName, $strUrl, $iInterval = SECONDS_IN_MIN, $arExtraHeaders = false)
 {
-   	$csv = new DebugCsvFile($strFileName);
-   	$strPathName = $csv->GetPathName();
-	if (StockNeedFile($strPathName, 5 * SECONDS_IN_MIN) == false)	return false; 	// updates on every 5 minutes
+	if (StockNeedFile($strPathName, $iInterval) == false)	return false; 	// do not update too often
 	
 	if ($str = url_get_contents($strUrl, $arExtraHeaders))
 	{
 		file_put_contents($strPathName, $str);
-		DebugString('Saved '.$strUrl.' to '.$strFileName);
-		return true;
+		DebugString($strUrl.' saved to '.basename($strPathName));
+		return $str;
 	}
-   	else
-		file_put_failed($strFileName);
-   	
+
+	file_put_failed($strPathName);
 	return false;
+}
+
+function StockDebugJson($strPathName, $strUrl, $iInterval = SECONDS_IN_MIN, $arExtraHeaders = false)
+{
+	if ($str = StockSaveDebugFile($strPathName, $strUrl, $iInterval, $arExtraHeaders))
+	{
+		return json_decode($str, true);
+	}
+	return false;
+}
+
+function StockSaveDebugCsv($strFileName, $strUrl, $arExtraHeaders = false)
+{
+   	$csv = new DebugCsvFile($strFileName);
+	return StockSaveDebugFile($csv->GetPathName(), $strUrl, 5 * SECONDS_IN_MIN, $arExtraHeaders);
 }
 
 function StockGetHoldingsReference($strSymbol)

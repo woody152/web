@@ -2,7 +2,7 @@
 require('_wxprivate.php');
 
 // 微信公众号公共模板, 返回输入信息
-define('WX_DEBUG_VER', '版本201');		
+define('WX_DEBUG_VER', '版本207');		
 
 define('BOT_EOL', "\r\n");
 define('MAX_BOT_MSG_LEN', 2048);
@@ -118,6 +118,7 @@ class WeixinCallback
 	        break;
 	        
 	    case WX_MSG_TYPE_LINK:
+			// DebugPrint($postObj);
 	    	$str = $this->OnLink(trim($postObj->Url), $strUserName);
 	    	break;
 	    	

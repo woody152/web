@@ -17,15 +17,11 @@ Array
 https://www.ssga.com/bin/v1/ssmp/fund/dividend-distribution?ticker=XOP&country=us&language=en&role=individual&product=etfs
 */
 
-function _updateSpdrEtfDividend($strStockId, $strSymbol, $strFileName, $sql)
+function _updateSpdrEtfDividend($strStockId, $strSymbol, $strPathName, $sql)
 {
 	$strUrl = GetSpdrUrl().'bin/v1/ssmp/fund/dividend-distribution?ticker='.$strSymbol.'&country=us&language=en&role=individual&product=etfs';
-   	if ($str = url_get_contents($strUrl))
+   	if ($ar = StockDebugJson($strPathName, $strUrl))
    	{
-   		DebugString($strUrl.' save new file to '.$strFileName);
-   		file_put_contents($strFileName, $str);
-   		$ar = json_decode($str, true);
-   		
 //   		$sql->DeleteAll($strStockId);
 		for ($i = 0; $i < count($ar); $i ++)
 		{
@@ -37,8 +33,6 @@ function _updateSpdrEtfDividend($strStockId, $strSymbol, $strFileName, $sql)
 			}
 		}
    	}
-   	else
-        file_put_failed($strFileName);
 }
 
 /*
@@ -111,15 +105,11 @@ Array
 https://www.proshares.com/api/distributionsummary?fund=TQQQ&year=2024
 */
 
-function _updateProsharesEtfDividend($strStockId, $strSymbol, $strFileName, $sql)
+function _updateProsharesEtfDividend($strStockId, $strSymbol, $strPathName, $sql)
 {
 	$strUrl = GetProsharesUrl().'api/distributionsummary?fund='.$strSymbol.'&year=2025';
-   	if ($str = url_get_contents($strUrl))
+   	if ($ar = StockDebugJson($strPathName, $strUrl))
    	{
-   		DebugString($strUrl.' save new file to '.$strFileName);
-   		file_put_contents($strFileName, $str);
-   		$ar = json_decode($str, true);
-   		
 //   		$sql->DeleteAll($strStockId);
 		for ($i = 0; $i < count($ar); $i ++)
 		{
@@ -130,8 +120,6 @@ function _updateProsharesEtfDividend($strStockId, $strSymbol, $strFileName, $sql
 			}
 		}
    	}
-   	else
-        file_put_failed($strFileName);
 }
 
 class _AdminDividendAccount extends SymbolAccount
@@ -141,13 +129,16 @@ class _AdminDividendAccount extends SymbolAccount
 	    if ($ref = $this->GetSymbolRef())
 	    {
 	    	$strSymbol = $ref->GetSymbol();
-	    	$strFileName = DebugGetYahooFileName($strSymbol.'Dividend');
-	    	if (StockNeedFile($strFileName))	// updates on every minute
-	    	{
-	    		$strStockId = $ref->GetStockId();
-   		   		$sql = new StockDividendSql();
-	    		if (GetSpdrOfficialUrl($strSymbol))		_updateSpdrEtfDividend($strStockId, $strSymbol, $strFileName, $sql);
-	    		else									_updateProsharesEtfDividend($strStockId, $strSymbol, $strFileName, $sql);
+	    	$strPathName = DebugGetYahooFileName($strSymbol.'Dividend');
+    		$strStockId = $ref->GetStockId();
+	   		$sql = new StockDividendSql();
+    		if (GetSpdrOfficialUrl($strSymbol))
+            {
+                _updateSpdrEtfDividend($strStockId, $strSymbol, $strPathName, $sql);
+            }		
+	    	else
+            {
+            	_updateProsharesEtfDividend($strStockId, $strSymbol, $strPathName, $sql);
 	    	}
 	    }
 	}

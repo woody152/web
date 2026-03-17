@@ -138,6 +138,11 @@ function DebugGetFile()
     return DebugGetPathName('debug.txt');
 }
 
+function DebugGetNetValueFile($strSymbol)
+{
+	return DebugGetPathName('netvalue_'.$strSymbol.'.txt');
+}
+
 function DebugIsPalmmicro()
 {
    	global $acct;

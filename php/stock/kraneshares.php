@@ -11,6 +11,7 @@ Array
 )
 */
 
+/*
 function GetKraneNetValue($ref, $strPrevDate)
 {
 	$strStockId = $ref->GetStockId();
@@ -25,10 +26,10 @@ function GetKraneNetValue($ref, $strPrevDate)
 //	$ref->SetTimeZone();
 	date_default_timezone_set('Europe/London');
 	$strSymbol = $ref->GetSymbol();
-	$strFileName = DebugGetPathName('netvalue_'.$strSymbol.'.txt');
+	$strFileName = DebugGetNetValueFile($strSymbol);
 	if (StockNeedFile($strFileName) == false)	return false; 	// updates on every minute
 
-	$strUrl = GetKraneUrl()."product-json/?pid=477&type=premium-discount&start=$strPrevDate&end=$strPrevDate";
+	$strUrl = GetKraneUrl()."product-json/?pid=7615&type=premium-discount&start=$strPrevDate&end=$strPrevDate";
    	if ($str = url_get_contents($strUrl))
    	{
    		DebugString($strUrl.' save new file to '.$strFileName);
@@ -55,6 +56,37 @@ function GetKraneNetValue($ref, $strPrevDate)
    	else
 		file_put_failed($strFileName);
    	
+    return false;
+}
+*/
+
+function GetKraneNetValue($ref, $strPrevDate)
+{
+	$strStockId = $ref->GetStockId();
+	$his_sql = GetStockHistorySql();
+	
+	date_default_timezone_set('Europe/London');
+	$strSymbol = $ref->GetSymbol();
+	if ($ar = StockDebugJson(DebugGetNetValueFile($strSymbol), GetKraneUrl()."product-json/?pid=7615&type=premium-discount&start=$strPrevDate&end=$strPrevDate"))
+	{
+		if (!isset($ar[0]))			
+		{
+			DebugString('no data');
+			return false;
+		}
+		$ar0 = $ar[0];
+		$iTick = intval($ar0[0]) / 1000;
+        $ymd = new TickYMD($iTick);
+        if ($ymd->GetYMD() != $strPrevDate)
+        {
+        	DebugString($ymd->GetYMD().' '.$strPrevDate.' miss match date');
+        	DebugPrint(localtime($iTick, true));
+        	return false;
+        }
+        $fNetValue = floatval($his_sql->GetClose($strStockId, $strPrevDate)) / (1.0 + floatval($ar0[1]));
+        DebugVal($fNetValue, __FUNCTION__);
+		return number_format($fNetValue, NETVALUE_PRECISION, '.', '');
+   	}
     return false;
 }
 

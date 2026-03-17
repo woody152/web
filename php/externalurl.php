@@ -169,7 +169,8 @@ function GetProsharesUrl()
 
 // https://kraneshares.com/kweb/
 // https://kraneshares.com/csv/06_22_2021_kweb_holdings.csv
-// https://kraneshares.com/product-json/?pid=477&type=premium-discount&start=2025-08-18&end=2025-08-19
+// https://kraneshares.com/product-json/?pid=7615&type=premium-discount&start=2025-08-18&end=2025-08-19
+// https://kraneshares.com/resources/trading_history/2026_03_16_kweb_trading.history.csv
 function GetKraneUrl()
 {
 	return 'https://kraneshares.com/';
@@ -288,7 +289,6 @@ function GetSpdrNetValueUrl($strSymbol)
 	return GetSpdrEtfUrl().'library-content/products/fund-data/etfs/us/navhist-us-en-'.strtolower($strSymbol).'.xlsx';
 }
 
-// https://dng-api.invesco.com/cache/v1/accounts/en_US/shareclasses/46090E103/prices?idType=cusip&variationType=priceListing&productType=ETF&productSubType=ETF
 function GetInvescoUrl($strSubDomain = 'www')
 {
 	return 'https://'.$strSubDomain.'.invesco.com/';
@@ -305,15 +305,15 @@ function GetInvescoOfficialUrl($strSymbol)
 	return false;
 }
 
-function GetInvescoEtfUrl()
-{
-	return GetInvescoUrl().'us/financial-products/etfs/product-detail';
-}
-
-// https://www.invesco.com/us/financial-products/etfs/product-detail/main/sidebar/0?audienceType=Investor&action=download&ticker=QQQ
+// https://dng-api.invesco.com/cache/v1/accounts/en_US/shareclasses/46090E103/prices?idType=cusip&variationType=priceListing&productType=ETF&productSubType=ETF
 function GetInvescoNetValueUrl($strSymbol)
 {
-	return GetInvescoEtfUrl().'/main/sidebar/0?audienceType=Investor&action=download&ticker='.$strSymbol;
+	switch ($strSymbol)
+	{
+	case 'QQQ':
+		return GetInvescoUrl('dng-api').'cache/v1/accounts/en_US/shareclasses/46090E103/prices?idType=cusip&variationType=priceListing&productType=ETF&productSubType=ETF';
+	}
+	return false;
 }
 
 function GetEtfNetValueUrl($strSymbol)

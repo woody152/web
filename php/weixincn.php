@@ -46,8 +46,10 @@ class WeixinStock extends WeixinCallback
 	{
 		LogBotVisit(TABLE_WECHAT_BOT, $strText, $strUserName);
 	    
-        if (strpos($strText, '商务合作') !== false)	return '请把具体合作内容和方式'._wxEmailInfo();
         if (stripos($strText, 'Q群') !== false)		return 'QQ群已经在2020年停用。'.BOT_EOL;
+        if (strpos($strText, '商务合作') !== false)	return '请把具体合作内容和方式'._wxEmailInfo();
+		if (preg_match('/(?:义工|套利|微信|[有进加入拉])群/u', $strText))			
+				return '请阅读公众号文章：'.GetLinkElement('市值百万的微信号起点兼2025年卖铲子总结', 'https://mp.weixin.qq.com/s/CbfbWZaBl-ikheuQnpiltA').BOT_EOL;
         
         if ($str = StockBotGetStr($strText, $this->GetVersion()))		return $str;
 		return $this->GetUnknownText($strText, $strUserName);

@@ -1,4 +1,5 @@
 <?php
+/*
 require_once('../../php/csvfile.php');
 
 class _InvescoCsvFile extends DebugCsvFile
@@ -71,6 +72,17 @@ function UpdateInvescoNetValue($strSymbol)
 		$csv->Read();
 		DebugVal($csv->GetCount(), 'Net value updated');
 	}
+}
+*/
+
+function UpdateInvescoNetValue($strSymbol)
+{
+	if ($ar = StockDebugJson(DebugGetNetValueFile($strSymbol), GetInvescoNetValueUrl($strSymbol)))
+	{
+		DebugPrint($ar);
+		$net_sql = GetNetValueHistorySql();
+		$net_sql->WriteDaily(SqlGetStockId($strSymbol), $ar['effectiveDate'], $ar['nav']);
+   	}
 }
 
 ?>
