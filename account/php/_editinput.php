@@ -116,14 +116,19 @@ function _getSimpleTestString($strInput, $bChinese)
     		if ($ar = json_decode($strRead, true))
     		{
     			DebugPrint($ar);
-    			$str .= ConvertToHtmlDisplay(print_r($ar, true));
+				$strOutput = print_r($ar, true);
     		}
+			else if ($xml = simplexml_load_string($strRead))
+			{
+				DebugPrint($xml);
+				$strOutput = print_r($xml, true);
+			}
     		else
     		{
-    			$strRead = strip_tags($strRead);
-    			DebugString($strRead);
-    			$str .= ConvertToHtmlDisplay($strRead);
+    			$strOutput = strip_tags($strRead);
+    			DebugString($strOutput);
     		}
+   			$str .= ConvertToHtmlDisplay($strOutput);
     	}
     	else	$str = $bChinese ? 'Curl读错误' : 'Curl read error';
 	}

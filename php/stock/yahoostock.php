@@ -266,14 +266,9 @@ Array
 // https://query1.finance.yahoo.com/v7/finance/chart/AAPL?range=2y&interval=1d&indicators=quote&includeTimestamps=true
 function _getYahooChartData($strYahooSymbol, $strFileName, $strRange = '2y')
 {
-	if (StockNeedFile($strFileName) == false)	return false; 	// updates on every minute
-
 	$strUrl = GetYahooDataUrl('7')."/chart/$strYahooSymbol?range=$strRange&interval=1d&indicators=quote&includeTimestamps=true";
-   	if ($str = url_get_contents($strUrl))
+   	if ($ar = StockDebugJson($strFileName, $strUrl))
    	{
-   		DebugString($strUrl.' save new file to '.$strFileName);
-   		file_put_contents($strFileName, $str);
-   		$ar = json_decode($str, true);
 		if (!isset($ar['chart']))			
 		{
 			DebugString('no chart');
@@ -307,9 +302,6 @@ function _getYahooChartData($strYahooSymbol, $strFileName, $strRange = '2y')
 		}
 		return $arResult;
 	}
-   	else
-		file_put_failed($strFileName);
-   	
 	return false;
 }
 

@@ -114,7 +114,8 @@ function StockSaveDebugFile($strPathName, $strUrl, $iInterval = SECONDS_IN_MIN, 
 		return $str;
 	}
 
-	file_put_failed($strPathName);
+	DebugString('mark failed '.$strPathName);
+	file_put_contents($strPathName, 'failed');
 	return false;
 }
 
@@ -123,6 +124,15 @@ function StockDebugJson($strPathName, $strUrl, $iInterval = SECONDS_IN_MIN, $arE
 	if ($str = StockSaveDebugFile($strPathName, $strUrl, $iInterval, $arExtraHeaders))
 	{
 		return json_decode($str, true);
+	}
+	return false;
+}
+
+function StockDebugXml($strPathName, $strUrl, $iInterval = SECONDS_IN_MIN, $arExtraHeaders = false)
+{
+	if ($str = StockSaveDebugFile($strPathName, $strUrl, $iInterval, $arExtraHeaders))
+	{
+		return simplexml_load_string($str);
 	}
 	return false;
 }

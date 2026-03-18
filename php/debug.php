@@ -254,10 +254,4 @@ function unlinkConfigFile($strSymbol)
 	unlinkEmptyFile(DebugGetConfigFileName($strSymbol));
 }
 
-function file_put_failed($strFileName)
-{
-	DebugString('mark failed '.$strFileName);
-	file_put_contents($strFileName, 'failed');
-}
-
 ?>

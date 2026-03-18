@@ -105,42 +105,28 @@ function SzseGetLofShares($ref)
 	
 //    date_default_timezone_set('PRC');
 	$ref->SetTimeZone();
-	$strFileName = DebugGetSymbolFile('szse', $ref->GetSymbol());
-	if (StockNeedFile($strFileName, 20 * SECONDS_IN_MIN) === false)	
+	if ($ar = StockDebugJson(DebugGetSymbolFile('szse', $ref->GetSymbol()), GetSzseUrl().'api/report/ShowReport/data?SHOWTYPE=JSON&CATALOGID=1945_LOF&txtQueryKeyAndJC='.$ref->GetDigitA(), 20 * SECONDS_IN_MIN))	
 	{
-//		DebugString(__FUNCTION__.' too many request of '.$strFileName, true);
-		return;	// updates on every 20 minutes
-	}
-
-	$strUrl = GetSzseUrl().'api/report/ShowReport/data?SHOWTYPE=JSON&CATALOGID=1945_LOF&txtQueryKeyAndJC='.$ref->GetDigitA();
-   	if ($str = url_get_contents($strUrl))
-    {
-   		file_put_contents($strFileName, $str);
-   		if ($ar = json_decode($str, true))
-   		{
-   			$ar0 = $ar[0];
-   			if (isset($ar0['metadata']))
-   			{
-   				$arMetaData = $ar0['metadata'];
-   				if ($arMetaData['subname'] == $strDate)
-   				{
-   					if (isset($ar0['data']))
-   					{
-   						$arData = $ar0['data'];
-   						$arData0 = $arData[0];
-   						$strClose = str_replace(',', '', $arData0['dqgm']);
-   						$sql->WriteDaily($strStockId, $strDate, $strClose);
-   						DebugString(__FUNCTION__.': '.$strClose);
-   					}
-   					else	DebugString(__FUNCTION__.' no data');
-   				}
-   				else	DebugString(__FUNCTION__.' different date: '.$arMetaData['subname'].' '.$strDate);
-   			}
-   			else	DebugString(__FUNCTION__.' no metadata');
-   		}
+		$ar0 = $ar[0];
+		if (isset($ar0['metadata']))
+		{
+			$arMetaData = $ar0['metadata'];
+			if ($arMetaData['subname'] == $strDate)
+			{
+				if (isset($ar0['data']))
+				{
+					$arData = $ar0['data'];
+					$arData0 = $arData[0];
+					$strClose = str_replace(',', '', $arData0['dqgm']);
+					$sql->WriteDaily($strStockId, $strDate, $strClose);
+					DebugString(__FUNCTION__.': '.$strClose);
+				}
+				else	DebugString(__FUNCTION__.' no data');
+			}
+			else	DebugString(__FUNCTION__.' different date: '.$arMetaData['subname'].' '.$strDate);
+		}
+		else	DebugString(__FUNCTION__.' no metadata');
    	}
-   	else
-		file_put_failed($strFileName);
 }
 
 ?>

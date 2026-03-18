@@ -20,55 +20,46 @@ function _chinaMoneyInsertData($strMoney, $strDate, $strPrice)
 
 function GetChinaMoney($ref)
 {
-    if (_chinaMoneyNeedData($ref->GetDate()) == false)				return;
+    if (_chinaMoneyNeedData($ref->GetDate()) == false)			return;
 	if ($ref->GetHourMinute() < 915)									return;	// Data not updated until 9:15
     
 //    date_default_timezone_set('PRC');
 	$ref->SetTimeZone();
-	$strFileName = DebugGetChinaMoneyFile();
-	if (StockNeedFile($strFileName) == false)						return; 	// updates on every minute
-	
-   	if ($str = url_get_contents(GetChinaMoneyJsonUrl()))
-   	{
-   		DebugString($strFileName.': Save new file');
-   		file_put_contents($strFileName, $str);
-   	}
-   	else
-   	{
-		file_put_failed($strFileName);
-   		return;
-   	}
-	
-	$ar = json_decode($str, true);
-    $arData = $ar['data'];
-    $strDate = _chinaMoneyNeedData(substr($arData['lastDate'], 0, 10));		// 2018-04-12 9:15
-    if ($strDate == false)											return;
-
-    if (isset($ar['records']) == false)								return;
-    foreach ($ar['records'] as $arPair)
-    {
-    	$strPair = $arPair['vrtEName'];
-    	$strPrice = $arPair['price'];
-    	DebugString($strPair.' '.$strPrice);
-    	switch ($strPair)
-    	{
-    	case 'USD/CNY':
-    		_chinaMoneyInsertData('USCNY', $strDate, $strPrice);
-    		break;
+	if ($ar = StockDebugJson(DebugGetChinaMoneyFile(), GetChinaMoneyJsonUrl()))
+	{
+		$arData = $ar['data'];
+    	if ($strDate = _chinaMoneyNeedData(substr($arData['lastDate'], 0, 10)))		// 2018-04-12 9:15
+		{
+			if (isset($ar['records']))
+			{
+			    foreach ($ar['records'] as $arPair)
+    			{
+    				$strPair = $arPair['vrtEName'];
+    				$strPrice = $arPair['price'];
+    				DebugString($strPair.' '.$strPrice);
+    				switch ($strPair)
+    				{
+    				case 'USD/CNY':
+    					_chinaMoneyInsertData('USCNY', $strDate, $strPrice);
+    					break;
     		
-    	case 'EUR/CNY':
-    		_chinaMoneyInsertData('EUCNY', $strDate, $strPrice);
-    		break;
+    				case 'EUR/CNY':
+    					_chinaMoneyInsertData('EUCNY', $strDate, $strPrice);
+    					break;
     		
-    	case '100JPY/CNY':
-    		_chinaMoneyInsertData('JPCNY', $strDate, $strPrice);
-    		break;
+    				case '100JPY/CNY':
+    					_chinaMoneyInsertData('JPCNY', $strDate, $strPrice);
+    					break;
     		
-    	case 'HKD/CNY':
-    		_chinaMoneyInsertData('HKCNY', $strDate, $strPrice);
-    		break;
+    				case 'HKD/CNY':
+    					_chinaMoneyInsertData('HKCNY', $strDate, $strPrice);
+    					break;
+					}
+				}
+    		}
+			else	DebugString(__FUNCTION__.' no records');
 		}
-    }
+	}
 }
 
 ?>

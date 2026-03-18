@@ -144,10 +144,12 @@ function GetSseUrl($strSubDomain = 'www')
 }
 
 // https://www.sse.com.cn/disclosure/fund/etflist/
+/*
 function GetSseDisclosureUrl()
 {
 	return GetSseUrl().'disclosure/fund/etflist/';
 }
+
 
 function GetSseEtfType($strSymbol)
 {
@@ -155,11 +157,20 @@ function GetSseEtfType($strSymbol)
 	if (isset($ar[$strSymbol]))		return $ar[$strSymbol];
 	return false;
 }
+*/
 
 // https://www.sse.com.cn/disclosure/fund/etflist/detail.shtml?type=087&fundid=513050&etfClass=33
+/*
 function GetSseDisclosureDetailUrl($sym, $strEtfType)
 {
 	return GetSseDisclosureUrl().'detail.shtml?type='.$strEtfType.'&fundid='.$sym->GetDigitA().'&etfClass=33';
+}
+*/
+
+// https://www.sse.com.cn/disclosure/fund/etflist/detail.shtml?fundid=513050&etfClass=33
+function GetSseDisclosureDetailUrl($sym)
+{
+	return GetSseUrl().'disclosure/fund/etflist/detail.shtml?fundid='.$sym->GetDigitA().'&etfClass=33';
 }
 
 function GetProsharesUrl()
