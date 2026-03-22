@@ -37,27 +37,13 @@ function _tradingUserDefined($strVal = false)
    	return TableColumnGetStock($est_ref).$strLev.TableColumnGetPrice();
 }
 
-function _callbackFundListHedge($fPos, $fFactor, $strDate, $strStockId)
+//function _callbackFundListHedge($fPos, $fFactor, $strDate, $strStockId)
+function _callbackFundListHedge($strSymbol)
 {
 	global $acct;
     
 	$ref = $acct->GetRef();
-   	$fQdiiPos = $ref->GetPosition();
-   	
-   	$cal_sql = GetCalibrationSql();
-	if ($record = $cal_sql->GetRecordNow($ref->GetStockId()))
-    {
-		$fQdiiCalibration = floatval($record['close']);
-		$strQdiiDate = $record['date']; 
-		if ($strQdiiDate != $strDate)
-		{
-			if ($strFactor = $cal_sql->GetCloseFrom($strStockId, $strQdiiDate))		$fFactor = floatval($strFactor);
-//			else																		return '';
-			// DebugString(__FUNCTION__.' Reload calibration factor because of difference date: '.$strQdiiDate.' '.$strDate);
-		}
-		return StockCalcLeverageHedge($fQdiiCalibration, $fQdiiPos, $fFactor, $fPos);
-	}
-	return 1.0;
+	return GetStockHedge($ref->GetSymbol(), $ref->GetStockId(), $strSymbol);
 }
 
 class QdiiGroupAccount extends FundGroupAccount 

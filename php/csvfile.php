@@ -79,7 +79,12 @@ class CsvFile
     	$this->strReport .= $str.PHP_EOL;
     }
     
-    function Read()
+	function TriggerReport()
+	{
+    	if ($this->strReport != '')	trigger_error($this->strReport);
+	}
+	
+	function Read()
     {
     	if ($this->HasFile() === false)		return;
     	
@@ -101,7 +106,7 @@ class CsvFile
     		}
     		$this->Close();
     	}
-    	if ($this->strReport != '')	trigger_error($this->strReport);
+		$this->TriggerReport();
     }
 }
 

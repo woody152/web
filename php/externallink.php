@@ -91,13 +91,6 @@ function GetCsindexOfficialLink($strSymbol)
 	return GetOfficialLink($str, $strSymbol);
 }
 
-/*function GetShangHaiEtfListLink($sym)
-{
-	if ($strEtfType = GetSseEtfType($sym->GetSymbol()))		$strUrl = GetSseDisclosureDetailUrl($sym, $strEtfType);
-	else													$strUrl = GetSseDisclosureUrl();
-    return GetExternalLink($strUrl, '上交所ETF申购赎回清单');
-}
-*/
 function GetShangHaiEtfListLink($sym)
 {
     return GetExternalLink(GetSseDisclosureDetailUrl($sym), '上交所ETF申购赎回清单');

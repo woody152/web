@@ -83,6 +83,7 @@ function ReadSseHoldingsFile($strSymbol, $strStockId)
     		}
     		$csv->AddHolding($strHolding, trim($holding_xml->InstrumentName), floatval(trim($holding_xml->SubstitutionCashAmount)));
 		}
+		$csv->TriggerReport();
 		return $csv->Done();
 	}
 	return false;

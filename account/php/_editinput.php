@@ -102,6 +102,19 @@ function _getDiceCaptchaString($strInput, $bChinese)
 	return ($bChinese ? '数据格式不对' : 'Wrong data format');
 }
 
+function isValidXml($str) 
+{
+    libxml_use_internal_errors(true);
+    $xml = simplexml_load_string($str);
+    $errors = libxml_get_errors();
+    libxml_clear_errors();
+    if (!empty($errors)) 
+	{
+        return false;
+    }
+    return $xml;
+}
+
 function _getSimpleTestString($strInput, $bChinese)
 {
 	if (str_starts_with($strInput, 'http'))
@@ -110,17 +123,17 @@ function _getSimpleTestString($strInput, $bChinese)
     	{
     		$strFileName = DebugGetPathName('simpletest.txt');
     		file_put_contents($strFileName, $strRead);
-    		DebugString('Saved '.$strInput.' to '.$strFileName);
+    		DebugString('Saved '.$strInput.' to '.basename($strFileName));
    		   	$strNewLine = GetHtmlNewLine();
     		$str = GetFileDebugLink($strFileName).$strNewLine;
     		if ($ar = json_decode($strRead, true))
     		{
-    			DebugPrint($ar);
+    			DebugPrint($ar, 'json_decode成功');
 				$strOutput = print_r($ar, true);
     		}
-			else if ($xml = simplexml_load_string($strRead))
+			else if ($xml = isValidXml($strRead))
 			{
-				DebugPrint($xml);
+				DebugPrint($xml, 'simplexml_load_string成功');
 				$strOutput = print_r($xml, true);
 			}
     		else

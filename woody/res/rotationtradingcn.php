@@ -3,7 +3,7 @@ require_once('php/_stock.php');
 require_once('php/_emptygroup.php');
 require_once('../../php/ui/editinputform.php');
 
-function _echoRotationTradingItem($rotation_ref, $iQuantity, $bRotationSell)
+function _echoRotationTradingItem($rotation_ref, $fEstQuantity, $bRotationSell)
 {
 	$ar = array();
 	
@@ -15,19 +15,33 @@ function _echoRotationTradingItem($rotation_ref, $iQuantity, $bRotationSell)
    		$strPrice = $stock_ref->GetAvailablePrice($bRotationSell);
    		$ar[] = $strPrice;
    		$ar[] = $strQuantity;
+		
+		$fHedge = GetStockHedge($stock_ref->GetSymbol(), $stock_ref->GetStockId());
+		$fHintQuantity = abs(round($fHedge * $fEstQuantity / 100.0) * 100.0);
+		$strHintQuantity = strval($fHintQuantity);
+		if ($fHintQuantity > floatval($strQuantity))	$strHintQuantity = GetFontElement($strHintQuantity);
+		$ar[] = $strHintQuantity;
+		$ar[] = number_format($fHedge);
+		$ar[] = number_format($fEstQuantity);
    	}
 
 	EchoTableColumn($ar);
 }
 
-function _echoRotationTradingParagraph($arRotationRef, $iQuantity, $bSell)
+function _echoRotationTradingParagraph($strPage, $arRotationRef, $fEstQuantity, $bSell)
 {
 	$bRotationSell = $bSell ? false : true;
 	$strPrefix = '可'.($bRotationSell ? '卖' : '买');
 	$strHint = '建议';
-	$ar = array(new TableColumnSymbol(), new TableColumnPrice($strPrefix), new TableColumnQuantity($strPrefix), new TableColumnQuantity($strHint));
-	EchoTableParagraphBegin($ar, 'rotationtrading');
-	foreach ($arRotationRef as $rotation_ref)	_echoRotationTradingItem($rotation_ref, $iQuantity, $bRotationSell);
+	$pair_ref = $arRotationRef[0]->GetEstRef();
+	$ar = array(new TableColumnSymbol(),
+				new TableColumnPrice($strPrefix),
+				new TableColumnQuantity($strPrefix),
+				new TableColumnQuantity($strHint),
+				new TableColumnHedge(),
+				new TableColumnQuantity($pair_ref->GetSymbol()));
+	EchoTableParagraphBegin($ar, $strPage);
+	foreach ($arRotationRef as $rotation_ref)	_echoRotationTradingItem($rotation_ref, $fEstQuantity, $bRotationSell);
 	EchoTableParagraphEnd();
 }
 
@@ -57,9 +71,10 @@ function EchoAll()
    			$acct->SetRef($ref);
    			$acct->EchoStockGroup();
 
-   			if ($strInput = GetEditInput())		$iInput = intval($strInput);
-   			else								$iInput = -1000000;
-   			$bSell = ($iInput < 0) ? true : false;
+   			if ($strInput = GetEditInput())		$fInput = floatval($strInput);
+   			else								$fInput = -1000000.0;
+   			$bSell = ($fInput < 0.0) ? true : false;
+			$fEstQuantity = $fInput / GetStockHedge($strSymbol, $ref->GetStockId());
 			
    			if ($strQuantity = $ref->GetAvailableQuantity($bSell))
    			{
@@ -73,8 +88,8 @@ function EchoAll()
    					$strPrice = $ref->GetAskPrice();
    					$strOp = '买';
    				}
-   				EchoEditInputForm(GetXueqiuLink($ref).'目前可'.$strOp.'价格'.$strPrice.'、可'.$strOp.'数量'.$strQuantity.'，轮动数量：', strval($iInput));
-   				_echoRotationTradingParagraph($arRotationRef, abs($iInput), $bSell);
+   				EchoEditInputForm(GetXueqiuLink($ref).'目前可'.$strOp.'价格'.$strPrice.'、可'.$strOp.'数量'.$strQuantity.'，轮动数量：', strval($fInput));
+   				_echoRotationTradingParagraph($acct->GetPage(), $arRotationRef, $fEstQuantity, $bSell);
    			}
    		}
     }

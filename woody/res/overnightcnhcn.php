@@ -92,39 +92,13 @@ function _echoOverNightCnhItem($strSymbol, $strInput, $bSell)
 
    		if ($est_ref)
    		{
-			$cal_sql = GetCalibrationSql();
-			if ($record = $cal_sql->GetRecordNow($strStockId))
+			if ($fHedge = GetStockHedge($strSymbol, $strStockId))
 			{
-				$fCal = floatval($record['close']);
-				if ($strEtf = GetLeverageHedgeSymbol($strSymbol))
-				{
-					$strDate = $record['date'];
-					$strEtfId = SqlGetStockId($strEtf);
-					if ($strFactor = $cal_sql->GetCloseFrom($strEtfId, $strDate))
-					{
-						$strEtfDate = $cal_sql->GetDateFrom($strEtfId, $strDate);
-						if ($strEtfDate != $strDate)	DebugString($strEtf.' calibration date '.$strEtfDate.' is different from '.$strSymbol.': '.$strDate, true);
-						$pos_sql = GetPositionSql();
-						$fHedge = StockCalcLeverageHedge($fCal, $fPos, floatval($strFactor), $pos_sql->ReadVal($strEtfId));
-					}
-					else
-					{
-						$fHedge = false;
-					}
-				}
-				else
-				{
-					$fHedge = StockCalcHedge($fCal, $fPos);
-					$strEtf = $est_ref->GetSymbol();
-				}
-				if ($fHedge)
-				{
-//					$fHedgeQuantity = floor($fHintQuantity / $fHedge);
-					$fHedgeQuantity = round($fHintQuantity / $fHedge);
-					$fHintQuantity = $fHedgeQuantity * $fHedge;
-					$strHedge = number_format($fHedge);
-					$strMemo = _buildHedgeString($fHedgeQuantity, $strEtf);
-				}
+//				$fHedgeQuantity = floor($fHintQuantity / $fHedge);
+				$fHedgeQuantity = round($fHintQuantity / $fHedge);
+				$fHintQuantity = $fHedgeQuantity * $fHedge;
+				$strHedge = number_format($fHedge);
+				$strMemo = _buildHedgeString($fHedgeQuantity, ($strEtf = GetLeverageHedgeSymbol($strSymbol)) ? $strEtf : $est_ref->GetSymbol());
 			}
    		}
    		else if (method_exists($ref, 'GetHoldingsDate'))
