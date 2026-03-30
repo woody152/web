@@ -32,12 +32,15 @@ function _echoSmaTableItem($his, $strKey, $strVal, $cb_ref, $callback, $callback
 
     $ar = array();
     $ar[] = _getSmaRow($strKey);
-    $ar[] = $stock_ref->GetPriceDisplay(floatval($strVal));
-    $ar[] = $stock_ref->GetPercentageDisplay(floatval($strVal));
+
+	$fVal = floatval($strVal);
+    $ar[] = $stock_ref->GetPriceDisplay($fVal);
+    $ar[] = $stock_ref->GetPercentageDisplay($fVal);
    	if ($strNext = $his->arNext[$strKey])
    	{
-   		$ar[] = $stock_ref->GetPriceDisplay(floatval($strNext));
-   		$ar[] = $stock_ref->GetPercentageDisplay(floatval($strNext));
+		$fNext = floatval($strNext);
+   		$ar[] = $stock_ref->GetPriceDisplay($fNext);
+   		$ar[] = $stock_ref->GetPercentageDisplay($fNext);
    	}
    	else
    	{
@@ -47,7 +50,7 @@ function _echoSmaTableItem($his, $strKey, $strVal, $cb_ref, $callback, $callback
    	if ($bAfterHour)
    	{
    		if ($strAfterHour = $his->arAfterHour[$strKey])	$ar[] = $stock_ref->GetPriceDisplay(floatval($strAfterHour));
-   		else									   				$ar[] = '';
+   		else									   		$ar[] = '';
    	}
    	
     if ($callback)

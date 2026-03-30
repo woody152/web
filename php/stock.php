@@ -396,35 +396,33 @@ function GetLeverageHedgeSymbol($strSymbol)
 function GetStockHedge($strSymbol, $strStockId, $strLev = false)
 {
 	$pos_sql = GetPositionSql();
-	if ($fPos = $pos_sql->ReadVal($strStockId))
-   	{
-   		$cal_sql = GetCalibrationSql();
-		if ($strLev || ($strLev = GetLeverageHedgeSymbol($strSymbol)))
-		{
-			$strLevId = SqlGetStockId($strLev);
-    		if ($result = $cal_sql->GetAll($strStockId)) 
+	$fPos = $pos_sql->ReadPos($strStockId);
+	$cal_sql = GetCalibrationSql();
+	if ($strLev || ($strLev = GetLeverageHedgeSymbol($strSymbol)))
+	{
+		$strLevId = SqlGetStockId($strLev);
+    	if ($result = $cal_sql->GetAll($strStockId)) 
+    	{
+    		while ($record = mysqli_fetch_assoc($result)) 
     		{
-    			while ($record = mysqli_fetch_assoc($result)) 
-    			{
-					$strDate = $record['date'];
-					if ($strLevCal = $cal_sql->GetClose($strLevId, $strDate))
-					{
-						DebugString(__FUNCTION__.$strLev.' '.$strDate, true);
-			    		mysqli_free_result($result);
-						return StockCalcHedge(floatval($record['close']), $fPos) / StockCalcHedge(floatval($strLevCal), $pos_sql->ReadVal($strLevId));
-					}
+				$strDate = $record['date'];
+				if ($strLevCal = $cal_sql->GetClose($strLevId, $strDate))
+				{
+//					DebugString(__FUNCTION__.$strLev.' '.$strDate, true);
+		    		mysqli_free_result($result);
+					return StockCalcHedge(floatval($record['close']), $fPos) / StockCalcHedge(floatval($strLevCal), $pos_sql->ReadPos($strLevId));
 				}
-	    		mysqli_free_result($result);
-    		}
+			}
+	   		mysqli_free_result($result);
     	}
-		else
-		{
-			if ($strCal = $cal_sql->GetCloseNow($strStockId))
-    		{
-   				return StockCalcHedge(floatval($strCal), $fPos);
-   			}
-		}
-   	}
+    }
+	else
+	{
+		if ($strCal = $cal_sql->GetCloseNow($strStockId))
+    	{
+   			return StockCalcHedge(floatval($strCal), $fPos);
+   		}
+	}
    	return 1.0;
 }
 

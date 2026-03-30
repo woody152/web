@@ -16,10 +16,11 @@ function _echoFundHistoryTableItem($csv, $strNetValue, $arHistory, $arFundEst, $
     {
     	if ($strEstValue = $arFundEst['close'])
     	{
-    		$ar[] = $ref->GetPriceDisplay(floatval($strEstValue), floatval($strNetValue));
+			$fEstValue = floatval($strEstValue);
+    		$ar[] = $ref->GetPriceDisplay($fEstValue, $fNetValue);
     		$strTime = GetHM($arFundEst['time']); 
     		$ar[] = $bAdmin ? GetOnClickLink('/php/_submitdelete.php?'.'fundest'.'='.$arFundEst['id'], '确认删除'.STOCK_DISP_EST.'记录'.$strEstValue.'？', $strTime) : $strTime;
-    		$ar[] = $ref->GetPercentageDisplay(floatval($strNetValue), floatval($strEstValue));
+    		$ar[] = $ref->GetPercentageDisplay($fNetValue, $fEstValue);
     		if ($est_ref)	$ar[] = $est_ref->GetNetValueDisplay($est_ref->GetNetValue($arFundEst['date']));
     	}
     }

@@ -24,7 +24,7 @@ function EchoEditInputForm($strPage, $strInput = '', $bChinese = true)
     $strClear =  $bChinese ? '清除' : 'Clear';
     $strName = EDIT_INPUT_NAME;
 	$strCur = UrlGetCur();
-	$strPage = GetFontElement($strPage, 'olive');
+	//$strPage = GetFontElement($strPage, 'olive');
 	echo <<< END
 	<form id="inputForm" name="inputForm" method="post" action="$strCur">
         <div>

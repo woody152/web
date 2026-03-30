@@ -408,8 +408,12 @@ function UpdateYahooHistoryChart($ref)
 	$strStockId = $ref->GetStockId();
 	$strCurDate = $ref->GetDate();
    	$date_sql = new StockHistoryDateSql();
-   	if ($strCurDate == $date_sql->ReadDate($strStockId))		return false;
-	
+   	if ($strCurDate == $date_sql->ReadDate($strStockId))
+    {
+        DebugString(__FUNCTION__.' already updated', true);
+		return false;
+	}
+    
 	$ref->SetTimeZone();
 	$strYahooSymbol = $ref->GetYahooSymbol();
    	if ($arResult = _getYahooChartData($strYahooSymbol, DebugGetYahooFileName($strYahooSymbol.'Chart')))

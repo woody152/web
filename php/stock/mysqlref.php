@@ -71,10 +71,45 @@ class MysqlReference extends StockReference
 		}
 		return $this->GetVal($strDate);
 	}
+
+	function GetNetValuePercent($strDate, $strPrevDate)
+	{
+		if ($fNetValue = $this->GetNetValue($strDate))
+		{
+			if ($fPrev = $this->GetNetValue($strPrevDate))
+			{
+				return StockGetPercentage($fPrev, $fNetValue);
+			}
+		}
+		return false;
+	}
 	
 	function GetNetValueDisplay($fNetValue)
 	{
 		return $this->GetPriceDisplay($fNetValue, false, ($this->iNetValueCount > 0 ? NETVALUE_PRECISION : $this->GetPrecision()));
+	}
+
+    public function GetOfficialNetValue()
+    {
+    	return false;
+    }
+    
+    public function GetFairNetValue()
+    {
+    	return false;
+    }
+    
+    public function GetRealtimeNetValue()
+    {
+    	return false;
+    }
+
+	function GetEstNetValue()
+	{
+		if ($fEst = $this->GetRealtimeNetValue())		return $fEst;
+		else if ($fEst = $this->GetFairNetValue())		return $fEst;
+		else if ($fEst = $this->GetOfficialNetValue())	return $fEst;
+		return false;
 	}
 
     function _loadSqlId($strSymbol)

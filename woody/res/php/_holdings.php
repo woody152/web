@@ -39,18 +39,19 @@ function _echoHoldingItem($ref, $arRatio, $fNetValueChange, $arHistory, $fAdjust
 	$strClose = strval($fClose);
 	
 	$strPrice = $ref->GetPrice();
-	$fRatio = floatval($arRatio[$strStockId]);
-	$fChange = ($fClose > MIN_FLOAT_VAL) ? floatval($strPrice) / $fClose : 0.0;
+	$fPrice = floatval($strPrice);
+	$fChange = ($fClose > MIN_FLOAT_VAL) ? $fPrice / $fClose : 0.0;
 	$fChange /= $fAdjust;
 	
 	$ar = array();
 	$ar[] = RefGetMyStockLink($ref);
 	
+	$fRatio = floatval($arRatio[$strStockId]);
 	$fTotalOld += $fRatio;
     $ar[] = number_format($fRatio, 2);
     
     $ar[] = mysql_round($strClose, 2);
-    $ar[] = $ref->GetPercentageDisplay(floatval($strClose), floatval($strPrice));
+    $ar[] = $ref->GetPercentageDisplay($fClose, $fPrice);
     
     $fNewRatio = $fRatio * $fChange / $fNetValueChange;
 	$fTotalNew += $fNewRatio;

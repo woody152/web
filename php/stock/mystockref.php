@@ -161,7 +161,7 @@ class MyStockReference extends MysqlReference
     			if ($his_sql->WriteHistory($strStockId, $strDate, $strClose, $strVolume))
     			{
     				$tick_sql->WriteInt($strStockId, $iCurTick);
-    				DebugString(__CLASS__.'->'.__FUNCTION__.': '.$strSymbol.' updated history on '.$strDate.': '.$strClose);
+    				//DebugString(__CLASS__.'->'.__FUNCTION__.': '.$strSymbol.' updated history on '.$strDate.': '.$strClose);
     			}
     		}
     	}

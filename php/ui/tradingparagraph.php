@@ -15,12 +15,14 @@ function _echoTradingTableItem($strColor, $strAskBid, $strPrice, $strQuantity, $
 	if ($strQuantity == '0')	return;
 	
     $ar = array($strAskBid);
-    $ar[] = $ref->GetPriceDisplay(floatval($strPrice), floatval($ref->GetPrevPrice()));
+
+	$fPrice = floatval($strPrice);
+    $ar[] = $ref->GetPriceDisplay($fPrice, floatval($ref->GetPrevPrice()));
     $ar[] = $strQuantity;
     
-	if ($fEstPrice)		$ar[] = $ref->GetPercentageDisplay($fEstPrice, $strPrice);
-	if ($fEstPrice2)	$ar[] = $ref->GetPercentageDisplay($fEstPrice2, $strPrice);
-	if ($fEstPrice3)	$ar[] = $ref->GetPercentageDisplay($fEstPrice3, $strPrice);
+	if ($fEstPrice)		$ar[] = $ref->GetPercentageDisplay($fEstPrice, $fPrice);
+	if ($fEstPrice2)	$ar[] = $ref->GetPercentageDisplay($fEstPrice2, $fPrice);
+	if ($fEstPrice3)	$ar[] = $ref->GetPercentageDisplay($fEstPrice3, $fPrice);
     if ($callback && (empty($strPrice) == false))
     {
     	$ar[] = call_user_func($callback, $strPrice);
@@ -140,7 +142,13 @@ function EchoFundTradingParagraph($fund, $callback = false)
     }
     
     $strSymbol = $ref->GetSymbol();
-    if (in_arrayXopQdii($strSymbol))	$str .= ' '.GetRotationTradingLink($strSymbol);
+    if (in_arrayXopQdii($strSymbol) || 
+		in_arrayXbiQdii($strSymbol) ||
+		in_arraySpyQdii($strSymbol) ||
+		in_arrayQqqMatch($strSymbol))
+	{
+		$str .= ' '.GetRotationTradingLink($strSymbol);
+	}	
 	
     _echoTradingParagraph($str, $arColumn, $ref, $fOfficial, $fFair, $fRealtime, $callback); 
 }

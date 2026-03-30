@@ -134,7 +134,7 @@ function _echoOverNightCnhItem($strSymbol, $strInput, $bSell)
 }
 
 // function _echoOverNightCnhParagraph($arSymbol, $fCnh)
-function _echoOverNightCnhParagraph($arSymbol, $strInput)
+function _echoOverNightCnhParagraph($strPage, $arSymbol, $strInput)
 {
 	$bSell = (substr($strInput, 0, 1) == '-') ? true : false;
 //	$bSell = ($fCnh < 0.0) ? true : false;
@@ -148,10 +148,15 @@ function _echoOverNightCnhParagraph($arSymbol, $strInput)
 				new TableColumnQuantity($strHint),
 				new TableColumnHedge());
 	$ar[] = new TableColumn($strHint.'对冲操作', TableColumnGetLastWidth($ar));
-	EchoTableParagraphBegin($ar, 'overnightcnh');
+	EchoTableParagraphBegin($ar, $strPage);
 	foreach ($arSymbol as $strSymbol)	_echoOverNightCnhItem($strSymbol, $strInput, $bSell);
 	EchoTableParagraphEnd();
 }               
+
+function _copyFutureLink($strQuery, $strFuture)
+{
+	return ' '.CopyPhpLink($strQuery.'1'.$strFuture, $strFuture.'对冲');
+}
 
 function EchoAll()
 {
@@ -163,16 +168,17 @@ function EchoAll()
     }
 	
 	$str = '需要平衡的离岸人民币CNH';
-	$strQuery = $acct->GetPage().'=';
-	$str .= ' '.CopyPhpLink($strQuery.'1MCL', 'MCL');
-	$str .= ' '.CopyPhpLink($strQuery.'1MGC', 'MGC');
+	$strPage = $acct->GetPage();
+	$strQuery = $strPage.'=';
+	$str .= _copyFutureLink($strQuery, 'MCL');
+	$str .= _copyFutureLink($strQuery, 'MGC');
 	$str .= ' '.CopyPhpLink($strQuery.'100000F', '基金申购');
    	EchoEditInputForm($str, $strInput);
    	if ($strInput != '')
    	{
 		$arSymbol = GetOverNightSymbolArray();
    		StockPrefetchArrayExtendedData($arSymbol);
-   		_echoOverNightCnhParagraph($arSymbol, $strInput);
+   		_echoOverNightCnhParagraph($strPage, $arSymbol, $strInput);
     }
     $acct->EchoLinks();
 }

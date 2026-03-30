@@ -76,6 +76,20 @@ class ValSql extends TableSql
     }
 }
 
+class FundPositionSql extends ValSql
+{
+    public function __construct()
+    {
+        parent::__construct('fundposition');
+    }
+
+	function ReadPos($strStockId)
+	{
+		if ($fPos = $this->ReadVal($strStockId))	return $fPos;
+		return 1.0;
+	}
+}
+
 class LastCalibrationSql extends ValSql
 {
     public function __construct()

@@ -56,72 +56,15 @@ function _getSwitchDates($net_sql, $strStockId)
     return $arDate;
 }
 
-/*function _getSwitchDateArray($net_sql, $strStockId, $est_sql, $strEstId)
-{
-	$arDate = array();
-	$bFirst = true;
-    if ($result = $net_sql->GetAll($strStockId)) 
-    {
-        while ($record = mysqli_fetch_assoc($result)) 
-        {
-       		$strDate = $record['date'];
-       		if ($strEst = $est_sql->GetClose($strEstId, $strDate))
-       		{
-       			$fCur = floatval($strEst);
-       			if ($bFirst)
-       			{
-       				$arDate[] = $strDate;
-       				$bSecond = true;
-       				$bFirst = false;
-       			}
-       			else
-       			{
-       				if ($bSecond)
-       				{
-       					$bUp = ($fOld > $fCur) ? true : false;
-       					$bSecond = false;
-       				}
-       				else
-       				{
-       					if ($bUp)
-       					{
-       						if ($fOld < $fCur)
-       						{
-       							$bUp = false;
-       							$arDate[] = $strOldDate;
-       						}
-       					}
-       					else
-       					{
-       						if ($fOld > $fCur)
-       						{
-       							$bUp = true;
-       							$arDate[] = $strOldDate;
-       						}
-       					}
-       				}
-       			}
-   				$fOld = $fCur;
-   				$strOldDate = $strDate;
-       		}
-        }
-        mysqli_free_result($result);
-    }
-    return $arDate;
-}
-*/	
-function _echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $strInput, $bAdmin)
+function _echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $strInput, $iNum, $bAdmin)
 {
    	$strStockId = $ref->GetStockId();
-//	$strEstId = $est_ref->GetStockId();
 	$net_sql = GetNetValueHistorySql();
-//	$est_sql = ($est_ref->CountNetValue() > 0) ? $net_sql : GetStockHistorySql(); 
-
-//	$arDate = _getSwitchDateArray($net_sql, $strStockId, $est_sql, $strEstId);
 	$arDate = _getSwitchDates($net_sql, $strStockId);
 	if (count($arDate) == 0)		return;
  
  	$iIndex = 0;
+	$iTotal = 0;
     if ($result = $net_sql->GetAll($strStockId)) 
     {
         while ($record = mysqli_fetch_assoc($result)) 
@@ -131,7 +74,12 @@ function _echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $strInput, $bAdmi
        		if ($strDate == $arDate[$iIndex])
        		{
    				$iIndex ++;
-   				if (isset($arDate[$iIndex]))	EchoNetValueItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue, $arDate[$iIndex], $strInput, $bAdmin);
+   				if (isset($arDate[$iIndex]))
+				{
+					EchoNetValueItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue, $arDate[$iIndex], $strInput, $bAdmin);
+					$iTotal ++;
+					if ($iTotal == $iNum)	break;	
+				}
    				else
    				{
    					$csv->Write($strDate, $strNetValue);
@@ -144,12 +92,12 @@ function _echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $strInput, $bAdmi
     }
 }
 
-function _echoFundPositionParagraph($ref, $cny_ref, $est_ref, $strSymbol, $strInput, $bAdmin)
+function _echoFundPositionParagraph($strPage, $ref, $cny_ref, $est_ref, $strSymbol, $strInput, $iNum, $bAdmin)
 {
-	EchoTableParagraphBegin(GetNetValueTableColumn($est_ref, $cny_ref), 'fundposition', GetFundLinks($strSymbol));
+	EchoTableParagraphBegin(GetNetValueTableColumn($est_ref, $cny_ref), $strPage, StockGetAllLink($strSymbol).' '.GetFundLinks($strSymbol));
 	
 	$csv = new PageCsvFile();
-	_echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $strInput, $bAdmin);
+	_echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $strInput, $iNum, $bAdmin);
 	$csv->Close();
 	
  	$str = '';
@@ -187,7 +135,7 @@ function EchoAll()
 				$cny_ref = $fund->GetCnyRef();
 				$est_ref = false;				
 			}
-    		if ($fund)		_echoFundPositionParagraph($fund, $cny_ref, $est_ref, $strSymbol, $strInput, $acct->IsAdmin());
+    		if ($fund)		_echoFundPositionParagraph($acct->GetPage(), $fund, $cny_ref, $est_ref, $strSymbol, $strInput, $acct->GetNum(), $acct->IsAdmin());
     	}
     }
     $acct->EchoLinks();

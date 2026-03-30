@@ -149,6 +149,11 @@ class FundReference extends MysqlReference
     {
     	return $this->est_ref;
     }
+    
+    function SetEstRef($ref)
+    {
+        $this->est_ref = $ref;
+    }
 
     function GetRealtimeRef()
     {
@@ -164,6 +169,11 @@ class FundReference extends MysqlReference
     function GetForexRef()
     {
 		return $this->IsEtfA() ? $this->forex_ref : $this->cny_ref;
+    }
+
+    function SetForexRef($strSymbol)
+    {
+        $this->forex_ref = new MyStockReference($strSymbol);
     }
 
     function GetForexRefArray()

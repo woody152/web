@@ -239,10 +239,11 @@ class QdiiReference extends _QdiiReference
         
         if ($strEstSymbol = QdiiGetEstSymbol($strSymbol))
         {
-        	if (SqlCountHoldings($strEstSymbol) > 0)	$this->est_ref = new HoldingsReference($strEstSymbol);
-        	else										        $this->est_ref = new FundPairReference($strEstSymbol);
+        	if (SqlCountHoldings($strEstSymbol) > 0)	$est_ref = new HoldingsReference($strEstSymbol);
+        	else										$est_ref = new FundPairReference($strEstSymbol);
+            $this->SetEstRef($est_ref);
         }
-        $this->forex_ref = new MyStockReference('fx_susdcny');
+        $this->SetForexRef('fx_susdcny');
         $this->EstNetValue();
     }
 }
@@ -255,9 +256,9 @@ class QdiiHkReference extends _QdiiReference
         
         if ($strEstSymbol = QdiiHkGetEstSymbol($strSymbol))
         {
-            $this->est_ref = new FundPairReference($strEstSymbol);
+            $this->SetEstRef(new FundPairReference($strEstSymbol));
         }
-        $this->forex_ref = new MyStockReference('fx_shkdcny');
+        $this->SetForexRef('fx_shkdcny');
         $this->EstNetValue();
     }
 }
@@ -270,9 +271,9 @@ class QdiiJpReference extends _QdiiReference
         
         if ($strEstSymbol = QdiiJpGetEstSymbol($strSymbol))
         {
-            $this->est_ref = new FundPairReference($strEstSymbol);
+            $this->SetEstRef(new FundPairReference($strEstSymbol));
         }
-        $this->forex_ref = new MyStockReference('fx_sjpycny');
+        $this->SetForexRef('fx_sjpycny');
         $this->EstNetValue();
     }
 }
@@ -285,9 +286,9 @@ class QdiiEuReference extends _QdiiReference
         
         if ($strEstSymbol = QdiiEuGetEstSymbol($strSymbol))
         {
-            $this->est_ref = new FundPairReference($strEstSymbol);
+            $this->SetEstRef(new FundPairReference($strEstSymbol));
         }
-        $this->forex_ref = new MyStockReference('fx_seurcny');
+        $this->SetForexRef('fx_seurcny');
         $this->EstNetValue();
     }
 }

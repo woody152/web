@@ -4,6 +4,7 @@ require_once('stocktable.php');
 define('POSITION_EST_LEVEL', '4.0');
 
 // (est * cny / estPrev * cnyPrev - 1) * position = (nv / nvPrev - 1) 
+/*
 function _QdiiGetStockPosition($fEstPrev, $fEst, $fPrev, $fNetValue, $fCnyPrev, $fCny, $strInput = POSITION_EST_LEVEL)
 {
 	$f = StockGetPercentage($fEstPrev, $fEst);
@@ -13,6 +14,26 @@ function _QdiiGetStockPosition($fEstPrev, $fEst, $fPrev, $fNetValue, $fCnyPrev, 
 		if (($f !== false) && (abs($f) > MIN_FLOAT_VAL))
 		{
 			$fVal = StockGetPercentage($fPrev, $fNetValue) / $f;
+			if ($fVal > 0.1)
+			{
+				return number_format($fVal, 2);
+			}
+		}
+	}
+	return false;
+}
+*/
+
+function _QdiiGetStockPosition($fEstPrev, $fEst, $fPrev, $fNetValue, $fCnyPrev, $fCny, $strInput = POSITION_EST_LEVEL)
+{
+	$fPercent = StockGetPercentage($fPrev, $fNetValue);
+//	DebugVal($fPercent, __FUNCTION__, true);
+	if (($fPercent !== false) && (abs($fPercent) > floatval($strInput)))
+	{
+		$fEstPercent = StockGetPercentage($fEstPrev * $fCnyPrev, $fEst * $fCny);
+		if (($fEstPercent !== false) && (abs($fEstPercent) > MIN_FLOAT_VAL))
+		{
+			$fVal = $fPercent / $fEstPercent;
 			if ($fVal > 0.1)
 			{
 				return number_format($fVal, 2);

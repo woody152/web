@@ -117,7 +117,7 @@ class StockSql extends KeyNameSql
        	$this->his_sql = new StockHistorySql();
         $this->holdings_sql = new HoldingsSql();
        	$this->net_sql = new DailyCloseSql('netvaluehistory');
-       	$this->pos_sql = new ValSql('fundposition');
+       	$this->pos_sql = new FundPositionSql();
        	
        	$this->ab_pair_sql = new StockPairSql('abpair');
        	$this->adr_pair_sql = new StockPairSql('adrpair');
