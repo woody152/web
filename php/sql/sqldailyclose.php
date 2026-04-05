@@ -205,6 +205,57 @@ class DailyCloseSql extends KeySql
     	}
 		return $this->WriteDaily($strKeyId, $strDate, $strClose);
     }
+
+    function GetSwitchDates($strKeyId)
+    {
+	    $arDate = array();
+	    $bFirst = true;
+        if ($result = $this->GetAll($strKeyId)) 
+        {
+            while ($record = mysqli_fetch_assoc($result)) 
+            {
+       		    $strDate = $record['date'];
+			    $fCur = floatval($record['close']);
+   			    if ($bFirst)
+   			    {
+   				    $arDate[] = $strDate;
+   				    $bSecond = true;
+   				    $bFirst = false;
+   		    	}
+   			    else
+   			    {
+   				    if ($bSecond)
+   				    {
+   					    $bUp = ($fOld > $fCur) ? true : false;
+   					    $bSecond = false;
+   				    }
+   				    else
+   				    {
+   					    if ($bUp)
+   					    {
+   						    if ($fOld < $fCur)
+   						    {
+   							    $bUp = false;
+   							    $arDate[] = $strOldDate;
+   						    }
+   					    }
+   					    else
+   					    {
+   						    if ($fOld > $fCur)
+   						    {
+   							    $bUp = true;
+   							    $arDate[] = $strOldDate;
+   						    }
+   					    }
+       			    }
+       		    }
+			    $fOld = $fCur;
+			    $strOldDate = $strDate;
+            }
+            mysqli_free_result($result);
+        }
+        return $arDate;
+    }
 }
 
 class FuturePremiumSql extends DailyCloseSql

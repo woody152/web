@@ -22,7 +22,7 @@ function _updateStockOptionHoldings($strSymbol, $strStockId, $strDate, $strVal)
 			}
 			else
 			{
-				$holdings_sql->InsertHolding($strStockId, $sql->GetId($strHolding), $strRatio);
+				$holdings_sql->InsertHoldingId($strStockId, $sql->GetId($strHolding), $strRatio);
 			}
 		}
 	}

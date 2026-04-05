@@ -12,7 +12,7 @@ function EchoHead($bChinese = true)
 }
 
 	$acct = false;
-	$strRetry = UrlGetIp().' Retry-After: '.strval(SECONDS_IN_DAY/2);
+	$strRetry = 'Retry-After: '.strval(SECONDS_IN_DAY/2);
 	
 	http_response_code(429);
 	header($strRetry);
@@ -20,6 +20,7 @@ function EchoHead($bChinese = true)
 	EchoNobody();
 	echo '<body>';
 	EchoHeading(DISP_TITLE);
+	$strRetry .= ', '.UrlGetIp();
 	EchoHtmlElement($strRetry);
     echo <<<END
 

@@ -348,7 +348,7 @@ function GetEtfNetValueLink($strSymbol)
 {
 	if ($strUrl = GetEtfNetValueUrl($strSymbol))
 	{
-		return GetExternalLink($strUrl, '净值文件');
+		return GetExternalLink($strUrl, STOCK_DISP_NETVALUE.'文件');
 	}
 	return '';
 }

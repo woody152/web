@@ -94,7 +94,7 @@ function GetMetaDescription()
     
     $strDescription = RefGetStockDisplay($ref);
     $strEst = RefGetStockDisplay($ref->GetPairRef());
-    $str = "用{$strEst}估算{$strDescription}净值，同时测算无风险套利的国内期货市场对冲比例等数据。";
+    $str = "用{$strEst}估算{$strDescription}".STOCK_DISP_NETVALUE.'，同时测算无风险套利的国内期货市场对冲比例等数据。';
     return CheckMetaDescription($str);
 }
 

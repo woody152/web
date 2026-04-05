@@ -29,4 +29,5 @@ define('STOCK_DISP_TURNOVER', '换手');	// green
 
 define('STOCK_DISP_DEBUG', '调试信息');
 
+define('NETVALUE_DIFF', 4.0);
 ?>

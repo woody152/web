@@ -44,6 +44,16 @@ class _EtfHoldingsFile extends _HoldingsCsvFile
    		$this->AddSum($fVal);
    		$this->InsertHolding($strHolding, $strName, strval(100.0 * $fVal / $this->fCash));
     }
+
+    function ConvertHolding($strHolding)
+    {
+        if (is_numeric($strHolding))
+    	{
+    		if (strlen($strHolding) <= 5)	return BuildHongkongStockSymbol($strHolding);
+    		else							return BuildChinaStockSymbol($strHolding);
+    	}
+		return str_replace('/', '.', $strHolding);	// BRK/B -> BRK.B
+    }
 }
 
 ?>

@@ -70,8 +70,8 @@ class MyEWrapper(EWrapper):
         #self.arXOPETF = {'SH513350', 'SZ159518'}
         #self.arXBIETF = {'SZ159502'}
         self.arOrder = {}
-        self.arOrder['KWEB'] = GetOrderArray([23.48, 27.38, 28.38, 28.80, 29.52, 31.66, 33.40, 39.40, 40.71], 200, 1, 5, -1)
-        self.arOrder['XOP'] = GetOrderArray([101.08, 143.39, 149.47, 170.06, 178.11, 183.84, 190.65], 100, 5, 6)
+        self.arOrder['KWEB'] = GetOrderArray([24.85, 26.87, 28.11, 28.30, 29.28, 31.68, 33.40, 39.40, 39.87], 200, 1, 5, -1)
+        self.arOrder['XOP'] = GetOrderArray([97.17, 101.08, 143.39, 153.23, 173.25, 180.98, 182.59, 193.28], 100, 2, -1)
         if IsChinaMarketOpen():
             #self.arOrder['KWEB'] = GetOrderArray()
             self.arOrder['GLD'] = GetOrderArray()
@@ -82,12 +82,12 @@ class MyEWrapper(EWrapper):
             self.arOrder['USO'] = GetOrderArray()
             self.arOrder['XBI'] = GetOrderArray()
             self.arOrder['XLY'] = GetOrderArray()
-            self.arOrder['XOP'] = GetOrderArray()
+            #self.arOrder['XOP'] = GetOrderArray()
         else:
         #if IsMarketOpen():
-            self.arOrder['TLT'] = GetOrderArray([81.15, 84.57, 84.66, 86.15, 86.52, 87.36, 90.07, 90.40, 92.68], 100, 1, 8)
-            self.arOrder['SPX'] = GetOrderArray([5113.34, 6219.14, 6364.24, 6498.57, 6558.78, 6665.44, 6966.64, 7177.45, 7324.95])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0067, 1, 6)
+            self.arOrder['TLT'] = GetOrderArray([80.90, 84.23, 84.57, 85.98, 86.08, 86.64, 88.70, 90.05, 91.88], 100, 1, 8)
+            self.arOrder['SPX'] = GetOrderArray([5194.58, 6265.47, 6318.21, 6454.10, 6503.26, 6609.16, 6900.11, 7177.45, 7336.35])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0065, 1, -1)
             self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0181, -1, -1)
         self.palmmicro = Palmmicro()
         self.client.StartStreaming(orderId)

@@ -218,7 +218,7 @@ function _getStockOptionCalibration($strSymbol, $strDate)
 		$est_ref = new MyStockReference('znb_SENSEX');
 	}
 
-	return $est_ref ? _getBestEstNetValue($est_ref, $strDate) : '对方净值';
+	return $est_ref ? _getBestEstNetValue($est_ref, $strDate) : '对方'.STOCK_DISP_NETVALUE;
 }
 
 function _getStockOptionHoldings($strStockId)
@@ -308,7 +308,7 @@ function _getStockOptionMemo($strSubmit)
 		return '股票收盘后的第2天修改才会生效，同时删除以往全部EMA记录。';
 
 	case STOCK_OPTION_FUND:
-		return '输入INDEX*0删除对应关系和全部'.CALIBRATION_HISTORY_DISPLAY.'，输入0删除仓位。';
+		return '输入INDEX*0删除对应关系和全部'.CALIBRATION_HISTORY_DISPLAY.'，输入0删除'.STOCK_DISP_POSITION.'。';
 
 	case STOCK_OPTION_HA:
 		return '清空输入删除对应A股。';

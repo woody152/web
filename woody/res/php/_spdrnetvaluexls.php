@@ -69,7 +69,7 @@ function _readXlsFile($bIshares, $strPathName, $net_sql, $shares_sql, $strStockI
    			}
 		}
 	}
-	return '更新'.strval($iCount).'条净值和'.strval($iSharesCount).'条流通股数';
+	return '更新'.strval($iCount).'条'.STOCK_DISP_NETVALUE.'和'.strval($iSharesCount).'条流通股数';
 }
 
 function GetNetValueXlsStr($sym, $bAutoCheck = false)

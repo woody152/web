@@ -31,7 +31,7 @@ function GetMetaDescription()
 	global $acct;
 	
   	$str = $acct->GetMetaDisplay(NETVALUE_HISTORY_DISPLAY);
-    $str .= '页面。用于某基金历史净值超过一定数量后的显示。最近的基金净值记录一般会直接显示在该基金页面。';
+    $str .= '页面。用于某基金历史'.STOCK_DISP_NETVALUE.'超过一定数量后的显示。最近的基金'.STOCK_DISP_NETVALUE.'记录一般会直接显示在该基金页面。';
     return CheckMetaDescription($str);
 }
 

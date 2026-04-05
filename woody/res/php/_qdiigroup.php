@@ -133,10 +133,11 @@ function GetMetaDescription()
     
     $fund = $acct->GetRef();
     $cny_ref = $fund->GetCnyRef();
-	$strBase = SqlGetStockName($cny_ref->GetSymbol());
-    if ($est_ref = $fund->GetEstRef())     $strBase .= '、'.SqlGetStockName($est_ref->GetSymbol());
+	$strBase = RefGetStockDisplay($cny_ref);
+    if ($est_ref = $fund->GetEstRef())     			$strBase .= '、'.RefGetStockDisplay($est_ref);
+	if ($realtime_ref = $fund->GetRealtimeRef())	$strBase .= '、'.RefGetStockDisplay($realtime_ref);
     
-    $str = '根据'.$strBase.'等其它网站的数据来源估算'.$acct->GetStockDisplay().'净值的网页工具。';
+    $str = '根据'.$strBase.'等其它网站的数据来源估算'.$acct->GetStockDisplay().STOCK_DISP_NETVALUE.'的网页工具。';
     return CheckMetaDescription($str);
 }
 

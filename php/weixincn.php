@@ -38,7 +38,7 @@ class WeixinStock extends WeixinCallback
 
 		_wxDebug($strUserName, GetRemarkElement('内容：').$strDebug, 'Wechat message');
 		$str = $strContents.BOT_EOL;
-		$str .= '本公众号目前只提供部分股票交易和净值估算自动查询。因为没有匹配到信息，此消息内容已经'._wxEmailInfo();
+		$str .= '本公众号目前只提供部分股票交易和'.STOCK_DISP_NETVALUE.'估算自动查询。因为没有匹配到信息，此消息内容已经'._wxEmailInfo();
 		return $str;
 	}
 

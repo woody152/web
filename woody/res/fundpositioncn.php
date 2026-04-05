@@ -5,62 +5,11 @@ require_once('../../php/dateimagefile.php');
 require_once('../../php/ui/editinputform.php');
 require_once('../../php/ui/netvaluehistoryparagraph.php');
 
-function _getSwitchDates($net_sql, $strStockId)
-{
-	$arDate = array();
-	$bFirst = true;
-    if ($result = $net_sql->GetAll($strStockId)) 
-    {
-        while ($record = mysqli_fetch_assoc($result)) 
-        {
-       		$strDate = $record['date'];
-			$fCur = floatval($record['close']);
-   			if ($bFirst)
-   			{
-   				$arDate[] = $strDate;
-   				$bSecond = true;
-   				$bFirst = false;
-   			}
-   			else
-   			{
-   				if ($bSecond)
-   				{
-   					$bUp = ($fOld > $fCur) ? true : false;
-   					$bSecond = false;
-   				}
-   				else
-   				{
-   					if ($bUp)
-   					{
-   						if ($fOld < $fCur)
-   						{
-   							$bUp = false;
-   							$arDate[] = $strOldDate;
-   						}
-   					}
-   					else
-   					{
-   						if ($fOld > $fCur)
-   						{
-   							$bUp = true;
-   							$arDate[] = $strOldDate;
-   						}
-   					}
-       			}
-       		}
-			$fOld = $fCur;
-			$strOldDate = $strDate;
-        }
-        mysqli_free_result($result);
-    }
-    return $arDate;
-}
-
-function _echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $strInput, $iNum, $bAdmin)
+function _echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $fInput, $iNum, $bAdmin)
 {
    	$strStockId = $ref->GetStockId();
 	$net_sql = GetNetValueHistorySql();
-	$arDate = _getSwitchDates($net_sql, $strStockId);
+	$arDate = $net_sql->GetSwitchDates($strStockId);
 	if (count($arDate) == 0)		return;
  
  	$iIndex = 0;
@@ -69,6 +18,7 @@ function _echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $strInput, $iNum,
     {
         while ($record = mysqli_fetch_assoc($result)) 
         {
+			$bWritten = false;
        		$strDate = $record['date'];
        		$strNetValue = $record['close'];
        		if ($strDate == $arDate[$iIndex])
@@ -76,28 +26,36 @@ function _echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $strInput, $iNum,
    				$iIndex ++;
    				if (isset($arDate[$iIndex]))
 				{
-					EchoNetValueItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue, $arDate[$iIndex], $strInput, $bAdmin);
-					$iTotal ++;
-					if ($iTotal == $iNum)	break;	
+					$strPrevDate = $arDate[$iIndex];
+					$fPercent = $ref->GetNetValuePercent($strDate, $strPrevDate);
+					if (abs($fPercent) > $fInput)
+					{
+						//DebugVal($fPercent, __FUNCTION__, true);
+						$bWritten = EchoNetValueItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue, $strPrevDate, $fInput, $bAdmin);
+						$iTotal ++;
+						if ($iTotal == $iNum)	break;
+					}	
 				}
    				else
    				{
-   					$csv->Write($strDate, $strNetValue);
    					break;
        			}
        		}
-       		else	$csv->Write($strDate, $strNetValue);
+			if ($bWritten === false)
+			{
+				$csv->Write($strDate, $strNetValue);
+			}
         }
         mysqli_free_result($result);
     }
 }
 
-function _echoFundPositionParagraph($strPage, $ref, $cny_ref, $est_ref, $strSymbol, $strInput, $iNum, $bAdmin)
+function _echoFundPositionParagraph($strPage, $ref, $cny_ref, $est_ref, $strSymbol, $fInput, $iNum, $bAdmin)
 {
 	EchoTableParagraphBegin(GetNetValueTableColumn($est_ref, $cny_ref), $strPage, StockGetAllLink($strSymbol).' '.GetFundLinks($strSymbol));
 	
 	$csv = new PageCsvFile();
-	_echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $strInput, $iNum, $bAdmin);
+	_echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $fInput, $iNum, $bAdmin);
 	$csv->Close();
 	
  	$str = '';
@@ -118,8 +76,8 @@ function EchoAll()
 	
     if ($ref = $acct->EchoStockGroup())
     {
-    	if (($strInput = GetEditInput()) === false)		$strInput = POSITION_EST_LEVEL;
-    	EchoEditInputForm('进行估算的涨跌阈值', $strInput);
+    	if (($strInput = GetEditInput()) === false)		$strInput = strval(NETVALUE_DIFF);
+    	EchoEditInputForm('进行'.TableColumnGetPosition().'估算的'.TableColumnGetNetValue().'涨跌%阈值', $strInput);
     	if ($strInput != '')
     	{
     		$fund = false;
@@ -129,14 +87,17 @@ function EchoAll()
     			$cny_ref = $fund->GetCnyRef();
     			$est_ref = $fund->GetEstRef();
     		}
-			else if (in_array($strSymbol, GetQdiiGoldOilSymbolArray()))
+			else if (in_arrayQdiiGoldOil($strSymbol))
 			{
 				$fund = new HoldingsReference($strSymbol);
 				$cny_ref = $fund->GetCnyRef();
 				$est_ref = false;				
 			}
-    		if ($fund)		_echoFundPositionParagraph($acct->GetPage(), $fund, $cny_ref, $est_ref, $strSymbol, $strInput, $acct->GetNum(), $acct->IsAdmin());
-    	}
+    		if ($fund)
+			{
+				_echoFundPositionParagraph($acct->GetPage(), $fund, $cny_ref, $est_ref, $strSymbol, floatval($strInput), $acct->GetNum(), $acct->IsAdmin());
+    		}
+		}
     }
     $acct->EchoLinks();
 }

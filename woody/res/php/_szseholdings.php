@@ -50,7 +50,7 @@ class _SzseHoldingsFile extends _EtfHoldingsFile
 					$strHolding = $ar[0];
 					if ($strHolding != '159900')
 					{
-						if (is_numeric($strHolding))	$strHolding = BuildHongkongStockSymbol($strHolding);
+						$strHolding = $this->ConvertHolding($strHolding);
 						
 						$iQuantity = intval(str_replace(',', '', $ar[2]));
 						if ($iQuantity == 0)		$fVal = floatval(str_replace(',', '', $ar[5]));

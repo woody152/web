@@ -2,157 +2,151 @@
 require_once('php/_stock.php');
 require_once('php/_emptygroup.php');
 require_once('../../php/ui/editinputform.php');
+require_once('../../php/tutorial/math.php');
 
-function _echoExhaustiveHoldingsItem($ref, $arNew, $arOrg, $strDate, $strNetValue, $strPrevDate, $strPrevNetValue, $fLimit, $bAdmin)
+function __getHoldingsArray($arRatio, $strDate, $strPrevDate)
 {
-	static $strOldDate = false;
-	
 	$ar = array();
-	$bMatch = true;
-	$iCount = 0;
-	foreach ($arNew as $iPos)
+	foreach ($arRatio as $strHoldingId => $strRatio)
 	{
-		if ($iPos != $arOrg[$iCount])	$bMatch = false;
-		$iCount ++;
-		$ar[] = strval($iPos);
-	}
-	$ref->SetHoldingsRatioArray($ar);
-	$ref->SetHoldingsDate($strPrevDate);
-	$ref->SetNetValueString($strPrevNetValue);
-	
-	$fEst = $ref->_estNetValue($strDate);
-	$strEst = strval($fEst);
-
-	if (abs($ref->GetPercentage(floatval($strNetValue), floatval($strEst))) < $fLimit)
-	{
-		if ($strPrevDate != $strOldDate)
+		if ($str = SqlGetHistoryByDate($strHoldingId, $strDate))
 		{
-			$ar[] = $strPrevDate;
-			$ar[] = $strPrevNetValue;
-			$strOldDate = $strPrevDate;
+			if ($strPrev = SqlGetHistoryByDate($strHoldingId, $strPrevDate))
+			{
+				$ar[] = floatval($str) / floatval($strPrev);
+			}
+			else
+			{
+			 	return false;
+			}
 		}
 		else
 		{
-			$ar[] = '';
-			$ar[] = '';
+		 	return false;
 		}
-	
-		$ar[] = number_format($fEst, 3);
-		$bHit = ($ref->GetPercentageString(floatval($strNetValue), floatval($strEst)) == '0') ? true : false;
-		if ($bAdmin && ($bMatch == false) && $bHit)
-		{
-			$strHoldings = $ref->GetHoldingsDisplay();
-			$ar[] = GetOnClickLink(PATH_STOCK.'submitholdings.php?symbol='.$ref->GetSymbol().'&holdings='.$strHoldings, '确认更新持仓：'.$strHoldings.'？', '0');
-		}	
-		else
-		{
-			$ar[] = $ref->GetPercentageDisplay(floatval($strNetValue), floatval($strEst));
-		}
-		EchoTableColumn($ar, $bMatch ? 'yellow' : false);
-		return $bHit;
 	}
-	return false;
+	// DebugPrint($ar);
+	return $ar;
 }
 
-function __getPrevHoldingsDate($ref, $strStockId, $strDate, $net_sql)
+function _echoExhaustiveHoldingsItem($ref, $iCount, $fPercent, $strDate, $strNetValue, $strPrevDate, $bAdmin)
 {
-	while ($strPrevDate = $net_sql->GetDatePrev($strStockId, $strDate))
+	static $a = 1.0;
+	static $b = 1.0;
+	static $c = 1.0;
+	static $d = 1.0;
+
+	$ar = array($strDate);
+	
+	$fNetValue = floatval($strNetValue);
+	$ar[] = $ref->GetNetValueDisplay($fNetValue);
+	
+	$fPrev = $ref->GetNetValue($strPrevDate);
+	$ar[] = $ref->GetPercentageDisplay($fPrev, $fNetValue);
+
+	$arRatio = $ref->GetHoldingsRatioArray();
+	$bMatch = false;
+	if ($arHolding = __getHoldingsArray($arRatio, $strDate, $strPrevDate))
 	{
-		if ($ref->CheckHoldingsDate($strPrevDate))	break;
-		else										$strDate = $strPrevDate;
+		$fPercent /= 100.0;
+		$fPos = $ref->GetPosition();
+		$cny_ref = $ref->GetCnyRef();
+		$fCny = $cny_ref->GetVal($strDate) / $cny_ref->GetVal($strPrevDate);
+		$fVal = ($fPercent / $fPos + 1) / $fCny;
+		if ($iCount == 2)
+		{
+			$arXY = CramersRule(1.0, 1.0, 1.0, $arHolding[0], $arHolding[1], $fVal);
+		}
+		else if ($iCount == 3)
+		{
+			$arXY = CramersRule3(1.0, 1.0, 1.0, 1.0, $arHolding[0], $arHolding[1], $arHolding[2], $fVal, $a, $b, $c, $d);
+			$a = $arHolding[0];
+			$b = $arHolding[1];
+			$c = $arHolding[2];
+			$d = $fVal;
+		}
+		if ($arXY['status'] == 'unique')
+		{
+			$strHoldings = '';
+			$iIndex = 0;
+			$bMatch = true;
+			$arDisplay = array();
+			foreach ($arRatio as $strHoldingId => $strRatio)
+			{
+				$str = number_format($arXY['solution'][$iIndex] * 100.0, 2);
+				if ($str != $strRatio)	$bMatch = false;
+				$arDisplay[] = $str;
+				$strHoldings .= SqlGetStockSymbol($strHoldingId).'*'.$str.';';
+				$iIndex ++;
+			}
+			if ($bAdmin && $bMatch === false)
+			{
+				$strHoldings = rtrim($strHoldings, ';');
+				$arDisplay[0] = GetOnClickLink(PATH_STOCK.'submitholdings.php?symbol='.$ref->GetSymbol().'&holdings='.$strHoldings, '确认更新持仓'.$strHoldings.'？', $arDisplay[0]);
+			}
+			$ar = array_merge($ar, $arDisplay);
+		}
+		//else	DebugString(__FUNCTION__.$arXY['message']);
 	}
-	return $strPrevDate;
+
+	EchoTableColumn($ar, $bMatch ? 'yellow' : false);
 }
 
-function _echoExhaustiveHoldingsData($ref, $strDate, $strNetValue, $iCount, $fLimit, $bAdmin)
+function _echoExhaustiveHoldingsData($ref, $iCount, $fInput, $iNum, $bAdmin)
 {
-	$strDebug = '';
-	$iHit = 0;
-	$arHit = array();
-	
-	$iTotal = 0;
-	$arOrg = array();
-	foreach ($ref->GetHoldingsRatioArray() as $strHoldingId => $strRatio)
-	{
-		$iRatio = intval($strRatio);
-		$iTotal += $iRatio;
-		$arOrg[] = $iRatio;
-	}
-	
-	$strStockId = $ref->GetStockId();
+   	$strStockId = $ref->GetStockId();
 	$net_sql = GetNetValueHistorySql();
-	$strPrevDate = __getPrevHoldingsDate($ref, $strStockId, $strDate, $net_sql);
-	$strPrevNetValue = $net_sql->GetClose($strStockId, $strPrevDate);
-	
-	if ($iCount == 2)
-	{
-		for ($i = 1; $i <= $iTotal - 1; $i ++)
-    	{
-    		$arNew = array($i, $iTotal - $i);
-    		if (_echoExhaustiveHoldingsItem($ref, $arNew, $arOrg, $strDate, $strNetValue, $strPrevDate, $strPrevNetValue, $fLimit, $bAdmin))
-    		{
-    			$iHit ++;
-    			$arHit['H'.strval($iHit)] = $arNew;
-    		}
-    	}
-    }
-    else
+	$arDate = $net_sql->GetSwitchDates($strStockId);
+	if (count($arDate) == 0)		return;
+
+ 	$iIndex = 0;
+	$iTotal = 0;
+    if ($result = $net_sql->GetAll($strStockId)) 
     {
-    	for ($i = 1; $i <= $iTotal - 2; $i ++) 
-    	{
-    		for ($j = 1; $j <= $iTotal - 1 - $i; $j ++)
-    		{
-    			$arNew = array($i, $j, $iTotal - $i - $j);
-    			if (_echoExhaustiveHoldingsItem($ref, $arNew, $arOrg, $strDate, $strNetValue, $strPrevDate, $strPrevNetValue, $fLimit, $bAdmin))
-    			{
-    				$iHit ++;
-    				$arHit['H'.strval($iHit)] = $arNew;
-    			}
-    		}
-    	}
-   	}
-	$strDebug .= $strPrevDate.'拟合0误差数量'.strval($iHit);
-			
-	$iCount = 1;
-	while ($iHit > 0)
-	{
-		$strDate = $strPrevDate;
-		$strNetValue = $strPrevNetValue;
-		
-		$strPrevDate = __getPrevHoldingsDate($ref, $strStockId, $strDate, $net_sql);
-		$strPrevNetValue = $net_sql->GetClose($strStockId, $strPrevDate);
-		foreach ($arHit as $strHit => $arNew)
-		{
-			if (_echoExhaustiveHoldingsItem($ref, $arNew, $arOrg, $strDate, $strNetValue, $strPrevDate, $strPrevNetValue, $fLimit, $bAdmin) == false)	unset($arHit[$strHit]);
-		}
-		$iHit = count($arHit);
-		$strDebug .= '，'.$strPrevDate.'剩余'.strval($iHit);
-		$iCount ++;
-	}
-	$strDebug .= '，共'.strval($iCount).'天。';
-	return $strDebug;
+        while ($record = mysqli_fetch_assoc($result)) 
+        {
+       		$strDate = $record['date'];
+       		if ($strDate == $arDate[$iIndex])
+       		{
+   				$iIndex ++;
+   				if (isset($arDate[$iIndex]))
+				{
+					$strPrevDate = $arDate[$iIndex];
+					$fPercent = $ref->GetNetValuePercent($strDate, $strPrevDate);
+					if (abs($fPercent) > $fInput)
+					{
+						_echoExhaustiveHoldingsItem($ref, $iCount, $fPercent, $strDate, $record['close'], $strPrevDate, $bAdmin);
+						$iTotal ++;
+						if ($iTotal == $iNum)	break;
+					}	
+				}
+   				else
+   				{
+   					break;
+       			}
+       		}
+        }
+        mysqli_free_result($result);
+    }
 }
 
-function _echoExhaustiveHoldingsParagraph($strSymbol, $fLimit, $bAdmin)
+function _echoExhaustiveHoldingsParagraph($strPage, $strSymbol, $fInput, $iNum, $bAdmin)
 {
 	$ref = new HoldingsReference($strSymbol);
-    if ($strDate = $ref->GetHoldingsDate())
+    if ($ref->GetHoldingsDate())
     {
     	$arHoldingRef = $ref->GetHoldingsRefArray();
     	$iCount = count($arHoldingRef);
     	if ($iCount <= 3)
     	{
-    		$strNetValue = $ref->GetNetValueString();
-			$str = GetXueqiuLink($ref).' '.$strDate.'最新公布净值'.$strNetValue;
 			$ar = array();
-			foreach ($arHoldingRef as $holding_ref)	$ar[] = new TableColumnStock($holding_ref);
 			$ar[] = new TableColumnDate();
 			$ar[] = new TableColumnNetValue();
-			$ar[] = new TableColumnEst();
-			$ar[] = new TableColumnError();
-    		EchoTableParagraphBegin($ar, 'exhaustiveholdings', $str);
-    		$strDebug = _echoExhaustiveHoldingsData($ref, $strDate, $strNetValue, $iCount, $fLimit, $bAdmin);
-			EchoTableParagraphEnd($strDebug);
+			$ar[] = new TableColumnChange();
+			foreach ($arHoldingRef as $holding_ref)	$ar[] = new TableColumnStock($holding_ref);
+    		EchoTableParagraphBegin($ar, $strPage, GetFundLinks($strSymbol));
+    		_echoExhaustiveHoldingsData($ref, $iCount, $fInput, $iNum, $bAdmin);
+			EchoTableParagraphEnd();
 		}
 	}
 }
@@ -163,9 +157,12 @@ function EchoAll()
 	
     if ($ref = $acct->EchoStockGroup())
     {
-    	if (($strInput = GetEditInput()) === false)		$strInput = '0.1';
-    	EchoEditInputForm('显示'.STOCK_DISP_EST.'差异的阈值', $strInput);
-    	if ($strInput != '')	_echoExhaustiveHoldingsParagraph($ref->GetSymbol(), floatval($strInput), $acct->IsAdmin());
+    	if (($strInput = GetEditInput()) === false)		$strInput = strval(NETVALUE_DIFF);
+    	EchoEditInputForm('进行'.EXHAUSTIVE_HOLDINGS_DISPLAY.'计算的'.TableColumnGetNetValue().'涨跌%阈值', $strInput);
+    	if ($strInput != '')
+    	{
+			_echoExhaustiveHoldingsParagraph($acct->GetPage(), $ref->GetSymbol(), floatval($strInput), $acct->GetNum(), $acct->IsAdmin());
+		}
     }
     $acct->EchoLinks();
 }

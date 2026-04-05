@@ -81,11 +81,12 @@ class MysqlReference extends StockReference
 				return StockGetPercentage($fPrev, $fNetValue);
 			}
 		}
-		return false;
+		return 0.0;
 	}
 	
 	function GetNetValueDisplay($fNetValue)
 	{
+		if ($fNetValue === false)	return '';
 		return $this->GetPriceDisplay($fNetValue, false, ($this->iNetValueCount > 0 ? NETVALUE_PRECISION : $this->GetPrecision()));
 	}
 

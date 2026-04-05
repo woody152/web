@@ -121,7 +121,7 @@ function _echoOverNightCnhItem($strSymbol, $strInput, $bSell)
 				}
 			}
 			$strMemo = rtrim($strMemo, '、');
-			if ($strSymbol != 'SZ160216' && $strSymbol != 'SZ164701')	$strMemo .= '，共'.strval(round($fTotalQuantity)).'股。';
+			if ($strSymbol != 'SZ160216' && $strSymbol != 'SZ161815' && $strSymbol != 'SZ164701')	$strMemo .= '，共'.strval(round($fTotalQuantity)).'股。';
    		}
 		$fHintQuantity = round($fHintQuantity / 100.0) * 100.0;
 		$strHintQuantity = strval($fHintQuantity);

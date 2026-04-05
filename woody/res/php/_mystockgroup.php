@@ -69,12 +69,12 @@ function _getMetaDescriptionStr($strPage)
 	$ar = array('abcompare' => AB_COMPARE_DISPLAY.'工具，按A/B价格比和B/A价格比排序。B股的正式名称是人民币特种股票，以外币认购和买卖，在中国上海和深圳证券交易所上市交易。',
 				  'adrhcompare' => ADRH_COMPARE_DISPLAY.'工具，按ADR/H价格比和H/ADR价格比排序。这里H股泛指香港上市的所有企业，ADR也不限于传统意义，同时包括了二次回港上市美股。',
 				  'ahcompare' => AH_COMPARE_DISPLAY.'工具，按A/H价格比和H/A价格比排序。H股开始是指获中国证监会批核到香港上市的国有企业，也称国企股，现在已经扩大到两地上市私企。',
-				  'biotech' => BIOTECH_GROUP_DISPLAY.'基金的净值估算。使用XBI的净值'.STOCK_DISP_EST.'，目前包括SZ159502标普生物科技ETF和SZ161127标普生物科技LOF。',
-				  'chinafuture' => CHINA_FUTURE_DISPLAY.'基金工具，使用国内市场黄金、白银和豆粕等大宗商品期货数据计算基金净值，同时测算无风险套利的对冲比例等数据。',
-				  'chinaindex' => CHINA_INDEX_DISPLAY.'基金工具。计算基金净值，同时分析比较各种套利对冲方案。包括美股ASHR和多家国内基金公司的A股沪深300指数基金的配对交易等。',
+				  'biotech' => BIOTECH_GROUP_DISPLAY.'基金的'.STOCK_DISP_NETVALUE.'估算。使用XBI的'.STOCK_DISP_NETVALUE.STOCK_DISP_EST.'，目前包括SZ159502标普生物科技ETF和SZ161127标普生物科技LOF。',
+				  'chinafuture' => CHINA_FUTURE_DISPLAY.'基金工具，使用国内市场黄金、白银和豆粕等大宗商品期货数据计算基金'.STOCK_DISP_NETVALUE.'，同时测算无风险套利的对冲比例等数据。',
+				  'chinaindex' => CHINA_INDEX_DISPLAY.'基金工具。计算基金'.STOCK_DISP_NETVALUE.'，同时分析比较各种套利对冲方案。包括美股ASHR和多家国内基金公司的A股沪深300指数基金的配对交易等。',
 				  'chinainternet' => '跟踪几个不同中证海外中国互联网指数的中概互联基金们在2021年初疯狂见顶后几个月时间一路狂泻都跌成了'.CHINAINTERNET_GROUP_DISPLAY.'，也因此跌出了QDII基金有史以来最为壮观的流动性。',
-				  'commodity' => COMMODITY_GROUP_DISPLAY.'基金的净值估算。目前包括大致对应跟踪GSG的信诚商品(SZ165513)和银华通胀(SZ161815)。跟踪大宗商品期货的基金都有因为期货升水带来的损耗，不建议长期持有。',
-				  'hangseng' => HANGSENG_GROUP_DISPLAY.'基金的净值估算。使用恒生指数【^HSI】计算官方'.STOCK_DISP_EST.'和参考'.STOCK_DISP_EST.'、使用恒生指数期货【hf_HSI】提供港股不开盘期间的实时'.STOCK_DISP_EST.'。',
+				  'commodity' => COMMODITY_GROUP_DISPLAY.'基金的'.STOCK_DISP_NETVALUE.'估算。目前包括大致对应跟踪GSG的信诚商品(SZ165513)和银华通胀(SZ161815)。跟踪大宗商品期货的基金都有因为期货升水带来的损耗，不建议长期持有。',
+				  'hangseng' => HANGSENG_GROUP_DISPLAY.'基金的'.STOCK_DISP_NETVALUE.'估算。使用恒生指数【^HSI】计算官方'.STOCK_DISP_EST.'和参考'.STOCK_DISP_EST.'、使用恒生指数期货【hf_HSI】提供港股不开盘期间的实时'.STOCK_DISP_EST.'。',
 				  'hshares' => '港交所在2017年后玩弄文字游戏把H股国企指数改成'.HSHARES_GROUP_DISPLAY.'，大量加入非国有企业成分股，就是为了吸引迷信鹅厂的国内韭菜跨过香江去夺取港股定价权！',
 				  'hstech' => '厌倦了港交所加印花税的贪婪，本来没想跟踪'.HSTECH_GROUP_DISPLAY.'基金的净值。不过在无意中发现了KTEC后，觉得还是应该补上，为日后可能的跨市场套利机会做好准备。',
 				  'lof' => '本网站有'.STOCK_DISP_EST.'的'.LOF_ALL_DISPLAY.'汇总，方便申购不起ETF的穷人发现套利机会。使用拖拉机自动化软件前注意查询基金的限购状态和限购方式等具体内容。',
@@ -86,8 +86,8 @@ function _getMetaDescriptionStr($strPage)
 				  'qdiihk' => '把'.QDII_HK_DISPLAY.'从其它QDII页面分出来，不光能够优化网站和代码结构，还能更好的体验股市三大幻觉：A股要涨、美股见顶、港股便宜！',
 				  'qdiijp' => '四个跟踪日经225指数的'.QDII_JP_DISPLAY.'上市好几年来一直不愠不火，直到最近有人趁巴菲特光环和易方达因为'.CHINAINTERNET_GROUP_DISPLAY.'缺QDII额度的机会拉场内溢价，让我觉得不能再观望下去了！',
 				  'qdiimix' => '采用跟踪成分股变化的方式对同时有美股、港股和A股持仓的'.CHINAINTERNET_GROUP_DISPLAY.'等'.QDII_MIX_DISPLAY.'基金进行净值估算，这样参考'.STOCK_DISP_EST.'可以反应白天港股和A股波动对净值的影响。',
-				  'qqqfund' => QQQ_GROUP_DISPLAY.'基金的净值估算。使用纳斯达克100指数^NDX计算官方'.STOCK_DISP_EST.'和参考'.STOCK_DISP_EST.'，芝商所纳斯达克期货NQ计算实时'.STOCK_DISP_EST.'，QQQ仅用于参考。',
-				  'spyfund' => SPY_GROUP_DISPLAY.'基金的净值估算。使用标普500指数^GSPC计算官方'.STOCK_DISP_EST.'和参考'.STOCK_DISP_EST.'，芝商所标普500期货ES计算实时'.STOCK_DISP_EST.'，SPY仅用于参考。',
+				  'qqqfund' => QQQ_GROUP_DISPLAY.'基金的'.STOCK_DISP_NETVALUE.'估算。使用纳斯达克100指数^NDX计算官方'.STOCK_DISP_EST.'和参考'.STOCK_DISP_EST.'，芝商所纳斯达克期货NQ计算实时'.STOCK_DISP_EST.'，QQQ仅用于参考。',
+				  'spyfund' => SPY_GROUP_DISPLAY.'基金的'.STOCK_DISP_NETVALUE.'估算。使用标普500指数^GSPC计算官方'.STOCK_DISP_EST.'和参考'.STOCK_DISP_EST.'，芝商所标普500期货ES计算实时'.STOCK_DISP_EST.'，SPY仅用于参考。',
 				  );
     return $ar[$strPage];
 }

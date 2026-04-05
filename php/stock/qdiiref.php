@@ -33,7 +33,6 @@ function QdiiGetEstArray()
                );
     foreach (QdiiGetXopSymbolArray() as $strSymbol)			$ar[$strSymbol] = 'XOP';	// '^SPSIOP'
     foreach (QdiiGetXbiSymbolArray() as $strSymbol)			$ar[$strSymbol] = 'XBI';
-    foreach (QdiiGetCommoditySymbolArray() as $strSymbol)	$ar[$strSymbol] = 'GSG';
     foreach (QdiiGetSpySymbolArray() as $strSymbol)			$ar[$strSymbol] = '^GSPC';	// 'SPY'
     foreach (QdiiGetQqqSymbolArray() as $strSymbol)			$ar[$strSymbol] = '^NDX';	// 'QQQ'
     return $ar;

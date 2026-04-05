@@ -51,7 +51,7 @@ class SymbolAccount extends StockAccount
         return $ref ? $ref->GetSymbol() : '';
     }
 
-    function GetStockDisplay()
+    public function GetStockDisplay()
     {
     	$ref = $this->GetSymbolRef();
         return $ref ? RefGetStockDisplay($ref) : '【缺少股票代码】';

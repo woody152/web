@@ -104,7 +104,7 @@ function FutureNeedNewFile($strFileName, $iInterval = SECONDS_IN_MIN)
 function PrefetchSaveSinaData($strFileName, $strData)
 {
 //	DebugString(__FUNCTION__.$strFileName.' '.$strData, true);
-	file_put_contents($strFileName, $strData);
+	file_put_contents($strFileName, $strData, LOCK_EX);
 }
 
 function PrefetchLoadSinaData($strFileName)

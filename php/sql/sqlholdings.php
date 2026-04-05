@@ -22,7 +22,7 @@ class HoldingsSql extends KeySql
     	return '`ratio` DESC';
     }
     
-    function InsertHolding($strStockId, $strHoldingId, $strRatio)
+    function InsertHoldingId($strStockId, $strHoldingId, $strRatio)
     {
     	return $this->InsertArrays($this->MakeFieldKeyId($strStockId), array('holding_id' => $strHoldingId, 'ratio' => $strRatio));
     }
@@ -31,7 +31,7 @@ class HoldingsSql extends KeySql
     {
     	foreach ($ar as $strHoldingId => $strRatio)
     	{
-    		$this->InsertHolding($strStockId, $strHoldingId, $strRatio);
+    		$this->InsertHoldingId($strStockId, $strHoldingId, $strRatio);
     	}
     }
     

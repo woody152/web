@@ -121,7 +121,7 @@ function GetRatioDisplay($fVal, $iPrecision = 4)
 function StockGetPercentage($fDivisor, $fDividend)
 {
 	if (abs($fDivisor) > MIN_FLOAT_VAL)		return ($fDividend/$fDivisor - 1.0) * 100.0;
-	return false;
+	return 0.0;
 }
 
 function StockCompareEstResult($strStockId, $strNetValue, $strDate, $strSymbol)
@@ -133,7 +133,7 @@ function StockCompareEstResult($strStockId, $strNetValue, $strDate, $strSymbol)
        	if ($strEstValue = $fund_est_sql->GetClose($strStockId, $strDate))
        	{
        		$fPercentage = StockGetPercentage(floatval($strNetValue), floatval($strEstValue));
-       		if (($fPercentage !== false) && (abs($fPercentage) > 1.0))
+       		if (abs($fPercentage) > 1.0)
        		{
        			$strLink = GetNetValueHistoryLink($strSymbol);
        			$str = sprintf('%s%s 实际值%s %s%s 误差:%.2f%%', $strSymbol, $strLink, $strNetValue, STOCK_DISP_EST, $strEstValue, $fPercentage); 

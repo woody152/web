@@ -71,16 +71,6 @@ function in_arrayOilEtfQdii($strSymbol)
     return in_array($strSymbol, QdiiGetOilEtfSymbolArray());
 }
 
-function QdiiGetCommoditySymbolArray()
-{
-    return array('SZ161815'); 
-}
-
-function in_arrayCommodityQdii($strSymbol)
-{
-    return in_array($strSymbol, QdiiGetCommoditySymbolArray());
-}
-
 function QdiiGetQqqMatchArray()
 {
     return array('SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941', 'SZ161130'); 
@@ -147,7 +137,6 @@ function QdiiGetSymbolArray()
     				   , QdiiGetXbiSymbolArray()
     				   , QdiiGetXopSymbolArray()
     				   , QdiiGetOilEtfSymbolArray()
-    				   , QdiiGetCommoditySymbolArray()
     				   , QdiiGetQqqSymbolArray()
     				   , QdiiGetSpySymbolArray());
     return $ar;
@@ -276,7 +265,7 @@ function in_arrayHkMix($strSymbol)
 
 function GetQdiiGoldSymbolArray()
 {
-	return array('SZ160216', 'SZ160719', 'SZ161116', 'SZ164701', 'SZ165513');
+	return array('SZ160216', 'SZ161815', 'SZ160719', 'SZ161116', 'SZ164701', 'SZ165513');
 }
 
 function GetQdiiOilSymbolArray()
@@ -286,7 +275,12 @@ function GetQdiiOilSymbolArray()
 
 function GetQdiiGoldOilSymbolArray()
 {
-    return array_merge(GetQdiiGoldSymbolArray(), GetQdiiOilSymbolArray());
+    return array_merge(GetQdiiOilSymbolArray(), GetQdiiGoldSymbolArray());
+}
+
+function in_arrayQdiiGoldOil($strSymbol)
+{
+    return in_array($strSymbol, GetQdiiGoldOilSymbolArray());
 }
 
 function QdiiMixGetSymbolArray()
@@ -324,9 +318,10 @@ function in_arrayAll($strSymbol)
 
 function GetOverNightSymbolArray()
 {
-	return array_merge(QdiiGetXopSymbolArray(), 
+	return array_merge(QdiiGetXopSymbolArray(),
+                       array('SZ162719'),
                        GetQdiiGoldOilSymbolArray(), 
-                       array('SZ161125', 'SZ161126', 'SZ161130', 'SZ161226', 'SZ162415', 'SZ162719', 'SZ164906'),
+                       array('SZ161226', 'SZ161125', 'SZ161126', 'SZ161130', 'SZ162415', 'SZ164906'),
                        QdiiGetXbiSymbolArray());
 }
 

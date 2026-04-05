@@ -34,9 +34,9 @@ define('ACCOUNT_TOOL_LINEAR', 'Linear Regression');
 define('ACCOUNT_TOOL_PRIME', 'Prime Number');
 define('ACCOUNT_TOOL_SINAJS', 'Sina Stock Data');
 
-define('ACCOUNT_TOOL_BENFORD_CN', '本福特定律');
+define('ACCOUNT_TOOL_BENFORD_CN', 'Benford定律');
 define('ACCOUNT_TOOL_CHI_CN', 'Pearson卡方检验');
-define('ACCOUNT_TOOL_CRAMER_CN', '解二元一次方程组');
+define('ACCOUNT_TOOL_CRAMER_CN', 'Cramer法则解方程组');
 define('ACCOUNT_TOOL_DICE_CN', '骰子验证码');
 define('ACCOUNT_TOOL_PHRASE_CN', '个人常用短语');
 define('ACCOUNT_TOOL_EDIT_CN', '简单测试');

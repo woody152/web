@@ -48,23 +48,12 @@ class _QdiiMixAccount extends FundGroupAccount
     	
     	$date_sql = new HoldingsDateSql();
     	$strHoldingsDate = $date_sql->ReadDate($strStockId);
-		if ($strNetValueDate == $strHoldingsDate)											return;	// Already up to date
-    	if ($strHoldingsDate == $ref->GetOfficialDate())									return;
+		if ($strNetValueDate == $strHoldingsDate)			return;	// Already up to date
+    	if ($strHoldingsDate == $ref->GetOfficialDate())	return;
     	
     	$bUpdated = false;
-    	switch ($strSymbol)
+		if (in_arrayQdiiGoldOil($strSymbol) || in_array($strSymbol, array('SH501225', 'SH501312', 'SZ160644')))
     	{
-    	case 'SZ160216':
-		case 'SZ160644':
-		case 'SZ160719':
-		case 'SZ160723':
-		case 'SZ161116':
-		case 'SZ161129':
-		case 'SZ164701':
-		case 'SZ165513':
-		case 'SH501018':
-		case 'SH501225':
-		case 'SH501312':
         	if ($strNetValueDate != $strHoldingsDate)		
         	{
         		if ($ref->CheckHoldingsDate($strNetValueDate))
@@ -72,33 +61,31 @@ class _QdiiMixAccount extends FundGroupAccount
         			if ($date_sql->WriteDate($strStockId, $strNetValueDate))		$bUpdated = true;
         		}
         	}
-        	break;
-		
-		default:
-    		$fund_est_sql = GetFundEstSql();
+		}
+		else
+		{
+	   		$fund_est_sql = GetFundEstSql();
     		$strEstDate = $fund_est_sql->GetDateNow($strStockId);
-    		if ($strEstDate == $strNetValueDate)													return;	//
+    		if ($strEstDate == $strNetValueDate)	return;	//
     		$strDate = $ref->GetDate();
     		if (!in_arrayHkMix($strSymbol))
     		{
-    			if ($strEstDate == $strDate)													return;	// A day too early
+    			if ($strEstDate == $strDate)		return;	// A day too early
     		}
     		
     		$iHourMinute = $ref->GetHourMinute();
-    		if ($iHourMinute < 930)															return;	// Data not updated until 9:30
-			else if ($iHourMinute > 1455)													return;	// Stop autoupdate after market close. 美股休市后第2天的盘前，有可能会有数据看上去像休市日数据，导致5分钟一次频繁下载老文件。这里有意错过每天美股盘前时间，并且考虑了夏令时的不同最坏情况。
+    		if ($iHourMinute < 930)					return;	// Data not updated until 9:30
+			else if ($iHourMinute > 1455)			return;	// Stop autoupdate after market close. 美股休市后第2天的盘前，有可能会有数据看上去像休市日数据，导致5分钟一次频繁下载老文件。这里有意错过每天美股盘前时间，并且考虑了夏令时的不同最坏情况。
 
     		$strSymbol = $ref->GetSymbol();
     		if ($ref->IsShangHaiEtf())		$bUpdated = ReadSseHoldingsFile($strSymbol, $strStockId);
     		else if ($ref->IsShenZhenEtf())	$bUpdated = ReadSzseHoldingsFile($strSymbol, $strStockId, $strDate);
-    		break;
     	}
     	
     	if ($bUpdated)
     	{
     		unset($this->ref);
     		$this->ref = new HoldingsReference($strSymbol);
-//    		DebugString('Holdings updated');
     	}
     }
 }
@@ -150,7 +137,7 @@ function GetMetaDescription()
     global $acct;
 
     $strDescription = $acct->GetStockDisplay();
-    $str = "根据美元人民币汇率中间价和港币人民币汇率中间价以及成分股持仓涨跌比例估算{$strDescription}净值的网页工具.";
+    $str = "根据美元人民币汇率中间价和港币人民币汇率中间价以及成分股持仓涨跌比例估算{$strDescription}".STOCK_DISP_NETVALUE.'的网页工具.';
     return CheckMetaDescription($str);
 }
 

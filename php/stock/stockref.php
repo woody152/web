@@ -124,7 +124,6 @@ class StockReference extends StockSymbol
     function GetPercentageString($fDivisor = false, $fDividend = false)
     {
    		$fPercentage = $this->GetPercentage($fDivisor, $fDividend);
-   		if ($fPercentage === false)		return '';
    		
     	if ($fDivisor == false)		$fDivisor = floatval($this->strPrevPrice);
 		if (abs($fPercentage * $fDivisor) < (50.0 / pow(10, $this->GetPrecision())))	return '0';

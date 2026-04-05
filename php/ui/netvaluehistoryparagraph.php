@@ -1,37 +1,15 @@
 <?php
 require_once('stocktable.php');
 
-define('POSITION_EST_LEVEL', '4.0');
-
 // (est * cny / estPrev * cnyPrev - 1) * position = (nv / nvPrev - 1) 
-/*
-function _QdiiGetStockPosition($fEstPrev, $fEst, $fPrev, $fNetValue, $fCnyPrev, $fCny, $strInput = POSITION_EST_LEVEL)
-{
-	$f = StockGetPercentage($fEstPrev, $fEst);
-	if (($f !== false) && (abs($f) > floatval($strInput)))
-	{
-		$f = StockGetPercentage($fEstPrev * $fCnyPrev, $fEst * $fCny);
-		if (($f !== false) && (abs($f) > MIN_FLOAT_VAL))
-		{
-			$fVal = StockGetPercentage($fPrev, $fNetValue) / $f;
-			if ($fVal > 0.1)
-			{
-				return number_format($fVal, 2);
-			}
-		}
-	}
-	return false;
-}
-*/
-
-function _QdiiGetStockPosition($fEstPrev, $fEst, $fPrev, $fNetValue, $fCnyPrev, $fCny, $strInput = POSITION_EST_LEVEL)
+function _QdiiGetStockPosition($fEstPrev, $fEst, $fPrev, $fNetValue, $fCnyPrev, $fCny, $fInput)
 {
 	$fPercent = StockGetPercentage($fPrev, $fNetValue);
 //	DebugVal($fPercent, __FUNCTION__, true);
-	if (($fPercent !== false) && (abs($fPercent) > floatval($strInput)))
+	if (abs($fPercent) > $fInput)
 	{
 		$fEstPercent = StockGetPercentage($fEstPrev * $fCnyPrev, $fEst * $fCny);
-		if (($fEstPercent !== false) && (abs($fEstPercent) > MIN_FLOAT_VAL))
+		if (abs($fEstPercent) > MIN_FLOAT_VAL)
 		{
 			$fVal = $fPercent / $fEstPercent;
 			if ($fVal > 0.1)
@@ -61,13 +39,13 @@ function _QdiiMixCalcEstValue($arRatio, $strDate)
 	return $fEst;
 }
 
-function _QdiiMixGetPosition($ref, $strDate, $strPrevDate, $fPrev, $fNetValue, $fCnyPrev, $fCny, $strInput)
+function _QdiiMixGetPosition($ref, $strDate, $strPrevDate, $fPrev, $fNetValue, $fCnyPrev, $fCny, $fInput)
 {
 	$arRatio = $ref->GetHoldingsRatioArray();
 	// DebugPrint($arRatio);
 	$fEst = _QdiiMixCalcEstValue($arRatio, $strDate);
 	$fEstPrev = _QdiiMixCalcEstValue($arRatio, $strPrevDate);
-	if ($fEst !== false && $fEstPrev !== false)		return  _QdiiGetStockPosition($fEstPrev, $fEst, $fPrev, $fNetValue, $fCnyPrev, $fCny, $strInput);
+	if ($fEst !== false && $fEstPrev !== false)		return  _QdiiGetStockPosition($fEstPrev, $fEst, $fPrev, $fNetValue, $fCnyPrev, $fCny, $fInput);
 	return false;
 }
 
@@ -91,12 +69,13 @@ function GetNetValueTableColumn($est_ref, $cny_ref)
 
 function _adjustAdminPositionDisplay($ref, $strPosition)
 {
-	return GetOnClickLink('/php/_submitoperation.php?stockid='.$ref->GetStockId().'&fundposition='.$strPosition, "确认使用{$strPosition}作为".STOCK_DISP_EST.'仓位？', $strPosition);
+	return GetOnClickLink('/php/_submitoperation.php?stockid='.$ref->GetStockId().'&fundposition='.$strPosition, "确认使用{$strPosition}作为".STOCK_DISP_EST.STOCK_DISP_POSITION.'？', $strPosition);
 }
 
-function EchoNetValueItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue, $strPrevDate, $strInput = POSITION_EST_LEVEL, $bAdmin = false)
+function EchoNetValueItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue, $strPrevDate, $fInput = NETVALUE_DIFF, $bAdmin = false)
 {
 	$bWritten = false;
+	$bMatch = false;
 	$ar = array($strDate);
 	
 	$fNetValue = floatval($strNetValue);
@@ -107,12 +86,13 @@ function EchoNetValueItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue
 
 	if ($cny_ref)
 	{
-		$fCny = $cny_ref->GetVal($strDate);
-		$ar[] = $cny_ref->GetPriceDisplay($fCny);
-		$fCnyPrev = $cny_ref->GetVal($strPrevDate);
-		$ar[] = $cny_ref->GetPercentageDisplay($fCnyPrev, $fCny);
+		if ($fCny = $cny_ref->GetVal($strDate))				$ar[] = $cny_ref->GetPriceDisplay($fCny);
+		else												$ar[] = '';
+		if ($fCnyPrev = $cny_ref->GetVal($strPrevDate))		$ar[] = $cny_ref->GetPercentageDisplay($fCnyPrev, $fCny);
+		else												$ar[] = '';
 	}
 
+	$strOrgPos = strval($ref->GetPosition());
 	if ($est_ref)
 	{
 		if ($fEst = $est_ref->GetNetValue($strDate))
@@ -121,11 +101,12 @@ function EchoNetValueItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue
 			if ($fEstPrev = $est_ref->GetNetValue($strPrevDate))
 			{
 				$ar[] = $est_ref->GetPercentageDisplay($fEstPrev, $fEst);
-				if ($strPosition = _QdiiGetStockPosition($fEstPrev, $fEst, $fPrev, $fNetValue, $fCnyPrev, $fCny, $strInput))
+				if ($strPosition = _QdiiGetStockPosition($fEstPrev, $fEst, $fPrev, $fNetValue, $fCnyPrev, $fCny, $fInput))
 				{
 					$bWritten = true;
 					if ($csv)	$csv->Write($strDate, $strNetValue, $strPosition);
-					if ($bAdmin)	$strPosition = _adjustAdminPositionDisplay($ref, $strPosition);
+					if ($strPosition == $strOrgPos)		$bMatch = true;
+					if ($bAdmin && $bMatch === false)	$strPosition = _adjustAdminPositionDisplay($ref, $strPosition);
 					$ar[] = $strPosition;
 				}
 			}
@@ -133,20 +114,18 @@ function EchoNetValueItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue
 	}
 	else if ($cny_ref)
 	{
-		if ($strPosition = _QdiiMixGetPosition($ref, $strDate, $strPrevDate, $fPrev, $fNetValue, $fCnyPrev, $fCny, $strInput))
+		if ($strPosition = _QdiiMixGetPosition($ref, $strDate, $strPrevDate, $fPrev, $fNetValue, $fCnyPrev, $fCny, $fInput))
 		{
 			$bWritten = true;
 			if ($csv)	$csv->Write($strDate, $strNetValue, $strPosition);
-			if ($bAdmin)	$strPosition = _adjustAdminPositionDisplay($ref, $strPosition);
+			if ($strPosition == $strOrgPos)		$bMatch = true;
+			if ($bAdmin && $bMatch === false)	$strPosition = _adjustAdminPositionDisplay($ref, $strPosition);
 			$ar[] = $strPosition;
 		}
 	}
 
-	if ($bWritten == false)
-	{
-		if ($csv)	$csv->Write($strDate, $strNetValue);
-	}
-	EchoTableColumn($ar);
+	EchoTableColumn($ar, $bMatch ? 'yellow' : false);
+	return $bWritten;
 }
 
 function _echoNetValueData($csv, $ref, $est_ref, $cny_ref, $iStart, $iNum)
@@ -158,7 +137,12 @@ function _echoNetValueData($csv, $ref, $est_ref, $cny_ref, $iStart, $iNum)
         while ($record = mysqli_fetch_assoc($result)) 
         {
         	$strDate = $record['date'];
-        	EchoNetValueItem($csv, $ref, $cny_ref, $est_ref, $strDate, $record['close'], $net_sql->GetDatePrev($strStockId, $strDate));
+			$strNetValue = $record['close'];
+        	$bWritten = EchoNetValueItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue, $net_sql->GetDatePrev($strStockId, $strDate));
+			if ($bWritten === false)
+			{
+				if ($csv)	$csv->Write($strDate, $strNetValue);
+			}
         }
         mysqli_free_result($result);
     }
@@ -187,7 +171,7 @@ function EchoNetValueHistoryParagraph($ref, $csv = false, $iStart = 0, $iNum = T
    		$cny_ref = $fund_ref->GetCnyRef();
    		$est_ref = $fund_ref->GetEstRef();
    	}
-	else if (in_array($strSymbol, GetQdiiGoldOilSymbolArray()))
+	else if (in_arrayQdiiGoldOil($strSymbol))
 	{
 		$ref = new HoldingsReference($strSymbol);
 		$cny_ref = $ref->GetCnyRef();

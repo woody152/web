@@ -21,7 +21,7 @@ class _HoldingsCsvFile extends DebugCsvFile
     
     function InsertHolding($strSymbol, $strName, $strRatio)
     {
-        $strSymbol = str_replace('/', '.', $strSymbol);	// BRK/B -> BRK.B
+    //    $strSymbol = str_replace('/', '.', $strSymbol);	// BRK/B -> BRK.B
         $sql = GetStockSql();
 		$sql->InsertSymbol($strSymbol, $strName);
     	if ($strStockId = $sql->GetId($strSymbol))
@@ -34,7 +34,7 @@ class _HoldingsCsvFile extends DebugCsvFile
     		}
         
     		$holdings_sql = GetHoldingsSql();
-			return $holdings_sql->InsertHolding($this->strStockId, $strStockId, $strRatio);
+			return $holdings_sql->InsertHoldingId($this->strStockId, $strStockId, $strRatio);
 		}
 		return false;
     }

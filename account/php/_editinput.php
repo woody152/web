@@ -301,36 +301,84 @@ function _getLinearRegressionString($strInput, $bChinese)
    	return $str.$strNewLine.$strData;
 }
 
-function _getLinearEquationString($strA, $strB, $strC)
+function ___get_xyz()
 {
-	return $strA.' * x + '.$strB.' * y = '.$strC;
+	return array('x', 'y', 'z');
 }
 
-function _getCramersLawString($strInput, $bChinese)
+function __getLinearEquationString($ar)
 {
-   	$strNewLine = GetHtmlNewLine();
-	$ar = explode(';', $strInput);
-	if (count($ar) == 2)
+	$strAdd = ' + ';
+	$arVar = ___get_xyz();
+	$iTotal = count($ar);
+	$str = '';
+	for ($i = 0; $i < $iTotal - 1; $i ++)
 	{
-		list($strA1, $strB1, $strC1) = explode(',', trim($ar[0]));
-		list($strA2, $strB2, $strC2) = explode(',', trim($ar[1]));
-		$str = _getLinearEquationString($strA1, $strB1, $strC1);
-		$str .= $strNewLine._getLinearEquationString($strA2, $strB2, $strC2).$strNewLine;
-		
-		if ($arXY = CramersRule(floatval($strA1), floatval($strB1), floatval($strC1), floatval($strA2), floatval($strB2), floatval($strC2)))
+		$strVal = $ar[$i];
+		if (str_ends_with($str, $strAdd) && str_starts_with($strVal, '-'))
 		{
-			list($fX, $fY) = $arXY;
-			$str .= $strNewLine.'<b>x = '.number_format($fX, 3);
-			$str .= '; y = '.number_format($fY, 3).'</b>';
+			$str = substr($str, 0, strlen($str) - strlen($strAdd));
+			$str .= ' - ';
+			$strVal = substr($strVal, 1, strlen($strVal) - 1);
+		}
+		if ($strVal != '1')
+		{
+			$str .= $strVal.' * ';
+		}
+		$str .= $arVar[$i].$strAdd;
+	}
+	$str = rtrim($str, $strAdd);
+	$str .= ' = '.$ar[$i].GetHtmlNewLine();
+	return $str;
+}
+
+function __getCramersRuleResultString($arXY, $bChinese)
+{
+	if ($arXY['status'] == 'unique')
+	{
+		$strSemicolon = '; ';
+		$arVar = ___get_xyz();
+		$arSolution = $arXY['solution'];
+		$iTotal = count($arSolution);
+		$str = '';
+		for ($i = 0; $i < $iTotal; $i ++)
+		{
+			$str .= $arVar[$i].' = '.number_format($arSolution[$i], 3).$strSemicolon;
+		}
+		return GetBoldElement(rtrim($str, $strSemicolon));
+	}
+	return $bChinese ? $arXY['message'] : 'No solution';
+}
+
+function _getCramersRuleString($strInput, $bChinese)
+{
+	$str = '';
+	$ar = explode(';', $strInput);
+	$iCount = count($ar);
+	if ($iCount == 2 || $iCount == 3)
+	{
+		$ar0 = explode(',', trim($ar[0]));
+		$str .= __getLinearEquationString($ar0);
+		$ar1 = explode(',', trim($ar[1]));
+		$str .= __getLinearEquationString($ar1);
+		if ($iCount == 2)
+		{
+			list($strA1, $strB1, $strC1) = $ar0;
+			list($strA2, $strB2, $strC2) = $ar1;
+			$arXY = CramersRule(floatval($strA1), floatval($strB1), floatval($strC1), floatval($strA2), floatval($strB2), floatval($strC2));
 		}
 		else
 		{
-			$str .= $bChinese ? '无解' : 'No solution';
+			$ar2 = explode(',', trim($ar[2]));
+			$str .= __getLinearEquationString($ar2);
+			list($strA1, $strB1, $strC1, $strD1) = $ar0;
+			list($strA2, $strB2, $strC2, $strD2) = $ar1;
+			list($strA3, $strB3, $strC3, $strD3) = $ar2;
+			$arXY = CramersRule3(floatval($strA1), floatval($strB1), floatval($strC1), floatval($strD1), 
+								 floatval($strA2), floatval($strB2), floatval($strC2), floatval($strD2),
+								 floatval($strA3), floatval($strB3), floatval($strC3), floatval($strD3));
 		}
-	}
-	else
-	{
-		$str = '';
+		$str .= __getCramersRuleResultString($arXY, $bChinese);
 	}
 	return $str;
 }
@@ -366,7 +414,7 @@ function _getSinaJsChineseStockArray($bChinese)
 
 function _getSinaJsFundArray($bChinese)
 {
-	if ($bChinese)	return	 array('GB2312编码的名字', '目前净值', '累计净值', '昨日净值', '日期', '？');
+	if ($bChinese)	return	 array('GB2312编码的名字', '目前'.STOCK_DISP_NETVALUE, '累计'.STOCK_DISP_NETVALUE, '昨日'.STOCK_DISP_NETVALUE, '日期', '？');
 	return	 array('GB2312 coded name', 'Current net value', 'Accumulated net value', 'Previous net value', 'Date', '?');
 }
 
@@ -551,7 +599,7 @@ function _echoInputResult($acct, $strPage, $strInput, $bChinese)
     	break;
     		
    	case 'cramersrule':
-    	$str = _getCramersLawString($strInput, $bChinese);
+    	$str = _getCramersRuleString($strInput, $bChinese);
     	break;
     	
     case 'dicecaptcha':

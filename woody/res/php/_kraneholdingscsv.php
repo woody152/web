@@ -31,6 +31,7 @@ class _KraneHoldingsCsvFile extends _HoldingsCsvFile
     	else if ($this->bUse)
     	{
     		$strHolding = $arWord[3];
+			DebugString($strName.' '.$strHolding);
     		if (is_numeric($strHolding))	$strHolding = BuildHongkongStockSymbol($strHolding);
     		if ($strHolding == 'YY')		$strHolding = 'JOYY';
     		if ($this->InsertHolding($strHolding, $strName, $strRatio))		$this->AddSum(floatval(str_replace(',', '', $arWord[6])));

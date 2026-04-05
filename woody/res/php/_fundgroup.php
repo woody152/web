@@ -48,7 +48,7 @@ function GetTitle()
 
 class FundGroupAccount extends GroupAccount 
 {
-    function GetStockDisplay()
+    public function GetStockDisplay()
     {
     	$ref = $this->GetRef();
     	if (method_exists($ref, 'GetStockRef'))
@@ -65,8 +65,8 @@ class FundGroupAccount extends GroupAccount
     	$str = $netvalue_ref->GetChineseName();
     	$str = str_replace('(人民币份额)', '', $str);
     	$str = str_replace('(人民币)', '', $str);
-//    	return RefGetStockDisplay($stock_ref).$str;
-    	return $stock_ref->GetSymbol().$str;
+    	return RefGetStockDisplay($stock_ref).$str;
+//    	return $stock_ref->GetSymbol().$str;
     }
 }
 

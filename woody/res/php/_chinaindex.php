@@ -94,7 +94,7 @@ function GetMetaDescription()
     $strEst = RefGetStockDisplay($ref->GetPairRef());
     $strUS = RefGetStockDisplay($us_ref);
     $strCNY = RefGetStockDisplay($us_ref->GetCnyRef());
-    $str = "用{$strEst}估算{$strDescription}净值。参考{$strCNY}比较{$strUS}净值。";
+    $str = "用{$strEst}估算{$strDescription}".STOCK_DISP_NETVALUE."。参考{$strCNY}比较{$strUS}".STOCK_DISP_NETVALUE.'。';
     return CheckMetaDescription($str);
 }
 
