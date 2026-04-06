@@ -12,9 +12,9 @@ function _QdiiGetStockPosition($fEstPrev, $fEst, $fPrev, $fNetValue, $fCnyPrev, 
 		if (abs($fEstPercent) > MIN_FLOAT_VAL)
 		{
 			$fVal = $fPercent / $fEstPercent;
-			if ($fVal > 0.1)
+			if ($fVal > MIN_FLOAT_VAL)
 			{
-				return number_format($fVal, 2);
+				return number_format($fVal, 4);
 			}
 		}
 	}

@@ -121,9 +121,6 @@ class Palmmicro:
     def GetAG0(self):
         return self.arAG0
 
-    def _getTelegramChatId(self):
-        return 992671436
-
     def _fetchSinaData(self, strSymbols):
         strUrl = f'http://hq.sinajs.cn/list=fx_susdcny,nf_AG0,{strSymbols.lower()}'
         try:
@@ -157,35 +154,34 @@ class Palmmicro:
         except requests.exceptions.RequestException as e:
             print('_fetchSinaData error:', e)
 
+    def _getTelegramChatId(self):
+        return 992671436
+
     def _fetchPalmmicroData(self, strSymbols):
         iChatId = self._getTelegramChatId()
-        arMsg = {
-            'update_id': 886050244,
-            'message': {
-                'message_id': 6620,
-                'from': {
-                    'id': iChatId,
-                    'is_bot': False,
-                    'first_name': 'ny152',
-                    'username': 'sz152',
-                    'language_code': 'zh-hans'
-                        },
-                'chat': {
-                    'id': iChatId,
-                    'first_name': 'ny152',
-                    'username': 'sz152',
-                    'type': 'private'
-                        },
-                'date': 0,
-                'text': ''
-                       }
-                    }
-        arMessage = arMsg['message']
+        ar = {'update_id': 886050244,
+              'message': {'message_id': 6620,
+                          'from': {'id': iChatId,
+                                   'is_bot': False,
+                                   'first_name': 'woody',
+                                   'username': 'palmmicro',
+                                   'language_code': 'zh-Hans'
+                                  },
+                          'chat': {'id': iChatId,
+                                   'first_name': 'woody',
+                                   'username': 'palmmicro',
+                                   'type': 'private'
+                                  },
+                          'date': 0,
+                          'text': ''
+                         }
+                }
+        arMessage = ar['message']
         arMessage['date'] = int(time.time())
-        arMessage['text'] = f"@{strSymbols}"
+        arMessage['text'] = strSymbols
         strUrl = 'https://palmmicro.com/php/telegram.php?token=' + TG_TOKEN
         try:
-            response = requests.post(strUrl, json=arMsg, headers={'Content-Type': 'application/json'})
+            response = requests.post(strUrl, json=ar, headers={'Content-Type': 'application/json'})
             response.raise_for_status()  # Raise an exception for HTTP errors
             if response.status_code == 200:
                 response_data = response.json()  # Parse the JSON response data

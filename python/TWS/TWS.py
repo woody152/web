@@ -70,8 +70,8 @@ class MyEWrapper(EWrapper):
         #self.arXOPETF = {'SH513350', 'SZ159518'}
         #self.arXBIETF = {'SZ159502'}
         self.arOrder = {}
-        self.arOrder['KWEB'] = GetOrderArray([24.85, 26.87, 28.11, 28.30, 29.28, 31.68, 33.40, 39.40, 39.87], 200, 1, 5, -1)
-        self.arOrder['XOP'] = GetOrderArray([97.17, 101.08, 143.39, 153.23, 173.25, 180.98, 182.59, 193.28], 100, 2, -1)
+        self.arOrder['KWEB'] = GetOrderArray([24.85, 26.73, 28.15, 28.29, 29.19, 31.66, 33.40, 39.40, 39.87], 200, 1, 5, -1)
+        self.arOrder['XOP'] = GetOrderArray([97.17, 101.08, 143.39, 154.60, 174.01, 179.97, 181.12, 193.41], 100, 2, 7)
         if IsChinaMarketOpen():
             #self.arOrder['KWEB'] = GetOrderArray()
             self.arOrder['GLD'] = GetOrderArray()
