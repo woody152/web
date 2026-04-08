@@ -4,11 +4,11 @@ require_once('php/_emptygroup.php');
 require_once('../../php/ui/editinputform.php');
 require_once('../../php/tutorial/math.php');
 
-function _echoExhaustiveHoldingsItem($ref, $iCount, $fPercent, $strDate, $strNetValue, $strPrevDate, $bAdmin)
+function _echoPositionHoldingsItem($ref, $iCount, $fPercent, $strDate, $strNetValue, $strPrevDate, $bAdmin)
 {
 	static $a = 1.0;
 	static $b = 1.0;
-	static $c = 1.0;
+	static $c = 0.0;
 	static $d = 1.0;
 
 	$ar = array($strDate);
@@ -24,22 +24,22 @@ function _echoExhaustiveHoldingsItem($ref, $iCount, $fPercent, $strDate, $strNet
 	$his_sql = GetStockHistorySql();
 	if ($arHolding = $his_sql->GetDailyCloseProportionArray($arRatio, $strDate, $strPrevDate))
 	{
-		$fPercent /= 100.0;														// e - 1, GetDailyCloseProportion($ref->GetStockId()) - 1
-		$fPos = $ref->GetPosition();											// p
+		$fPercent /= 100.0;
+		//$fPos = $ref->GetPosition();
 		$cny_ref = $ref->GetCnyRef();
-		$fCny = $cny_ref->GetVal($strDate) / $cny_ref->GetVal($strPrevDate);	// n, GetDailyCloseProportion($cny_ref->GetStockId())
-		$fVal = ($fPercent / $fPos + 1) / $fCny;
+		$fCny = $cny_ref->GetVal($strDate) / $cny_ref->GetVal($strPrevDate);
+		//$fVal = ($fPercent / $fPos + 1) / $fCny;
 		if ($iCount == 2)
-		{	// x + y = 1; ax + by = ((e - 1)/p + 1) / n
-			$arXY = CramersRule(1.0, 1.0, 1.0, $arHolding[0], $arHolding[1], $fVal);
-		}
-		else if ($iCount == 3)
-		{	// x + y + z = 1; ax + by + cz = ((e - 1)/p + 1) / n
-			$arXY = CramersRule3(1.0, 1.0, 1.0, 1.0, $arHolding[0], $arHolding[1], $arHolding[2], $fVal, $a, $b, $c, $d);
-			$a = $arHolding[0];
-			$b = $arHolding[1];
-			$c = $arHolding[2];
-			$d = $fVal;
+		{
+			$a1 = $arHolding[0];
+			$b1 = $arHolding[1];
+			$c1 = -$fPercent/$fCny;
+			$d1 = 1.0/$fCny;
+			$arXY = CramersRule3(1.0, 1.0, 0.0, 1.0, $a1, $b1, $c1, $d1, $a, $b, $c, $d);
+			$a = $a1;
+			$b = $b1;
+			$c = $c1;
+			$d = $d1;
 		}
 		if ($arXY['status'] == 'unique')
 		{
@@ -55,6 +55,7 @@ function _echoExhaustiveHoldingsItem($ref, $iCount, $fPercent, $strDate, $strNet
 				$strHoldings .= SqlGetStockSymbol($strHoldingId).'*'.$str.';';
 				$iIndex ++;
 			}
+			$arDisplay[] = number_format(1.0 / $arXY['solution'][$iIndex], 2);
 			if ($bAdmin && $bMatch === false)
 			{
 				$strHoldings = rtrim($strHoldings, ';');
@@ -68,7 +69,7 @@ function _echoExhaustiveHoldingsItem($ref, $iCount, $fPercent, $strDate, $strNet
 	EchoMatchTableColumn($ar, $bMatch);
 }
 
-function _echoExhaustiveHoldingsData($ref, $iCount, $fInput, $iNum, $bAdmin)
+function _echoPositionHoldingsData($ref, $iCount, $fInput, $iNum, $bAdmin)
 {
    	$strStockId = $ref->GetStockId();
 	$net_sql = GetNetValueHistorySql();
@@ -91,7 +92,7 @@ function _echoExhaustiveHoldingsData($ref, $iCount, $fInput, $iNum, $bAdmin)
 					$fPercent = $ref->GetNetValuePercent($strDate, $strPrevDate);
 					if (abs($fPercent) > $fInput)
 					{
-						_echoExhaustiveHoldingsItem($ref, $iCount, $fPercent, $strDate, $record['close'], $strPrevDate, $bAdmin);
+						_echoPositionHoldingsItem($ref, $iCount, $fPercent, $strDate, $record['close'], $strPrevDate, $bAdmin);
 						$iTotal ++;
 						if ($iTotal == $iNum)	break;
 					}	
@@ -106,19 +107,20 @@ function _echoExhaustiveHoldingsData($ref, $iCount, $fInput, $iNum, $bAdmin)
     }
 }
 
-function _echoExhaustiveHoldingsParagraph($strPage, $strSymbol, $fInput, $iNum, $bAdmin)
+function _echoPositionHoldingsParagraph($strPage, $strSymbol, $fInput, $iNum, $bAdmin)
 {
 	$ref = new HoldingsReference($strSymbol);
     if ($ref->GetHoldingsDate())
     {
     	$arHoldingRef = $ref->GetHoldingsRefArray();
     	$iCount = count($arHoldingRef);
-    	if ($iCount <= 3)
+    	if ($iCount <= 2)
     	{
 			$ar = array(new TableColumnDate(), new TableColumnNetValue(), new TableColumnChange());
 			foreach ($arHoldingRef as $holding_ref)	$ar[] = new TableColumnStock($holding_ref);
+			$ar[] = new TableColumnPosition();
     		EchoTableParagraphBegin($ar, $strPage, GetFundLinks($strSymbol));
-    		_echoExhaustiveHoldingsData($ref, $iCount, $fInput, $iNum, $bAdmin);
+    		_echoPositionHoldingsData($ref, $iCount, $fInput, $iNum, $bAdmin);
 			EchoTableParagraphEnd();
 		}
 	}
@@ -131,10 +133,10 @@ function EchoAll()
     if ($ref = $acct->EchoStockGroup())
     {
     	if (($strInput = GetEditInput()) === false)		$strInput = strval(NETVALUE_DIFF);
-    	EchoEditInputForm('进行'.EXHAUSTIVE_HOLDINGS_DISPLAY.'计算的'.TableColumnGetNetValue().'涨跌%阈值', $strInput);
+    	EchoEditInputForm('进行'.POSITION_HOLDINGS_DISPLAY.'计算的'.TableColumnGetNetValue().'涨跌%阈值', $strInput);
     	if ($strInput != '')
     	{
-			_echoExhaustiveHoldingsParagraph($acct->GetPage(), $ref->GetSymbol(), floatval($strInput), $acct->GetNum(), $acct->IsAdmin());
+			_echoPositionHoldingsParagraph($acct->GetPage(), $ref->GetSymbol(), floatval($strInput), $acct->GetNum(), $acct->IsAdmin());
 		}
     }
     $acct->EchoLinks();
@@ -144,15 +146,15 @@ function GetMetaDescription()
 {
 	global $acct;
 	
-  	$str = $acct->GetStockDisplay().EXHAUSTIVE_HOLDINGS_DISPLAY;
-    $str .= '。仅用于只有2到3个持仓用来'.STOCK_DISP_EST.'的美股QDII基金，使用穷举法来计算这些持仓最可能的实际比例。';
+  	$str = $acct->GetStockDisplay().POSITION_HOLDINGS_DISPLAY;
+    $str .= '。仅用于只有2个持仓用来'.STOCK_DISP_EST.'的美股QDII基金，使用解多元一次方程组的方法来计算这些持仓最可能的实际比例以及总体'.STOCK_DISP_POSITION.'。';
     return CheckMetaDescription($str);
 }
 
 function GetTitle()
 {
 	global $acct;
-	return $acct->GetSymbolDisplay().EXHAUSTIVE_HOLDINGS_DISPLAY;
+	return $acct->GetSymbolDisplay().POSITION_HOLDINGS_DISPLAY;
 }
 
     $acct = new SymbolAccount();

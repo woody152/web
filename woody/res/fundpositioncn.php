@@ -26,33 +26,24 @@ function _echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $fInput, $iNum, $
    				$iIndex ++;
    				if (isset($arDate[$iIndex]))
 				{
-					$strPrevDate = $arDate[$iIndex];
-					$fPercent = $ref->GetNetValuePercent($strDate, $strPrevDate);
-					if (abs($fPercent) > $fInput)
-					{
-						//DebugVal($fPercent, __FUNCTION__, true);
-						$bWritten = EchoNetValueItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue, $strPrevDate, $fInput, $bAdmin);
-						$iTotal ++;
-						if ($iTotal == $iNum)	break;
-					}	
+					$bWritten = EchoNetValueItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue, $arDate[$iIndex], $fInput, $bAdmin);
+					$iTotal ++;
+					if ($iTotal == $iNum)	break;
 				}
    				else
    				{
    					break;
        			}
        		}
-			if ($bWritten === false)
-			{
-				$csv->Write($strDate, $strNetValue);
-			}
+			if ($bWritten === false)	$csv->Write($strDate, $strNetValue);
         }
         mysqli_free_result($result);
     }
 }
 
-function _echoFundPositionParagraph($strPage, $ref, $cny_ref, $est_ref, $strSymbol, $fInput, $iNum, $bAdmin)
+function _echoFundPositionParagraph($strPage, $strLinks, $ref, $cny_ref, $est_ref, $strSymbol, $fInput, $iNum, $bAdmin)
 {
-	EchoTableParagraphBegin(GetNetValueTableColumn($est_ref, $cny_ref), $strPage, StockGetAllLink($strSymbol).' '.GetFundLinks($strSymbol));
+	EchoTableParagraphBegin(GetNetValueTableColumn($est_ref, $cny_ref), $strPage, $strLinks);
 	
 	$csv = new PageCsvFile();
 	_echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $fInput, $iNum, $bAdmin);
@@ -95,7 +86,9 @@ function EchoAll()
 			}
     		if ($fund)
 			{
-				_echoFundPositionParagraph($acct->GetPage(), $fund, $cny_ref, $est_ref, $strSymbol, floatval($strInput), $acct->GetNum(), $acct->IsAdmin());
+				$strLinks = GetFundLinks($strSymbol);
+				if ($acct->GetLoginId())	$strLinks .= ' '.StockGetAllLink($strSymbol);
+				_echoFundPositionParagraph($acct->GetPage(), $strLinks, $fund, $cny_ref, $est_ref, $strSymbol, floatval($strInput), $acct->GetNum(), $acct->IsAdmin());
     		}
 		}
     }

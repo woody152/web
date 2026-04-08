@@ -85,6 +85,40 @@ class DailyCloseSql extends KeySql
     	return $this->_getCloseString('GetRecord', $strKeyId, $strDate);
     }
 
+    function GetDailyCloseProportion($strKeyId, $strDate, $strPrevDate)
+    {
+		if ($str = $this->GetClose($strKeyId, $strDate))
+		{
+			if ($strPrev = $this->GetClose($strKeyId, $strPrevDate))
+			{
+                $fPrev = floatval($strPrev);
+                if ($fPrev > MIN_FLOAT_VAL)
+                {
+    				return floatval($str) / $fPrev;
+                }
+			}
+		}
+	 	return false;
+    }
+
+    function GetDailyCloseProportionArray($arHoldingsRatio, $strDate, $strPrevDate)
+    {
+	    $ar = array();
+	    foreach ($arHoldingsRatio as $strHoldingId => $strRatio)
+	    {
+            if ($fProportion = $this->GetDailyCloseProportion($strHoldingId, $strDate, $strPrevDate))
+		    {
+				$ar[] = $fProportion;
+			}
+			else
+			{
+			 	return false;
+			}
+		}
+    	// DebugPrint($ar);
+	    return $ar;
+    }
+
     function GetClosePrev($strKeyId, $strDate)
     {
     	return $this->_getCloseString('GetRecordPrev', $strKeyId, $strDate);

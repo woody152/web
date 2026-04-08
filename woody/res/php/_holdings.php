@@ -81,7 +81,11 @@ function EchoAll()
     		$arHoldingRef = $ref->GetHoldingsRefArray();
     		$str = '持仓和测算示意 ';
     		$iTotal = count($arHoldingRef);
-    		if ($iTotal <= 3)	$str .= GetExhaustiveHoldingsLink($strSymbol);
+    		if ($iTotal <= 3)
+			{
+				$str .= GetExhaustiveHoldingsLink($strSymbol);
+				if ($iTotal == 2)	$str .= ' '.GetPositionHoldingsLink($strSymbol);
+			}
     		else				$str .= '总数'.strval($iTotal);
     		$str .= ' '.$ref->GetHoldingsRatioDisplay();
     		

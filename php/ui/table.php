@@ -148,6 +148,11 @@ function EchoTableColumn($ar, $strColor = false, $strFirstHint = false)
 END;
 }
 
+function EchoMatchTableColumn($ar, $bMatch)
+{
+	EchoTableColumn($ar, $bMatch ? 'yellow' : false);
+}
+
 function EchoTableParagraphEnd($str = '')
 {
 	if ($str == '')	$str = GetHtmlSpace();

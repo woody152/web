@@ -14,7 +14,7 @@ function _QdiiGetStockPosition($fEstPrev, $fEst, $fPrev, $fNetValue, $fCnyPrev, 
 			$fVal = $fPercent / $fEstPercent;
 			if ($fVal > MIN_FLOAT_VAL)
 			{
-				return number_format($fVal, 4);
+				return number_format($fVal, 2);
 			}
 		}
 	}
@@ -124,7 +124,7 @@ function EchoNetValueItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue
 		}
 	}
 
-	EchoTableColumn($ar, $bMatch ? 'yellow' : false);
+	EchoMatchTableColumn($ar, $bMatch);
 	return $bWritten;
 }
 
