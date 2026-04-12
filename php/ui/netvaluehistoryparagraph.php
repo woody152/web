@@ -49,7 +49,7 @@ function _QdiiMixGetPosition($ref, $strDate, $strPrevDate, $fPrev, $fNetValue, $
 	return false;
 }
 
-function GetNetValueTableColumn($est_ref, $cny_ref)
+function GetNetValueTableColumn($est_ref = false, $cny_ref = false)
 {
 	$change_col = new TableColumnChange();
 	$ar = array(new TableColumnDate(), new TableColumnNetValue(), $change_col);
@@ -69,7 +69,7 @@ function GetNetValueTableColumn($est_ref, $cny_ref)
 
 function _adjustAdminPositionDisplay($ref, $strPosition)
 {
-	return GetOnClickLink('/php/_submitoperation.php?stockid='.$ref->GetStockId().'&fundposition='.$strPosition, "确认使用{$strPosition}作为".STOCK_DISP_EST.STOCK_DISP_POSITION.'？', $strPosition);
+	return GetOnClickLink(PATH_STOCK.'submitholdings.php?symbol='.$ref->GetSymbol().'&fundposition='.$strPosition, "确认使用{$strPosition}作为".STOCK_DISP_EST.STOCK_DISP_POSITION.'？', $strPosition);
 }
 
 function EchoNetValueItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue, $strPrevDate, $fInput = NETVALUE_DIFF, $bAdmin = false)

@@ -225,14 +225,15 @@ function _getStockOptionHoldings($strStockId)
 {
 	$sql = GetHoldingsSql();
 	$ar = $sql->GetHoldingsArray($strStockId);
-	if (count($ar) == 0)			return 'STOCK1*10.1;STOCK2*20.2;STOCK3*30.3;STOCK4*39.4';
 
-	$str = '';
-	foreach ($ar as $strStockId => $strRatio)
+	$arSymbolRatio = array();
+	foreach ($ar as $strHoldingId => $strRatio)
 	{
-		$str .= SqlGetStockSymbol($strStockId).'*'.rtrim0($strRatio).';';
+		$strSymbol = SqlGetStockSymbol($strHoldingId);
+		$arSymbolRatio[$strSymbol] = rtrim0($strRatio);
 	}
-	return rtrim($str, ';');
+	$str = DebugEncode($arSymbolRatio);
+	return $str;
 }
 
 function _getStockOptionVal($strSubmit, $strLoginId, $ref, $strSymbol, $strDate)
@@ -314,7 +315,7 @@ function _getStockOptionMemo($strSubmit)
 		return '清空输入删除对应A股。';
 
 	case STOCK_OPTION_HOLDINGS:
-		return '输入STOCK*0删除对应基金持仓，用;号间隔多个持仓品种。';
+		return '清空输入删除对应基金持仓。';
 		
 	case STOCK_OPTION_NETVALUE:
 		return '清空输入删除对应日期净值。';

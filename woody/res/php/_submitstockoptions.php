@@ -393,7 +393,11 @@ class _SubmitOptionsAccount extends Account
 		$strEmail = SqlCleanString($_POST['login']);
 		$strSymbol = SqlCleanString($_POST['symbol']);
 		$strDate = isset($_POST['date']) ? SqlCleanString($_POST['date']) : '';
-		$strVal = SqlCleanString($_POST['val']);
+
+		$strVal = $_POST['val'];
+		if ($bAdmin === false)		$strVal = SqlCleanString($strVal);
+//		$strVal = str_replace('\\', '', $strVal);
+		DebugString(__CLASS__.'->'.__FUNCTION__.' '.$strVal);
 		
     	StockPrefetchExtendedData($strSymbol);
         $ref = StockGetReference($strSymbol);
@@ -445,36 +449,9 @@ class _SubmitOptionsAccount extends Account
 		case STOCK_OPTION_HOLDINGS:
 			if ($bAdmin)
 			{
-				switch ($strSymbol)
-				{
-				case 'SH513050':
-				case 'SH513090':
-				case 'SH513220':
-				case 'SH513230':
-				case 'SH513360':
-				case 'SH513750':
-				case 'SH513850':
-				case 'SH513990':
-					ReadSseHoldingsFile($strSymbol, $strStockId);
-					break;
-					
-				case 'SZ159509':
-				case 'SZ159529':
-				case 'SZ159567':
-				case 'SZ159570':
-				case 'SZ159577':
-				case 'SZ159605':
-				case 'SZ159607':
-				case 'SZ159615':
-				case 'SZ159751':
-				case 'SZ159792':
-					ReadSzseHoldingsFile($strSymbol, $strStockId, $strDate);
-					break;
-					
-				default:
-					_updateStockOptionHoldings($strSymbol, $strStockId, $strDate, $strVal);
-					break;
-				}
+	    		if ($ref->IsShangHaiEtf())			ReadSseHoldingsFile($strSymbol, $strStockId);
+    			else if ($ref->IsShenZhenEtf())		ReadSzseHoldingsFile($strSymbol, $strStockId, $strDate);
+				else								UpdateStockOptionHoldings($strStockId, $strDate, $strVal);
 			}
 			break;
 			
@@ -506,4 +483,5 @@ class _SubmitOptionsAccount extends Account
 		unset($_POST['submit']);
 	}
 }
+
 ?>

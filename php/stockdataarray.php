@@ -92,7 +92,7 @@ function GetStockDataArray($strSymbols)
 		}
 		$ar[$strSymbol] = $arData;
     }
-    DebugPrint($ar);
+//    DebugPrint($ar);
     return $ar;
 }
 

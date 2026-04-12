@@ -5,6 +5,8 @@ require_once('../php/gb2312.php');
 require_once('../php/iplookup.php');
 require_once('../php/benfordimagefile.php');
 require_once('../php/linearimagefile.php');
+require_once('../php/tutorial/cramersrule.php');
+require_once('../php/tutorial/gaussianelimination.php');
 require_once('../php/tutorial/dice.php');
 require_once('../php/tutorial/primenumber.php');	// require /php/sql/sqltable.php
 require_once('../php/sql/sqlkeystring.php');
@@ -303,7 +305,7 @@ function _getLinearRegressionString($strInput, $bChinese)
 
 function ___get_xyz()
 {
-	return array('x', 'y', 'z');
+	return array('x', 'y', 'z', 'w');
 }
 
 function __getLinearEquationString($ar)
@@ -332,53 +334,46 @@ function __getLinearEquationString($ar)
 	return $str;
 }
 
-function __getCramersRuleResultString($arXY, $bChinese)
+function __getExceptionMessage($e, $bChinese)
 {
-	if ($arXY['status'] == 'unique')
-	{
-		$strSemicolon = '; ';
-		$arVar = ___get_xyz();
-		$arSolution = $arXY['solution'];
-		$iTotal = count($arSolution);
-		$str = '';
-		for ($i = 0; $i < $iTotal; $i ++)
-		{
-			$str .= $arVar[$i].' = '.number_format($arSolution[$i], 3).$strSemicolon;
-		}
-		return GetBoldElement(rtrim($str, $strSemicolon));
-	}
-	return $bChinese ? $arXY['message'] : 'No solution';
+	return $bChinese ? $e->getMessage() : 'No solution';
 }
-
 function _getCramersRuleString($strInput, $bChinese)
 {
-	$str = '';
-	$ar = explode(';', $strInput);
-	$iCount = count($ar);
-	if ($iCount == 2 || $iCount == 3)
+	$ar = json_decode('['.$strInput.']', true);
+	if (json_last_error() !== JSON_ERROR_NONE) 
 	{
-		$ar0 = explode(',', trim($ar[0]));
-		$str .= __getLinearEquationString($ar0);
-		$ar1 = explode(',', trim($ar[1]));
-		$str .= __getLinearEquationString($ar1);
-		if ($iCount == 2)
+    	return $bChinese ? '解析方程组系数失败' : json_last_error_msg();
+	}
+	$str = '';
+	foreach ($ar as $arEq)	$str .= __getLinearEquationString($arEq);
+	
+	try
+	{
+		$arXY = CramersRule($ar);
+		$strSemicolon = '; ';
+		$arVar = ___get_xyz();
+		$iTotal = count($arXY);
+		$strResult = '';
+		for ($i = 0; $i < $iTotal; $i ++)
 		{
-			list($strA1, $strB1, $strC1) = $ar0;
-			list($strA2, $strB2, $strC2) = $ar1;
-			$arXY = CramersRule(floatval($strA1), floatval($strB1), floatval($strC1), floatval($strA2), floatval($strB2), floatval($strC2));
+			$strResult .= $arVar[$i].' = '.number_format($arXY[$i], 2).$strSemicolon;
 		}
-		else
-		{
-			$ar2 = explode(',', trim($ar[2]));
-			$str .= __getLinearEquationString($ar2);
-			list($strA1, $strB1, $strC1, $strD1) = $ar0;
-			list($strA2, $strB2, $strC2, $strD2) = $ar1;
-			list($strA3, $strB3, $strC3, $strD3) = $ar2;
-			$arXY = CramersRule3(floatval($strA1), floatval($strB1), floatval($strC1), floatval($strD1), 
-								 floatval($strA2), floatval($strB2), floatval($strC2), floatval($strD2),
-								 floatval($strA3), floatval($strB3), floatval($strC3), floatval($strD3));
-		}
-		$str .= __getCramersRuleResultString($arXY, $bChinese);
+		$str .= GetBoldElement(rtrim($strResult, $strSemicolon));
+	}
+	catch (Exception $e) 
+	{
+		$str .= __getExceptionMessage($e, $bChinese);
+	}
+
+	$str .= GetHtmlNewLine();
+	try
+	{
+		$str .= print_r(GaussianElimination($ar), true);
+	}
+	catch (Exception $e) 
+	{
+		$str .= __getExceptionMessage($e, $bChinese);
 	}
 	return $str;
 }
@@ -650,7 +645,7 @@ function _getDefaultInput($strPage)
     	break;
     		
     case 'cramersrule':
-    	$str = '0.2506,2.487,1099; 2.450,2.557,7408';
+    	$str = '[0.2506, 2.487, 1099], [2.450, 2.557, 7408]';
     	break;
     		
     case 'dicecaptcha':

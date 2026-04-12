@@ -34,7 +34,7 @@ class HoldingsReference extends MyStockReference
     var $ar_realtime_ref = array();
 
     var $strNetValue;
-    var $strHoldingsDate;
+    var $strHoldingsDate = false;
     var $arHoldingsDateHistory = array();
     var $arHoldingsRatio = array();
     
@@ -181,12 +181,32 @@ class HoldingsReference extends MyStockReference
     function CheckHoldingsDate($strDate)
     {
     	$his_sql = GetStockHistorySql();
-		foreach ($this->arHoldingsRatio as $strId => $strRatio)
+		foreach ($this->arHoldingsRatio as $strHoldingId => $strRatio)
 		{
-			if ($his_sql->GetClose($strId, $strDate) === false)		return false;
+			if ($his_sql->GetClose($strHoldingId, $strDate) === false)		return false;
 		}
 		return true;
     }
+
+	function GetProportionArray($strDate, $strPrevDate)
+    {
+	   	$his_sql = GetStockHistorySql();
+	    $ar = array();
+	    foreach ($this->arHoldingsRatio as $strHoldingId => $strRatio)
+	    {
+            if ($fProportion = $his_sql->GetProportion($strHoldingId, $strDate, $strPrevDate))
+		    {
+				$ar[] = $fProportion;
+			}
+			else
+			{
+			 	return false;
+			}
+		}
+    	// DebugPrint($ar);
+	    return $ar;
+    }
+
     
     function GetHoldingsRefArray()
     {

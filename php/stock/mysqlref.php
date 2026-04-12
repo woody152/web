@@ -72,18 +72,6 @@ class MysqlReference extends StockReference
 		return $this->GetVal($strDate);
 	}
 
-	function GetNetValuePercent($strDate, $strPrevDate)
-	{
-		if ($fNetValue = $this->GetNetValue($strDate))
-		{
-			if ($fPrev = $this->GetNetValue($strPrevDate))
-			{
-				return StockGetPercentage($fPrev, $fNetValue);
-			}
-		}
-		return 0.0;
-	}
-	
 	function GetNetValueDisplay($fNetValue)
 	{
 		if ($fNetValue === false)	return '';

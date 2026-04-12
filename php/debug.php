@@ -79,6 +79,11 @@ function unlinkEmptyFile($strFileName)
 	}
 }
 
+function DebugEncode($arJson)
+{
+	return substr(json_encode($arJson), 1, -1);
+}
+
 function DebugFormat_date($strFormat, $iTime = false, $strTimeZone = DEBUG_TIME_ZONE)
 {
     if ($strTimeZone)	

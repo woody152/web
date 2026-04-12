@@ -1,6 +1,6 @@
 <?php
 
-function _updateStockOptionHoldings($strSymbol, $strStockId, $strDate, $strVal)
+function UpdateStockOptionHoldings($strStockId, $strDate, $strVal)
 {
 	$sql = GetStockSql();
 	$holdings_sql = GetHoldingsSql();
@@ -8,20 +8,14 @@ function _updateStockOptionHoldings($strSymbol, $strStockId, $strDate, $strVal)
 	
 	$date_sql->WriteDate($strStockId, $strDate);
 	$holdings_sql->DeleteAll($strStockId);
-	
-	$ar = explode(';', $strVal);
-	foreach ($ar as $str)
+
+	if ($ar = json_decode('{'.$strVal.'}', true))
 	{
-		$arHolding = explode('*', $str);
-		if (count($arHolding) == 2)
+		foreach ($ar as $strHolding => $strRatio)
 		{
-			$strHolding = StockGetSymbol($arHolding[0]);
-			$strRatio = $arHolding[1];
-			if ($strRatio == '0')
-			{	// delete
-			}
-			else
+			if ($strRatio != '0')
 			{
+				$strHolding = StockGetSymbol($strHolding);
 				$holdings_sql->InsertHoldingId($strStockId, $sql->GetId($strHolding), $strRatio);
 			}
 		}

@@ -25,6 +25,7 @@ function GetNameLink($strName, $strDisplay = false, $strLink = '')
 
 function GetOnClickLink($strPath, $strQuestion, $strDisplay)
 {
+    $strQuestion = str_replace('"', '', $strQuestion);
 	return GetLinkElement($strDisplay, UrlGetServer().$strPath, array('onclick' => GetDoubleQuotes("return confirm('$strQuestion')")));
 }
 

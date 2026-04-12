@@ -6,12 +6,7 @@ class _AdminOperationAccount extends Account
 {
     public function AdminProcess()
     {
-    	if ($strPosition = UrlGetQueryValue('fundposition'))
-    	{
-    		$sql = GetPositionSql();
-    		$sql->WriteVal(UrlGetQueryValue('stockid'), $strPosition);
-    	}
-    	else if ($strIp = UrlGetQueryValue('ip'))
+    	if ($strIp = UrlGetQueryValue('ip'))
     	{
     		$this->SetCrawler($strIp);
     	}
