@@ -35,7 +35,7 @@ function mysql_round($str, $iPrecision = FLOAT_PRECISION)
 	return strval_round(floatval($str), $iPrecision);
 }
 
-function strval_round_implode($arVal, $strSeparator = ': ')
+function strval_round_implode($arVal, $strSeparator = ', ')
 {
 	$str = '';
 	foreach ($arVal as $fVal)

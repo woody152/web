@@ -235,9 +235,9 @@ class TableSql
     	if ($iCount > 0)
     	{
     		DebugVal($iCount, 'DeleteData table '.$this->strName.' WHERE '.$strWhere);
-    		return SqlDeleteTableData($this->strName, $strWhere, $strLimit);
+    		if (SqlDeleteTableData($this->strName, $strWhere, $strLimit))	return $iCount;
     	}
-    	return false;
+    	return 0;
     }
 
     function DeleteById($strId)

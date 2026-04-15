@@ -45,7 +45,7 @@ class QdiiAccount extends QdiiGroupAccount
 				if ($strNetValue = GetKraneNetValue($est_ref, $strDate))
 				{
 					$net_sql = GetNetValueHistorySql();
-					$net_sql->ModifyDaily($strEstId, $strDate, $strNetValue);
+					$net_sql->WriteDaily($strEstId, $strDate, $strNetValue);
 				}
 				else
 				{

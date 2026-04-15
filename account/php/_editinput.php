@@ -57,7 +57,7 @@ function _getCommonPhraseString($strInput, $strMemberId, $bChinese)
 function _getBenfordsLawString($strInput, $bChinese)
 {
     $jpg = new BenfordImageFile();
-    $jpg->Draw(explode(';', $strInput));
+    $jpg->Draw(explode(',', $strInput));
     return $jpg->GetAll($bChinese ? '总数' : 'Total');
 }
 
@@ -249,7 +249,7 @@ function _getLinearRegressionStockArrays(&$arX, &$arY, $strInput, $strSeparator,
 
 function _getLinearRegressionArrays(&$arX, &$arY, $strInput, $strSeparator, $strNewLine, $strFunction)
 {
-	$fCount = 0.0;
+/*	$fCount = 0.0;
 	$ar = explode(';', $strInput);
 	foreach ($ar as $str)
 	{
@@ -271,9 +271,49 @@ function _getLinearRegressionArrays(&$arX, &$arY, $strInput, $strSeparator, $str
 		$arX[] = $fX;
 		$arY[] = empty($strFunction) ? $fY : call_user_func($strFunction, $fY);
 	}
+*/
+	$ar = json_decode('['.$strInput.']', true);
+	if (json_last_error() !== JSON_ERROR_NONE) 
+	{
+	}
+	else
+	{
+		$fCount = 0.0;
+    	foreach ($ar as $item) 
+		{
+        	if (is_array($item)) 
+			{
+				$iTotal = count($item);
+				if ($iTotal == 0)
+				{
+					$fX = $fCount;
+					$fY = 0.0;
+				}
+				else if ($iTotal == 0)
+				{
+					$fX = $fCount;
+					$fY = $item[0];
+				}
+				else
+				{
+					$fX = $item[0];
+					$fY = $item[1];
+					$fCount = $fX;				
+				}
+			}
+			else
+			{
+				$fX = $fCount;
+				$fY = $item;
+			}
+			$arX[] = $fX;
+			$arY[] = empty($strFunction) ? $fY : call_user_func($strFunction, $fY);
+			$fCount ++;
+        }
+    }		
 	
-    $str = 'x = {'.implode($strSeparator, $arX).'}';
-    $str .= $strNewLine.'y = {'.(empty($strFunction) ? implode($strSeparator, $arY) : strval_round_implode($arY, $strSeparator)).'}';
+    $str = 'x = ['.implode($strSeparator, $arX).']';
+	$str .= $strNewLine.'y = ['.(empty($strFunction) ? implode($strSeparator, $arY) : strval_round_implode($arY, $strSeparator)).']';
 	return $str;
 }
 
@@ -290,8 +330,8 @@ function _getLinearRegressionString($strInput, $bChinese)
 
    	$strNewLine = GetHtmlNewLine();
    	$strSeparator = ', ';
-	if ($strFunction == 'stock')		$strData = _getLinearRegressionStockArrays($arX, $arY, $strInput, $strSeparator, $strNewLine);
-	else								$strData = _getLinearRegressionArrays($arX, $arY, $strInput, $strSeparator, $strNewLine, $strFunction);
+	if ($strFunction == 'stock')	$strData = _getLinearRegressionStockArrays($arX, $arY, $strInput, $strSeparator, $strNewLine);
+	else							$strData = _getLinearRegressionArrays($arX, $arY, $strInput, $strSeparator, $strNewLine, $strFunction);
 
     $jpg = new LinearImageFile();
     if ($jpg->Draw($arX, $arY))
@@ -299,8 +339,27 @@ function _getLinearRegressionString($strInput, $bChinese)
     	$str = GetBoldElement($jpg->GetEquation());
     	$str .= $strNewLine.$jpg->GetLink();
     }
-	else	$str = GetFontElement($bChinese ? '数据不足' : 'Not enough data');
-   	return $str.$strNewLine.$strData;
+	else	
+	{
+		$str = GetFontElement($bChinese ? '数据不足' : 'Not enough data');
+	}	
+   	$str .= $strNewLine.$strData;
+	$str .= $strNewLine;
+	$str .= $bChinese ? '求解超定线性方程组验证：' : 'Verify by Solve Overdetermined: ';
+	$arEq = array();
+	for ($i = 0; $i < count($arX); $i ++)
+	{
+		$arEq[] = array(1.0, $arX[$i], $arY[$i]);
+	}	
+	try
+	{
+		$str .= print_r(SolveOverdetermined($arEq), true);
+	}
+	catch (Exception $e) 
+	{
+		DebugString($e->getFile().' '.$e->getLine().' '.$e->getMessage());	// $e->getTraceAsString()
+	}
+	return $str;
 }
 
 function ___get_xyz()
@@ -325,7 +384,7 @@ function __getLinearEquationString($ar)
 		}
 		if ($strVal != '1')
 		{
-			$str .= $strVal.' * ';
+			$str .= $strVal;	// .' * ';
 		}
 		$str .= $arVar[$i].$strAdd;
 	}
@@ -367,6 +426,7 @@ function _getCramersRuleString($strInput, $bChinese)
 	}
 
 	$str .= GetHtmlNewLine();
+	$str .= $bChinese ? '高斯消元法验证：' : 'Verify by Gaussian Elimination: ';
 	try
 	{
 		$str .= print_r(GaussianElimination($ar), true);
@@ -507,7 +567,7 @@ function _getSinaJsString($strInput, $bChinese)
 
 function _getTaobaoDouble11Data()
 {
-	return '0.5; 9.36; 52; 191; 352; 571; 912; 1207; 1682.69; 2135; 2684';
+	return '0.5, 9.36, 52, 191, 352, 571, 912, 1207, 1682.69, 2135, 2684';
 }
 
 function _getTaobaoDouble11SqrtData()
@@ -517,7 +577,7 @@ function _getTaobaoDouble11SqrtData()
 
 function _getTaobaoSalesData()
 {
-	return '66.7; 119; 200; 345; 525; 762; 1011; 1583; 2503; 3768';
+	return '66.7, 119, 200, 345, 525, 762, 1011, 1583, 2503, 3768';
 }
 
 function _getTaobaoSalesLogData()
@@ -542,9 +602,10 @@ END;
 
 function _echoLinearRegressionRelated()
 {
+	$strAcountNumber = GetQuoteElement('[1.02, 5069], [0.51, 3081], [2.92, 6936], [3.47, 7846], [2.07, 5583]');
 	$strTaobaoSqrt = GetQuoteElement(_getTaobaoDouble11SqrtData());
 	$strTaobaoLog = GetQuoteElement(_getTaobaoSalesLogData());
-	$strBenford = GetQuoteElement('1,'.GetStandardBenfordData());
+	$strBenford = GetQuoteElement(GetStandardBenfordData());
 	$strStockHistory = GetQuoteElement('stock(600028,00386,1)');
 
 	$strSZ162411 = GetGroupStockLink('SZ162411', true);	
@@ -554,7 +615,7 @@ function _echoLinearRegressionRelated()
 	echo <<< END
 	<p>测试数据:</p>
 	<ol>
-	    <li>{$strSZ162411}2019年8月16日到22日场内溢价百分比x和场内申购账户数y: <font color=gray>1.02,5069; 0.51,3081; 2.92,6936; 3.47,7846; 2.07,5583</font></li>
+	    <li>{$strSZ162411}2019年8月16日到22日场内溢价百分比x和场内申购账户数y: {$strAcountNumber}</li>
 	    <li>淘宝天猫从x=0(2009年)开始双11交易额y(亿元): $strTaobaoSqrt</li>
 	    <li>阿里{$strBaba}历年x=0(2010年)财报中的总销售额y(亿元): $strTaobaoLog</li>
 	    <li>本福特标准分布: $strBenford</li>
@@ -657,7 +718,6 @@ function _getDefaultInput($strPage)
     	break;
     		
     case 'linearregression':
-//  	$strInput = '1.02,5069; 0.51,3081; 2.92,6936; 3.47,7846; 2.07,5583';
     	$str = _getTaobaoDouble11SqrtData();
     	break;
     		

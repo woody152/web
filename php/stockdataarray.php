@@ -9,6 +9,8 @@ function _addIndexArray(&$ar, $strIndex, $strEtf, $strDate, $cal_sql)
 		
 		$strEtfId = SqlGetStockId($strEtf);
 		$arData['calibration'] = $cal_sql->GetCloseFrom($strEtfId, $strDate);
+		$strDate = $cal_sql->GetDateFrom($strEtfId, $strDate);
+		$arData['date'] = $strDate;
 		$arData['netvalue'] = SqlGetNetValueByDate($strEtfId, $strDate);
 
 		$pos_sql = GetPositionSql();
@@ -42,6 +44,7 @@ function GetStockDataArray($strSymbols)
 				{
 					$arData['calibration'] = $record['close'];
 					$strDate = $record['date'];
+					$arData['date'] = $strDate;
 					$arData['netvalue'] = SqlGetNetValueByDate($strStockId, $strDate);
 				
 					if (method_exists($fund_ref, 'GetEstRef'))
@@ -68,8 +71,9 @@ function GetStockDataArray($strSymbols)
 				}
 				else
 				{
-					$arData['netvalue'] = $fund_ref->GetNetValueString();
 					$strDate = $fund_ref->GetHoldingsDate();
+					$arData['date'] = $strDate;
+					$arData['netvalue'] = $fund_ref->GetNetValueString();
 					$arData['CNYholdings'] = $cny_ref->GetClose($strDate);
 
 					$arSymbolHedge = array();

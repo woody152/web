@@ -198,7 +198,7 @@ function GetFundLinks($strSymbol)
 		$str .= ' '.GetCalibrationHistoryLink($strSymbol);
 		if ($bQdii || $bQdiiHk || $bQdiiJp || $bQdiiEu || $bGoldOil)	$str .= ' '.GetFundPositionLink($strSymbol);
 		if ($bQdii)											            $str .= ' '.GetFundAccountLink($strSymbol).' '.GetThanousParadoxLink($strSymbol);
-		if ($bQdiiEu || $bGoldOil)	                                    $str .= ' '.GetExhaustiveHoldingsLink($strSymbol).' '.GetPositionHoldingsLink($strSymbol);
+		if ($bQdiiEu || $bGoldOil)	                                    $str .= ' '.GetExhaustiveHoldingsLink($strSymbol);
 	}
 	else
 	{
@@ -237,17 +237,10 @@ function GetFundShareLink($strSymbol)
     return GetStockSymbolLink('fundshare', $strSymbol, FUND_SHARE_DISPLAY);
 }
 
-define('HOLDINGS_RATIO_DISPLAY', STOCK_DISP_HOLDING.'比例');
-define('EXHAUSTIVE_HOLDINGS_DISPLAY', '穷举'.HOLDINGS_RATIO_DISPLAY);
+define('EXHAUSTIVE_HOLDINGS_DISPLAY', '穷举'.STOCK_DISP_HOLDING.'比例');
 function GetExhaustiveHoldingsLink($strSymbol)
 {
     return GetStockSymbolLink('exhaustiveholdings', $strSymbol, EXHAUSTIVE_HOLDINGS_DISPLAY);
-}
-
-define('POSITION_HOLDINGS_DISPLAY', '同时估算'.STOCK_DISP_POSITION.'和'.HOLDINGS_RATIO_DISPLAY);
-function GetPositionHoldingsLink($strSymbol)
-{
-    return GetStockSymbolLink('positionholdings', $strSymbol, POSITION_HOLDINGS_DISPLAY);
 }
 
 define('ROTATION_TRADING_DISPLAY', '轮动交易');

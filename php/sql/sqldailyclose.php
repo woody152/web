@@ -209,17 +209,7 @@ class DailyCloseSql extends KeySql
 
     function DeleteClose($str = '0.000000')
     {
-    	$this->DeleteData("close = '$str'");
-    }
-
-    function ModifyDaily($strKeyId, $strDate, $strClose)
-    {
-    	if (empty($strClose))
-    	{
-    		$this->DeleteByDate($strKeyId, $strDate);
-    		return false;
-    	}
-		return $this->WriteDaily($strKeyId, $strDate, $strClose);
+    	return $this->DeleteData("close = '$str'");
     }
 
     function GetSwitchDates($strKeyId)

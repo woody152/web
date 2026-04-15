@@ -67,7 +67,7 @@ function EchoAll()
 	
     if ($ref = $acct->EchoStockGroup())
     {
-    	if (($strInput = GetEditInput()) === false)		$strInput = strval(NETVALUE_DIFF);
+    	if (($strInput = GetEditInput()) === false)		$strInput = strval(POS_NETVALUE_DIFF);
     	EchoEditInputForm('进行'.TableColumnGetPosition().'估算的'.TableColumnGetNetValue().'涨跌%阈值', $strInput);
     	if ($strInput != '')
     	{

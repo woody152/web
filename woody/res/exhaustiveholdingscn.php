@@ -3,8 +3,10 @@ require_once('php/_stock.php');
 require_once('php/_emptygroup.php');
 require_once('../../php/ui/editinputform.php');
 require_once('../../php/ui/netvaluehistoryparagraph.php');
-require_once('../../php/tutorial/cramersrule.php');
+//require_once('../../php/tutorial/cramersrule.php');
+require_once('../../php/tutorial/gaussianelimination.php');
 
+/*
 function _echoExhaustiveHoldingsItem($ref, $iCount, $fInput, $strDate, $fNetValue, $strPrevDate, $bAdmin)
 {
 	static $a = 1.0;
@@ -68,6 +70,78 @@ function _echoExhaustiveHoldingsItem($ref, $iCount, $fInput, $strDate, $fNetValu
 
 	EchoMatchTableColumn($ar, $bMatch);
 }
+*/
+function _echoExhaustiveHoldingsItem($ref, $iCount, $fInput, $strDate, $fNetValue, $strPrevDate, $bAdmin)
+{
+	static $arEq = array();
+
+	$strStockId = $ref->GetStockId();
+	$net_sql = GetNetValueHistorySql();
+	$ar = array($strDate, $ref->GetNetValueDisplay($fNetValue));
+	$ar[] = $ref->GetPercentageDisplay(floatval($net_sql->GetClose($strStockId, $strPrevDate)), $fNetValue);
+
+	$bMatch = false;
+	$fPercent = $net_sql->GetProportion($strStockId, $strDate, $strPrevDate) - 1.0;			// f
+	if (abs($fPercent) > $fInput && $arPro = $ref->GetProportionArray($strDate, $strPrevDate))
+	{
+		$cny_ref = $ref->GetCnyRef();
+		$fCny = $net_sql->GetProportion($cny_ref->GetStockId(), $strDate, $strPrevDate);	// n
+		$fEnd = end($arPro);
+		// x + y = 1; ax + by - (f/n)z = 1/n 			 ==> (a - b)x -            (f/n)z = 1/n - b
+		// x + y + z = 1; ax + by + cz - (f/n)w = 1/n	 ==> (a - c)x + (b - c)y - (f/n)w = 1/n - c
+		$arLine = array();
+		for ($i = 0; $i < $iCount - 1; $i ++)	$arLine[] = $arPro[$i] - $fEnd;
+		$arLine[] = -$fPercent / $fCny;
+		$arLine[] = 1.0/$fCny - $fEnd;
+		$arEq[] = $arLine;
+		if (count($arEq) >= $iCount)
+		{
+			try
+			{
+				$arXY = SolveOverdetermined($arEq);
+				$iIndex = 0;
+				$bMatch = true;
+				$arDisplay = array();
+				$arJson = array();
+				$arHoldingsRatio = $ref->GetHoldingsRatioArray();
+				$fTotal = 0.0;
+				foreach ($arHoldingsRatio as $strHoldingId => $strRatio)
+				{
+					if ($iIndex == $iCount - 1)
+					{
+						$fVal = 1.0 - $fTotal;
+					}
+					else
+					{
+						$fVal = $arXY[$iIndex];
+						$fTotal += $fVal;
+					}
+					$str = number_format($fVal * 100.0, 0);
+					if ($str != $strRatio)	$bMatch = false;
+					$arDisplay[] = str_starts_with($str, '-') ? GetFontElement($str) : $str;
+					$strHolding = SqlGetStockSymbol($strHoldingId);
+					$arJson[$strHolding] = $str;
+					$iIndex ++;
+				}
+				$strPos = number_format(1.0 / $arXY[$iIndex - 1], 2);
+				if ($strPos != strval($ref->GetPosition()))	$bMatch = false;
+				$arDisplay[] = $strPos;
+				if ($bAdmin && $bMatch === false)
+				{
+					$str = DebugEncode($arJson);
+					$arDisplay[$iIndex] = GetOnClickLink(PATH_STOCK.'submitholdings.php?symbol='.$ref->GetSymbol().'&holdings='.urlencode($str).'&fundposition='.$strPos, '确认更新持仓'.$str.'和仓位'.$strPos.'？', $arDisplay[$iIndex]);
+				}
+				$ar = array_merge($ar, $arDisplay);
+			}
+			catch (Exception $e) 
+			{
+				DebugString($e->getFile().' '.$e->getLine().' '.$e->getMessage());	// $e->getTraceAsString()
+			}
+		}	
+	}
+
+	EchoMatchTableColumn($ar, $bMatch);
+}
 
 function _echoExhaustiveHoldingsData($ref, $iCount, $fInput, $iNum, $bAdmin)
 {
@@ -109,11 +183,13 @@ function _echoExhaustiveHoldingsParagraph($strPage, $strSymbol, $fInput, $iNum, 
     {
     	$arHoldingRef = $ref->GetHoldingsRefArray();
     	$iCount = count($arHoldingRef);
-    	if ($iCount <= 3)
+    	if ($iCount <= 4)
     	{
 			$ar = GetNetValueTableColumn();
 			foreach ($arHoldingRef as $holding_ref)	$ar[] = new TableColumnStock($holding_ref);
-    		EchoTableParagraphBegin($ar, $strPage, GetFundLinks($strSymbol));
+			$ar[] = new TableColumnPosition();
+    		
+			EchoTableParagraphBegin($ar, $strPage, GetFundLinks($strSymbol));
     		_echoExhaustiveHoldingsData($ref, $iCount, $fInput, $iNum, $bAdmin);
 			EchoTableParagraphEnd();
 		}
@@ -126,7 +202,7 @@ function EchoAll()
 	
     if ($ref = $acct->EchoStockGroup())
     {
-    	if (($strInput = GetEditInput()) === false)		$strInput = strval(NETVALUE_DIFF);
+    	if (($strInput = GetEditInput()) === false)		$strInput = strval(HOLDINGS_NETVALUE_DIFF);
     	EchoEditInputForm('进行'.EXHAUSTIVE_HOLDINGS_DISPLAY.'计算的'.TableColumnGetNetValue().'涨跌%阈值', $strInput);
     	if ($strInput != '')
     	{
@@ -141,7 +217,7 @@ function GetMetaDescription()
 	global $acct;
 	
   	$str = $acct->GetStockDisplay().EXHAUSTIVE_HOLDINGS_DISPLAY;
-    $str .= '。仅用于只有2到3个持仓用来'.STOCK_DISP_EST.'的美股QDII基金，使用穷举法来计算这些持仓最可能的实际比例。';
+    $str .= '。仅用于不超过4个持仓用来'.STOCK_DISP_EST.'的QDII基金，通过穷举求解超定线性方程组来计算这些持仓最可能的实际比例以及总体'.STOCK_DISP_POSITION.'。';
     return CheckMetaDescription($str);
 }
 

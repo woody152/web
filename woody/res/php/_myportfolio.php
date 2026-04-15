@@ -51,9 +51,9 @@ function _transEchoReferenceParagraph($arTrans, $bAdmin)
 function _echoMergeParagraph($arMerge)
 {
 	EchoTableParagraphBegin(array(new TableColumnSymbol(),
-								   new TableColumnQuantity(),
-								   new TableColumnTest()
-								   ), 'merge', '合并'.TableColumnGetQuantity());
+								  new TableColumnQuantity(),
+								  new TableColumnTest()
+								 ), 'merge', '合并'.TableColumnGetQuantity());
 
 	foreach ($arMerge as $strSymbol => $trans)
 	{

@@ -129,14 +129,14 @@ function _updateStockOptionHa($strSymbolH, $strSymbolA)
 {
 	$pair_sql = GetAhPairSql();
 	if (empty($strSymbolA))		$pair_sql->DeleteByPairSymbol($strSymbolH);
-	else							$pair_sql->WritePairSymbol($strSymbolA, $strSymbolH);
+	else						$pair_sql->WritePairSymbol($strSymbolA, $strSymbolH);
 }
 
 function _updateStockOptionAh($strSymbolA, $strSymbolH)
 {
 	$pair_sql = GetAhPairSql();
 	if (empty($strSymbolH))		$pair_sql->DeleteBySymbol($strSymbolA);
-	else							$pair_sql->WritePairSymbol($strSymbolA, $strSymbolH);
+	else						$pair_sql->WritePairSymbol($strSymbolA, $strSymbolH);
 }
 
 function _updateStockOptionEmaDays($strStockId, $iDays, $strDate, $strVal)
@@ -208,7 +208,13 @@ function _updateStockOptionFund($strSymbol, $strStockId, $strVal)
 function _updateOptionDailySql($sql, $strStockId, $strDate, $strVal)
 {
 	DebugString(__FUNCTION__.' '.$strVal.' '.$strDate, true);
-	return $sql->ModifyDaily($strStockId, $strDate, $strVal);
+   	if (empty($strVal))
+    {
+		$iCount = $sql->DeleteByDate($strStockId, $strDate);
+		DebugVal($iCount, __FUNCTION__.' deleted', true);
+    	return false;
+    }
+	return $sql->WriteDaily($strStockId, $strDate, $strVal);
 }
 
 function _updateStockOptionSplitGroupTransactions($strGroupId, $strStockId, $strDate, $fRatio, $fPrice)

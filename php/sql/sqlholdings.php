@@ -43,7 +43,7 @@ class HoldingsSql extends KeySql
     		while ($record = mysqli_fetch_assoc($result)) 
     		{
     			$strHoldingId = $record['holding_id']; 
-    			$ar[$strHoldingId] = $record['ratio'];
+    			$ar[$strHoldingId] = rtrim0($record['ratio']);
     		}
     		mysqli_free_result($result);
     	}

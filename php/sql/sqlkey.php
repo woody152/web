@@ -3,11 +3,11 @@ require_once('sqltable.php');
 
 class KeySql extends TableSql
 {
-	var $strKey;
+    var $strKey;
 	
     public function __construct($strTableName, $strKeyPrefix = TABLE_PAGE) 
     {
-    	$this->strKey = $this->Add_id($strKeyPrefix);
+      	$this->strKey = $this->Add_id($strKeyPrefix);
         parent::__construct($strTableName);
     }
     
