@@ -93,9 +93,12 @@ function EchoReferenceParagraph($arRef, $bAdmin = false)
 	array_pop($ar);
 	$ar[] = new TableColumnName(false, 270);
 	if ($bAdmin)	$ar[] = new TableColumn('调试数据', TableColumnGetLastWidth($ar));
-	EchoTableParagraphBegin($ar, 'reference', $str);
-	_echoReferenceTableData($arRef, $bAdmin);
-    EchoTableParagraphEnd();
+	
+	if (EchoTableParagraphBegin($ar, 'reference', $str))
+	{
+		_echoReferenceTableData($arRef, $bAdmin);
+    	EchoTableParagraphEnd();
+	}	
 }
 
 ?>

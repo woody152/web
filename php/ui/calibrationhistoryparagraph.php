@@ -27,7 +27,7 @@ function EchoCalibrationHistoryParagraph($ref, $iStart = 0, $iNum = TABLE_COMMON
    	else
    	{
    		$strMenuLink = StockGetMenuLink($strSymbol, $cal_sql->Count($strStockId), $iStart, $iNum);
-   		$strLink = GetFundListLink().' '.GetFundLinks($strSymbol).'<br />'.$strMenuLink;
+   		$strLink = GetFundListLink().' '.GetFundLinks($strSymbol).GetHtmlNewLine().$strMenuLink;
    	}
     
    	$ar = array(new TableColumnDate(), new TableColumnCalibration(), new TableColumnTime(), new TableColumn('次数', 50));
@@ -64,16 +64,18 @@ function EchoCalibrationHistoryParagraph($ref, $iStart = 0, $iNum = TABLE_COMMON
 		break;
 	}
 
-	EchoTableParagraphBegin($ar, $strSymbol.'calibrationhistory', $strLink);
-    if ($result = $cal_sql->GetAll($strStockId, $iStart, $iNum)) 
-    {
-        while ($record = mysqli_fetch_assoc($result)) 
-        {
-			_echoCalibrationHistoryItem($fPosition, $ref, $record, $iMultiplier);
-        }
-        mysqli_free_result($result);
-    }
-    EchoTableParagraphEnd($strMenuLink);
+	if (EchoTableParagraphBegin($ar, $strSymbol.'calibrationhistory', $strLink))
+	{
+	    if ($result = $cal_sql->GetAll($strStockId, $iStart, $iNum)) 
+    	{
+        	while ($record = mysqli_fetch_assoc($result)) 
+        	{
+				_echoCalibrationHistoryItem($fPosition, $ref, $record, $iMultiplier);
+        	}
+        	mysqli_free_result($result);
+    	}
+    	EchoTableParagraphEnd($strMenuLink);
+	}
 }
 
 ?>

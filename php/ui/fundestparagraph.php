@@ -114,9 +114,11 @@ function _echoFundEstParagraph($arColumn, $bFair, $arRef, $str, $bWide = false)
 		}
 	}
 	
-	EchoTableParagraphBegin($arColumn, 'estimation', $str);
-    foreach ($arRef as $ref)		_echoFundEstTableItem($ref, $bFair, $bWide);
-    EchoTableParagraphEnd();
+	if (EchoTableParagraphBegin($arColumn, 'estimation', $str))
+	{
+	    foreach ($arRef as $ref)		_echoFundEstTableItem($ref, $bFair, $bWide);
+    	EchoTableParagraphEnd();
+	}	
 }
 
 function EchoFundArrayEstParagraph($arRef, $str = false, $bWide = false)

@@ -89,7 +89,7 @@ function _getSmaParagraphWarning($ref)
 			if (abs($fDiff) > 0.0005)
 			{
 				$strSymbol = $ref->GetSymbol();
-				$str = '<br />'.GetFontElement($strSymbol.' '.$record['date'].'收盘价冲突：').$record['adjclose'].' - '.$ref->GetPrevPrice().' = '.number_format($fDiff, 6);
+				$str = GetHtmlNewLine().GetFontElement($strSymbol.' '.$record['date'].'收盘价冲突：').$record['adjclose'].' - '.$ref->GetPrevPrice().' = '.number_format($fDiff, 6);
 				if (DebugIsAdmin())
 				{
 					$str .= ' '.GetStockOptionLink(STOCK_OPTION_CLOSE, $strSymbol);
@@ -127,13 +127,15 @@ function EchoSmaParagraph($ref, $str = false, $cb_ref = false, $callback = false
     }
     if ($callback2)	$ar[] = new TableColumn(call_user_func($callback2), 90);
 
-	EchoTableParagraphBegin($ar, 'smatable', $str);
-    foreach ($his->GetSMA() as $strKey => $strVal)
-    {
-        _echoSmaTableItem($his, $strKey, $strVal, $cb_ref, $callback, $callback2, $his->GetColor($strKey), $bAfterHour);
-    }
-    $str = DebugIsAdmin() ? implode(', ', $his->GetOrderArray()) : '';
-    EchoTableParagraphEnd($str);
+	if (EchoTableParagraphBegin($ar, 'smatable', $str))
+	{
+	    foreach ($his->GetSMA() as $strKey => $strVal)
+    	{
+        	_echoSmaTableItem($his, $strKey, $strVal, $cb_ref, $callback, $callback2, $his->GetColor($strKey), $bAfterHour);
+    	}
+    	$str = DebugIsAdmin() ? implode(', ', $his->GetOrderArray()) : '';
+    	EchoTableParagraphEnd($str);
+	}
 }
 
 function _callbackQdiiSma($qdii_ref, $strEst = false)

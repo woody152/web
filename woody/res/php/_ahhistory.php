@@ -38,29 +38,35 @@ function _echoAhHistoryParagraph($ref, $h_ref, $iStart, $iNum, $bAdmin)
 
 	$cny_ref = $ref->GetCnyRef();
 	$ah_col = new TableColumnRatio('A/H');
-	EchoTableParagraphBegin(array(new TableColumnDate(),
-								   new TableColumnStock($cny_ref),
-								   new TableColumnStock($ref),
-								   new TableColumnStock($h_ref),
-								   $ah_col,
-								   new TableColumnRatio('H/A')
-								   ), $strSymbol.'ahhistory', $str);
-
-   	$csv = new PageCsvFile();
-	if ($result = $his_sql->GetAll($strStockId, $iStart, $iNum)) 
-    {
-        while ($record = mysqli_fetch_assoc($result))		_echoAhHistoryItem($csv, $ref, $h_ref, $cny_ref, $record);
-        mysqli_free_result($result);
-    }
-    $csv->Close();
+	
+	if (EchoTableParagraphBegin(array(new TableColumnDate(),
+									  new TableColumnStock($cny_ref),
+									  new TableColumnStock($ref),
+									  new TableColumnStock($h_ref),
+									  $ah_col,
+									  new TableColumnRatio('H/A')
+									 ), $strSymbol.'ahhistory', $str))
+	{
+	   	$csv = new PageCsvFile();
+		if ($result = $his_sql->GetAll($strStockId, $iStart, $iNum)) 
+    	{
+        	while ($record = mysqli_fetch_assoc($result))		_echoAhHistoryItem($csv, $ref, $h_ref, $cny_ref, $record);
+        	mysqli_free_result($result);
+    	}
+    	$csv->Close();
     
-    $str = $strMenuLink;
-    if ($csv->HasFile())
-    {
-    	$jpg = new DateImageFile();
-    	if ($jpg->Draw($csv->ReadColumn(4), $csv->ReadColumn(1)))		$str .= '<br />'.$csv->GetLink().'<br />'.$jpg->GetAll($ah_col->GetDisplay(), $strSymbol);
-    }
-    EchoTableParagraphEnd($str);
+    	$str = $strMenuLink;
+    	if ($csv->HasFile())
+    	{
+			$strNewLine = GetHtmlNewLine();
+    		$jpg = new DateImageFile();
+    		if ($jpg->Draw($csv->ReadColumn(4), $csv->ReadColumn(1)))
+			{
+				$str .= $strNewLine.$csv->GetLink().$strNewLine.$jpg->GetAll($ah_col->GetDisplay(), $strSymbol);
+			}
+    	}
+    	EchoTableParagraphEnd($str);
+	}
 }
 
 function EchoAll()

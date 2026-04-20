@@ -95,17 +95,22 @@
 
 function SzseGetLofShares($ref)
 {
-	if ($ref->IsShenZhenLof() == false)					return;				// Only works for Shenzhen Lof
+	if ($ref->IsShenZhenLof() == false)				return;				// Only works for Shenzhen Lof
 	
 	$sql = new SharesHistorySql();
 	$strDate = $ref->GetDate();
 	$strStockId = $ref->GetStockId();
 	if ($sql->GetRecord($strStockId, $strDate))		return;				// Already has today's data
-	if ($ref->GetHourMinute() < 915)						return;				// Data not updated until 9:15
+	if ($ref->GetHourMinute() < 915)				return;				// Data not updated until 9:15
 	
+
+	$strFileName = DebugGetPathName('debugszse.txt');
+	if (StockNeedFile($strFileName) == false)		return;				// pause 1 minute after curl error response
 //    date_default_timezone_set('PRC');
 	$ref->SetTimeZone();
-	if ($ar = StockDebugJson(DebugGetSymbolFile('szse', $ref->GetSymbol()), GetSzseUrl().'api/report/ShowReport/data?SHOWTYPE=JSON&CATALOGID=1945_LOF&txtQueryKeyAndJC='.$ref->GetDigitA(), 20 * SECONDS_IN_MIN))	
+	if ($ar = StockDebugJson(DebugGetSymbolFile('szse', $ref->GetSymbol()),
+							 GetSzseUrl().'api/report/ShowReport/data?SHOWTYPE=JSON&CATALOGID=1945_LOF&txtQueryKeyAndJC='.$ref->GetDigitA(),
+							 20 * SECONDS_IN_MIN, false, $strFileName))	
 	{
 		$ar0 = $ar[0];
 		if (isset($ar0['metadata']))

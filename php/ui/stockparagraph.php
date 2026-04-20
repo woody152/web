@@ -34,10 +34,12 @@ function EchoStockParagraph($iStart, $iNum, $bAdmin)
 	{
 		$ar[] = new TableColumn('', 270);
 	}
-	EchoTableParagraphBegin($ar, 'stock', $strMenuLink);
 
-	_echoStockTableData($sql, $iStart, $iNum, $bAdmin);
-    EchoTableParagraphEnd($strMenuLink);
+	if (EchoTableParagraphBegin($ar, 'stock', $strMenuLink))
+	{
+		_echoStockTableData($sql, $iStart, $iNum, $bAdmin);
+    	EchoTableParagraphEnd($strMenuLink);
+	}
 }
 
 ?>

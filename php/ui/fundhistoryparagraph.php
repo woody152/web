@@ -77,11 +77,16 @@ function _echoFundHistoryParagraph($ref, $est_ref, $csv, $iStart, $iNum, $bAdmin
 		$ar[] = new TableColumnError();
 		if ($est_ref)		$ar[] = RefGetTableColumnNetValue($est_ref);
 	}
-	else	$fund_est_sql = false;
+	else
+	{
+		$fund_est_sql = false;
+	}
 	
-	EchoTableParagraphBegin($ar, $strSymbol.'fundhistory', $str.' '.$strMenuLink);
-	_echoHistoryTableData($his_sql, $fund_est_sql, $csv, $ref, $strStockId, $est_ref, $iStart, $iNum, $bAdmin);
-    EchoTableParagraphEnd($strMenuLink);
+	if (EchoTableParagraphBegin($ar, $strSymbol.'fundhistory', $str.' '.$strMenuLink))
+	{
+		_echoHistoryTableData($his_sql, $fund_est_sql, $csv, $ref, $strStockId, $est_ref, $iStart, $iNum, $bAdmin);
+    	EchoTableParagraphEnd($strMenuLink);
+	}
 }
 
 function EchoFundHistoryParagraph($ref, $csv = false, $iStart = 0, $iNum = TABLE_COMMON_DISPLAY, $bAdmin = false)

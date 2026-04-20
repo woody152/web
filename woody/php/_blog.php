@@ -6,7 +6,7 @@ function GetBlogYearTags()
 	$ar = array();
 	foreach (GetBlogPhotoYears() as $iYear)
 	{
-		$ar[$iYear] = '<br />'.GetRemarkElement(GetNameTag(strval($iYear)));
+		$ar[$iYear] = GetHtmlNewLine().GetRemarkElement(GetNameTag(strval($iYear)));
 	}
 	return $ar;
 }

@@ -84,9 +84,11 @@ function _echoTradingParagraph($str, $arColumn, $ref, $fEstPrice = false, $fEstP
 {
 	if (_checkTradingQuantity($ref))	return;
 
-	EchoTableParagraphBegin($arColumn, 'trading', $str);
-    _echoTradingTableData($ref, $fEstPrice, $fEstPrice2, $fEstPrice3, $callback);
-    EchoTableParagraphEnd();
+	if (EchoTableParagraphBegin($arColumn, 'trading', $str))
+	{
+	    _echoTradingTableData($ref, $fEstPrice, $fEstPrice2, $fEstPrice3, $callback);
+    	EchoTableParagraphEnd();
+	}
 }
 
 function _getTradingParagraphStr($ref, $arColumn)

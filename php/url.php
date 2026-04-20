@@ -75,12 +75,11 @@ function url_get_contents($strUrl, $arExtraHeaders = false, $strFileName = false
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
     }
     	
-    if (($img = curl_exec($ch)) == false)
+    if (($img = curl_exec($ch)) === false)
     {
     	DebugString($strUrl.'读取错误：'.curl_error($ch));
     	if ($strFileName)		file_put_contents($strFileName, $strUrl);
     }
-    curl_close($ch);
     return $img;
 }
 

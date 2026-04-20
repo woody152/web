@@ -38,18 +38,19 @@ function _echoFundListItem($ref, $sql, $last_sql, $callback)
 function EchoFundListParagraph($arRef, $callback = false)
 {
 	$str = GetFundListLink();
-	EchoTableParagraphBegin(array(new TableColumnSymbol(),
-								   new TableColumnSymbol('跟踪'),
-								   new TableColumnPosition(),
-								   new TableColumnCalibration(),
-								   new TableColumnDate(),
-								   ($callback ? new TableColumnHedge() : new TableColumn('参考值'))
-								   ), 'fundlist', $str);
-	
-	$sql = GetCalibrationSql();
-	$last_sql = new LastCalibrationSql();
-	foreach ($arRef as $ref)		_echoFundListItem($ref, $sql, $last_sql, $callback);
-    EchoTableParagraphEnd();
+	if (EchoTableParagraphBegin(array(new TableColumnSymbol(),
+									  new TableColumnSymbol('跟踪'),
+									  new TableColumnPosition(),
+									  new TableColumnCalibration(),
+									  new TableColumnDate(),
+									  ($callback ? new TableColumnHedge() : new TableColumn('参考值'))
+									 ), 'fundlist', $str))
+	{
+		$sql = GetCalibrationSql();
+		$last_sql = new LastCalibrationSql();
+		foreach ($arRef as $ref)		_echoFundListItem($ref, $sql, $last_sql, $callback);
+    	EchoTableParagraphEnd();
+	}							   
 }
 
 ?>

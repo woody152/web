@@ -140,20 +140,21 @@ function _echoPortfolioTableItem($trans)
 function EchoPortfolioParagraph($arTrans)
 {
 	$profit_col = new TableColumnProfit();
-	EchoTableParagraphBegin(array(new TableColumnSymbol(),
-								   $profit_col,
-								   new TableColumnHolding(),
-								   new TableColumnQuantity(),
-								   new TableColumnPrice('平均'),
-								   new TableColumnChange(),
-								   new TableColumnTest()
-								   ), 'myportfolio', '个股'.$profit_col->GetDisplay());
-
-	foreach ($arTrans as $trans)
+	if (EchoTableParagraphBegin(array(new TableColumnSymbol(),
+									  $profit_col,
+									  new TableColumnHolding(),
+									  new TableColumnQuantity(),
+									  new TableColumnPrice('平均'),
+									  new TableColumnChange(),
+									  new TableColumnTest()
+									 ), 'myportfolio', '个股'.$profit_col->GetDisplay()))
 	{
-		if ($trans->GetTotalRecords() > 0)	_echoPortfolioTableItem($trans);
-	}
-    EchoTableParagraphEnd();
+		foreach ($arTrans as $trans)
+		{
+			if ($trans->GetTotalRecords() > 0)	_echoPortfolioTableItem($trans);
+		}
+    	EchoTableParagraphEnd();
+	}								 
 }
 
 ?>

@@ -109,16 +109,17 @@ class BenfordImageFile extends PageImageFile
     
     function GetAll($strLine = '', $strCompare = false, $strCombine = false)
     {
+		$strNewLine = GetHtmlNewLine();
 		$str = $this->_getText($strLine, $this->strLineColor, $this->iTotal, $this->fP);
    		if ($strCompare)
    		{
-   			$str .= '<br />'.$this->_getText($strCompare, $this->strCompareColor, $this->iTotal2, $this->fP2);
+   			$str .= $strNewLine.$this->_getText($strCompare, $this->strCompareColor, $this->iTotal2, $this->fP2);
    			if ($strCombine)
    			{
-   				$str .= '<br />'.$this->_getText($strCombine, $this->strPixelColor, $this->iTotal3, $this->fP3);
+   				$str .= $strNewLine.$this->_getText($strCombine, $this->strPixelColor, $this->iTotal3, $this->fP3);
    			}
    		}
-    	$str .= '<br />'.$this->GetLink();
+    	$str .= $strNewLine.$this->GetLink();
     	return $str;
 	}
 }

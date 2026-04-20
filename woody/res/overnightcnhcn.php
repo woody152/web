@@ -148,9 +148,12 @@ function _echoOverNightCnhParagraph($strPage, $arSymbol, $strInput)
 				new TableColumnQuantity($strHint),
 				new TableColumnHedge());
 	$ar[] = new TableColumn($strHint.'对冲操作', TableColumnGetLastWidth($ar));
-	EchoTableParagraphBegin($ar, $strPage);
-	foreach ($arSymbol as $strSymbol)	_echoOverNightCnhItem($strSymbol, $strInput, $bSell);
-	EchoTableParagraphEnd();
+	
+	if (EchoTableParagraphBegin($ar, $strPage))
+	{
+		foreach ($arSymbol as $strSymbol)	_echoOverNightCnhItem($strSymbol, $strInput, $bSell);
+		EchoTableParagraphEnd();
+	}
 }               
 
 function _copyFutureLink($strQuery, $strFuture)

@@ -43,22 +43,23 @@ function _echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $fInput, $iNum, $
 
 function _echoFundPositionParagraph($strPage, $strLinks, $ref, $cny_ref, $est_ref, $strSymbol, $fInput, $iNum, $bAdmin)
 {
-	EchoTableParagraphBegin(GetNetValueTableColumn($est_ref, $cny_ref), $strPage, $strLinks);
-	
-	$csv = new PageCsvFile();
-	_echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $fInput, $iNum, $bAdmin);
-	$csv->Close();
-	
- 	$str = '';
-	if ($csv->HasFile())
+	if (EchoTableParagraphBegin(GetNetValueTableColumn($est_ref, $cny_ref), $strPage, $strLinks))
 	{
-		$jpg = new DateImageFile();
-		$strNewLine = GetHtmlNewLine();
+		$csv = new PageCsvFile();
+		_echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $fInput, $iNum, $bAdmin);
+		$csv->Close();
+	
+ 		$str = '';
+		if ($csv->HasFile())
+		{
+			$jpg = new DateImageFile();
+			$strNewLine = GetHtmlNewLine();
 		
-		$str = $strNewLine.$csv->GetLink();
-		if ($jpg->Draw($csv->ReadColumn(2), $csv->ReadColumn(1)))	$str .= $strNewLine.$jpg->GetAll(TableColumnGetPosition(), $strSymbol);
-   	}
-	EchoTableParagraphEnd($str);
+			$str = $strNewLine.$csv->GetLink();
+			if ($jpg->Draw($csv->ReadColumn(2), $csv->ReadColumn(1)))	$str .= $strNewLine.$jpg->GetAll(TableColumnGetPosition(), $strSymbol);
+   		}
+		EchoTableParagraphEnd($str);
+	}
 }
 
 function EchoAll()

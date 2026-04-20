@@ -193,10 +193,10 @@ function _changePassword($strPassword, $strPassword2)
 	$arErrMsg = array();	// Array to store validation errors
 
 	// Input Validations
-	if ($strPassword == '')							        $arErrMsg[] = ACCT_ERR_PASSWORD_INPUT;
-	else if (md5($strPassword) == $member['password'])    $arErrMsg[] = ACCT_ERR_PASSWORD_UNCHANGED;
-	if ($strPassword2 == '')						            $arErrMsg[] = ACCT_ERR_PASSWORD2_INPUT;
-	if ($strPassword != $strPassword2)                     $arErrMsg[] = ACCT_ERR_PASSWORD_MISMATCH;
+	if ($strPassword == '')							    $arErrMsg[] = ACCT_ERR_PASSWORD_INPUT;
+	else if (md5($strPassword) == $member['password'])	$arErrMsg[] = ACCT_ERR_PASSWORD_UNCHANGED;
+	if ($strPassword2 == '')						    $arErrMsg[] = ACCT_ERR_PASSWORD2_INPUT;
+	if ($strPassword != $strPassword2)                  $arErrMsg[] = ACCT_ERR_PASSWORD_MISMATCH;
 	if (EditEmailErrOcurred($arErrMsg))	return false;
 
 	if (SqlUpdatePasswordField($member['email'], $_POST['password']))
@@ -235,8 +235,9 @@ function _updateLoginEmail($strEmail)
 
 function _emailReport($strText, $strSubject, $strWho) 
 {
-	$str = $strWho.':<br />'.$strSubject;
-    if ($strText)		$str .= '<br />'.$strText;
+	$strNewLine = GetHtmlNewLine();
+	$str = $strWho.':'.$strNewLine.$strSubject;
+    if ($strText)		$str .= $strNewLine.$strText;
 	if (EmailHtml($strWho, $strSubject, $str) == false)
 	{
         DebugString('mail failed in _emailReport');
@@ -308,9 +309,9 @@ class _ProfileAccount extends CommentAccount
 		{
 			$arErrMsg[] = ACCT_ERR_EMAIL_INPUT;
 		}
-		if ($strPassword == '')					$arErrMsg[] = ACCT_ERR_PASSWORD_INPUT;
-		if ($strPassword2 == '')					$arErrMsg[] = ACCT_ERR_PASSWORD2_INPUT;
-		if ($strPassword != $strPassword2)    $arErrMsg[] = ACCT_ERR_PASSWORD_MISMATCH;
+		if ($strPassword == '')				$arErrMsg[] = ACCT_ERR_PASSWORD_INPUT;
+		if ($strPassword2 == '')			$arErrMsg[] = ACCT_ERR_PASSWORD2_INPUT;
+		if ($strPassword != $strPassword2)	$arErrMsg[] = ACCT_ERR_PASSWORD_MISMATCH;
 		if (EditEmailErrOcurred($arErrMsg))	return false;
 
 		if (!SqlInsertMember($strEmail, $_POST['password']))

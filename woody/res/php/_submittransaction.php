@@ -79,19 +79,21 @@ function _debugStockTransaction($strStockId, $strGroupId, $strQuantity, $strPric
 {
 	if (strlen($strRemark) == 0)	return;
 	
+	$strNewLine = GetHtmlNewLine();
+
 	$str = $_POST['submit'];
-    $str .= '<br />Symbol: '._getStockTransactionLink($strGroupId, $strStockId); 
-    $str .= '<br />Quantity: '.$strQuantity; 
-    $str .= '<br />Price: '.$strPrice; 
-    $str .= '<br />Cost: '.$strCost; 
-    $str .= '<br />Remark: '.$strRemark; 
+    $str .= $strNewLine.'Symbol: '._getStockTransactionLink($strGroupId, $strStockId); 
+    $str .= $strNewLine.'Quantity: '.$strQuantity; 
+    $str .= $strNewLine.'Price: '.$strPrice; 
+    $str .= $strNewLine.'Cost: '.$strCost; 
+    $str .= $strNewLine.'Remark: '.$strRemark; 
     trigger_error($str); 
 }
 
 function _debugFundPurchase($strGroupId, $strFundId)
 {
 	$str = 'Arbitrage Fund Purchase';
-    $str .= '<br />Fund: '._getStockTransactionLink($strGroupId, $strFundId); 
+    $str .= GetHtmlNewLine().'Fund: '._getStockTransactionLink($strGroupId, $strFundId); 
     trigger_error($str); 
 }
 

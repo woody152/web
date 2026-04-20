@@ -4,10 +4,12 @@ require_once('stockbot.php');
 
 function _wxDebug($strUserName, $strText, $strSubject)
 {   
+	$strNewLine = GetHtmlNewLine();
+
 	$str = GetInfoElement('用户：').$strUserName;
-	$str .= '<br />'.$strText;
-	$str .= '<br />'.GetWeixinLink();
-    trigger_error($strSubject.'<br />'.$str);
+	$str .= $strNewLine.$strText;
+	$str .= $strNewLine.GetWeixinLink();
+    trigger_error($strSubject.$strNewLine.$str);
 }
 
 function _wxEmailInfo()

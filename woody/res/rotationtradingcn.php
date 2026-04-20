@@ -45,9 +45,12 @@ function _echoRotationTradingParagraph($strPage, $arRotationRef, $fEstQuantity, 
 				new TableColumnHedge(),
 				new TableColumnQuantity($strHedgeSymbol),
 				new TableColumnPremium());
-	EchoTableParagraphBegin($ar, $strPage);
-	foreach ($arRotationRef as $rotation_ref)	_echoRotationTradingItem($rotation_ref, $fEstQuantity, $bRotationSell);
-	EchoTableParagraphEnd();
+	
+	if (EchoTableParagraphBegin($ar, $strPage))
+	{
+		foreach ($arRotationRef as $rotation_ref)	_echoRotationTradingItem($rotation_ref, $fEstQuantity, $bRotationSell);
+		EchoTableParagraphEnd();
+	}
 }
 
 function _getRotationSymbolArray($strSymbol)

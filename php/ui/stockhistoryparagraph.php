@@ -70,10 +70,12 @@ function EchoStockHistoryParagraph($ref, $compare_ref = false, $forex_ref = fals
     	if ($forex_ref)	$ar[] = new TableColumnStock($forex_ref);
     	$ar[] = new TableColumnRatio();
     }
-	EchoTableParagraphBegin($ar, $strSymbol.'stockhistory', $str.'<br />'.$strMenuLink);
-   
-    _echoStockHistoryData($ref, $compare_ref, $forex_ref, $csv, $his_sql, $strStockId, $iStart, $iNum, $bAdmin);
-    EchoTableParagraphEnd($strMenuLink);
+
+	if (EchoTableParagraphBegin($ar, $strSymbol.'stockhistory', $str.GetHtmlNewLine().$strMenuLink))
+	{
+		_echoStockHistoryData($ref, $compare_ref, $forex_ref, $csv, $his_sql, $strStockId, $iStart, $iNum, $bAdmin);
+    	EchoTableParagraphEnd($strMenuLink);
+	}
 }
 
 ?>

@@ -96,7 +96,11 @@ function EchoTableParagraphBegin($ar, $strId, $str = '')
 {
 	$iTotal = TableColumnGetTotalWidth($ar);
     $strWidth = strval($iTotal);
-	if (!$_SESSION['mobile'] && $iTotal > LayoutGetDisplayWidth())	trigger_error('Table too wide: '.$strWidth);
+	if (!$_SESSION['mobile'] && $iTotal > LayoutGetDisplayWidth())
+	{
+		trigger_error('Table too wide: '.$strWidth);
+		return false;
+	}
 	
     $strColumn = '';
 	foreach ($ar as $col)
@@ -112,6 +116,8 @@ function EchoTableParagraphBegin($ar, $strId, $str = '')
         	$strColumn
         	<tbody>
 END;
+
+	return true;
 }
 
 function SelectColumnItem($strDisplay, $strLink, $strId, &$arId)

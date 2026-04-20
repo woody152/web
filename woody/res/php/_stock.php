@@ -10,19 +10,6 @@ require_once('_edittransactionform.php');
 require_once('_stocklink.php');
 
 // ****************************** Money table *******************************************************
-function _EchoMoneyParagraphBegin()
-{
-	$strMoney = '单一货币';
-	$profit_col = new TableColumnProfit();
-	EchoTableParagraphBegin(array(new TableColumnGroupName(),
-								   new TableColumnProfit(DISP_ALL_CN),
-								   new TableColumnHolding(DISP_ALL_CN),
-								   new TableColumnProfit($strMoney),
-								   new TableColumnHolding($strMoney),
-								   new TableColumnTest()
-								   ), 'money', GetMyStockGroupLink().$profit_col->GetDisplay());
-}
-
 function _echoMoneyItem($strGroup, $fValue, $fProfit, $fConvertValue, $fConvertProfit)
 {
 	global $acct;
@@ -103,11 +90,11 @@ function _EchoMoneyGroupData($acct, $group, $strUSDCNY, $strHKDCNY)
     }
 }
 
-function StockSaveDebugFile($strPathName, $strUrl, $iInterval = SECONDS_IN_MIN, $arExtraHeaders = false)
+function StockSaveDebugFile($strPathName, $strUrl, $iInterval = SECONDS_IN_MIN, $arExtraHeaders = false, $strFileName = false)
 {
 	if (StockNeedFile($strPathName, $iInterval) == false)	return false; 	// do not update too often
 	
-	if ($str = url_get_contents($strUrl, $arExtraHeaders))
+	if ($str = url_get_contents($strUrl, $arExtraHeaders, $strFileName))
 	{
 		file_put_contents($strPathName, $str);
 		DebugString($strUrl.' saved to '.basename($strPathName));
@@ -119,18 +106,18 @@ function StockSaveDebugFile($strPathName, $strUrl, $iInterval = SECONDS_IN_MIN, 
 	return false;
 }
 
-function StockDebugJson($strPathName, $strUrl, $iInterval = SECONDS_IN_MIN, $arExtraHeaders = false)
+function StockDebugJson($strPathName, $strUrl, $iInterval = SECONDS_IN_MIN, $arExtraHeaders = false, $strFileName = false)
 {
-	if ($str = StockSaveDebugFile($strPathName, $strUrl, $iInterval, $arExtraHeaders))
+	if ($str = StockSaveDebugFile($strPathName, $strUrl, $iInterval, $arExtraHeaders, $strFileName))
 	{
 		return json_decode($str, true);
 	}
 	return false;
 }
 
-function StockDebugXml($strPathName, $strUrl, $iInterval = SECONDS_IN_MIN, $arExtraHeaders = false)
+function StockDebugXml($strPathName, $strUrl, $iInterval = SECONDS_IN_MIN, $arExtraHeaders = false, $strFileName = false)
 {
-	if ($str = StockSaveDebugFile($strPathName, $strUrl, $iInterval, $arExtraHeaders))
+	if ($str = StockSaveDebugFile($strPathName, $strUrl, $iInterval, $arExtraHeaders, $strFileName))
 	{
 		return simplexml_load_string($str);
 	}

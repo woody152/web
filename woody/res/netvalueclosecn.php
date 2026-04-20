@@ -27,7 +27,7 @@ function _echoNetValueCloseGraph($csv)
     if ($jpg->Draw($csv->ReadColumn(1), $csv->ReadColumn(2)))
     {
     	$str = $csv->GetLink();
-    	$str .= '<br />'.$jpg->GetAllLinks();
+    	$str .= GetHtmlNewLine().$jpg->GetAllLinks();
     	EchoHtmlElement($str);
     }
 }
@@ -41,10 +41,14 @@ function EchoAll()
    		$strSymbol = $ref->GetSymbol();
    		$strLinks = GetFundLinks($strSymbol);
    		$strLinks .= ' '.GetEtfNetValueLink($strSymbol);
-   		if ($acct->IsAdmin())	$strLinks .= '<br />'.StockGetAllLink($strSymbol).' '.GetOnClickLink(PATH_STOCK.'submitnetvalue.php?symbol='.$strSymbol, '确认更新'.$strSymbol.NETVALUE_HISTORY_DISPLAY.'？', '更新'.STOCK_DISP_NETVALUE);
-    		
+   		if ($acct->IsAdmin())
+		{
+			$strLinks .= GetHtmlNewLine().StockGetAllLink($strSymbol).' ';
+			$strLinks .= GetOnClickLink(PATH_STOCK.'submitnetvalue.php?symbol='.$strSymbol, '确认更新'.$strSymbol.NETVALUE_HISTORY_DISPLAY.'？', '更新'.STOCK_DISP_NETVALUE);
+		}
+
    		$csv = new PageCsvFile();
-		EchoNetValueCloseParagraph($ref, $strLinks.'<br />', $csv, $acct->GetStart(), $acct->GetNum());
+		EchoNetValueCloseParagraph($ref, $strLinks.GetHtmlNewLine(), $csv, $acct->GetStart(), $acct->GetNum());
 		$csv->Close();
 
 		if ($csv->HasFile())

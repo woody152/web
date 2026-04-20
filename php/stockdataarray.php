@@ -21,10 +21,16 @@ function _addIndexArray(&$ar, $strIndex, $strEtf, $strDate, $cal_sql)
 	}
 }
 
-function GetStockDataArray($strSymbols)
+function GetStockDataArray($strSymbols, $arRange = false)
 {
+	DebugString(__FUNCTION__.' '.$strSymbols);
+
 	InitGlobalStockSql();
     $arSymbol = GetInputSymbolArray(SqlCleanString($strSymbols));
+	if ($arRange)
+	{
+		$arSymbol = array_intersect($arRange, $arSymbol);
+	}
     StockPrefetchArrayExtendedData($arSymbol);
 	
 	$ar = array();
@@ -47,6 +53,7 @@ function GetStockDataArray($strSymbols)
 					$arData['date'] = $strDate;
 					$arData['netvalue'] = SqlGetNetValueByDate($strStockId, $strDate);
 				
+					//$strIndexId = false;
 					if (method_exists($fund_ref, 'GetEstRef'))
 					{
 						if ($est_ref = $fund_ref->GetEstRef())
@@ -57,6 +64,10 @@ function GetStockDataArray($strSymbols)
 								_addIndexArray($ar, $strIndex, $strEtf, $strDate, $cal_sql);
 								$strIndex = $strEtf;
 							}
+					/*		else
+							{
+								$strIndexId = $est_ref->GetStockId();
+							}*/
 						}
 					}
 					else
@@ -67,6 +78,12 @@ function GetStockDataArray($strSymbols)
 						}
 					}
 					$arData['symbol_hedge'] = $strIndex;
+					/*if ($strIndexId)
+					{
+						$net_sql = GetNetValueHistorySql();
+						$arData['netvalue_hedge'] = $net_sql->GetCloseNow($strIndexId);
+						$arData['date_hedge'] = $net_sql->GetDateNow($strIndexId);
+					}*/
 					$arData['hedge'] = strval(round(GetStockHedge($strSymbol, $strStockId), FLOAT_PRECISION));
 				}
 				else
@@ -96,7 +113,7 @@ function GetStockDataArray($strSymbols)
 		}
 		$ar[$strSymbol] = $arData;
     }
-//    DebugPrint($ar);
+    //DebugPrint($ar);
     return $ar;
 }
 

@@ -87,9 +87,11 @@ function _echoVisitorParagraph($strIp, $strId, $visitor_sql, $contents_sql, $iSt
     }
     
     $strMenuLink = GetMenuLink($strQuery, $iTotal, $iStart, $iNum, $bChinese);
-	EchoTableParagraphBegin($ar, $visitor_sql->GetTableName(), $strMenuLink.$str);
-    _echoVisitorData($strId, $visitor_sql, $contents_sql, $iStart, $iNum, $bChinese);
-    EchoTableParagraphEnd($strMenuLink);
+	if (EchoTableParagraphBegin($ar, $visitor_sql->GetTableName(), $strMenuLink.$str))
+    {
+        _echoVisitorData($strId, $visitor_sql, $contents_sql, $iStart, $iNum, $bChinese);
+        EchoTableParagraphEnd($strMenuLink);
+    }
 }
 
 function EchoAll($bChinese = true)
@@ -118,7 +120,7 @@ function EchoAll($bChinese = true)
         $str = $acct->IpLookupString($strIp, $bChinese);
         $strId = GetIpId($strIp);
         $iPageCount = $visitor_sql->CountUniqueDst($strId);
-        if ($iPageCount > 0)		$str .= '<br />'.($bChinese ? '保存的不同页面数量' : 'Saved unique page number').': '.strval($iPageCount);
+        if ($iPageCount > 0)		$str .= GetHtmlNewLine().($bChinese ? '保存的不同页面数量' : 'Saved unique page number').': '.strval($iPageCount);
     }
     else
     {

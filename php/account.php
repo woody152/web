@@ -55,7 +55,7 @@ class Account
 	    else if ($this->IsCrawler($strIp))
 	    {
 			if ($this->_allowCrawler($ymd, $tick_sql, $strIp))	$this->bAllowCurl = false;
-			else																		SwitchToLink('/account/code429.php');
+			else												SwitchToLink('/account/code429.php');
 	    }
 
 	    $strUri = UrlGetUri();
@@ -70,8 +70,9 @@ class Account
 	    if ($iCount >= 1000)
 	    {
 	    	$iPageCount = $this->visitor_sql->CountUniqueDst($strId);
-	    	$strDebug = '访问次数: '.strval($iCount).'<br />不同页面数: '.strval($iPageCount).'<br />';
-	    	if ($this->GetLoginId())						$strDebug .= 'logined!<br />';
+			$strNewLine = GetHtmlNewLine();
+	    	$strDebug = '访问次数: '.strval($iCount).$strNewLine.'不同页面数: '.strval($iPageCount).$strNewLine;
+	    	if ($this->GetLoginId())					$strDebug .= 'logined!'.$strNewLine;
 	    	if ($this->bAllowCurl === false)
 	    	{
 	    		$strDebug .= '已标注的老爬虫';

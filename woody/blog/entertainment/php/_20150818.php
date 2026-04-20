@@ -368,11 +368,13 @@ function EchoPage20160818($strPage)
 END;
 
 	EchoFundArrayEstParagraph(array(_getDemoFundReference()));
-	EchoTableParagraphBegin(array(new TableColumn(STOCK_DISP_EST.'因素', 140), $offical_col, $fair_col, $realtime_col), 'estcompare');
-	EchoTableColumn(array('T日美股交易',		'XOP净值',	'XOP净值',	'XOP净值'));
-	EchoTableColumn(array('CL期货',			'否',		'否',		'是'));
-	EchoTableColumn(array('美元人民币中间价',	'T日',		'T/T+1日',	'T/T+1日'));
-    EchoTableParagraphEnd();
+	if (EchoTableParagraphBegin(array(new TableColumn(STOCK_DISP_EST.'因素', 140), $offical_col, $fair_col, $realtime_col), 'estcompare'))
+	{
+		EchoTableColumn(array('T日美股交易',		'XOP净值',	'XOP净值',	'XOP净值'));
+		EchoTableColumn(array('CL期货',			'否',		'否',		'是'));
+		EchoTableColumn(array('美元人民币中间价',	'T日',		'T/T+1日',	'T/T+1日'));
+	    EchoTableParagraphEnd();
+	}
 
     echo <<<END2
 <p>相对于{$strOfficalEst}，当美元人民币中间价波动比较大的时候{$strFairEst}就值得关注了，此外在A股或者美股休市的日子里, 它也比{$strOfficalEst}更能反映实际的净值。

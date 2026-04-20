@@ -42,12 +42,11 @@ function _echoFundPurchaseTableData($strMemberId, $bChinese)
 
 function EchoFundPurchaseParagraph($str, $strMemberId, $bChinese)
 {
-	EchoTableParagraphBegin(array(new TableColumnSymbol(),
-								   new TableColumnAmount()
-								   ), 'fund', $str);
-
-	_echoFundPurchaseTableData($strMemberId, $bChinese);
-    EchoTableParagraphEnd();
+	if (EchoTableParagraphBegin(array(new TableColumnSymbol(), new TableColumnAmount()), 'fund', $str))
+	{
+		_echoFundPurchaseTableData($strMemberId, $bChinese);
+    	EchoTableParagraphEnd();
+	}
 }
 
 ?>

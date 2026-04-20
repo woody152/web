@@ -4,13 +4,15 @@ require_once('_editprofileform.php');
 
 function _onProfileChanged($strName, $strPhone, $strAddress, $strWeb, $strSignature, $strStatus)
 {
+	$strNewLine = GetHtmlNewLine();
+
     $str = 'Profile Changed';
-    $str .= '<br />Name: '.$strName; 
-    $str .= '<br />Phone: '.$strPhone; 
-    $str .= '<br />Address: '.$strAddress; 
-    $str .= '<br />Web: '.$strWeb; 
-    $str .= '<br />Signature: '.$strSignature; 
-    $str .= '<br />Status: '.$strStatus; 
+    $str .= $strNewLine.'Name: '.$strName; 
+    $str .= $strNewLine.'Phone: '.$strPhone; 
+    $str .= $strNewLine.'Address: '.$strAddress; 
+    $str .= $strNewLine.'Web: '.$strWeb; 
+    $str .= $strNewLine.'Signature: '.$strSignature; 
+    $str .= $strNewLine.'Status: '.$strStatus; 
     trigger_error($str); 
 }
 

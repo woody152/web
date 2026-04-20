@@ -87,30 +87,33 @@ function EchoAll()
     		
 		    EchoHoldingsEstParagraph($ref);
     		EchoReferenceParagraph(array_merge(array($ref), RefSort($arHoldingRef)), $acct->IsAdmin());
-    		EchoTableParagraphBegin(array(new TableColumnSymbol(),
-										   new TableColumnPercentage('旧'),
-										   new TableColumnPrice('旧'),
-										   new TableColumnChange('此后'),
-										   new TableColumnPercentage('新'),
-										   new TableColumnPercentage('影响'),
-										   new TableColumn('汇率调整', 100)
-										   ), 'holdings', $str);
-			$arAdrhRef = array();
-			$arRatio = $ref->GetHoldingsRatioArray();
-			$fNetValueChange = $ref->GetNetValueChange();
-			$arHistory = $ref->GetHoldingDateHistory(GetStockHistorySql());
-			$fAdjustUSD = $ref->GetAdjustUSD();
-			$fAdjustHKD = $ref->GetAdjustHKD();
-			foreach ($arHoldingRef as $holding_ref)
+
+    		if (EchoTableParagraphBegin(array(new TableColumnSymbol(),
+											  new TableColumnPercentage('旧'),
+											  new TableColumnPrice('旧'),
+											  new TableColumnChange('此后'),
+											  new TableColumnPercentage('新'),
+											  new TableColumnPercentage('影响'),
+											  new TableColumn('汇率调整', 100)
+											 ), 'holdings', $str))
 			{
-				_echoHoldingItem($holding_ref, $arRatio, $fNetValueChange, $arHistory, RefAdjustForex($holding_ref, $fAdjustHKD, $fAdjustUSD));
-				if ($holding_ref->IsSymbolH())
+				$arAdrhRef = array();
+				$arRatio = $ref->GetHoldingsRatioArray();
+				$fNetValueChange = $ref->GetNetValueChange();
+				$arHistory = $ref->GetHoldingDateHistory(GetStockHistorySql());
+				$fAdjustUSD = $ref->GetAdjustUSD();
+				$fAdjustHKD = $ref->GetAdjustHKD();
+				foreach ($arHoldingRef as $holding_ref)
 				{
-					if ($strAdrSymbol = SqlGetHadrPair($holding_ref->GetSymbol()))	$arAdrhRef[] = new AdrPairReference($strAdrSymbol);	
+					_echoHoldingItem($holding_ref, $arRatio, $fNetValueChange, $arHistory, RefAdjustForex($holding_ref, $fAdjustHKD, $fAdjustUSD));
+					if ($holding_ref->IsSymbolH())
+					{
+						if ($strAdrSymbol = SqlGetHadrPair($holding_ref->GetSymbol()))	$arAdrhRef[] = new AdrPairReference($strAdrSymbol);	
+					}
 				}
+				_echoHoldingItem(false, $arRatio, $fNetValueChange, $arHistory, RefAdjustForex($ref, $fAdjustHKD, $fAdjustUSD));
+				EchoTableParagraphEnd();
 			}
-			_echoHoldingItem(false, $arRatio, $fNetValueChange, $arHistory, RefAdjustForex($ref, $fAdjustHKD, $fAdjustUSD));
-			EchoTableParagraphEnd();
 			
 			EchoAdrhParagraph($arAdrhRef, LayoutUseWide());
 		}

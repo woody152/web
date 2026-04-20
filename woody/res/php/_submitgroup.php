@@ -42,9 +42,11 @@ class _SubmitGroupAccount extends StockAccount
     
     function _debugStockGroup($strGroupId, $strSymbols)
     {
+		$strNewLine = GetHtmlNewLine();
+
     	$str = 'Stock Group: '.$_POST['submit'];
-    	$str .= '<br />GroupName: '.$this->GetGroupLink($strGroupId); 
-    	$str .= '<br />Symbols: '.$strSymbols; 
+    	$str .= $strNewLine.'GroupName: '.$this->GetGroupLink($strGroupId); 
+    	$str .= $strNewLine.'Symbols: '.$strSymbols; 
     	trigger_error($str); 
     }
 

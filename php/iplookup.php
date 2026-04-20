@@ -66,29 +66,31 @@ class IpLookupAccount extends CommentAccount
 	    $iTotal = $this->CountComments($strWhere);
 	    if ($iTotal == 0)   return '';
         
-	    $str = '<br />';
+		$strNewLine = GetHtmlNewLine();
+	    $str = $strNewLine;
 	    if ($result = $comment_sql->GetAll($strWhere, 0, MAX_COMMENT_DISPLAY)) 
 	    {
 	    	while ($record = mysqli_fetch_assoc($result)) 
 	    	{
-	    		$str .= '<br />'.$this->GetCommentDescription($record, $strWhere, $bChinese);
+	    		$str .= $strNewLine.$this->GetCommentDescription($record, $strWhere, $bChinese);
 	    	}
 	    	mysqli_free_result($result);
 	    }
-	    $str .= '<br />'.strval($iTotal).' '.GetAllCommentLink('ip='.$strIp, $bChinese).'<br />';
+	    $str .= $strNewLine.strval($iTotal).' '.GetAllCommentLink('ip='.$strIp, $bChinese).$strNewLine;
 	    return $str;
 	}
 
 	function _visitorLookup($strIp, $bChinese)
 	{
+		$strNewLine = GetHtmlNewLine();
 		$str = '';
 		$visitor_sql = $this->GetVisitorSql();
 		$iVisit = $visitor_sql->CountBySrc(GetIpId($strIp));
 		if ($iStored = $this->GetVisit($strIp))		$iVisit += $iStored;
-		if ($iVisit > 0)								$str .= '<br />'.($bChinese ? '普通网页总访问次数' : 'Total normal page visit').': '.strval($iVisit);
-		if ($iLogin = $this->GetLogin($strIp))		$str .= '<br />'.($bChinese ? '总登录次数' : 'Total login').': '.strval($iLogin);
-	    if ($this->IsMalicious($strIp))				$str .= '<br />'.GetFontElement($bChinese ? '已标注恶意IP' : 'Marked malicious IP');
-		if ($this->IsCrawler($strIp))				$str .= '<br />'.GetRemarkElement($bChinese ? '已标注爬虫' : 'Marked crawler');
+		if ($iVisit > 0)							$str .= $strNewLine.($bChinese ? '普通网页总访问次数' : 'Total normal page visit').': '.strval($iVisit);
+		if ($iLogin = $this->GetLogin($strIp))		$str .= $strNewLine.($bChinese ? '总登录次数' : 'Total login').': '.strval($iLogin);
+	    if ($this->IsMalicious($strIp))				$str .= $strNewLine.GetFontElement($bChinese ? '已标注恶意IP' : 'Marked malicious IP');
+		if ($this->IsCrawler($strIp))				$str .= $strNewLine.GetRemarkElement($bChinese ? '已标注爬虫' : 'Marked crawler');
 		return $str;
 	}
 
@@ -97,7 +99,8 @@ class IpLookupAccount extends CommentAccount
     	$fStart = microtime(true);
     	$str = GetVisitorLink($strIp, $bChinese).' '.GetAllVisitorLink(TABLE_VISITOR, $bChinese);
     	if ($this->IsAdmin())		$str .= ' '.GetAllVisitorLink(TABLE_TELEGRAM_BOT, $bChinese).' '.GetAllVisitorLink(TABLE_WECHAT_BOT, $bChinese);
-    	$str .= '<br />'.GetExternalLink(_getIpInfoIpLookUpUrl($strIp), 'ipinfo.io').': ';
+		$strNewLine = GetHtmlNewLine();
+    	$str .= $strNewLine.GetExternalLink(_getIpInfoIpLookUpUrl($strIp), 'ipinfo.io').': ';
     	if ($arInfo = $this->_ipInfoLookUp($strIp))
     	{
     		if (isset($arInfo['error']) == false)
@@ -109,7 +112,7 @@ class IpLookupAccount extends CommentAccount
     	}
     	$str .= DebugGetStopWatchDisplay($fStart);
     
-    	$str .= _ipLookupMemberTable($strIp, '<br />', $bChinese);		// Search member login
+    	$str .= _ipLookupMemberTable($strIp, $strNewLine, $bChinese);		// Search member login
     	$str .= $this->_pageCommentLookup($strIp, $bChinese);  		// Search blog comment
     	$str .= $this->_visitorLookup($strIp, $bChinese);
     	return $str;

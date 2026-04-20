@@ -127,16 +127,18 @@ function EchoTransactionParagraph($acct, $strGroupId, $ref = false, $bAll = true
         $strMenuLink = '';
     }
 
-	EchoTableParagraphBegin(array(new TableColumnDate(),
-								   new TableColumnSymbol(),
-								   new TableColumnQuantity(),
-								   new TableColumnPrice(),
-								   new TableColumn('费用', 60),
-								   new TableColumnRemark(),
-								   new TableColumn('操作')
-								   ), 'transaction', $str);
-    _echoTransactionTableData($sql, $ref, $iStart, $iNum, $acct->IsGroupReadOnly($strGroupId), $acct->IsAdmin());
-    EchoTableParagraphEnd($strMenuLink);
+	if (EchoTableParagraphBegin(array(new TableColumnDate(),
+									  new TableColumnSymbol(),
+									  new TableColumnQuantity(),
+									  new TableColumnPrice(),
+									  new TableColumn('费用', 60),
+									  new TableColumnRemark(),
+									  new TableColumn('操作')
+									 ), 'transaction', $str))
+	{
+	    _echoTransactionTableData($sql, $ref, $iStart, $iNum, $acct->IsGroupReadOnly($strGroupId), $acct->IsAdmin());
+    	EchoTableParagraphEnd($strMenuLink);
+	}
 }
 
 ?>

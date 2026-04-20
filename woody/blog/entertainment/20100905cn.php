@@ -20,16 +20,18 @@ function _getAccountToolTag($strItem)
 
 function _echo20100905()
 {
+	$strNewLine = GetHtmlNewLine();
+
 	$strAR1688 = GetInternalLink('/ar1688/indexcn.html', 'AR1688');
 	$strYahoo = GetInternalLink('/res/translationcn.html#webhosting', 'Yahoo网站服务');
 	$strPA6488 = GetInternalLink('/pa6488/indexcn.html', 'PA6488');
 	$strCamMan = GetInternalLink('/pa6488/software/cammancn.html', 'CamMan');
 	$strImage = ImgPhpBest();
 	$strQuote = GetBlockquoteElement('女神：你能让这个论坛的人都吵起来，我今晚就跟你走。'
-										.'<br />程序猿：PHP是世界上最好的编程语言！'
-										.'<br />论坛炸锅了，各种吵架。'
-										.'<br />女神：服了你了，我们走吧，你想干啥都行。'
-										.'<br />程序猿：今天不行，我一定要说服他们，PHP是世界上最好的编程语言。');
+									 .$strNewLine.'程序猿：PHP是世界上最好的编程语言！'
+									 .$strNewLine.'论坛炸锅了，各种吵架。'
+									 .$strNewLine.'女神：服了你了，我们走吧，你想干啥都行。'
+									 .$strNewLine.'程序猿：今天不行，我一定要说服他们，PHP是世界上最好的编程语言。');
 	
 	EchoBlogDate();
     echo <<<END

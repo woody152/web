@@ -50,35 +50,36 @@ function _transEchoReferenceParagraph($arTrans, $bAdmin)
 
 function _echoMergeParagraph($arMerge)
 {
-	EchoTableParagraphBegin(array(new TableColumnSymbol(),
-								  new TableColumnQuantity(),
-								  new TableColumnTest()
-								 ), 'merge', '合并'.TableColumnGetQuantity());
-
-	foreach ($arMerge as $strSymbol => $trans)
+	if (EchoTableParagraphBegin(array(new TableColumnSymbol(),
+									  new TableColumnQuantity(),
+									  new TableColumnTest()
+									 ), 'merge', '合并'.TableColumnGetQuantity()))
 	{
-		$iTotal = $trans->GetTotalShares();
-		if ($iTotal != 0)
+		foreach ($arMerge as $strSymbol => $trans)
 		{
-			$ar = array();
-		
-			$ref = $trans->GetRef();
-			$ar[] = RefGetMyStockLink($ref);
-			$ar[] = strval($iTotal);
-			switch ($strSymbol)
+			$iTotal = $trans->GetTotalShares();
+			if ($iTotal != 0)
 			{
-			case 'KWEB':
-				$ar[] = strval($iTotal - 200 + 00);
-				break;
+				$ar = array();
+		
+				$ref = $trans->GetRef();
+				$ar[] = RefGetMyStockLink($ref);
+				$ar[] = strval($iTotal);
+				switch ($strSymbol)
+				{
+				case 'KWEB':
+					$ar[] = strval($iTotal - 200 + 00);
+					break;
 
-			case 'XOP':
-				$ar[] = strval($iTotal - 00 - 00);
-				break;
+				case 'XOP':
+					$ar[] = strval($iTotal - 00 - 00);
+					break;
+				}
+				RefEchoTableColumn($ref, $ar);
 			}
-			RefEchoTableColumn($ref, $ar);
 		}
+    	EchoTableParagraphEnd();
 	}
-    EchoTableParagraphEnd();
 }
 
 function _transEchoMergeParagraph($arTrans)

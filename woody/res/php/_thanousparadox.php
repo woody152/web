@@ -29,7 +29,7 @@ function _echoThanousParadoxGraph($csv)
     if ($jpg->Draw($csv->ReadColumn(2), $csv->ReadColumn(1)))
     {
     	$str = $csv->GetLink();
-    	$str .= '<br />'.$jpg->GetAllLinks();
+    	$str .= GetHtmlNewLine().$jpg->GetAllLinks();
     	EchoHtmlElement($str);
     }
 }
@@ -88,20 +88,21 @@ function _echoThanousParadoxParagraph($strSymbol, $iStart, $iNum)
  	$strStockId = $ref->GetStockId();
 	$net_sql = GetNetValueHistorySql();
    	$strMenuLink = StockGetMenuLink($strSymbol, $net_sql->Count($strStockId), $iStart, $iNum);
-	$str .= ' '.$strMenuLink;
+	$str .= GetHtmlNewLine().$strMenuLink;
 
-	EchoTableParagraphBegin(array(new TableColumnDate(),
-								   new TableColumnPrice(),
-								   new TableColumnNetValue(),
-								   new TableColumnPremium('x'),
-								   new TableColumnStock($est_ref),
-								   new TableColumnChange('y')
-								   ), 'thanousparadox', $str);
-
-   	$csv = new PageCsvFile();
-	_echoThanousParadoxData($csv, $net_sql, $ref->GetStockRef(), $strStockId, $est_ref, $iStart, $iNum);
-    $csv->Close();
-    EchoTableParagraphEnd($strMenuLink);
+	if (EchoTableParagraphBegin(array(new TableColumnDate(),
+									  new TableColumnPrice(),
+									  new TableColumnNetValue(),
+									  new TableColumnPremium('x'),
+									  new TableColumnStock($est_ref),
+									  new TableColumnChange('y')
+									 ), 'thanousparadox', $str))
+	{
+	   	$csv = new PageCsvFile();
+		_echoThanousParadoxData($csv, $net_sql, $ref->GetStockRef(), $strStockId, $est_ref, $iStart, $iNum);
+    	$csv->Close();
+    	EchoTableParagraphEnd($strMenuLink);
+	}
 
 	if ($csv->HasFile())
 	{

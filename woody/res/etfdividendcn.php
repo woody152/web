@@ -29,13 +29,16 @@ function _EchoEtfDividendHistoryParagraph($ref, $bAdmin = false)
     $strSymbol = $ref->GetSymbol();
    	$str = GetFundLinks($strSymbol).' '.GetStockDividendLink($ref);
    	if ($bAdmin)	$str .= ' '.GetOnClickLink(PATH_STOCK.'submitdividend.php?symbol='.$strSymbol, '确认更新'.$strSymbol.ETF_DIVIDEND_DISPLAY.'？', '更新'.ETF_DIVIDEND_DISPLAY);
-	EchoTableParagraphBegin(array(new TableColumnDate(),
-								  new TableColumn(STOCK_OPTION_DIVIDEND),
-								   new TableColumnPrice(),
-								   new TableColumnPercentage()
-								   ), $strSymbol.'etfdividend', $str);
-    _echoEtfDividendData(new StockDividendSql(), GetStockHistorySql(), $ref);
-    EchoTableParagraphEnd();
+	
+	if (EchoTableParagraphBegin(array(new TableColumnDate(),
+									  new TableColumn(STOCK_OPTION_DIVIDEND),
+									  new TableColumnPrice(),
+									  new TableColumnPercentage()
+									 ), $strSymbol.'etfdividend', $str))
+	{
+	    _echoEtfDividendData(new StockDividendSql(), GetStockHistorySql(), $ref);
+    	EchoTableParagraphEnd();
+	}
 }                                               
 
 function EchoAll()

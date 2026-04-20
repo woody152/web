@@ -3,9 +3,11 @@ define('MAX_META_DESCRIPTION', 156);
 
 function _onMetaDescriptionWarning($iLen, $strType, $str)
 {
+	$strNewLine = GetHtmlNewLine();
+
     $strText = $strType.' Meta Description Warning';
-    $strText .= '<br />Length='.strval($iLen);
-    $strText .= '<br />'.$str;
+    $strText .= $strNewLine.'Length='.strval($iLen);
+    $strText .= $strNewLine.$str;
 	trigger_error($strText);
 }
 

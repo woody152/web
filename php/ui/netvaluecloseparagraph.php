@@ -50,16 +50,18 @@ function EchoNetValueCloseParagraph($ref, $str = false, $csv = false, $iStart = 
    	$strMenuLink = IsTableCommonDisplay($iStart, $iNum) ? '' : StockGetMenuLink($strSymbol, $his_sql->Count($strStockId), $iStart, $iNum);
    	if ($str == false)	$str = GetYahooNetValueLink($strSymbol).'的'.GetNetValueCloseLink($strSymbol);
 
-	EchoTableParagraphBegin(array(new TableColumnDate(),
-								   new TableColumnPrice(),
-								   new TableColumnNetValue(),
-								   new TableColumnPremium('y'),
-								   new TableColumnChange('x'),
-								   new TableColumnShare(),
-								   new TableColumnTurnover()
-								   ), $strSymbol.'netvalueclose', $str.' '.$strMenuLink);
-    _echoNetValueCloseData($his_sql, $ref, $strStockId, $csv, $iStart, $iNum);
-    EchoTableParagraphEnd($strMenuLink);
+	if (EchoTableParagraphBegin(array(new TableColumnDate(),
+									  new TableColumnPrice(),
+									  new TableColumnNetValue(),
+									  new TableColumnPremium('y'),
+									  new TableColumnChange('x'),
+									  new TableColumnShare(),
+									  new TableColumnTurnover()
+									 ), $strSymbol.'netvalueclose', $str.' '.$strMenuLink))
+	{
+	    _echoNetValueCloseData($his_sql, $ref, $strStockId, $csv, $iStart, $iNum);
+    	EchoTableParagraphEnd($strMenuLink);
+	}
 }
 
 ?>

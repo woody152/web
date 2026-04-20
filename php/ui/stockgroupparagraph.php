@@ -89,29 +89,29 @@ function _echoStockGroupTableData($acct, $strStockId, $strMemberId, $bAdmin)
 
 function EchoStockGroupParagraph($acct, $strGroupId = false, $strStockId = false)
 {
-	EchoTableParagraphBegin(array(new TableColumnGroupName(),
-								   new TableColumnSymbol(false, 450),
-								   new TableColumn()
-								   ), TABLE_STOCK_GROUP, GetMyStockGroupLink());
-
-
-	$bAdmin = $acct->IsAdmin();
-	if ($strGroupId)
+	if (EchoTableParagraphBegin(array(new TableColumnGroupName(),
+									  new TableColumnSymbol(false, 450),
+									  new TableColumn()
+									 ), TABLE_STOCK_GROUP, GetMyStockGroupLink()))
 	{
-		_echoStockGroupTableItem($strGroupId, $acct, $acct->IsGroupReadOnly($strGroupId), $bAdmin);
+		$bAdmin = $acct->IsAdmin();
+		if ($strGroupId)
+		{
+			_echoStockGroupTableItem($strGroupId, $acct, $acct->IsGroupReadOnly($strGroupId), $bAdmin);
+		}
+		else
+		{
+   			if ($strMemberId = $acct->GetMemberId())
+    		{
+    			_echoStockGroupTableData($acct, $strStockId, $strMemberId, $bAdmin);
+    		}
+    		else
+    		{
+    			_echoNewStockGroupTableItem($strStockId);
+    		}
+		}
+    	EchoTableParagraphEnd();
 	}
-	else
-	{
-   		if ($strMemberId = $acct->GetMemberId())
-    	{
-    		_echoStockGroupTableData($acct, $strStockId, $strMemberId, $bAdmin);
-    	}
-    	else
-    	{
-    		_echoNewStockGroupTableItem($strStockId);
-    	}
-	}
-    EchoTableParagraphEnd();
 }
 
 ?>

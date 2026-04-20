@@ -108,7 +108,7 @@ function _getSimilarLinks($strPage)
     default:
     	return false;
     }
-    return '<br />类似软件：'.$str;
+    return GetHtmlNewLine().'类似软件：'.$str;
 }
 
 function _getOldBugs($strPage)
@@ -123,7 +123,7 @@ function _getOldBugs($strPage)
     default:
     	return false;
     }
-    return '<br />已知问题：'.$str;
+    return GetHtmlNewLine().'已知问题：'.$str;
 }
 
 function EchoAll()

@@ -162,8 +162,9 @@ function EchoNetValueHistoryParagraph($ref, $csv = false, $iStart = 0, $iNum = T
 	{
 		$strMenuLink = StockGetMenuLink($strSymbol, $iTotal, $iStart, $iNum);
    		$strLink = GetFundLinks($strSymbol);
-   		if ($bAdmin)	$strLink .= '<br />'.StockGetAllLink($strSymbol);
-   		$strLink .= '<br />'.$strMenuLink;
+		$strNewLine = GetHtmlNewLine();
+   		if ($bAdmin)	$strLink .= $strNewLine.StockGetAllLink($strSymbol);
+   		$strLink .= $strNewLine.$strMenuLink;
    	}
 	
    	if ($fund_ref = StockGetQdiiReference($strSymbol))
@@ -183,9 +184,11 @@ function EchoNetValueHistoryParagraph($ref, $csv = false, $iStart = 0, $iNum = T
     	$est_ref = false;
     }
     
-	EchoTableParagraphBegin(GetNetValueTableColumn($est_ref, $cny_ref), 'netvaluehistory', $strLink);
-	_echoNetValueData($csv, $ref, $est_ref, $cny_ref, $iStart, $iNum);
-    EchoTableParagraphEnd($strMenuLink);
+	if (EchoTableParagraphBegin(GetNetValueTableColumn($est_ref, $cny_ref), 'netvaluehistory', $strLink))
+	{
+		_echoNetValueData($csv, $ref, $est_ref, $cny_ref, $iStart, $iNum);
+    	EchoTableParagraphEnd($strMenuLink);
+	}
 }
 
 ?>

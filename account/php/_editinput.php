@@ -20,7 +20,7 @@ require_once('../php/stock.php');
 
 function HexView($strInput)
 {
-	$str = '<br />Hex: ';
+	$str = GetHtmlNewLine().'Hex: ';
    	for ($i = 0; $i < strlen($strInput); $i++)
    	{
    		$iChar = ord($strInput[$i]);
@@ -41,13 +41,14 @@ function _getCommonPhraseString($strInput, $strMemberId, $bChinese)
 	}
 	
 	$strConfirm = $bChinese ? '确认删除' : 'Confirm Delete';
+	$strNewLine = GetHtmlNewLine();
 	$str = '';
 	if ($result = $sql->GetAll($strMemberId)) 
 	{
 		while ($record = mysqli_fetch_assoc($result)) 
 		{
 			$strVal = $record['str'];
-		    $str .= GetOnClickLink('/account/submitcommonphrase.php?delete='.$record['id'], $strConfirm.': '.$strVal.'?', $strVal).'<br />';
+		    $str .= GetOnClickLink('/account/submitcommonphrase.php?delete='.$record['id'], $strConfirm.': '.$strVal.'?', $strVal).$strNewLine;
 		}
 		mysqli_free_result($result);
 	}

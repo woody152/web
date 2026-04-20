@@ -189,9 +189,11 @@ function _echoExhaustiveHoldingsParagraph($strPage, $strSymbol, $fInput, $iNum, 
 			foreach ($arHoldingRef as $holding_ref)	$ar[] = new TableColumnStock($holding_ref);
 			$ar[] = new TableColumnPosition();
     		
-			EchoTableParagraphBegin($ar, $strPage, GetFundLinks($strSymbol));
-    		_echoExhaustiveHoldingsData($ref, $iCount, $fInput, $iNum, $bAdmin);
-			EchoTableParagraphEnd();
+			if (EchoTableParagraphBegin($ar, $strPage, GetFundLinks($strSymbol)))
+			{
+	    		_echoExhaustiveHoldingsData($ref, $iCount, $fInput, $iNum, $bAdmin);
+				EchoTableParagraphEnd();
+			}
 		}
 	}
 }

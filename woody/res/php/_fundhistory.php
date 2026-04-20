@@ -6,8 +6,10 @@ require_once('../../php/ui/fundhistoryparagraph.php');
 
 function _echoFundHistory($strSymbol, $iStart, $iNum, $bAdmin)
 {
+	$strNewLine = GetHtmlNewLine();
+
     $str = GetFundLinks($strSymbol);
-    if ($bAdmin)		$str .= '<br />'.StockGetAllLink($strSymbol);
+    if ($bAdmin)		$str .= $strNewLine.StockGetAllLink($strSymbol);
    	EchoHtmlElement($str);
   
    	$csv = new PageCsvFile();
@@ -27,7 +29,10 @@ function _echoFundHistory($strSymbol, $iStart, $iNum, $bAdmin)
     if ($csv->HasFile())
     {
     	$jpg = new DateImageFile();
-   		if ($jpg->Draw($csv->ReadColumn(2), $csv->ReadColumn(1)))		EchoHtmlElement($csv->GetLink().'<br />'.$jpg->GetAll(STOCK_DISP_PREMIUM, $strSymbol));
+   		if ($jpg->Draw($csv->ReadColumn(2), $csv->ReadColumn(1)))
+		{
+			EchoHtmlElement($csv->GetLink().$strNewLine.$jpg->GetAll(STOCK_DISP_PREMIUM, $strSymbol));
+		}
    	}
 }
 

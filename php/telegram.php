@@ -70,14 +70,17 @@ class TelegramCallback
 		$strChatId = $message['chat']['id'];
 		if (isset($message['text'])) 
 		{	// incoming text message
-			$text = $message['text'];
-			LogBotVisit(TABLE_TELEGRAM_BOT, $text, $strChatId);
+			$strText = $message['text'];
+			LogBotVisit(TABLE_TELEGRAM_BOT, $strText, $strChatId);
 			if ($strToken = UrlGetQueryValue('token'))
 			{
 				if ($strToken == TG_TOKEN || $strToken == WECHAT_QMT_KEY)
 				{
-					DebugString(__CLASS__.'->'.__FUNCTION__.' '.$text);
-					$this->ReplyText(GetStockDataArray($text), $strMessageId, $strChatId);
+					$this->ReplyText(GetStockDataArray($strText), $strMessageId, $strChatId);
+				}
+				else if ($strToken == WECHAT_ROT_KEY)
+				{
+					$this->ReplyText(GetStockDataArray($strText, array_merge(QdiiGetQqqMatchArray(), QdiiGetXopSymbolArray(), QdiiGetXbiSymbolArray())), $strMessageId, $strChatId);
 				}
 				else
 				{
@@ -87,10 +90,10 @@ class TelegramCallback
 				}
 				return;
 			}
-			else if (str_starts_with($text, '/'))
+			else if (str_starts_with($strText, '/'))
 			{
-				$text = trim(ltrim($text, '/'));
-				switch ($text)
+				$strText = trim(ltrim($strText, '/'));
+				switch ($strText)
 				{
 				case 'start':
 //					apiRequestJson("sendMessage", array('chat_id' => $strChatId, "text" => 'Hello', 'reply_markup' => array('keyboard' => array(array('Hello', 'Hi')), 'one_time_keyboard' => true, 'resize_keyboard' => true)));
@@ -100,7 +103,7 @@ class TelegramCallback
 					return;
 				}
 			} 
-			$this->OnText($text, $strMessageId, $strChatId);
+			$this->OnText($strText, $strMessageId, $strChatId);
 		}
 		else 
 		{

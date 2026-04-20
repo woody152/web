@@ -177,9 +177,11 @@ function _echoFundAccountParagraph($csv, $ref, $strSymbol, $strStockId, $his_sql
  	$str = GetFundLinks($strSymbol);
 	if ($bAdmin)	$str .= ' '.GetStockOptionLink(STOCK_OPTION_SHARE_DIFF, $strSymbol);
 	
-	EchoTableParagraphBegin(_getFundAccountTableColumnArray(), 'fundaccount', $str);
-	_echoFundAccountData($csv, $ref, $strSymbol, $strStockId, $his_sql, $iDays);
-    EchoTableParagraphEnd();
+	if (EchoTableParagraphBegin(_getFundAccountTableColumnArray(), 'fundaccount', $str))
+	{
+		_echoFundAccountData($csv, $ref, $strSymbol, $strStockId, $his_sql, $iDays);
+    	EchoTableParagraphEnd();
+	}
 }
 
 function _echoFundAccountPredictData($ref, $strSymbol, $strStockId, $his_sql, $iDays, $jpg)
@@ -260,13 +262,16 @@ function _echoLinearRegressionGraph($csv, $ref, $strSymbol, $strStockId, $his_sq
     $jpg = new LinearImageFile();
     if ($jpg->Draw($csv->ReadColumn(5), $csv->ReadColumn(2)))
     {
+		$strNewLine = GetHtmlNewLine();
     	$str = $csv->GetLink();
-    	$str .= '<br />'.$jpg->GetAllLinks();
-    	$str .= '<br />下一交易日'.STOCK_OPTION_SHARE_DIFF.'预测';
+    	$str .= $strNewLine.$jpg->GetAllLinks();
+    	$str .= $strNewLine.'下一交易日'.STOCK_OPTION_SHARE_DIFF.'预测';
 
-    	EchoTableParagraphBegin(_getFundAccountTableColumnArray(), 'predict'.'fundaccount', $str);
-    	_echoFundAccountPredictData($ref, $strSymbol, $strStockId, $his_sql, $iDays, $jpg);
-    	EchoTableParagraphEnd();
+    	if (EchoTableParagraphBegin(_getFundAccountTableColumnArray(), 'predict'.'fundaccount', $str))
+		{
+	    	_echoFundAccountPredictData($ref, $strSymbol, $strStockId, $his_sql, $iDays, $jpg);
+    		EchoTableParagraphEnd();
+		}
     }
 }
 
@@ -274,7 +279,6 @@ function EchoAll()
 {
 	global $acct;
 	
-	$bAdmin = $acct->IsAdmin();
     if ($ref = $acct->EchoStockGroup())
     {
    		$strSymbol = $ref->GetSymbol();
@@ -293,7 +297,7 @@ function EchoAll()
         	$his_sql = GetStockHistorySql();
         	
         	$csv = new PageCsvFile();
-            _echoFundAccountParagraph($csv, $ref, $strSymbol, $strStockId, $his_sql, $iDays, $bAdmin);
+            _echoFundAccountParagraph($csv, $ref, $strSymbol, $strStockId, $his_sql, $iDays, $acct->IsAdmin());
             $csv->Close();
             if ($csv->HasFile())	_echoLinearRegressionGraph($csv, $ref, $strSymbol, $strStockId, $his_sql, $iDays);
             EchoRemarks($strSymbol);

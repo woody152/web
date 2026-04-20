@@ -36,9 +36,11 @@ function _echoPairParagraph($ar, $strId, $str, $arRef, $bWide)
 	if ($iCount > 2)	$arRef = RefSortByNumeric($arRef, '_callbackSortPair');
 	$pos_sql = GetPositionSql();
 
-	EchoTableParagraphBegin($ar, $strId, $str);
-	foreach ($arRef as $ref)		_echoPairItem($ref, $pos_sql, $bWide);
-    EchoTableParagraphEnd();
+	if (EchoTableParagraphBegin($ar, $strId, $str))
+	{
+		foreach ($arRef as $ref)		_echoPairItem($ref, $pos_sql, $bWide);
+    	EchoTableParagraphEnd();
+	}	
 }
 
 function _getPairColumn($bWide)

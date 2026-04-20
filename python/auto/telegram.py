@@ -4,6 +4,7 @@ from typing import Union, List, Dict, Any
 
 import time
 from _mytoken import BOT_TOKEN
+from _mytoken import ROT_TOKEN
 
 def post_json_array_to_telegram(
     data_array: List[Any], 
@@ -103,8 +104,8 @@ def FetchPalmmicroData(strSymbols):
     arMessage = ar['message']
     arMessage['date'] = int(time.time())
     arMessage['text'] = strSymbols
-    # 示例1：发送一个简单的数组
-    result = post_json_array_to_telegram(ar, BOT_TOKEN)
+    #result = post_json_array_to_telegram(ar, BOT_TOKEN)
+    result = post_json_array_to_telegram(ar, ROT_TOKEN)
     
     if result is not None:
         # 可以进一步处理result
