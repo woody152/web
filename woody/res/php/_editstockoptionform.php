@@ -223,14 +223,18 @@ function _getStockOptionCalibration($strSymbol, $strDate)
 
 function _getStockOptionHoldings($strStockId)
 {
-	$sql = GetHoldingsSql();
-	$ar = $sql->GetHoldingsArray($strStockId);
+	$pos_sql = GetPositionSql();
+	$fPos = $pos_sql->ReadPos($strStockId);
+
+	$holdings_sql = GetHoldingsSql();
+	$ar = $holdings_sql->GetHoldingsArray($strStockId);
 
 	$arSymbolRatio = array();
 	foreach ($ar as $strHoldingId => $strRatio)
 	{
 		$strSymbol = SqlGetStockSymbol($strHoldingId);
-		$arSymbolRatio[$strSymbol] = rtrim0($strRatio);
+//		$arSymbolRatio[$strSymbol] = rtrim0($strRatio);
+		$arSymbolRatio[$strSymbol] = strval(round(floatval($strRatio) * $fPos, 2));
 	}
 	$str = DebugEncode($arSymbolRatio);
 	return $str;
@@ -315,7 +319,7 @@ function _getStockOptionMemo($strSubmit)
 		return '清空输入删除对应A股。';
 
 	case STOCK_OPTION_HOLDINGS:
-		return '清空输入删除对应基金持仓。';
+		return '清空输入删除对应'.HOLDINGS_DISPLAY;
 		
 	case STOCK_OPTION_NETVALUE:
 		return '清空输入删除对应日期净值。';

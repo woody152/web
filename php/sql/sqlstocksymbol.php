@@ -2,7 +2,8 @@
 //require_once('sqlint.php');
 require_once('sqlkeyname.php');
 require_once('sqlkeytable.php');
-require_once('sqldailyclose.php');
+//require_once('sqldailyclose.php');
+require_once('sqldailystring.php');
 require_once('sqldailytime.php');
 require_once('sqlholdings.php');
 require_once('sqlval.php');

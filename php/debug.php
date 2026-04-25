@@ -84,6 +84,11 @@ function DebugEncode($arJson)
 	return substr(json_encode($arJson), 1, -1);
 }
 
+function DebugDecode($strJson)
+{
+	return json_decode('{'.$strJson.'}', true);
+}
+
 function DebugFormat_date($strFormat, $iTime = false, $strTimeZone = DEBUG_TIME_ZONE)
 {
     if ($strTimeZone)	

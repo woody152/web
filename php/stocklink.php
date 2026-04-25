@@ -25,6 +25,8 @@ define('QDII_HK_DISPLAY', '港股QDII');
 define('QDII_JP_DISPLAY', '日本QDII');
 define('QDII_EU_DISPLAY', '欧洲QDII');
 
+define('HOLDINGS_DISPLAY', '基金持仓');
+
 define('STOCK_OPTION_ADR', '修改H股对应ADR代码');
 define('STOCK_OPTION_AH', '修改A股对应H股代码');
 define('STOCK_OPTION_AMOUNT', '基金申购金额');
@@ -35,7 +37,7 @@ define('STOCK_OPTION_EDIT', '修改股票说明');
 define('STOCK_OPTION_EMA', '修改200/50日EMA');
 define('STOCK_OPTION_FUND', '修改对应配对代码和'.STOCK_DISP_POSITION);
 define('STOCK_OPTION_HA', '修改H股对应A股代码');
-define('STOCK_OPTION_HOLDINGS', '修改基金持仓');
+define('STOCK_OPTION_HOLDINGS', '修改'.HOLDINGS_DISPLAY);
 define('STOCK_OPTION_NETVALUE', '修改'.STOCK_DISP_NETVALUE);
 define('STOCK_OPTION_PREMIUM', '期货升水');
 define('STOCK_OPTION_SHARE_DIFF', '场内新增(万)');
@@ -137,7 +139,6 @@ function SymCalibrationHistoryLink($sym)
     return GetCalibrationHistoryLink($sym->GetSymbol(), $sym->GetDisplay());
 }
 
-define('HOLDINGS_DISPLAY', '基金持仓');
 function GetHoldingsLink($strSymbol, $strDisplay = HOLDINGS_DISPLAY)
 {
     return GetStockSymbolLink('holdings', $strSymbol, ($strDisplay ? $strDisplay : $strSymbol));

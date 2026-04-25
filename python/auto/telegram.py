@@ -104,8 +104,8 @@ def FetchPalmmicroData(strSymbols):
     arMessage = ar['message']
     arMessage['date'] = int(time.time())
     arMessage['text'] = strSymbols
-    #result = post_json_array_to_telegram(ar, BOT_TOKEN)
-    result = post_json_array_to_telegram(ar, ROT_TOKEN)
+    result = post_json_array_to_telegram(ar, BOT_TOKEN)
+    #result = post_json_array_to_telegram(ar, ROT_TOKEN)
     
     if result is not None:
         # 可以进一步处理result

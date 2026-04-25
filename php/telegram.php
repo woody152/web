@@ -4,7 +4,7 @@ require_once('stockbot.php');
 require_once('stockdataarray.php');
 
 // 电报公共模板, 返回输入信息
-define('TG_DEBUG_VER', '版本040');		
+define('TG_DEBUG_VER', '版本041');		
 
 define('BOT_EOL', "\r\n");
 define('MAX_BOT_MSG_LEN', 2048);
@@ -66,8 +66,12 @@ class TelegramCallback
 
 	function _processMessage($message) 
 	{	// process incoming message
-		$strMessageId = $message['message_id'];
-		$strChatId = $message['chat']['id'];
+		if (isset($message['message_id']))	$strMessageId = $message['message_id'];
+		else								return;
+
+		if (isset($message['chat']))		$strChatId = $message['chat']['id'];
+		else								return;
+
 		if (isset($message['text'])) 
 		{	// incoming text message
 			$strText = $message['text'];

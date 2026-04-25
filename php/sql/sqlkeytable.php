@@ -28,9 +28,9 @@ class KeyTableSql extends TableSql
     	return array($this->strKey => $this->strKeyId);
     }
     
-    function BuildOrderBy()
+    public function BuildOrderBy()
     {
-    	return false;
+		return '`id` ASC';
     }
     
     function BuildWhere_key()

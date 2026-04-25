@@ -389,6 +389,21 @@ function _updateStockOptionCalibration($strSymbol, $strStockId, $strDate, $strVa
 	_updateOptionDailySql(GetCalibrationSql(), $strStockId, $strDate, $strVal);
 }
 
+function _updateQuarterReportHoldings($strStockId, $strDate, $strVal)
+{
+	$date_sql = new HoldingsDateSql();
+	if ($strHoldingDate = $date_sql->ReadDate($strStockId))
+	{
+		if (strtotime($strDate) < strtotime($strHoldingDate))
+		{
+			$quarter_sql = new QuarterReportSql();
+			$quarter_sql->WriteDaily($strStockId, $strDate, $strVal);
+			return true;		
+		}
+	}
+	return false;
+}
+
 class _SubmitOptionsAccount extends Account
 {
     public function Process($strLoginId)
@@ -457,7 +472,13 @@ class _SubmitOptionsAccount extends Account
 			{
 	    		if ($ref->IsShangHaiEtf())			ReadSseHoldingsFile($strSymbol, $strStockId);
     			else if ($ref->IsShenZhenEtf())		ReadSzseHoldingsFile($strSymbol, $strStockId, $strDate);
-				else								UpdateStockOptionHoldings($strStockId, $strDate, $strVal);
+				else
+				{
+					if (_updateQuarterReportHoldings($strStockId, $strDate, $strVal) === false)
+					{
+						UpdateStockOptionHoldings($strStockId, $strDate, $strVal);
+					}	
+				}
 			}
 			break;
 			

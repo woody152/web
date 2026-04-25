@@ -30,4 +30,12 @@ class DailyStringSql extends DailyCloseSql
     }
 }
 
+class QuarterReportSql extends DailyStringSql
+{
+    public function __construct() 
+    {
+        parent::__construct('quarterreport');
+    }
+}
+
 ?>

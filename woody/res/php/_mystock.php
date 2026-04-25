@@ -56,7 +56,10 @@ function _echoMyStockTransactions($acct, $ref, $strStockId)
 
 function _getFundOptionLinks($strSymbol)
 {
-	return ' '.GetStockOptionLink(STOCK_OPTION_NETVALUE, $strSymbol).' '.GetStockOptionLink(STOCK_OPTION_CALIBRATION, $strSymbol).' '.GetStockOptionLink(STOCK_OPTION_HOLDINGS, $strSymbol);
+	$str = ' '.GetStockOptionLink(STOCK_OPTION_NETVALUE, $strSymbol);
+	$str .= ' '.GetStockOptionLink(STOCK_OPTION_CALIBRATION, $strSymbol);
+	$str .= ' '.GetStockOptionLink(STOCK_OPTION_HOLDINGS, $strSymbol);
+	return $str;
 }
 
 function _getMyStockLinks($sym, $bAdmin)

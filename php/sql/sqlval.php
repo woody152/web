@@ -39,7 +39,7 @@ class ValSql extends TableSql
    		{
    			if ($bString)
    			{
-   				if ($strVal == $record[$this->strValName])													return false;
+   				if ($strVal == $record[$this->strValName])												return false;
    			}
    			else
    			{
@@ -87,6 +87,11 @@ class FundPositionSql extends ValSql
 	{
 		if ($fPos = $this->ReadVal($strStockId))	return $fPos;
 		return 1.0;
+	}
+
+	function WritePos($strStockId, $fPos)
+	{
+		return $this->WriteVal($strStockId, strval($fPos));
 	}
 }
 

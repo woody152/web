@@ -8,7 +8,7 @@ function _echoFundEstTableItem($ref, $bFair, $bWide = false)
 {
     if (RefHasData($ref) == false)      return;
 
-    $ar = array($ref->GetStockLink());
+    $ar = array($ref->GetStockLink());	// .' '.$ref->GetStockId()
     if ($bWide)
     {
     	$stock_ref = GetStockRef($ref);
@@ -132,7 +132,7 @@ function _getFundPositionStr($ref)
 	$str = '';
 	$fPosition = $ref->GetPosition();
 	//if ($fPosition < 1.0)									
-	$str .= GetFundPositionLink($ref->GetSymbol()).'值使用'.strval($fPosition).'。';
+	$str .= GetFundPositionLink($ref->GetSymbol()).'值使用'.number_format($fPosition, 2).'。';
 	return $str;
 }
 

@@ -56,9 +56,9 @@ function _echoStockGroupArray($arStock, $bWide)
     }
     
 	if (count($arRef) > 0)		EchoReferenceParagraph($arRef);
-    if (count($arFund) > 0)     	EchoFundArrayEstParagraph($arFund, false, $bWide);
-    if (count($arAbRef) > 0)		EchoAbParagraph($arAbRef, $bWide);
-    if (count($arAhRef) > 0)		EchoAhParagraph($arAhRef, $bWide);
+    if (count($arFund) > 0)     EchoFundArrayEstParagraph($arFund, false, $bWide);
+    if (count($arAbRef) > 0)	EchoAbParagraph($arAbRef, $bWide);
+    if (count($arAhRef) > 0)	EchoAhParagraph($arAhRef, $bWide);
     if (count($arAdrRef) > 0)	EchoAdrhParagraph($arAdrRef, $bWide);
     
     return $arTransactionRef;
