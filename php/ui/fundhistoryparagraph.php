@@ -66,7 +66,10 @@ function _echoFundHistoryParagraph($ref, $est_ref, $csv, $iStart, $iNum, $bAdmin
         $str .= ' '.GetFundHistoryLink($strSymbol);
         $strMenuLink = '';
     }
-    else	$strMenuLink = StockGetMenuLink($strSymbol, $his_sql->Count($strStockId), $iStart, $iNum);
+    else
+	{
+		$strMenuLink = StockGetMenuLink($strSymbol, $his_sql->Count($strStockId), $iStart, $iNum);
+	}
 
 	$ar = array(new TableColumnDate(), $close_col, $netvalue_col, $premium_col);
 	$fund_est_sql = GetFundEstSql();

@@ -7,6 +7,7 @@ require_once('../../php/ui/netvaluehistoryparagraph.php');
 
 function _echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $fInput, $iNum, $bAdmin)
 {
+	//DebugVal($iNum, __FUNCTION__);
    	$strStockId = $ref->GetStockId();
 	$net_sql = GetNetValueHistorySql();
 	$arDate = $net_sql->GetSwitchDates($strStockId);

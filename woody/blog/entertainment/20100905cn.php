@@ -155,7 +155,8 @@ function _echoPage20171226($strPage)
 <br />{$strStrpos}
 <br />总是热衷于代码优化，我马上如获至宝当即改了几十个地方，却发现有些像{$strErrorStrpos}的代码变得不工作了。原因是会返回位置0，这时候要写成{$strCorrectStrpos}，才跟原来{$strCorrectStrstr}代码效果一致。
 <br />不过这不是我碰到的最深的PHP坑。最坑人的PHP函数是{$strArray_merge}，它在全数字下标的时候居然会把所有数字下标从头开始排序！
-这时候要把{$strErrorArray_merge}简单写成{$strCorrectArray_merge}。反过来，加法也不能随便写，无下标数组写加法也会出错！
+这时候要把{$strErrorArray_merge}简单写成{$strCorrectArray_merge}。
+<br />反过来，加法也不能随便写，无下标数组写加法也会出错！因为这时候实际下标是数字0、1、2、3，写加法的时候实际下标相同的后面被加数据就丢了。
 </p>
 END;
 }

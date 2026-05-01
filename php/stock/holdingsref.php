@@ -168,16 +168,6 @@ class HoldingsReference extends MyStockReference
     	return $this->arHoldingsRatio;
     }
     
-    function SetHoldingsRatioArray($ar)
-    {
-    	$iCount = 0;
-		foreach ($this->arHoldingsRatio as $strId => $strRatio)
-		{
-			$this->arHoldingsRatio[$strId] = $ar[$iCount];
-			$iCount ++;
-		}
-    }
-    
     function CheckHoldingsDate($strDate)
     {
     	$his_sql = GetStockHistorySql();
@@ -206,18 +196,15 @@ class HoldingsReference extends MyStockReference
     	// DebugPrint($ar);
 	    return $ar;
     }
-
     
     function GetHoldingsRefArray()
     {
     	return $this->ar_holdings_ref;
     }
     
-    function GetHoldingsDisplay()
+    function CountHoldings()
     {
-    	$str = '';
-    	foreach ($this->ar_holdings_ref as $ref)	$str .= $ref->GetSymbol().'*'.$this->arHoldingsRatio[$ref->GetStockId()].';';
-    	return rtrim($str, ';');
+		return count($this->ar_holdings_ref);
     }
     
     function GetHoldingsRatioDisplay()

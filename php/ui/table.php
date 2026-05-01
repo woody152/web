@@ -154,7 +154,7 @@ function EchoTableColumn($ar, $strColor = false, $strFirstHint = false)
 END;
 }
 
-function EchoMatchTableColumn($ar, $bMatch)
+function EchoMatchTableColumn($ar, $bMatch = true)
 {
 	EchoTableColumn($ar, $bMatch ? 'yellow' : false);
 }

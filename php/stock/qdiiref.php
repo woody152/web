@@ -27,7 +27,6 @@ function QdiiGetEstArray()
                 'SZ161128' => 'XLK',
                 'SZ162415' => 'XLY',	// '^IXY'
                 'SZ162719' => 'IEO',	// '^DJSOEP'
-                'SZ163208' => 'XLE',
                 'SZ164824' => 'INDA',
                 'SZ164906' => 'KWEB',
                );

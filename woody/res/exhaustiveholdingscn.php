@@ -7,6 +7,17 @@ require_once('../../php/ui/netvaluehistoryparagraph.php');
 require_once('../../php/tutorial/cramersrule.php');
 require_once('../../php/tutorial/gaussianelimination.php');
 
+function _echoCurrentHoldingsItem($ref)
+{
+	$ar = array();
+	foreach ($ref->GetHoldingsRatioArray() as $strHoldingId => $strRatio)
+	{
+		$ar[] = number_format(floatval($strRatio), 0);
+	}
+	$ar[] = number_format($ref->GetPosition(), 2);
+	EchoMatchTableColumn($ar);
+}
+
 function __getHoldingRatioDisplay($fVal, $strRatio, &$bMatch)
 {
 	$str = number_format($fVal, 0);
@@ -18,29 +29,34 @@ function __getPosDisplay($ref, $fPos, $arRatio, &$bMatch, $bAdmin)
 {
 	$strPos = number_format($fPos, 2);
 	if ($strPos != number_format($ref->GetPosition(), 2))	$bMatch = false;
-	if ($bAdmin && $bMatch === false)
+	if ($fPos > 0.25 && $fPos < 1.25)
 	{
-		$arJson = array();
-		foreach ($arRatio as $strHoldingId => $fRatio)
+		if ($bAdmin && $bMatch === false)
 		{
-			$strHolding = SqlGetStockSymbol($strHoldingId);
-			$arJson[$strHolding] = number_format($fRatio * $fPos, 2);
+			$arJson = array();
+			foreach ($arRatio as $strHoldingId => $fRatio)
+			{
+				$strHolding = SqlGetStockSymbol($strHoldingId);
+				$arJson[$strHolding] = number_format($fRatio * $fPos, 2);
+			}
+			$str = DebugEncode($arJson);
+			return GetOnClickLink(PATH_STOCK.'submitholdings.php?symbol='.$ref->GetSymbol().'&holdings='.urlencode($str), '确认更新持仓'.$str.'和仓位'.$strPos.'？', $strPos);
 		}
-		$str = DebugEncode($arJson);
-		return GetOnClickLink(PATH_STOCK.'submitholdings.php?symbol='.$ref->GetSymbol().'&holdings='.urlencode($str), '确认更新持仓'.$str.'和仓位'.$strPos.'？', $strPos);
+		return $strPos;
 	}
-	return $strPos;
+	return GetFontElement($strPos);
 }
 
-function _echoQuarterHoldingsItem($ref, $strDate, $strClose, $bAdmin)
+function _echoQuarterHoldingsItem($ref, $strDate, $strClose, $arExtraHoldings, $bAdmin)
 {
 	$bMatch = false;
 	$ar = array($strDate);
 	$arRatio = array();
 	if ($fPos = StockOptionDecodeHoldings($strClose, $arRatio))
 	{
+		$arExtraHoldings += $ref->GetHoldingsRatioArray();
 		$bMatch = true;
-		foreach ($ref->GetHoldingsRatioArray() as $strHoldingId => $strRatio)
+		foreach ($arExtraHoldings as $strHoldingId => $strRatio)
 		{
 			if (isset($arRatio[$strHoldingId]))
 			{
@@ -62,15 +78,21 @@ function _echoExhaustiveHoldingsItem($ref, $iCount, $fInput, $strDate, $fNetValu
 {
 	static $arEq = array();
 
+	$ar = array($strDate, $ref->GetNetValueDisplay($fNetValue));
+
 	$strStockId = $ref->GetStockId();
 	$net_sql = GetNetValueHistorySql();
-	$ar = array($strDate, $ref->GetNetValueDisplay($fNetValue));
-	$ar[] = $ref->GetPercentageDisplay(floatval($net_sql->GetClose($strStockId, $strPrevDate)), $fNetValue);
+	$strPrevNetValue = $net_sql->GetClose($strStockId, $strPrevDate);
+	$ar[] = $ref->GetPercentageDisplay(floatval($strPrevNetValue), $fNetValue);
 
 	$bMatch = false;
 	$fPercent = $net_sql->GetProportion($strStockId, $strDate, $strPrevDate) - 1.0;			// f
 	if (abs($fPercent) > $fInput && $arPro = $ref->GetProportionArray($strDate, $strPrevDate))
 	{
+		$ref->SetHoldingsDate($strPrevDate);
+		$ref->SetNetValueString($strPrevNetValue);
+		$ar[] = $ref->GetPercentageDisplay($fNetValue, $ref->_estNetValue($strDate));
+
 		$cny_ref = $ref->GetCnyRef();
 		$fCny = $net_sql->GetProportion($cny_ref->GetStockId(), $strDate, $strPrevDate);	// n
 		$fEnd = end($arPro);
@@ -172,14 +194,13 @@ function _echoVerifyHoldingsItem($ref, $iCount, $fInput, $strDate, $fNetValue, $
 	return $bReturn;
 }
 
-function _echoQuarterHoldingsData($ref, $bAdmin)
+function _echoQuarterHoldingsData($ref, $quarter_sql, $arExtraHoldings, $bAdmin)
 {
-	$quarter_sql = new QuarterReportSql();
     if ($result = $quarter_sql->GetAll($ref->GetStockId())) 
     {
         while ($record = mysqli_fetch_assoc($result)) 
         {
-			_echoQuarterHoldingsItem($ref, $record['date'], $record['close'], $bAdmin);
+			_echoQuarterHoldingsItem($ref, $record['date'], $record['close'], $arExtraHoldings, $bAdmin);
 		}
         mysqli_free_result($result);
     }
@@ -251,6 +272,25 @@ function _echoVerifyHoldingsData($ref, $iCount, $fInput, $bAdmin)
     }
 }
 
+function _getQuarterHoldingsExtra($ref, $quarter_sql)
+{
+	$arExtra = array();
+    if ($result = $quarter_sql->GetAll($ref->GetStockId())) 
+    {
+		$arHoldingsRatio = $ref->GetHoldingsRatioArray();
+        while ($record = mysqli_fetch_assoc($result)) 
+        {
+			$arRatio = array();
+			if (StockOptionDecodeHoldings($record['close'], $arRatio))
+			{
+				$arExtra += array_diff_key($arRatio, $arHoldingsRatio + $arExtra);
+			}
+		}
+        mysqli_free_result($result);
+    }
+	return $arExtra;
+}
+
 function _echoExhaustiveHoldingsParagraph($strPage, $strSymbol, $fInput, $iNum, $bAdmin)
 {
 	$ref = new HoldingsReference($strSymbol);
@@ -261,23 +301,36 @@ function _echoExhaustiveHoldingsParagraph($strPage, $strSymbol, $fInput, $iNum, 
 		foreach ($arHoldingRef as $holding_ref)	$ar[] = new TableColumnStock($holding_ref);
 		$ar[] = new TableColumnPosition();
 
-		if (EchoTableParagraphBegin(array_merge(array(new TableColumnDate()), $ar), 'quarter', '季报持仓'))
+		if (EchoTableParagraphBegin($ar, 'current', '当前使用的持仓数据'))
 		{
-    		_echoQuarterHoldingsData($ref, $bAdmin);
+    		_echoCurrentHoldingsItem($ref);
+			EchoTableParagraphEnd();
+		}
+
+		$quarter_sql = new QuarterReportSql();
+		$arExtraHoldings = _getQuarterHoldingsExtra($ref, $quarter_sql);
+		$arExtraColumn = array();
+		foreach ($arExtraHoldings as $strExtraId => $strExtraData)
+		{
+			$arExtraColumn[] = new TableColumn(SqlGetStockSymbol($strExtraId));
+		}	
+
+		if (EchoTableParagraphBegin(array_merge(array(new TableColumnDate()), $arExtraColumn, $ar), 'quarter', '季报持仓'))
+		{
+    		_echoQuarterHoldingsData($ref, $quarter_sql, $arExtraHoldings, $bAdmin);
 			EchoTableParagraphEnd();
 		}
 
 		$iCount = count($arHoldingRef);
     	if ($iCount <= 4)
     	{
-			$ar = array_merge(GetNetValueTableColumn(), $ar);
-			if (EchoTableParagraphBegin($ar, $strPage, GetFundLinks($strSymbol)))
+			if (EchoTableParagraphBegin(array_merge(GetNetValueTableColumn(), array(new TableColumnError()), $ar), $strPage, GetFundLinks($strSymbol)))
 			{
 	    		_echoExhaustiveHoldingsData($ref, $iCount, $fInput, $iNum, $bAdmin);
 				EchoTableParagraphEnd();
 			}
 
-			if (EchoTableParagraphBegin($ar, 'verify', '验证最近值'))
+			if (EchoTableParagraphBegin(array_merge(GetNetValueTableColumn(), $ar), 'verify', '验证最激进数据'))
 			{
 	    		_echoVerifyHoldingsData($ref, $iCount, $fInput, $bAdmin);
 				EchoTableParagraphEnd();

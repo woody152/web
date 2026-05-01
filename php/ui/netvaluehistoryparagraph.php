@@ -92,7 +92,7 @@ function EchoNetValueItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue
 		else												$ar[] = '';
 	}
 
-	$strOrgPos = strval($ref->GetPosition());
+	$strOrgPos = number_format($ref->GetPosition(), 2);
 	if ($est_ref)
 	{
 		if ($fEst = $est_ref->GetNetValue($strDate))

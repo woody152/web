@@ -72,17 +72,13 @@ function EchoAll()
 	
     if ($ref = $acct->EchoStockGroup())
     {
-   		//DebugNow('拿新浪数据存文件时间点');
    		$strSymbol = $ref->GetSymbol();
    		$ref = new HoldingsReference($strSymbol);
-   		//DebugNow('读数据文件时间点');
     	if ($ref->GetHoldingsDate())
     	{
     		$arHoldingRef = $ref->GetHoldingsRefArray();
     		$str = '持仓和测算示意 ';
-    		$iTotal = count($arHoldingRef);
-    		if ($iTotal <= 4)	$str .= GetExhaustiveHoldingsLink($strSymbol);
-    		else				$str .= '总数'.strval($iTotal);
+			$str .= '总数'.strval($ref->CountHoldings());
     		$str .= ' '.$ref->GetHoldingsRatioDisplay();
     		
 		    EchoHoldingsEstParagraph($ref);

@@ -196,10 +196,10 @@ function GetFundLinks($strSymbol)
 	$str = GetStockHistoryLink($strSymbol).' '.GetFundHistoryLink($strSymbol).' '.GetNetValueHistoryLink($strSymbol).' '.GetNetValueCloseLink($strSymbol).' '.GetFundShareLink($strSymbol);
 	if ($bChinaFuture || $bChinaIndex || $bQdii || $bQdiiHk || $bQdiiJp || $bQdiiEu || $bQdiiMix)
 	{
-		$str .= ' '.GetCalibrationHistoryLink($strSymbol);
+		if ($bQdii || $bQdiiHk || $bQdiiJp || $bQdiiEu)                 $str .= ' '.GetCalibrationHistoryLink($strSymbol);
 		if ($bQdii || $bQdiiHk || $bQdiiJp || $bQdiiEu || $bGoldOil)	$str .= ' '.GetFundPositionLink($strSymbol);
 		if ($bQdii)											            $str .= ' '.GetFundAccountLink($strSymbol).' '.GetThanousParadoxLink($strSymbol);
-		if ($bQdiiEu || $bGoldOil)	                                    $str .= ' '.GetExhaustiveHoldingsLink($strSymbol);
+		if ($bGoldOil)	                                                $str .= ' '.GetExhaustiveHoldingsLink($strSymbol);
 	}
 	else
 	{

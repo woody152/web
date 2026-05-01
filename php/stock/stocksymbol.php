@@ -63,7 +63,7 @@ function in_arrayChinaFuture($strSymbol)
 
 function QdiiGetOilEtfSymbolArray()
 {
-    return array('SZ160416', 'SZ162719', 'SZ163208'); 
+    return array('SZ160416', 'SZ162719'); 
 }
 
 function in_arrayOilEtfQdii($strSymbol)
@@ -265,12 +265,12 @@ function in_arrayHkMix($strSymbol)
 
 function GetQdiiGoldSymbolArray()
 {
-	return array('SZ160216', 'SZ161815', 'SZ160719', 'SZ161116', 'SZ164701', 'SZ165513');
+	return ['SZ160216', 'SZ161815', 'SZ160719', 'SZ161116', 'SZ164701', 'SZ165513'];
 }
 
 function GetQdiiOilSymbolArray()
 {
-	return array('SH501018', 'SZ160723', 'SZ161129');
+	return ['SZ163208', 'SH501018', 'SZ160723', 'SZ161129'];
 }
 
 function GetQdiiGoldOilSymbolArray()

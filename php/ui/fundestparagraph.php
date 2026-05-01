@@ -163,7 +163,9 @@ function EchoHoldingsEstParagraph($ref)
 	$arColumn = _getFundEstTableColumn($arRef, $bFair);
 	
 	$str = _getFundPositionStr($ref);
-	$str .= GetHoldingsLink($ref->GetSymbol()).'更新于'.$ref->GetHoldingsDate().'。';
+	$strSymbol = $ref->GetSymbol();
+	$str .= GetHoldingsLink($strSymbol).'更新于'.$ref->GetHoldingsDate().'。';
+	if ($ref->CountHoldings() <= 4)	$str .= GetExhaustiveHoldingsLink($strSymbol);
 
 	_echoFundEstParagraph($arColumn, $bFair, $arRef, $str);
    	EchoNetValueHistoryParagraph($ref, false, 0, 1);
