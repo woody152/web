@@ -182,10 +182,20 @@ class HoldingsReference extends MyStockReference
     {
 	   	$his_sql = GetStockHistorySql();
 	    $ar = array();
-	    foreach ($this->arHoldingsRatio as $strHoldingId => $strRatio)
+		foreach ($this->ar_holdings_ref as $ref)
 	    {
-            if ($fProportion = $his_sql->GetProportion($strHoldingId, $strDate, $strPrevDate))
+            if ($fProportion = $his_sql->GetProportion($ref->GetStockId(), $strDate, $strPrevDate))
 		    {
+				if ($ref->IsSymbolA())
+				{
+					$fProportion /= $this->uscny_ref->GetVal($strDate);
+					$fProportion *= $this->uscny_ref->GetVal($strPrevDate);
+				}
+				else if ($ref->IsSymbolH())
+				{
+					$fProportion /= $this->uscny_ref->GetVal($strDate) / $this->hkcny_ref->GetVal($strDate);
+					$fProportion *= $this->uscny_ref->GetVal($strPrevDate) / $this->hkcny_ref->GetVal($strPrevDate);
+				}
 				$ar[] = $fProportion;
 			}
 			else
@@ -193,7 +203,6 @@ class HoldingsReference extends MyStockReference
 			 	return false;
 			}
 		}
-    	// DebugPrint($ar);
 	    return $ar;
     }
     

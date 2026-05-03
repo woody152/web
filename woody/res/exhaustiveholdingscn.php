@@ -211,7 +211,6 @@ function _echoExhaustiveHoldingsData($ref, $iCount, $fInput, $iNum, $bAdmin)
    	$strStockId = $ref->GetStockId();
 	$net_sql = GetNetValueHistorySql();
 	$arDate = $net_sql->GetSwitchDates($strStockId);
-	if (count($arDate) == 0)		return;
 
  	$iIndex = 0;
 	$iTotal = 0;
@@ -244,7 +243,6 @@ function _echoVerifyHoldingsData($ref, $iCount, $fInput, $bAdmin)
    	$strStockId = $ref->GetStockId();
 	$net_sql = GetNetValueHistorySql();
 	$arDate = $net_sql->GetSwitchDates($strStockId);
-	if (count($arDate) == 0)		return;
 
  	$iIndex = 0;
     if ($result = $net_sql->GetAll($strStockId)) 

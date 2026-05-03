@@ -52,7 +52,7 @@ class _QdiiMixAccount extends FundGroupAccount
     	if ($strHoldingsDate == $ref->GetOfficialDate())	return;
     	
     	$bUpdated = false;
-		if (in_arrayQdiiGoldOil($strSymbol) || in_array($strSymbol, array('SH501225', 'SH501312', 'SZ160644')))
+		if (in_arrayLofMix($strSymbol))
     	{
         	if ($strNetValueDate != $strHoldingsDate)		
         	{

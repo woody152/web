@@ -126,7 +126,7 @@ class MysqlReference extends StockReference
     	return $this->fRatio;
     }
     
-    function LoadDailySqlData($sql)
+	function LoadDailySqlData($sql)
     {
        	if ($record = $sql->GetRecordNow($this->strSqlId))
        	{

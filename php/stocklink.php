@@ -191,15 +191,15 @@ function GetFundLinks($strSymbol)
 	$bQdiiJp = in_arrayQdiiJp($strSymbol);
 	$bQdiiEu = in_arrayQdiiEu($strSymbol);
 	$bQdiiMix = in_arrayQdiiMix($strSymbol);
-    $bGoldOil = in_arrayQdiiGoldOil($strSymbol);
+    $bLofMix = in_arrayLofMix($strSymbol);
 
 	$str = GetStockHistoryLink($strSymbol).' '.GetFundHistoryLink($strSymbol).' '.GetNetValueHistoryLink($strSymbol).' '.GetNetValueCloseLink($strSymbol).' '.GetFundShareLink($strSymbol);
 	if ($bChinaFuture || $bChinaIndex || $bQdii || $bQdiiHk || $bQdiiJp || $bQdiiEu || $bQdiiMix)
 	{
 		if ($bQdii || $bQdiiHk || $bQdiiJp || $bQdiiEu)                 $str .= ' '.GetCalibrationHistoryLink($strSymbol);
-		if ($bQdii || $bQdiiHk || $bQdiiJp || $bQdiiEu || $bGoldOil)	$str .= ' '.GetFundPositionLink($strSymbol);
+		if ($bQdii || $bQdiiHk || $bQdiiJp || $bQdiiEu || $bLofMix)	    $str .= ' '.GetFundPositionLink($strSymbol);
 		if ($bQdii)											            $str .= ' '.GetFundAccountLink($strSymbol).' '.GetThanousParadoxLink($strSymbol);
-		if ($bGoldOil)	                                                $str .= ' '.GetExhaustiveHoldingsLink($strSymbol);
+		if ($bLofMix)	                                                $str .= ' '.GetExhaustiveHoldingsLink($strSymbol);
 	}
 	else
 	{

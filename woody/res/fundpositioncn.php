@@ -7,11 +7,9 @@ require_once('../../php/ui/netvaluehistoryparagraph.php');
 
 function _echoFundPositionData($csv, $ref, $cny_ref, $est_ref, $fInput, $iNum, $bAdmin)
 {
-	//DebugVal($iNum, __FUNCTION__);
    	$strStockId = $ref->GetStockId();
 	$net_sql = GetNetValueHistorySql();
 	$arDate = $net_sql->GetSwitchDates($strStockId);
-	if (count($arDate) == 0)		return;
  
  	$iIndex = 0;
 	$iTotal = 0;
@@ -80,7 +78,7 @@ function EchoAll()
     			$cny_ref = $fund->GetCnyRef();
     			$est_ref = $fund->GetEstRef();
     		}
-			else if (in_arrayQdiiGoldOil($strSymbol))
+			else if (in_arrayLofMix($strSymbol))
 			{
 				$fund = new HoldingsReference($strSymbol);
 				$cny_ref = $fund->GetCnyRef();
@@ -102,7 +100,7 @@ function GetMetaDescription()
 	global $acct;
 	
   	$str = $acct->GetStockDisplay().FUND_POSITION_DISPLAY;
-    $str .= '。仅用于美股QDII基金，寻找对应美股ETF净值连续几天累计涨跌超过4%的机会测算A股基金的实际持仓仓位。';
+    $str .= '。仅用于美股QDII和部分混合QDII基金，寻找A股基金净值连续几天累计涨跌超过某个阈值例如4%的机会，测算基金的实际表现出来的持仓仓位。';
     return CheckMetaDescription($str);
 }
 

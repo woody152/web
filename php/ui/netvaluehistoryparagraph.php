@@ -2,13 +2,12 @@
 require_once('stocktable.php');
 
 // (est * cny / estPrev * cnyPrev - 1) * position = (nv / nvPrev - 1) 
-function _QdiiGetStockPosition($fEstPrev, $fEst, $fPrev, $fNetValue, $fCnyPrev, $fCny, $fInput)
+function _QdiiGetStockPosition($fEstProportion, $fPrev, $fNetValue, $fCnyPrev, $fCny, $fInput)
 {
 	$fPercent = StockGetPercentage($fPrev, $fNetValue);
-//	DebugVal($fPercent, __FUNCTION__, true);
 	if (abs($fPercent) > $fInput)
 	{
-		$fEstPercent = StockGetPercentage($fEstPrev * $fCnyPrev, $fEst * $fCny);
+		$fEstPercent = StockGetPercentage($fCnyPrev / $fEstProportion, $fCny);
 		if (abs($fEstPercent) > MIN_FLOAT_VAL)
 		{
 			$fVal = $fPercent / $fEstPercent;
@@ -21,31 +20,19 @@ function _QdiiGetStockPosition($fEstPrev, $fEst, $fPrev, $fNetValue, $fCnyPrev, 
 	return false;
 }
 
-function _QdiiMixCalcEstValue($arRatio, $strDate)
-{
-	$fEst = 0.0;
-	foreach ($arRatio as $strHoldingId => $strRatio)
-	{
-		if ($str = SqlGetHistoryByDate($strHoldingId, $strDate))
-		{
-			$fEst += floatval($str) * floatval($strRatio);
-		}
-		else
-		{
-//			DebugString(__FUNCTION__.' missing '.SqlGetStockSymbol($strHoldingId).' data on '.$strDate);
-		 	return false;
-		}
-	}
-	return $fEst;
-}
-
 function _QdiiMixGetPosition($ref, $strDate, $strPrevDate, $fPrev, $fNetValue, $fCnyPrev, $fCny, $fInput)
 {
-	$arRatio = $ref->GetHoldingsRatioArray();
-	// DebugPrint($arRatio);
-	$fEst = _QdiiMixCalcEstValue($arRatio, $strDate);
-	$fEstPrev = _QdiiMixCalcEstValue($arRatio, $strPrevDate);
-	if ($fEst !== false && $fEstPrev !== false)		return  _QdiiGetStockPosition($fEstPrev, $fEst, $fPrev, $fNetValue, $fCnyPrev, $fCny, $fInput);
+	if ($arPro = $ref->GetProportionArray($strDate, $strPrevDate))
+	{
+		$iIndex = 0;
+		$fTotal = 0.0;
+		foreach ($ref->GetHoldingsRatioArray() as $strHoldingsId => $strRatio)
+		{
+			$fTotal += $arPro[$iIndex] * floatval($strRatio) / 100.0;
+			$iIndex ++;
+		}	
+		return  _QdiiGetStockPosition($fTotal, $fPrev, $fNetValue, $fCnyPrev, $fCny, $fInput);
+	}
 	return false;
 }
 
@@ -101,7 +88,7 @@ function EchoNetValueItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue
 			if ($fEstPrev = $est_ref->GetNetValue($strPrevDate))
 			{
 				$ar[] = $est_ref->GetPercentageDisplay($fEstPrev, $fEst);
-				if ($strPosition = _QdiiGetStockPosition($fEstPrev, $fEst, $fPrev, $fNetValue, $fCnyPrev, $fCny, $fInput))
+				if ($strPosition = _QdiiGetStockPosition($fEst / $fEstPrev, $fPrev, $fNetValue, $fCnyPrev, $fCny, $fInput))
 				{
 					$bWritten = true;
 					if ($csv)	$csv->Write($strDate, $strNetValue, $strPosition);
@@ -172,7 +159,7 @@ function EchoNetValueHistoryParagraph($ref, $csv = false, $iStart = 0, $iNum = T
    		$cny_ref = $fund_ref->GetCnyRef();
    		$est_ref = $fund_ref->GetEstRef();
    	}
-	else if (in_arrayQdiiGoldOil($strSymbol))
+	else if (in_arrayLofMix($strSymbol))
 	{
 		$ref = new HoldingsReference($strSymbol);
 		$cny_ref = $ref->GetCnyRef();
