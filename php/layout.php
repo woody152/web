@@ -45,37 +45,14 @@ function ResizeJpg($strPathName, $iNewWidth = 300, $iNewHeight = false)
 		$imgNew = imagecreatetruecolor($iNewWidth, $iNewHeight);
 		imagecopyresampled($imgNew, $imgOrg, 0, 0, 0, 0, $iNewWidth, $iNewHeight, $iWidth, $iHeight);
 		imagejpeg($imgNew, $strNewRootName);
-		imagedestroy($imgNew);
-		imagedestroy($imgOrg);
 	}
 	return $strNewName;
 }
-/*
-function ResizePng($strPathName, $iNewWidth = 300, $iNewHeight = false)
-{
-	$strNewName = substr($strPathName, 0, strlen($strPathName) - 4).'x'.strval($iNewWidth).'__.jpg';
-	$strNewRootName = UrlModifyRootFileName($strNewName); 
-	if (!file_exists($strNewRootName))
-	{
-		$imgOrg = imagecreatefrompng(UrlModifyRootFileName($strPathName));
-		$iWidth = imagesx($imgOrg);
-		$iHeight = imagesy($imgOrg);
-		DebugString('Converting '.$strNewName);
-		if ($iNewHeight === false)		$iNewHeight = intval($iNewWidth * $iHeight / $iWidth);
-		$imgNew = imagecreatetruecolor($iNewWidth, $iNewHeight);
-		imagefill($imgNew, 0, 0, imagecolorallocate($bg, 255, 255, 255));	// 处理透明背景
-		imagecopyresampled($imgNew, $imgOrg, 0, 0, 0, 0, $iNewWidth, $iNewHeight, $iWidth, $iHeight);
-		imagejpeg($imgNew, $strNewRootName, 90);
-		imagedestroy($imgNew);
-		imagedestroy($imgOrg);
-	}
-	return $strNewName;
-}
-*/
+
 //	https://ibkr.com/referral/rongrong586
 function GetWechatPay($iType = 0, $bChinese = true)
 {
-	if ($iType == 0)	$iType = rand(1, 3);
+	if ($iType == 0)	$iType = rand(1, 4);
 	switch ($iType)
 	{
 	case 1:
@@ -85,19 +62,19 @@ function GetWechatPay($iType = 0, $bChinese = true)
 		
 	case 2:
 		$strRemark = '觉得这个网站有用？可以用微信打赏支持一下！';
-		$strImage = GetImgElement(ResizeJpg('/debug/wechat/29e0a407b577177b.jpg'), $strRemark);
+		$strImage = GetImgElement(ResizeJpg('/woody/image/wxpay_full.jpg'), $strRemark);
 		break;
 		
 	case 3:
 		$strRemark = $bChinese ? 'Palmmicro微信公众号小狐狸二维码' : 'Palmmicro Wechat Public Account QR code';
 		$strImage = GetImgElement('/woody/image/wx.jpg', $strRemark);
 		break;
-/*		
+		
 	case 4:
-		$strRemark = '华宝拖拉机开户群已经超过200人扫码入群限制，扫上面二维码后可以请小瓶子拉进群。';
-		$strImage = GetImgElement(ResizeJpg('/debug/wechat/bec5dabc01d8c812.jpg'), $strRemark);
+		$strRemark = '觉得这个网站有用？可以用支付宝打赏支持一下！';
+		$strImage = GetImgElement(ResizeJpg('/woody/image/alipay_full.jpg'), $strRemark);
 		break;
-        	
+/*        	
 	case 5:
 		$strRemark = '香港保诚保险投保微信群二维码';
 		$strImage = GetImgElement(ResizeJpg('/debug/wechat/25e7591ce033c357.jpg'), $strRemark);

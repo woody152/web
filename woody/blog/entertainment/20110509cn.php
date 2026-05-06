@@ -108,8 +108,24 @@ function Echo20250121($strHead)
 END;
 }
 
+function Echo20260504($strHead)
+{
+	$strHead = GetHeadElement($strHead);
+	$strWechat = GetNameLink('other', '微信');
+
+    echo <<<END
+	$strHead
+<p>2026年5月4日 周一
+<br />{$strWechat}讨饭今年收获不少，扩大讨饭规模，开始使用支付宝。
+</p>
+END;
+	
+	EchoHtmlElement(GetWechatPay(4));
+}
+
 	Echo20211222(GetNameTag('forth', '第四笔').'Adsense收入');
 	Echo20250121(GetNameTag('fifth', '第五笔').'Adsense收入');
+	Echo20260504('开始使用支付宝');
 ?>
 
 </div>

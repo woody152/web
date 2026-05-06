@@ -260,7 +260,7 @@ function GetJiaoYinSchroderSoftwareLinks($strDigitA)
 // http://www.jsfund.cn/main/fund/159607/fundManager.shtml
 function GetJiaShiSoftwareLinks($strDigitA)
 {
-    $ar = array('SZ159501', 'SZ159502', 'SZ159518', 'SZ159561', 'SZ159607', 'SZ159741', 'SZ159919', 'SZ160717', 'SZ160719', 'SZ160723');
+    $ar = array('SZ159501', 'SZ159502', 'SZ159518', 'SZ159561', 'SZ159607', 'SZ159741', 'SZ159919', 'SZ160706', 'SZ160717', 'SZ160719', 'SZ160723');
 	$strUrl = 'http://www.jsfund.cn';
     return ' '.GetOfficialLink($strUrl.'/main/fund/'.$strDigitA.'/fundManager.shtml', $strDigitA)._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '嘉实基金'));
 }
@@ -329,7 +329,7 @@ function GetXinChengSoftwareLinks($strDigitA)
 //https://www.yhfund.com.cn/main/fund/funddetail/index.shtml?product_code=161815
 function GetYinHuaSoftwareLinks($strDigitA)
 {
-    $ar = array('SZ159567', 'SZ161815', 'SZ161831');
+    $ar = array('SZ159567', 'SZ161812', 'SZ161815', 'SZ161831');
 	$strUrl = 'https://www.yhfund.com.cn';
     return ' '.GetOfficialLink($strUrl.'/main/fund/funddetail/index.shtml?product_code='.$strDigitA, $strDigitA)._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '银华基金'));
 }

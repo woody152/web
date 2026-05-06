@@ -24,7 +24,7 @@ function QdiiGetEstArray()
                 'SZ160140' => 'VNQ',	// SCHH
                 'SZ160416' => 'IXC',	// '^SPGOGUP'
                 'SZ161126' => 'RSPH',
-                'SZ161128' => 'XLK',
+                'SZ161128' => 'XLK',    // VGT
                 'SZ162415' => 'XLY',	// '^IXY'
                 'SZ162719' => 'IEO',	// '^DJSOEP'
                 'SZ164824' => 'INDA',

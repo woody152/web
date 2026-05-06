@@ -41,9 +41,19 @@ function GetSecondaryListingArray()
 				  );
 }
 
+function ChinaIndexGetAshrArray()
+{
+    return ['SH501043', 'SH510300', 'SH510310', 'SH510330', 'SZ159919', 'SZ160706'];
+}
+
+function in_arrayAshrSymbol($strSymbol)
+{
+    return in_array($strSymbol, ChinaIndexGetAshrArray());
+}
+
 function ChinaIndexGetSymbolArray()
 {
-    return array('SH501043', 'SH510300', 'SH510310', 'SH510330', 'SZ159919');
+    return array_merge(ChinaIndexGetAshrArray(), ['SZ161812']);
 }
 
 function in_arrayChinaIndex($strSymbol)

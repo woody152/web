@@ -33,8 +33,9 @@ $strAccount
 </p>
 
 <p>友情链接：
-<br /><a href="http://www.kancaibao.com" target=_blank>看财报</a>
-<br /><a href="http://www.haoetf.com" target=_blank>HaoETF</a>
+<br /><a href="https://www.kancaibao.com" target=_blank>看财报</a>
+<br /><a href="https://www.haoetf.com" target=_blank>HaoETF</a>
+<br /><a href="https://hehuan.qzz.io" target=_blank>广益录</a>
 </p>
 
 <p>$strImage
