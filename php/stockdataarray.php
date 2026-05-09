@@ -48,12 +48,11 @@ function GetStockDataArray($strSymbols, $arRange = false)
 				$cal_sql = GetCalibrationSql();
 				if ($record = $cal_sql->GetRecordNow($strStockId))
 				{
-					$arData['calibration'] = $record['close'];
+					$arData['calibration'] = rtrim0($record['close']);
 					$strDate = $record['date'];
 					$arData['date'] = $strDate;
-					$arData['netvalue'] = SqlGetNetValueByDate($strStockId, $strDate);
+					$arData['netvalue'] = rtrim0(SqlGetNetValueByDate($strStockId, $strDate));
 				
-					//$strIndexId = false;
 					if (method_exists($fund_ref, 'GetEstRef'))
 					{
 						if ($est_ref = $fund_ref->GetEstRef())
@@ -64,10 +63,6 @@ function GetStockDataArray($strSymbols, $arRange = false)
 								_addIndexArray($ar, $strIndex, $strEtf, $strDate, $cal_sql);
 								$strIndex = $strEtf;
 							}
-					/*		else
-							{
-								$strIndexId = $est_ref->GetStockId();
-							}*/
 						}
 					}
 					else
@@ -78,20 +73,14 @@ function GetStockDataArray($strSymbols, $arRange = false)
 						}
 					}
 					$arData['symbol_hedge'] = $strIndex;
-					/*if ($strIndexId)
-					{
-						$net_sql = GetNetValueHistorySql();
-						$arData['netvalue_hedge'] = $net_sql->GetCloseNow($strIndexId);
-						$arData['date_hedge'] = $net_sql->GetDateNow($strIndexId);
-					}*/
 					$arData['hedge'] = strval(round(GetStockHedge($strSymbol, $strStockId), FLOAT_PRECISION));
 				}
 				else
 				{
 					$strDate = $fund_ref->GetHoldingsDate();
 					$arData['date'] = $strDate;
-					$arData['netvalue'] = $fund_ref->GetNetValueString();
-					$arData['CNYholdings'] = $cny_ref->GetClose($strDate);
+					$arData['netvalue'] = rtrim0($fund_ref->GetNetValueString());
+					$arData['CNYholdings'] = rtrim0($cny_ref->GetClose($strDate));
 
 					$arSymbolHedge = array();
 					$sql = GetStockSql();
@@ -100,7 +89,7 @@ function GetStockDataArray($strSymbols, $arRange = false)
 					{	
 						$arHolding = array();
 						$arHolding['ratio'] = $strRatio;
-						$arHolding['price'] = $his_sql->GetClose($strHoldingId, $strDate);
+						$arHolding['price'] = rtrim0($his_sql->GetClose($strHoldingId, $strDate));
 						$strHoldingSymbol = $sql->GetStockSymbol($strHoldingId);
 						$arSymbolHedge[$strHoldingSymbol] = $arHolding;
 					}

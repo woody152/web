@@ -41,6 +41,11 @@ function _getStockOptionDate($strSubmit, $ref, $strSymbol)
 		if ($strDate = $date_sql->ReadDate($strStockId))		return $strDate;
 	 	return $strYMD;
 
+	case STOCK_OPTION_REPORT:
+		$quarter_sql = new QuarterReportSql();
+		if ($strDate = $quarter_sql->GetDateNow($strStockId))		return $strDate;
+	 	return $strYMD;
+
 	case STOCK_OPTION_PREMIUM:
 		$premium_sql = new FuturePremiumSql();
 		if ($strDate = $premium_sql->GetDateNow($strStockId))		return $strDate;
@@ -233,7 +238,6 @@ function _getStockOptionHoldings($strStockId)
 	foreach ($ar as $strHoldingId => $strRatio)
 	{
 		$strSymbol = SqlGetStockSymbol($strHoldingId);
-//		$arSymbolRatio[$strSymbol] = rtrim0($strRatio);
 		$arSymbolRatio[$strSymbol] = strval(round(floatval($strRatio) * $fPos, 2));
 	}
 	$str = DebugEncode($arSymbolRatio);
@@ -281,6 +285,11 @@ function _getStockOptionVal($strSubmit, $strLoginId, $ref, $strSymbol, $strDate)
 	case STOCK_OPTION_NETVALUE:
 		return _getStockOptionNetValue($ref, $strSymbol, $strStockId, $strDate);
 
+	case STOCK_OPTION_REPORT:
+		$quarter_sql = new QuarterReportSql();
+		if ($strClose = $quarter_sql->GetCloseNow($strStockId))		return $strClose;
+		return '"AAA":"60","BBB":"40"';
+
 	case STOCK_OPTION_PREMIUM:
 		return _getStockOptionPremium($strStockId, $strDate);
 		
@@ -327,6 +336,9 @@ function _getStockOptionMemo($strSubmit)
 	case STOCK_OPTION_PREMIUM:
 		return '期货升水年化百分比';
 		
+	case STOCK_OPTION_REPORT:
+	 	return '清空输入删除对应日期季报数据。';
+
 	case STOCK_OPTION_SHARE_DIFF:
 		return '清空输入删除对应日期新增。';
 		

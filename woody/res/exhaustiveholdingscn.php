@@ -294,7 +294,7 @@ function _echoExhaustiveHoldingsParagraph($strPage, $strSymbol, $fInput, $iNum, 
 	$ref = new HoldingsReference($strSymbol);
     if ($ref->GetHoldingsDate())
     {
-		$ar = array();
+		$ar = [];
     	$arHoldingRef = $ref->GetHoldingsRefArray();
 		foreach ($arHoldingRef as $holding_ref)	$ar[] = new TableColumnStock($holding_ref);
 		$ar[] = new TableColumnPosition();
@@ -307,13 +307,13 @@ function _echoExhaustiveHoldingsParagraph($strPage, $strSymbol, $fInput, $iNum, 
 
 		$quarter_sql = new QuarterReportSql();
 		$arExtraHoldings = _getQuarterHoldingsExtra($ref, $quarter_sql);
-		$arExtraColumn = array();
+		$arExtraColumn = [];
 		foreach ($arExtraHoldings as $strExtraId => $strExtraData)
 		{
 			$arExtraColumn[] = new TableColumn(SqlGetStockSymbol($strExtraId));
 		}	
 
-		if (EchoTableParagraphBegin(array_merge(array(new TableColumnDate()), $arExtraColumn, $ar), 'quarter', '季报持仓'))
+		if (EchoTableParagraphBegin(array_merge([new TableColumnDate()], $arExtraColumn, $ar), 'quarter', QUARTER_REPORT_DISPLAY))
 		{
     		_echoQuarterHoldingsData($ref, $quarter_sql, $arExtraHoldings, $bAdmin);
 			EchoTableParagraphEnd();
@@ -322,7 +322,7 @@ function _echoExhaustiveHoldingsParagraph($strPage, $strSymbol, $fInput, $iNum, 
 		$iCount = count($arHoldingRef);
     	if ($iCount <= 4)
     	{
-			if (EchoTableParagraphBegin(array_merge(GetNetValueTableColumn(), array(new TableColumnError()), $ar), $strPage, GetFundLinks($strSymbol)))
+			if (EchoTableParagraphBegin(array_merge(GetNetValueTableColumn(), [new TableColumnError()], $ar), $strPage, GetFundLinks($strSymbol)))
 			{
 	    		_echoExhaustiveHoldingsData($ref, $iCount, $fInput, $iNum, $bAdmin);
 				EchoTableParagraphEnd();

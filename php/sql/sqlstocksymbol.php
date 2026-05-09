@@ -75,7 +75,7 @@ class StockHistorySql extends DailyCloseSql
     {
     	if ($record = $this->$callback($strStockId, $strDate))
     	{
-    		return rtrim0($record['adjclose']);
+    		return $record['adjclose'];
     	}
     	return false;
     }

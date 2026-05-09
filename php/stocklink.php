@@ -26,6 +26,7 @@ define('QDII_JP_DISPLAY', '日本QDII');
 define('QDII_EU_DISPLAY', '欧洲QDII');
 
 define('HOLDINGS_DISPLAY', '基金持仓');
+define('QUARTER_REPORT_DISPLAY', '季报持仓');
 
 define('STOCK_OPTION_ADR', '修改H股对应ADR代码');
 define('STOCK_OPTION_AH', '修改A股对应H股代码');
@@ -40,6 +41,7 @@ define('STOCK_OPTION_HA', '修改H股对应A股代码');
 define('STOCK_OPTION_HOLDINGS', '修改'.HOLDINGS_DISPLAY);
 define('STOCK_OPTION_NETVALUE', '修改'.STOCK_DISP_NETVALUE);
 define('STOCK_OPTION_PREMIUM', '期货升水');
+define('STOCK_OPTION_REPORT', '修改'.QUARTER_REPORT_DISPLAY);
 define('STOCK_OPTION_SHARE_DIFF', '场内新增(万)');
 define('STOCK_OPTION_SPLIT', '拆股或合股');
 
@@ -257,6 +259,7 @@ function GetStockOptionArray()
                   'editfund' => STOCK_OPTION_FUND,
                   'editnetvalue' => STOCK_OPTION_NETVALUE,
                   'editpremium' => STOCK_OPTION_PREMIUM,
+                  'editquarterreport' => STOCK_OPTION_REPORT,
                   'editsharesdiff' => STOCK_OPTION_SHARE_DIFF,
     			  'editstock' => STOCK_OPTION_EDIT,
                   'editstockadr' => STOCK_OPTION_ADR,

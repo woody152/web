@@ -371,7 +371,7 @@ function _updateStockOptionCalibration($strSymbol, $strStockId, $strDate, $strVa
 				DebugString(__FUNCTION__.' unhandled China index symbol: '.$strSymbol);
 				return;
 			}
-			else if (in_arrayQdii($strSymbol))	$strCNY = SqlGetNetValueByDate(SqlGetStockId('USCNY'), $strDate);
+			else if (in_arrayQdii($strSymbol))		$strCNY = SqlGetNetValueByDate(SqlGetStockId('USCNY'), $strDate);
 			else if (in_arrayQdiiHk($strSymbol))	$strCNY = SqlGetNetValueByDate(SqlGetStockId('HKCNY'), $strDate);
 			else if (in_arrayQdiiJp($strSymbol))	$strCNY = SqlGetNetValueByDate(SqlGetStockId('JPCNY'), $strDate);
 			else if (in_arrayQdiiEu($strSymbol))	$strCNY = SqlGetNetValueByDate(SqlGetStockId('EUCNY'), $strDate);
@@ -389,6 +389,7 @@ function _updateStockOptionCalibration($strSymbol, $strStockId, $strDate, $strVa
 	_updateOptionDailySql(GetCalibrationSql(), $strStockId, $strDate, $strVal);
 }
 
+/*
 function _updateQuarterReportHoldings($strStockId, $strDate, $strVal)
 {
 	$date_sql = new HoldingsDateSql();
@@ -403,7 +404,7 @@ function _updateQuarterReportHoldings($strStockId, $strDate, $strVal)
 	}
 	return false;
 }
-
+*/
 class _SubmitOptionsAccount extends Account
 {
     public function Process($strLoginId)
@@ -466,7 +467,7 @@ class _SubmitOptionsAccount extends Account
 		case STOCK_OPTION_CALIBRATION:
 			if ($bAdmin)	_updateStockOptionCalibration($strSymbol, $strStockId, $strDate, $strVal);
 			break;
-			
+
 		case STOCK_OPTION_HOLDINGS:
 			if ($bAdmin)
 			{
@@ -474,12 +475,13 @@ class _SubmitOptionsAccount extends Account
     			else if ($ref->IsShenZhenEtf())		ReadSzseHoldingsFile($strSymbol, $strStockId, $strDate);
 				else
 				{
-					if (_updateQuarterReportHoldings($strStockId, $strDate, $strVal) === false)
-					{
-						UpdateStockOptionHoldings($strStockId, $strDate, $strVal);
-					}	
+					UpdateStockOptionHoldings($strStockId, $strDate, $strVal);
 				}
 			}
+			break;
+
+		case STOCK_OPTION_REPORT:
+			if ($bAdmin)	_updateOptionDailySql(new QuarterReportSql(), $strStockId, $strDate, $strVal);
 			break;
 			
 		case STOCK_OPTION_NETVALUE:

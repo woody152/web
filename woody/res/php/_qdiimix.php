@@ -3,10 +3,6 @@ require_once('_fundgroup.php');
 require_once('_sseholdings.php');
 require_once('_szseholdings.php');
 
-// SH501225 全球芯片LOF SOXX*75%+SH516640*15%
-// SH501312 海外科技LOF ARKW*19.56;ARKK*19.66;ARKF*16.75;ARKG*11.86;ARKQ*5.37;QQQ*8.88;SOXX*7.44;XLK*5.2
-// SZ160644 NVDA*9.48;MSFT*7.33;TSM*9.21;PDD*7.27;GOOGL*6.38;00700*6.26;09988*4.85;META*4.85;AMZN*5.8;03690*3.62
-
 class _QdiiMixAccount extends FundGroupAccount
 {
     var $cnh_ref;

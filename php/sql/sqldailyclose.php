@@ -75,7 +75,7 @@ class DailyCloseSql extends KeySql
     {
     	if ($record = $this->$callback($strKeyId, $strDate))
     	{
-    		return rtrim0($record['close']);
+    		return $record['close'];
     	}
     	return false;
     }

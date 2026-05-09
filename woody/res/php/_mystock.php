@@ -59,6 +59,7 @@ function _getFundOptionLinks($strSymbol)
 	$str = ' '.GetStockOptionLink(STOCK_OPTION_NETVALUE, $strSymbol);
 	$str .= ' '.GetStockOptionLink(STOCK_OPTION_CALIBRATION, $strSymbol);
 	$str .= ' '.GetStockOptionLink(STOCK_OPTION_HOLDINGS, $strSymbol);
+	$str .= ' '.GetStockOptionLink(STOCK_OPTION_REPORT, $strSymbol);
 	return $str;
 }
 
