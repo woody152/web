@@ -136,7 +136,7 @@ function _getStockOptionAdr($strSymbol)
 	return 'ADR/100';
 }
 
-function _getStockOptionFund($strSymbol)
+function _getStockOptionFund($ref, $strSymbol)
 {
 	$pos_sql = GetPositionSql();
 	if ($fPos = $pos_sql->ReadVal(SqlGetStockId($strSymbol)))	$strPos = strval($fPos);
@@ -149,7 +149,9 @@ function _getStockOptionFund($strSymbol)
 		return $strIndex;
 	}
 	if ($fPos)	return $strPos;
-	return 'INDEX*1';
+	$str = 'INDEX*';
+	$str .= $ref->IsLofA() ? '0.95' : '1';
+	return $str;
 }
 
 function _getStockOptionEmaDays($strStockId, $strDate, $iDays)
@@ -274,7 +276,7 @@ function _getStockOptionVal($strSubmit, $strLoginId, $ref, $strSymbol, $strDate)
 		return _getStockOptionEma($strStockId, $strDate);
 
 	case STOCK_OPTION_FUND:
-		return _getStockOptionFund($strSymbol);
+		return _getStockOptionFund($ref, $strSymbol);
 
 	case STOCK_OPTION_HA:
 		return _getStockOptionHa($strSymbol);

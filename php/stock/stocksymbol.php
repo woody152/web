@@ -105,7 +105,7 @@ function GetSecondaryListingArray()
 
 function ChinaIndexGetAshrArray()
 {
-    return ['SH501043', 'SH510300', 'SH510310', 'SH510330', 'SZ159919', 'SZ160706'];
+    return ['SH501043', 'SH510300', 'SH510310', 'SH510330', 'SZ159919', 'SZ160706', 'SZ163407'];
 }
 
 function in_arrayAshrSymbol($strSymbol)
@@ -113,9 +113,16 @@ function in_arrayAshrSymbol($strSymbol)
     return in_array($strSymbol, ChinaIndexGetAshrArray());
 }
 
+function ChinaIndexGetSz100Array()
+{
+    return ['SZ161227', 'SZ161812'];
+}
+
 function ChinaIndexGetSymbolArray()
 {
-    return array_merge(ChinaIndexGetAshrArray(), ['SZ161812']);
+    return array_merge(ChinaIndexGetAshrArray(),
+                       ChinaIndexGetSz100Array(),
+                       ['SZ160225', 'SZ161032', 'SZ162412', 'SZ163109', 'SZ168204']);
 }
 
 function in_arrayChinaIndex($strSymbol)

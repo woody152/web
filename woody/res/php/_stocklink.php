@@ -166,9 +166,10 @@ function GetEFundSoftwareLinks($strDigitA)
 // https://www.fullgoal.com.cn/fundDetail/513350/index.html
 function GetFuGuoSoftwareLinks($strDigitA)
 {
-    $ar = array('SH513350', 'SH513870', 'SZ159792');
+    $ar = ['SH513350', 'SH513870', 'SZ159792', 'SZ161032'];
 	$strUrl = 'https://www.fullgoal.com.cn';
-    return ' '.GetOfficialLink($strUrl.'/fundDetail/'.$strDigitA.'/index.html', $strDigitA)._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '富国基金'));
+    return ' '.GetOfficialLink($strUrl.'/fundDetail/'.$strDigitA.'/index.html', $strDigitA)
+              ._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '富国基金'));
 }
 
 function GetGuangFaSoftwareLinks($strDigitA)
@@ -181,9 +182,10 @@ function GetGuangFaSoftwareLinks($strDigitA)
 // https://e.gtfund.com/Etrade/Jijin/view/id/518800
 function GetGuoTaiSoftwareLinks($strDigitA)
 {
-    $ar = array('SH513100', 'SH518800', 'SZ159612', 'SZ160216');
+    $ar = ['SH513100', 'SH518800', 'SZ159612', 'SZ160216', 'SZ160225'];
 	$strUrl = 'https://e.gtfund.com';
-    return ' '.GetOfficialLink($strUrl.'/Etrade/Jijin/view/id/'.$strDigitA, $strDigitA)._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '国泰基金'));
+    return ' '.GetOfficialLink($strUrl.'/Etrade/Jijin/view/id/'.$strDigitA, $strDigitA)
+			  ._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '国泰基金'));
 }
 
 function GetHftSoftwareLinks($strDigitA)
@@ -204,9 +206,10 @@ function GetHuaAnSoftwareLinks($strDigitA)
 // https://www.fsfund.com/fund/501312/fundDetail.shtml
 function GetHuaBaoSoftwareLinks($strDigitA)
 {
-    $ar = array('SH501312', 'SZ162411', 'SZ162415');
+    $ar = ['SH501312', 'SZ162411', 'SZ162412', 'SZ162415'];
 	$strUrl = 'https://www.fsfund.com';
-    return ' '.GetOfficialLink($strUrl.'/fund/'.$strDigitA.'/fundDetail.shtml', $strDigitA)._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '华宝基金'));
+    return ' '.GetOfficialLink($strUrl.'/fund/'.$strDigitA.'/fundDetail.shtml', $strDigitA)
+			  ._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '华宝基金'));
 }
 
 function GetHuaTaiSoftwareLinks($strDigitA)
@@ -306,7 +309,7 @@ function GetPingAnSoftwareLinks($strDigitA)
 // http://www.ubssdic.com/main/jjcp/cpxq/161226.shtml
 function GetUbsSdicSoftwareLinks($strDigitA)
 {
-    $ar = array('SZ161226');
+    $ar = array('SZ161226', 'SZ161227');
 	$strUrl = 'http://www.ubssdic.com';
     return ' '.GetOfficialLink($strUrl.'/main/jjcp/cpxq/'.$strDigitA.'.shtml', $strDigitA)._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '国投瑞银'));
 }
@@ -326,13 +329,32 @@ function GetXinChengSoftwareLinks($strDigitA)
     return ' '.GetOfficialLink($strUrl.'/pc/productDetail?fundcode='.$strDigitA, $strDigitA)._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '信诚基金'));
 }
 
-//https://www.yhfund.com.cn/main/fund/funddetail/index.shtml?product_code=161815
+// https://www.yhfund.com.cn/main/fund/funddetail/index.shtml?product_code=161815
 function GetYinHuaSoftwareLinks($strDigitA)
 {
     $ar = array('SZ159567', 'SZ161812', 'SZ161815', 'SZ161831');
 	$strUrl = 'https://www.yhfund.com.cn';
     return ' '.GetOfficialLink($strUrl.'/main/fund/funddetail/index.shtml?product_code='.$strDigitA, $strDigitA)._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '银华基金'));
 }
+
+// https://www.swsmu.com/fundproject/zhishu/163109/index.html
+function GetShenWanSoftwareLinks($strDigitA)
+{
+    $ar = ['SZ163109'];
+	$strUrl = 'https://www.swsmu.com';
+    return ' '.GetOfficialLink($strUrl.'/fundproject/zhishu/'.$strDigitA.'/index.html', $strDigitA)
+              ._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '申万基金'));
+}
+
+// https://www.xqfunds.com/products/gupiao/163407/index.html
+function GetXingQuanSoftwareLinks($strDigitA)
+{
+    $ar = ['SZ163407'];
+	$strUrl = 'https://www.xqfunds.com';
+    return ' '.GetOfficialLink($strUrl.'/products/gupiao/'.$strDigitA.'/index.html', $strDigitA)
+              ._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '兴全基金'));	// 兴证全球
+}
+
 /*
 大卫把移民话题带这么火，我来跟风讲个凡尔赛的故事吧。
 前2年网上讨论“清华父母的子女上清华的概率多大”火热的时候，我有个大学同学在同学群里说，他马上中学毕业的儿子就不上清华，而是去UC伯克利读CS。后来又过了一段时间，听说他儿子最终自己选择去了布朗大学。没选择伯克利的原因，是因为布朗大学的白人女同学比较多。
