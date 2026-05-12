@@ -4,7 +4,7 @@ require('php/_qdiimix.php');
 function GetQdiiMixRelated($strDigitA)
 {
 	$str = GetHtmlNewLine();
-	$str .= GetPenghuaSoftwareLinks($strDigitA);
+	$str .= GetPengHuaSoftwareLinks($strDigitA);
 	return $str;
 }
 

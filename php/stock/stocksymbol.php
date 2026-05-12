@@ -122,7 +122,7 @@ function ChinaIndexGetSymbolArray()
 {
     return array_merge(ChinaIndexGetAshrArray(),
                        ChinaIndexGetSz100Array(),
-                       ['SZ160225', 'SZ161032', 'SZ162412', 'SZ163109', 'SZ168204']);
+                       ['SH502000', 'SZ160225', 'SZ160632', 'SZ160639', 'SZ161032', 'SZ162412', 'SZ163109', 'SZ163113', 'SZ168204']);
 }
 
 function in_arrayChinaIndex($strSymbol)

@@ -291,9 +291,9 @@ function GetNuoAnSoftwareLinks($strDigitA)
     return ' '.GetOfficialLink($strUrl.'/official/funds/main?fundCode='.$strDigitA, $strDigitA)._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '诺安基金'));
 }
 
-function GetPenghuaSoftwareLinks($strDigitA)
+function GetPengHuaSoftwareLinks($strDigitA)
 {
-    $ar = array('SH501025', 'SH513400', 'SH520590', 'SZ159751', 'SZ160644');
+    $ar = array('SH501025', 'SH513400', 'SH520590', 'SZ159751', 'SZ160632', 'SZ160639', 'SZ160644');
 	$strUrl = 'https://www.phfund.com.cn';
     return ' '.GetOfficialLink($strUrl.'/web/FUND_'.$strDigitA, $strDigitA)._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '鹏华基金'));
 }
@@ -340,7 +340,7 @@ function GetYinHuaSoftwareLinks($strDigitA)
 // https://www.swsmu.com/fundproject/zhishu/163109/index.html
 function GetShenWanSoftwareLinks($strDigitA)
 {
-    $ar = ['SZ163109'];
+    $ar = ['SZ163109', 'SZ163113'];
 	$strUrl = 'https://www.swsmu.com';
     return ' '.GetOfficialLink($strUrl.'/fundproject/zhishu/'.$strDigitA.'/index.html', $strDigitA)
               ._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '申万基金'));

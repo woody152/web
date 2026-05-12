@@ -368,8 +368,9 @@ function _updateStockOptionCalibration($strSymbol, $strStockId, $strDate, $strVa
 			}
 			else if (in_arrayChinaIndex($strSymbol))	
 			{
-				DebugString(__FUNCTION__.' unhandled China index symbol: '.$strSymbol);
-				return;
+				//DebugString(__FUNCTION__.' unhandled China index symbol: '.$strSymbol);
+				//return;
+				$strCNY = '1.0';
 			}
 			else if (in_arrayQdii($strSymbol))		$strCNY = SqlGetNetValueByDate(SqlGetStockId('USCNY'), $strDate);
 			else if (in_arrayQdiiHk($strSymbol))	$strCNY = SqlGetNetValueByDate(SqlGetStockId('HKCNY'), $strDate);

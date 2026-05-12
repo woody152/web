@@ -5,7 +5,7 @@ function GetQdiiRelated($strDigitA)
 {
 	$str = GetHtmlNewLine();
 	$str .= GetSpindicesOfficialLink('DJI');
-	$str .= GetPenghuaSoftwareLinks($strDigitA);
+	$str .= GetPengHuaSoftwareLinks($strDigitA);
 	return $str;
 }
 

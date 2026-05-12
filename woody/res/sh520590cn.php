@@ -4,7 +4,7 @@ require('php/_qdiihk.php');
 function GetQdiiHkRelated($strDigitA)
 {
 	$str = GetHtmlNewLine();
-	$str .= GetPenghuaSoftwareLinks($strDigitA);
+	$str .= GetPengHuaSoftwareLinks($strDigitA);
 	return $str;
 }
 

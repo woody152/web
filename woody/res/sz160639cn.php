@@ -1,7 +1,7 @@
 <?php 
-require('php/_qdiihk.php');
+require('php/_chinaindex.php');
 
-function GetQdiiHkRelated($strDigitA)
+function GetChinaIndexRelated($strDigitA)
 {
 	$str = GetHtmlNewLine();
 	$str .= GetPengHuaSoftwareLinks($strDigitA);
