@@ -122,7 +122,7 @@ function ChinaIndexGetSymbolArray()
 {
     return array_merge(ChinaIndexGetAshrArray(),
                        ChinaIndexGetSz100Array(),
-                       ['SH502000', 'SZ160225', 'SZ160632', 'SZ160639', 'SZ161032', 'SZ162412', 'SZ163109', 'SZ163113', 'SZ168204']);
+                       ['SH502000', 'SZ160225', 'SZ160632', 'SZ160639', 'SZ161032', 'SZ161725', 'SZ161726', 'SZ162412', 'SZ163109', 'SZ163113', 'SZ167301', 'SZ168204']);
 }
 
 function in_arrayChinaIndex($strSymbol)
@@ -997,20 +997,20 @@ class StockSymbol
 				return $strIndexPrefix.$this->strOthers;	// index ^HSI
 			}
         }
-        else if ($this->IsSymbolH())													return $this->strOthers.$strHK;	// Hongkong market
+        else if ($this->IsSymbolH())					return $this->strOthers.$strHK;	// Hongkong market
         else if ($this->IsSymbolA())
         {
-            if ($this->strPrefixA == SH_PREFIX)										return $this->strDigitA.'.ss';	// Shanghai market
-            else if ($this->strPrefixA == SZ_PREFIX)									return $this->strDigitA.'.sz';	// Shenzhen market
-            else if ($this->strPrefixA == BJ_PREFIX)									return $this->strDigitA.'.bj';	// Beijing market
+            if ($this->strPrefixA == SH_PREFIX)			return $this->strDigitA.'.ss';	// Shanghai market
+            else if ($this->strPrefixA == SZ_PREFIX)	return $this->strDigitA.'.sz';	// Shenzhen market
+            else if ($this->strPrefixA == BJ_PREFIX)	return $this->strDigitA.'.bj';	// Beijing market
         }
         return $strSymbol;
     }
     
     function GetPrecision()
     {
-    	if ($this->IsFundA() || $this->IsSinaFund() || $this->IsStockB())   	return 3;
-    	else if ($this->IsForex())   											return 4;
+    	if ($this->IsFundA() || $this->IsSinaFund() || $this->IsStockB())	return 3;
+    	else if ($this->IsForex())   										return 4;
     	return 2;
     }
 

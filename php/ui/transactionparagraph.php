@@ -8,10 +8,8 @@ function _echoTransactionTableItem($ref, $record, $bReadOnly, $bAdmin)
     
     $ar = array($strDate, $ref->GetDisplay(), $strQuantity);
     $strPrice = $record['price'];
-	$iPrecision = $ref->GetPrecision();
-	if ($ref->IsFundA())	$iPrecision = 4;
-    $ar[] = number_format(floatval($strPrice), $iPrecision);
-    $ar[] = number_format(floatval($record['fees']), 2);
+    $ar[] = $ref->GetPriceDisplay(floatval($strPrice), false, ($ref->IsFundA() ? 4 : $ref->GetPrecision()));
+    $ar[] = GetNumberDisplay(floatval($record['fees']));
 
     $strId = $record['id'];
     $strRemark = $record['remark'];

@@ -103,7 +103,9 @@ function StockGetPriceDisplay($fDisp, $fPrev, $iPrecision)
         if ($fDisp > $fPrev + $iDiff)         $strColor = 'red';
         else if ($fDisp < $fPrev - $iDiff)    $strColor = 'green';
         else                                  $strColor = 'black';
-        return GetFontElement(number_format($fDisp, $iPrecision, '.', ''), $strColor);
+		$strDisp = number_format($fDisp, $iPrecision, '.', '');
+		$strDisp = rtrim(rtrim($strDisp, '0'), '.'); 
+        return GetFontElement($strDisp, $strColor);
     }
     return '';
 }

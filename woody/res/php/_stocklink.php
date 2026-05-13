@@ -139,12 +139,31 @@ function GetBoShiSoftwareLinks($strDigitA)
     return ' '.GetOfficialLink($strUrl.'/fund/'.$strDigitA.'.html', $strDigitA)._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '博时基金'));
 }
 
-// http://www.cmfchina.com/main/513220/fundinfo.shtml
+// https://www.cmfchina.com/web/fundDetail/161726/index.html
 function GetCmfSoftwareLinks($strDigitA)
 {
-    $ar = array('SH513220', 'SH513990', 'SZ159659');
-	$strUrl = 'http://www.cmfchina.com';
-    return ' '.GetOfficialLink($strUrl.'/main/'.$strDigitA.'/fundinfo.shtml', $strDigitA)._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '招商基金'));
+    $ar = ['SH513220', 'SH513990', 'SZ159659', 'SZ161725', 'SZ161726'];
+	$strUrl = 'https://www.cmfchina.com';
+    return ' '.GetOfficialLink($strUrl.'/web/fundDetail/'.$strDigitA.'/index.html', $strDigitA)
+              ._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '招商基金'));
+}
+
+// https://www.founderff.com/funds/167301/index.html
+function GetFounderSoftwareLinks($strDigitA)
+{
+    $ar = ['SZ167301'];
+	$strUrl = 'https://www.founderff.com';
+    return ' '.GetOfficialLink($strUrl.'/funds/'.$strDigitA.'/index.html', $strDigitA)
+              ._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '方正富邦基金'));
+}
+
+// http://www.glfund.com/c/2021-05-21/8369.shtml
+function GetGuoLianSoftwareLinks($strDigitA)
+{
+    $ar = ['SZ168204'];
+	$strUrl = 'http://www.glfund.com';
+    return ' '.GetOfficialLink($strUrl.'/c/2021-05-21/8369.shtml', $strDigitA)
+              ._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '国联基金'));
 }
 
 // http://www.dcfund.com.cn/dcjj/159740/index.jhtml

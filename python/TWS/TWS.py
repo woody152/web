@@ -84,7 +84,7 @@ class MyEWrapper(EWrapper):
             self.arOrder['XOP'] = GetOrderArray()
         else:
             #self.arOrder['TLT'] = GetOrderArray([80.90, 84.19, 85.21, 86.40, 86.62, 86.72, 87.59, 89.76, 91.88], 100, 1, 8)
-            self.arOrder['SPX'] = GetOrderArray([5203.72, 6318.14, 6869.70, 6881.24, 6929.27, 7191.40, 7301.64, 7382.96, 7509.75])
+            self.arOrder['SPX'] = GetOrderArray([5203.72, 6318.14, 6869.70, 6881.24, 6944.91, 7211.29, 7312.67, 7387.46, 7477.68, 7479.48])
             self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0032, 6, 7)
             self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0181, -1, -1)
         self.palmmicro = Palmmicro()
