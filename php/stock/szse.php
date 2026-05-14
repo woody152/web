@@ -106,7 +106,6 @@ function SzseGetLofShares($ref)
 
 	$strFileName = DebugGetPathName('debugszse.txt');
 	if (StockNeedFile($strFileName) == false)		return;				// pause 1 minute after curl error response
-//    date_default_timezone_set('PRC');
 	$ref->SetTimeZone();
 	if ($ar = StockDebugJson(DebugGetSymbolFile('szse', $ref->GetSymbol()),
 							 GetSzseUrl().'api/report/ShowReport/data?SHOWTYPE=JSON&CATALOGID=1945_LOF&txtQueryKeyAndJC='.$ref->GetDigitA(),

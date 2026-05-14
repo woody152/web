@@ -88,31 +88,29 @@ function GetSinaQuotes($arSymbol)
     return false;
 }
 
-function StockGetPriceDisplay($fDisp, $fPrev, $iPrecision)
+function StockGetPriceDisplay($fDisp, $fPrev, $iPrecision, $strGreater = 'red', $strLess = 'green')
 {
-    if ($fDisp)
-    {
-    	$iDiff = 0.5;
-    	$iCur = $iPrecision;
-    	while ($iCur > 0)
-    	{
-    		$iDiff /= 10.0;
-    		$iCur --;
-    	}
+   	$iDiff = 0.5;
+   	$iCur = $iPrecision;
+   	while ($iCur > 0)
+   	{
+   		$iDiff /= 10.0;
+   		$iCur --;
+   	}
     	
-        if ($fDisp > $fPrev + $iDiff)         $strColor = 'red';
-        else if ($fDisp < $fPrev - $iDiff)    $strColor = 'green';
-        else                                  $strColor = 'black';
-		$strDisp = number_format($fDisp, $iPrecision, '.', '');
-		$strDisp = rtrim(rtrim($strDisp, '0'), '.'); 
-        return GetFontElement($strDisp, $strColor);
-    }
-    return '';
+    if ($fDisp > $fPrev + $iDiff)         $strColor = $strGreater;
+    else if ($fDisp < $fPrev - $iDiff)    $strColor = $strLess;
+    else                                  $strColor = 'grey';
+	$strDisp = number_format($fDisp, $iPrecision, '.', '');
+	if ($iPrecision > 0)	$strDisp = rtrim($strDisp, '0'); 
+	$strDisp = rtrim($strDisp, '.');
+    if ($strColor != 'black')	return GetFontElement($strDisp, $strColor);
+	return $strDisp;
 }
 
-function GetNumberDisplay($fVal, $iPrecision = 2)
+function GetNumberDisplay($fVal, $iPrecision = 2, $strGreater = 'black', $strLess = 'red')
 {
-    return StockGetPriceDisplay($fVal, 0.0, $iPrecision);
+    return StockGetPriceDisplay($fVal, 0.0, $iPrecision, $strGreater, $strLess);
 }
 
 function GetRatioDisplay($fVal, $iPrecision = 4)
@@ -256,6 +254,7 @@ function _getAllSymbolArray($strSymbol)
     	if ($strSymbolH = SqlGetAdrhPair($strSymbol))
         {
            	$ar[] = $strSymbolH;
+			$ar[] = 'fx_susdhkd';
             if ($strSymbolA = SqlGetHaPair($strSymbolH))
             {
             	$ar[] = $strSymbolA;
@@ -266,6 +265,7 @@ function _getAllSymbolArray($strSymbol)
        	if ($strPairSymbol = SqlGetFundPair($strSymbol))
        	{
        		$ar[] = $strPairSymbol;
+			if ($strPairSymbol == 'znb_SENSEX')							$ar[] = 'fx_susdinr';
          	if ($strSymbol == 'ASHR' || $strSymbol == 'hf_CHA50CFD')	$ar[] = 'fx_susdcnh';
       	}
     }

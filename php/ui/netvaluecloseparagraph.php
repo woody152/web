@@ -18,7 +18,7 @@ function _echoNetValueCloseItem($csv, $his_sql, $shares_sql, $arHistory, $fNetVa
     if ($strShare = $shares_sql->GetClose($strStockId, $strDate))
     {
     	$fShare = floatval($strShare);
-    	$ar[] = number_format($fShare, 2);
+    	$ar[] = GetNumberDisplay($fShare, 2);
     	$ar[] = GetTurnoverDisplay(floatval($his_sql->GetVolume($strStockId, $strDate)), $fShare);
     }
     

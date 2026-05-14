@@ -80,13 +80,13 @@ function _echoOverNightCnhItem($strSymbol, $strInput, $bSell)
    	if ($strQuantity = $stock_ref->GetAvailableQuantity($bSell))
    	{
    		$strPrice = $stock_ref->GetAvailablePrice($bSell);
-   		$ar[] = $strPrice;
+		$fPrice = floatval($strPrice);
+   		$ar[] = $stock_ref->GetPriceDisplay($fPrice);
    		$ar[] = $strQuantity;
 
 		$strStockId = $ref->GetStockId();
    		$fPos = $ref->GetPosition();
-		$fHintQuantity = ($fCnh / $fPos) / floatval($strPrice);
-		// DebugVal($fHintQuantity, $strSymbol, true);
+		$fHintQuantity = ($fCnh / $fPos) / $fPrice;
 		$strHedge = '';
 		$strMemo = '';
 
@@ -97,7 +97,7 @@ function _echoOverNightCnhItem($strSymbol, $strInput, $bSell)
 //				$fHedgeQuantity = floor($fHintQuantity / $fHedge);
 				$fHedgeQuantity = round($fHintQuantity / $fHedge);
 				$fHintQuantity = $fHedgeQuantity * $fHedge;
-				$strHedge = number_format($fHedge);
+				$strHedge = GetNumberDisplay($fHedge, 0);
 				$strMemo = _buildHedgeString($fHedgeQuantity, ($strEtf = GetLeverageHedgeSymbol($strSymbol)) ? $strEtf : $est_ref->GetSymbol());
 			}
    		}
@@ -133,20 +133,17 @@ function _echoOverNightCnhItem($strSymbol, $strInput, $bSell)
 	EchoTableColumn($ar);
 }
 
-// function _echoOverNightCnhParagraph($arSymbol, $fCnh)
 function _echoOverNightCnhParagraph($strPage, $arSymbol, $strInput)
 {
 	$bSell = (substr($strInput, 0, 1) == '-') ? true : false;
-//	$bSell = ($fCnh < 0.0) ? true : false;
-//	$fCnh = abs($fCnh);
 	$strPrefix = '可'.($bSell ? '卖' : '买');
 	$strHint = '建议';
 	
-	$ar = array(new TableColumnSymbol(),
-				new TableColumnPrice($strPrefix),
-				new TableColumnQuantity($strPrefix),
-				new TableColumnQuantity($strHint),
-				new TableColumnHedge());
+	$ar = [new TableColumnSymbol(),
+		   new TableColumnPrice($strPrefix),
+		   new TableColumnQuantity($strPrefix),
+		   new TableColumnQuantity($strHint),
+		   new TableColumnHedge()];
 	$ar[] = new TableColumn($strHint.'对冲操作', TableColumnGetLastWidth($ar));
 	
 	if (EchoTableParagraphBegin($ar, $strPage))

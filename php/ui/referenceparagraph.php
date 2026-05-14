@@ -55,7 +55,7 @@ function _echoReferenceTableData($arRef, $bAdmin)
 
 function GetTimeDisplay()
 {
-    date_default_timezone_set('PRC');
+    date_default_timezone_set('Asia/Shanghai');
 	$ymd = GetNowYMD();
 	$strTick = strval($ymd->GetTick() * 1000);
 	

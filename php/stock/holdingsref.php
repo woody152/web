@@ -1,13 +1,5 @@
 <?php
 
-/*
-function SqlSetNetValue($strStockId, $strDate, $strNetValue)
-{
-	$net_sql = GetNetValueHistorySql();
-	return $net_sql->InsertDaily($strStockId, $strDate, $strNetValue);
-}
-*/
-
 function RefAdjustForex($ref, $fAdjustHKD, $fAdjustUSD)
 {
 	if ($ref->IsSymbolA())		$fAdjust = 1.0;

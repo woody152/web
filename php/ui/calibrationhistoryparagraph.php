@@ -5,11 +5,11 @@ function _echoCalibrationHistoryItem($fPosition, $ref, $record, $iMultiplier)
 {
 	$fCalibration = floatval($record['close']);
 	$strDate = $record['date'];
-	$ar = array($strDate, number_format($fCalibration, NETVALUE_PRECISION), GetHM($record['time']), $record['num']);
+	$ar = array($strDate, GetNumberDisplay($fCalibration, NETVALUE_PRECISION), GetHM($record['time']), $record['num']);
 	if ($fPosition)
 	{
 		$ar[] = $ref->GetNetValueDisplay($ref->GetNetValue($strDate));
-		$ar[] = number_format(StockCalcHedge($fCalibration, $fPosition) * $iMultiplier);
+		$ar[] = GetNumberDisplay(StockCalcHedge($fCalibration, $fPosition) * $iMultiplier, 0);
 	}
 	EchoTableColumn($ar);
 }

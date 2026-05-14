@@ -1,15 +1,6 @@
 <?php
 require_once('stocktable.php');
 
-function GetDiffDisplay($fDiff)
-{
-	$strColor = ($fDiff > MIN_FLOAT_VAL) ? 'green' : 'red';
-	$strDisp = number_format($fDiff, 2);
-	if ($strDisp == '0')		$strColor = 'gray';
-
-   	return GetFontElement($strDisp, $strColor);
-}
-
 function _echoFundShareItem($record, $strStockId, $his_sql, $shares_sql)
 {
 	$strDate = $record['date'];
@@ -22,7 +13,7 @@ function _echoFundShareItem($record, $strStockId, $his_sql, $shares_sql)
     	$strVolume = $his_sql->GetVolume($strStockId, $strDate);
     	$fVolume = floatval($strVolume);
     	
-		$ar[] = GetDiffDisplay($fShareDiff);
+		$ar[] = GetNumberDisplay($fShareDiff);
 		$ar[] = $strVolume;
 		if (!empty($strShare))
 		{

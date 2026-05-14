@@ -12,9 +12,9 @@ function _echoCurrentHoldingsItem($ref)
 	$ar = array();
 	foreach ($ref->GetHoldingsRatioArray() as $strHoldingId => $strRatio)
 	{
-		$ar[] = number_format(floatval($strRatio), 0);
+		$ar[] = GetNumberDisplay(floatval($strRatio), 0);
 	}
-	$ar[] = number_format($ref->GetPosition(), 2);
+	$ar[] = GetNumberDisplay($ref->GetPosition(), 2);
 	EchoMatchTableColumn($ar);
 }
 

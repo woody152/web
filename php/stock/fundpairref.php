@@ -30,7 +30,11 @@ class MyPairReference extends MyStockReference
         	else if ($this->pair_ref->IsSymbolH())
         	{
         		if ($this->IsSymbolA())			$strCNY = 'HKCNY';
-				else if ($this->IsSymbolUS())	$this->cny_ref = new UsdHkdReference();
+				else if ($this->IsSymbolUS())	$this->cny_ref = new MyStockReference('fx_susdhkd');	// UsdHkdReference();
+        	}
+        	else if ($strPair == 'znb_SENSEX')
+        	{
+				$this->cny_ref = new MyStockReference('fx_susdinr');
         	}
         	else
         	{
@@ -83,7 +87,7 @@ class MyPairReference extends MyStockReference
     	if ($fCny == false)		$fCny = $this->GetDefaultCny();
     	
     	if ($this->IsSymbolA())	$fVal = QdiiGetVal($fPairVal, $fCny, $this->fFactor);
-    	else						$fVal = ($fPairVal / $fCny) / $this->fFactor;
+    	else					$fVal = ($fPairVal / $fCny) / $this->fFactor;
 		return FundAdjustPosition($this->GetPosition(), $fVal, ($this->fLastCalibrationVal ? $this->fLastCalibrationVal : $fVal));
     }
     

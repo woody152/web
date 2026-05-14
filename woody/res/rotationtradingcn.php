@@ -5,16 +5,16 @@ require_once('../../php/ui/editinputform.php');
 
 function _echoRotationTradingItem($rotation_ref, $fEstQuantity, $bRotationSell)
 {
-	$ar = array();
+	$ar = [];
     $stock_ref = GetStockRef($rotation_ref);
 	
-	// $ar[] = $rotation_ref->GetStockLink();
 	$strSymbol = $stock_ref->GetSymbol();
 	$ar[] = CopyPhpLink('symbol='.$strSymbol, $strSymbol);
    	if ($strQuantity = $stock_ref->GetAvailableQuantity($bRotationSell))
    	{
    		$strPrice = $stock_ref->GetAvailablePrice($bRotationSell);
-   		$ar[] = $strPrice;
+		$fPrice = floatval($strPrice);
+   		$ar[] = $stock_ref->GetPriceDisplay($fPrice);
    		$ar[] = $strQuantity;
 		
 		$fHedge = GetStockHedge($strSymbol, $stock_ref->GetStockId());
@@ -22,11 +22,11 @@ function _echoRotationTradingItem($rotation_ref, $fEstQuantity, $bRotationSell)
 		$strHintQuantity = strval($fHintQuantity);
 		if ($fHintQuantity > floatval($strQuantity))	$strHintQuantity = GetFontElement($strHintQuantity);
 		$ar[] = $strHintQuantity;
-		$ar[] = number_format($fHedge);
-		$ar[] = number_format($fEstQuantity);
+		$ar[] = GetNumberDisplay($fHedge, 0);
+		$ar[] = GetNumberDisplay($fEstQuantity, 0);
 		if ($fEst = $rotation_ref->GetEstNetValue())
 		{
-			$ar[] = $stock_ref->GetPercentageDisplay($fEst, floatval($strPrice));
+			$ar[] = $stock_ref->GetPercentageDisplay($fEst, $fPrice);
 		}
    	}
 
@@ -38,13 +38,13 @@ function _echoRotationTradingParagraph($strPage, $arRotationRef, $fEstQuantity, 
 	$bRotationSell = $bSell ? false : true;
 	$strPrefix = '可'.($bRotationSell ? '卖' : '买');
 	$strHint = '建议';
-	$ar = array(new TableColumnSymbol(),
-				new TableColumnPrice($strPrefix),
-				new TableColumnQuantity($strPrefix),
-				new TableColumnQuantity($strHint),
-				new TableColumnHedge(),
-				new TableColumnQuantity($strHedgeSymbol),
-				new TableColumnPremium());
+	$ar = [new TableColumnSymbol(),
+		   new TableColumnPrice($strPrefix),
+		   new TableColumnQuantity($strPrefix),
+		   new TableColumnQuantity($strHint),
+		   new TableColumnHedge(),
+		   new TableColumnQuantity($strHedgeSymbol),
+		   new TableColumnPremium()];
 	
 	if (EchoTableParagraphBegin($ar, $strPage))
 	{
@@ -71,7 +71,7 @@ function EchoAll()
     	if ($arSymbol = _getRotationSymbolArray($strSymbol))
     	{
     		StockPrefetchArrayExtendedData($arSymbol);
-    		$arRotationRef = array();
+    		$arRotationRef = [];
     		foreach ($arSymbol as $str)
     		{
     			if ($str != $strSymbol)		$arRotationRef[] = StockGetFundReference($str);

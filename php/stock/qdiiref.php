@@ -56,24 +56,24 @@ function QdiiGetEstSymbol($strSymbol)
 
 function QdiiHkGetEstSymbol($strSymbol)
 {
-    if ($strSymbol == 'SH501025')   		 									        return 'SH000869';	// '03143'
+    if ($strSymbol == 'SH501025')   		 									return 'SH000869';	// '03143'
     else if (in_arrayTechQdiiHk($strSymbol))									return '^HSTECH';
     else if (in_arrayHangSengQdiiHk($strSymbol) || $strSymbol == 'SZ161124')	return '^HSI';		// '02800' || HKHSSI
-    else if (in_arrayHSharesQdiiHk($strSymbol))								return '^HSCE';		// '02828'
+    else if (in_arrayHSharesQdiiHk($strSymbol))									return '^HSCE';		// '02828'
     return false;
 }
 
 function QdiiJpGetEstSymbol($strSymbol)
 {
-    if ($strSymbol == 'SH513800')   		 		    return 'znb_TPX';
-	else if (in_arrayNkyQdiiJp($strSymbol))	return 'znb_NKY';
+    if ($strSymbol == 'SH513800')   			return 'znb_TPX';
+	else if (in_arrayNkyQdiiJp($strSymbol))		return 'znb_NKY';
     return false;
 }
 
 function QdiiEuGetEstSymbol($strSymbol)
 {
-    if ($strSymbol == 'SH513080')   		 		    return 'znb_CAC';
-	else if (in_arrayDaxQdiiEu($strSymbol))	return 'znb_DAX';
+    if ($strSymbol == 'SH513080')   		 	return 'znb_CAC';
+	else if (in_arrayDaxQdiiEu($strSymbol))		return 'znb_DAX';
     return false;
 }
 

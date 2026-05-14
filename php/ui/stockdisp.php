@@ -19,12 +19,12 @@ define('STOCK_DISP_ORDER', '申购');
 define('STOCK_DISP_POSITION', '仓位');
 define('STOCK_DISP_PREMIUM', '溢价');	// orange
 define('STOCK_DISP_PRICE', '价格');		// blue
-define('STOCK_DISP_PROFIT', '盈利');		// red
+define('STOCK_DISP_PROFIT', '盈亏');	// red
 define('STOCK_DISP_QUANTITY', '数量');	// indigo
 define('STOCK_DISP_RATIO', '比价');
 define('STOCK_DISP_REALTIME', '实时');
 define('STOCK_DISP_REMARK', '备注');
-define('STOCK_DISP_SYMBOL', '代码');		// maroon
+define('STOCK_DISP_SYMBOL', '代码');	// maroon
 define('STOCK_DISP_TURNOVER', '换手');	// green
 
 define('STOCK_DISP_DEBUG', '调试信息');

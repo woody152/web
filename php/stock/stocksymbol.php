@@ -278,7 +278,7 @@ function in_arrayQdiiHk($strSymbol)
 
 function QdiiJpGetNkySymbolArray()
 {
-    return array('SH513000', 'SH513520', 'SH513880', 'SZ159866');
+    return ['SH513000', 'SH513520', 'SH513880', 'SZ159866'];
 }
 
 function in_arrayNkyQdiiJp($strSymbol)
@@ -288,9 +288,7 @@ function in_arrayNkyQdiiJp($strSymbol)
 
 function QdiiJpGetSymbolArray()
 {
-    $ar = array_merge(array('SH513800') 
-    				   , QdiiJpGetNkySymbolArray());
-//    sort($ar);
+    $ar = array_merge(['SH513800'], QdiiJpGetNkySymbolArray());
     return $ar;
 }
 
@@ -501,7 +499,7 @@ function BuildChinaStockSymbol($strDigit)
         $iDigit = intval($strDigit);
         if (($iDigit < 100000) || ($iDigit >= 200000 && $iDigit < 400000))								return SZ_PREFIX.$strDigit;
         else if (($iDigit >= 400000 && $iDigit < 500000) || ($iDigit >= 800000 && $iDigit < 900000))	return BJ_PREFIX.$strDigit;
-        else if ($iDigit >= 600000)																			return SH_PREFIX.$strDigit;
+        else if ($iDigit >= 600000)																		return SH_PREFIX.$strDigit;
     }
     return false;
 }
@@ -1040,13 +1038,10 @@ class StockSymbol
 			case 'DAX':
 			case 'NKY':
 			case 'TPX':
+			case 'SENSEX':	// PRC 1145
     			if ($iHourMinute < 900)		return true;
     			break;
-
-			case 'SENSEX':
-    			if ($iHourMinute < 1145)		return true;
-    			break;
-   		}
+	   		}
     	}
    		else if ($this->IsSymbolA())
    		{
@@ -1081,7 +1076,7 @@ class StockSymbol
     			break;
 
 			case 'SENSEX':
-    			if ($iHourMinute > 1835)		return true;
+    			if ($iHourMinute > 1605)		return true;	// PRC 1835
     			break;
     		}
     	}
@@ -1139,10 +1134,10 @@ class StockSymbol
     {
     	$strEDT = 'America/New_York';
     	
-        if ($this->IsSinaFund())								{}
+        if ($this->IsSinaFund())							{}
         else if ($this->IsSinaFuture())
         {
-        	if ($this->IsSinaFutureUS())						return $strEDT;
+        	if ($this->IsSinaFutureUS())					return $strEDT;
         }
         else if ($this->IsSinaForex())						return $strEDT;
         else if ($this->IsEastMoneyForex())					{}
@@ -1158,13 +1153,15 @@ class StockSymbol
 				
 			case 'NKY':
 			case 'TPX':
+				return 'Asia/Tokyo';
+
 			case 'SENSEX':
-				return 'PRC';	//  'Asia/Tokyo';
+				return 'Asia/Kolkata';
 			}
 		}
         else if ($this->IsSymbolA() || $this->IsSymbolH())	{}
         else													return $strEDT;
-        return 'PRC';
+        return 'Asia/Shanghai';
     }
 
     function SetTimeZone()

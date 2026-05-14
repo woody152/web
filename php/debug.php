@@ -1,7 +1,7 @@
 <?php
 require_once('url.php');
 
-define('DEBUG_TIME_ZONE', 'PRC');
+define('DEBUG_TIME_ZONE', 'Asia/Shanghai');
 
 define('SECONDS_IN_MIN', 60);
 define('SECONDS_IN_HOUR', 3600);

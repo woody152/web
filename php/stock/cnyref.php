@@ -20,6 +20,7 @@ class CnyReference extends MysqlReference
 	}
 }
 
+/*
 class UsdHkdReference
 {
 	var $uscny_ref;
@@ -41,5 +42,6 @@ class UsdHkdReference
 		return $this->uscny_ref->GetClose($strDate) / $this->hkcny_ref->GetClose($strDate); 
 	}
 }
+*/
 
 ?>

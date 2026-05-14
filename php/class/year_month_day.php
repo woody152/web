@@ -236,7 +236,7 @@ class NowYMD extends TickYMD
     
     public function __construct()
     {
-        $this->strTimeZone = 'PRC';
+        $this->strTimeZone = 'Asia/Shanghai';
     	date_default_timezone_set($this->strTimeZone);
         
         parent::__construct(time());
