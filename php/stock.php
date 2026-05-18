@@ -25,7 +25,7 @@ require_once('stock/fundpairref.php');
 function StockGetSymbol($str)
 {
 	$str = trim($str);
-	if ($strSymbol = BuildChinaFundSymbol($str))		return $strSymbol;
+	if ($strSymbol = BuildChinaFundSymbol($str))	return $strSymbol;
 	if ($strSymbol = BuildChinaStockSymbol($str))	return $strSymbol;
 	if (strpos($str, '_') === false)	$str = strtoupper($str);
     return $str;

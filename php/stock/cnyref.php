@@ -20,28 +20,4 @@ class CnyReference extends MysqlReference
 	}
 }
 
-/*
-class UsdHkdReference
-{
-	var $uscny_ref;
-	var $hkcny_ref;
-    
-    public function __construct()
-    {
-   		$this->uscny_ref = new CnyReference('USCNY');
-   		$this->hkcny_ref = new CnyReference('HKCNY');
-    }
-    
-	public function GetVal($strDate = false)
-	{
-		return $this->uscny_ref->GetVal($strDate) / $this->hkcny_ref->GetVal($strDate); 
-	}
-    
-	public function GetClose($strDate)
-	{
-		return $this->uscny_ref->GetClose($strDate) / $this->hkcny_ref->GetClose($strDate); 
-	}
-}
-*/
-
 ?>

@@ -30,7 +30,7 @@ class MyPairReference extends MyStockReference
         	else if ($this->pair_ref->IsSymbolH())
         	{
         		if ($this->IsSymbolA())			$strCNY = 'HKCNY';
-				else if ($this->IsSymbolUS())	$this->cny_ref = new MyStockReference('fx_susdhkd');	// UsdHkdReference();
+				else if ($this->IsSymbolUS())	$this->cny_ref = new MyStockReference('fx_susdhkd');
         	}
         	else if ($strPair == 'znb_SENSEX')
         	{
