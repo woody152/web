@@ -105,7 +105,7 @@ function GetSecondaryListingArray()
 
 function ChinaIndexGetAshrArray()
 {
-    return ['SH501043', 'SH510300', 'SH510310', 'SH510330', 'SZ159919', 'SZ160706', 'SZ163407'];
+    return ['SH501043', 'SH510300', 'SH510310', 'SH510330', 'SZ159919', 'SZ160706', 'SZ161005', 'SZ163407'];
 }
 
 function in_arrayAshrSymbol($strSymbol)

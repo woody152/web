@@ -185,7 +185,7 @@ function GetEFundSoftwareLinks($strDigitA)
 // https://www.fullgoal.com.cn/fundDetail/513350/index.html
 function GetFuGuoSoftwareLinks($strDigitA)
 {
-    $ar = ['SH513350', 'SH513870', 'SZ159792', 'SZ161032'];
+    $ar = ['SH513350', 'SH513870', 'SZ159792', 'SZ161005', 'SZ161032'];
 	$strUrl = 'https://www.fullgoal.com.cn';
     return ' '.GetOfficialLink($strUrl.'/fundDetail/'.$strDigitA.'/index.html', $strDigitA)
               ._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '富国基金'));
