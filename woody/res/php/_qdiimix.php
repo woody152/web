@@ -5,6 +5,7 @@ require_once('_szseholdings.php');
 
 class _QdiiMixAccount extends FundGroupAccount
 {
+	var $inr_ref = false;
     var $cnh_ref;
 
     function Create()
@@ -22,11 +23,18 @@ class _QdiiMixAccount extends FundGroupAccount
         {
         	$ar_realtime_ref = $this->ref->GetRealtimeRefArray();
         	$arRef = array_merge($arRef, $ar_realtime_ref);
-        	$arPairSymbol = array();
         	foreach ($ar_realtime_ref as $ref)
         	{
         		$pair_ref = $ref->GetPairRef();
 				if (in_array_ref($pair_ref, $arRef) == false)	$arRef[] = $pair_ref;
+				if ($ref->GetSymbol() == 'INDA')
+				{
+					$this->inr_ref = $ref->GetCnyRef();
+					if (YahooUpdateNetValue($ref))
+        			{
+        				$ref->DailyCalibration();
+        			}
+				}	
         	}
         }
 
@@ -93,7 +101,7 @@ function EchoAll()
     $ref = $acct->GetRef();
     $uscny_ref = $ref->GetCnyRef();
     $hkcny_ref = $ref->GetHkcnyRef();
-    $arForex = array($acct->cnh_ref);
+    $arForex = [$acct->cnh_ref];
     if ($uscny_ref !== false)
     {
     	$arForex[] = $ref->GetUsdcnyRef();
@@ -104,12 +112,16 @@ function EchoAll()
     	$arForex[] = $ref->GetHkdcnyRef();
     	$arForex[] = $hkcny_ref;
     }
+	if ($acct->inr_ref !== false)
+	{
+    	$arForex[] = $acct->inr_ref;
+	}	
     
 	EchoHoldingsEstParagraph($ref);
     EchoReferenceParagraph(array_merge($acct->GetStockRefArray(), 
     									//$ref->GetHoldingsRefArray(), 
-    									$arForex), $acct->IsAdmin());
-    
+    								   $arForex),
+						   $acct->IsAdmin());
 	EchoFundTradingParagraph($ref);
     if ($ref->UseRealtimeEst())		EchoFundListParagraph($ref->GetRealtimeRefArray());
 

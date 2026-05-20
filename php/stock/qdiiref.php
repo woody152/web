@@ -18,28 +18,27 @@ function QdiiGetPeerVal($fQdii, $fCny, $fFactor)
 // https://markets.ft.com/data/indices/tearsheet/charts?s=SPGOGUP:
 function QdiiGetEstArray()
 {
-	$ar = array('SH501300' => 'AGG',
-                'SH513290' => 'IBB',
-                'SH513400' => '^DJI',
-                'SZ160140' => 'VNQ',	// SCHH
-                'SZ160416' => 'IXC',	// '^SPGOGUP'
-                'SZ161126' => 'RSPH',
-                'SZ161128' => 'VGT',    // XLK IXN
-                'SZ162415' => 'XLY',	// '^IXY'
-                'SZ162719' => 'IEO',	// '^DJSOEP'
-                'SZ164824' => 'INDA',
-                'SZ164906' => 'KWEB',
-               );
-    foreach (QdiiGetXopSymbolArray() as $strSymbol)			$ar[$strSymbol] = 'XOP';	// '^SPSIOP'
-    foreach (QdiiGetXbiSymbolArray() as $strSymbol)			$ar[$strSymbol] = 'XBI';
-    foreach (QdiiGetSpySymbolArray() as $strSymbol)			$ar[$strSymbol] = '^GSPC';	// 'SPY'
-    foreach (QdiiGetQqqSymbolArray() as $strSymbol)			$ar[$strSymbol] = '^NDX';	// 'QQQ'
+	$ar = ['SH501300' => 'AGG',
+           'SH513290' => 'IBB',
+           'SH513400' => '^DJI',
+           'SZ160140' => 'VNQ',		// SCHH
+           'SZ160416' => 'IXC',		// '^SPGOGUP'
+           'SZ161126' => 'RSPH',
+           'SZ161128' => 'VGT',		// XLK IXN
+           'SZ162415' => 'XLY',		// '^IXY'
+           'SZ162719' => 'IEO',		// '^DJSOEP'
+           'SZ164906' => 'KWEB',
+	      ];
+    foreach (QdiiGetXopSymbolArray() as $strSymbol)		$ar[$strSymbol] = 'XOP';	// '^SPSIOP'
+    foreach (QdiiGetXbiSymbolArray() as $strSymbol)		$ar[$strSymbol] = 'XBI';
+    foreach (QdiiGetSpySymbolArray() as $strSymbol)		$ar[$strSymbol] = '^GSPC';	// 'SPY'
+    foreach (QdiiGetQqqSymbolArray() as $strSymbol)		$ar[$strSymbol] = '^NDX';	// 'QQQ'
     return $ar;
 }
 
 function QdiiGetArray($strEst)
 {
-	$ar = array();
+	$ar = [];
 	foreach (QdiiGetEstArray() as $strSymbol => $str)
 	{
 		if ($str == $strEst)	$ar[] = $strSymbol;
@@ -166,8 +165,14 @@ class _QdiiReference extends FundReference
         
         $strDate = $est_ref->GetDate();
        	$cny_ref = $this->GetCnyRef();
-       	if ($this->IsEtfA() || ($cny_ref->GetDate() != $this->strOfficialDate) || ($strDate != $this->strOfficialDate))		$this->fFairNetValue = $this->GetQdiiValue($this->_getFairEstVal($strDate));
-		if ($realtime_ref = $this->GetRealtimeRef())															           	$this->fRealtimeNetValue = $this->GetQdiiValue(strval($est_ref->EstFromPair()));
+       	if ($this->IsEtfA() || ($cny_ref->GetDate() != $this->strOfficialDate) || ($strDate != $this->strOfficialDate))
+		{
+			$this->fFairNetValue = $this->GetQdiiValue($this->_getFairEstVal($strDate));
+		}
+		if ($this->GetRealtimeRef())
+		{
+			$this->fRealtimeNetValue = $this->GetQdiiValue(strval($est_ref->EstFromPair()));
+		}
     }
 
     function AdjustFactor()

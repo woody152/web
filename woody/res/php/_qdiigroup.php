@@ -55,10 +55,10 @@ class QdiiGroupAccount extends FundGroupAccount
     	$ref = $this->GetRef();
     	$stock_ref = $ref->GetStockRef();
        	$est_ref = $ref->GetEstRef();
-       	$arRef = array($stock_ref, $est_ref);
+       	$arRef = [$stock_ref, $est_ref];
 		if ($realtime_ref = $ref->GetRealtimeRef())		$arRef[] = $realtime_ref;
     	
-        if ($ar = YahooUpdateNetValue($est_ref))
+        if (YahooUpdateNetValue($est_ref))
         {
         	if ($est_ref->GetSymbol() == 'INDA')	$est_ref->DailyCalibration();
         }

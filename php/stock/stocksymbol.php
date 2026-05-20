@@ -212,7 +212,7 @@ function in_arrayXbiQdii($strSymbol)
 
 function QdiiGetSymbolArray()
 {
-    $ar = array_merge(array('SH501300', 'SH513290', 'SH513400', 'SZ160140', 'SZ161126', 'SZ161128', 'SZ162415', 'SZ164824', 'SZ164906') 
+    $ar = array_merge(array('SH501300', 'SH513290', 'SH513400', 'SZ160140', 'SZ161126', 'SZ161128', 'SZ162415', 'SZ164906') 
     				   , QdiiGetXbiSymbolArray()
     				   , QdiiGetXopSymbolArray()
     				   , QdiiGetOilEtfSymbolArray()
@@ -352,7 +352,7 @@ function GetQdiiOilSymbolArray()
 
 function GetLofMixSymbolArray()
 {
-	return array_merge(['SH501225', 'SH501312', 'SZ160644'], GetQdiiOilSymbolArray(), GetQdiiGoldSymbolArray());
+	return array_merge(['SH501225', 'SH501312', 'SZ160644', 'SZ164824'], GetQdiiOilSymbolArray(), GetQdiiGoldSymbolArray());
 }
 
 function in_arrayLofMix($strSymbol)

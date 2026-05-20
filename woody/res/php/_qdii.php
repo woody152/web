@@ -6,7 +6,6 @@ require_once('../../php/stock/kraneshares.php');
 class QdiiAccount extends QdiiGroupAccount
 {
     var $oil_ref = false;
-	var $inr_ref = false;
     var $cnh_ref;
 
     function Create() 
@@ -38,11 +37,7 @@ class QdiiAccount extends QdiiGroupAccount
         if ($strOil)	$this->oil_ref = new MyStockReference($strOil);
 
        	$est_ref = $this->ref->GetEstRef();
-		if ($strEstSymbol == 'INDA')
-		{
-			$this->inr_ref = $est_ref->GetCnyRef();
-		}
-        else if ($strEstSymbol == 'KWEB')
+		if ($strEstSymbol == 'KWEB')
         {
         	if ($strDate = NeedOfficialWebData($est_ref))
         	{
@@ -73,7 +68,10 @@ function EchoAll()
     EchoFundEstParagraph($ref);
     if (method_exists($est_ref, 'GetHoldingsDate'))		EchoHoldingsEstParagraph($est_ref);
     
-    EchoReferenceParagraph(array_merge($acct->GetStockRefArray(), [$acct->oil_ref, $acct->inr_ref, $acct->cnh_ref], $ref->GetForexRefArray()), $acct->IsAdmin());
+    EchoReferenceParagraph(array_merge($acct->GetStockRefArray(),
+									   [$acct->oil_ref, $acct->cnh_ref],
+									   $ref->GetForexRefArray()),
+						   $acct->IsAdmin());
     $acct->EchoCommonParagraphs();
     if ($group = $acct->EchoTransaction()) 
     {

@@ -84,8 +84,8 @@ class MyEWrapper(EWrapper):
             self.arOrder['XOP'] = GetOrderArray()
         else:
             #self.arOrder['TLT'] = GetOrderArray([80.90, 84.19, 85.21, 86.40, 86.62, 86.72, 87.59, 89.76, 91.88], 100, 1, 8)
-            self.arOrder['SPX'] = GetOrderArray([5203.72, 6285.28, 6910.19, 6955.96, 6999.12, 7285.85, 7408.00, 7439.26, 7572.58])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0028, 5, 6)
+            self.arOrder['SPX'] = GetOrderArray([5203.72, 6285.28, 6910.19, 6955.96, 7020.31, 7297.20, 7406.72, 7416.60, 7574.10])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0027, 5, 6)
             self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0181, -1, -1)
         self.palmmicro = Palmmicro()
         self.client.StartStreaming(orderId)

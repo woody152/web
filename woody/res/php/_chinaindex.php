@@ -45,23 +45,13 @@ class _ChinaIndexAccount extends FundGroupAccount
 		if ($strA50)	$arRef[] = $this->a50_ref;
         $this->CreateGroup($arRef);
     }
-
-    function GetUsRef()
-    {
-    	return $this->us_ref;
-    }
-
-    function GetA50Ref()
-    {
-    	return $this->a50_ref;
-    }
 }
 
 function _RealtimeCallback()
 {
     global $acct;
     
-    $a50_ref = $acct->GetA50Ref();
+    $a50_ref = $acct->a50_ref;
     return $a50_ref->EstToPair();
 }
 
@@ -70,8 +60,8 @@ function EchoAll()
     global $acct;
 
     $ref = $acct->GetRef();
-    $us_ref = $acct->GetUsRef();
-    $a50_ref = $acct->GetA50Ref();
+    $us_ref = $acct->us_ref;
+    $a50_ref = $acct->a50_ref;
 
     if ($us_ref)	$cnh_ref = $us_ref->GetCnyRef();
 	else			$cnh_ref = false;
@@ -109,7 +99,7 @@ function GetChinaIndexLinks($sym)
     global $acct;
 
 	$str = '';
-    if ($us_ref = $acct->GetUsRef())
+    if ($us_ref = $acct->us_ref)
 	{
 		if ($us_ref->GetSymbol() == 'ASHR')
 		{
@@ -126,7 +116,7 @@ function GetMetaDescription()
     global $acct;
 
     $ref = $acct->GetRef();
-    $us_ref = $acct->GetUsRef();
+    $us_ref = $acct->us_ref;
     
     $strDescription = RefGetStockDisplay($ref);
     $strEst = RefGetStockDisplay($ref->GetPairRef());
