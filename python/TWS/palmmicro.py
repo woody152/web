@@ -74,7 +74,8 @@ def GetSendMsgArray(strKey):
     ar = {'key': strKey,
           'count': 6,
           'timer': 0,
-          'msg': '',
+          'msg_SELL': '',
+          'msg_BUY': '',
           'array_msg': []
          }
     return ar
@@ -343,12 +344,13 @@ class Palmmicro:
             print('SendWechatMsg Error occurred:', e)
 
     def __convert_array_msg(self, group):
-        if len(self.arSendMsg[group]['array_msg']) == 0:
-            str = ''
-        else:
-            unique = set(self.arSendMsg[group]['array_msg'])
-            str = '\n\n'.join(unique)
-        return GetBeijingTimeDisplay() + ' | ' + str
+        arMsg = self.arSendMsg[group]['array_msg']
+        if len(arMsg) >= 0:
+            #unique = set(arMsg)
+            #str = '\n\n'.join(unique)
+            str = '\n\n'.join(arMsg)
+            return GetBeijingTimeDisplay() + '\n\n' + str
+        return ''
 
     def __send_msg(self, group):
         str = self.__convert_array_msg(group)
@@ -357,19 +359,33 @@ class Palmmicro:
             #self.SendTelegramMsg(str)
         self.arSendMsg[group]['array_msg'].clear()
 
-    def SendMsg(self, strMsg, group='telegram'):
-        if self.arSendMsg[group]['msg'] != strMsg:
+    def SendMsg(self, strMsg, strType, group='telegram'):
+        strMsgType = 'msg_' + strType
+        arSendMsg = self.arSendMsg[group]
+        if arSendMsg[strMsgType] != strMsg:
             if len(self.__convert_array_msg(group).encode('utf-8')) + len(strMsg.encode('utf-8')) < 2046:
-                self.arSendMsg[group]['msg'] = strMsg
-                self.arSendMsg[group]['array_msg'].append(strMsg)
+                arSendMsg[strMsgType] = strMsg
+                arSendMsg['array_msg'].append(strMsg)
                 if self.IsFree(group):
                     self.__send_msg(group)
             else:
                 print('too many message in group: ', group)
 
-    def SendSymbolMsg(self, strMsg, strSymbol):
+    def SendSymbolMsg(self, strMsg, strType, strSymbol):
         if strSymbol in self.arSendMsg:
-            self.SendMsg(strMsg.replace(' ' + strSymbol.rstrip('ETF'), ''), strSymbol)
+            strMsg = strMsg.replace(' ' + strSymbol.rstrip('ETF'), '')
+            #self.SendMsg(strMsg, strType, strSymbol)
+            strMsgType = 'msg_' + strType
+            arSendMsg = self.arSendMsg[strSymbol]
+            if arSendMsg[strMsgType] != strMsg:
+                arSendMsg[strMsgType] = strMsg
+            arSendMsg['array_msg'].clear()
+            for strType in ['SELL', 'BUY']:
+                str = arSendMsg['msg_' + strType]
+                if str != '':
+                    arSendMsg['array_msg'].append(str)
+            if self.IsFree(strSymbol):
+                self.__send_msg(strSymbol)
 
     def SendOldMsg(self):
         for group, value in self.arSendMsg.items():

@@ -831,5 +831,5 @@ function GetTitle($bChinese = true)
 	return _getAccountToolTitle($strPage, $acct->GetQuery(), $bChinese);
 }
 
-	$acct = new IpLookupAccount(false, array('commonphrase', 'ip', 'sinajs'));
+	$acct = new IpLookupAccount(false, ['commonphrase', 'ip', 'sinajs']);
 ?>

@@ -26,5 +26,5 @@ function GetMetaDescription()
    	return CheckMetaDescription($str);
 }
 
-   	$acct = new StockAccount('edit', true);
+   	$acct = new StockAccount('edit');
 ?>

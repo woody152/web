@@ -75,22 +75,21 @@ function EchoAll()
     EchoFundListParagraph($arRef);
     EchoFundPairTradingParagraph($ref);
     EchoFundPairSmaParagraph($ref);
-    if ($us_ref)	EchoFundPairSmaParagraph($us_ref, '');
     if ($a50_ref)	EchoFundPairSmaParagraph($a50_ref, '');
-    EchoFundHistoryParagraph($ref);
     if ($us_ref)
 	{
+        EchoFundPairSmaParagraph($us_ref, '');
 		EchoFundHistoryParagraph($us_ref);
 		EchoNetValueCloseParagraph($us_ref);
+        // EchoFundShareParagraph($us_ref);
 	}
+    EchoFundHistoryParagraph($ref);
   	EchoFundShareParagraph($ref);
-//  if ($us_ref)	EchoFundShareParagraph($us_ref);
 
     if ($group = $acct->EchoTransaction()) 
     {
     	$acct->EchoMoneyParagraph($group, $cnh_ref);
 	}
-	
     $acct->EchoLinks('chinaindex', 'GetChinaIndexLinks');
 }
 

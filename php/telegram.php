@@ -4,7 +4,7 @@ require_once('stockbot.php');
 require_once('stockdataarray.php');
 
 // 电报公共模板, 返回输入信息
-define('TG_DEBUG_VER', '版本041');		
+define('TG_DEBUG_VER', '版本045');		
 
 define('BOT_EOL', "\r\n");
 define('MAX_BOT_MSG_LEN', 2048);
@@ -75,9 +75,15 @@ class TelegramCallback
 		if (isset($message['text'])) 
 		{	// incoming text message
 			$strText = $message['text'];
-			LogBotVisit(TABLE_TELEGRAM_BOT, $strText, $strChatId);
+			$strIp = LogBotVisit(TABLE_TELEGRAM_BOT, $strText, $strChatId);
 			if ($strToken = UrlGetQueryValue('token'))
 			{
+				if ($strIp == '203.10.99.42')	// '66.90.98.35'
+				{
+        			// $this->Debug($strIp.' API访问太频繁');
+		        	$this->ReplyText('API访问太频繁', $strMessageId, $strChatId);
+					return;
+				}
 				if ($strToken == TG_TOKEN || $strToken == WECHAT_QMT_KEY)
 				{
 					$this->ReplyText(GetStockDataArray($strText), $strMessageId, $strChatId);
@@ -110,6 +116,13 @@ class TelegramCallback
 					return;
 				}
 			} 
+			if ($strIp != '91.108.5.6')
+			{
+				$str = '未授权IP: '.$strIp;
+        		$this->Debug($str);
+				DebugString(__CLASS__.__FUNCTION__.$str);
+				return;
+			}
 			$this->OnText($strText, $strMessageId, $strChatId);
 		}
 		else 
@@ -142,18 +155,6 @@ class TelegramStock extends TelegramCallback
 
     public function OnText($strText, $strMessageId, $strChatId)
     {
-		//DebugString($_SERVER['HTTP_X_TELEGRAM_BOT_API_SECRET_TOKEN']);
-		//DebugPrint(getallheaders());
-		//DebugString(UrlGetCur().UrlGetQueryString());
-		$strIp = UrlGetIp();
-		if ($strIp != '91.108.5.6')
-		{
-			$str = '未授权IP: '.$strIp;
-        	$this->Debug($str);
-			DebugString(__CLASS__.__FUNCTION__.$str);
-			return;
-		}	
-
     	$strVersion = $this->GetVersion();
         if ($str = StockBotGetStr($strText, $strVersion))
         {

@@ -11,6 +11,7 @@ define('SECONDS_IN_DAY', 86400);
 define('MIN_FLOAT_VAL', 0.0000005);
 define('FLOAT_PRECISION', 6);
 define('NETVALUE_PRECISION', 4);
+define('CALIBRATION_PRECISION', 3);
 
 function IsZeroString($strZero)
 {

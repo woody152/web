@@ -19,5 +19,5 @@ function GetTitle()
 	return STOCK_TRANSACTION_EDIT;
 }
 
-   	$acct = new StockAccount(false, true);
+   	$acct = new StockAccount();
 ?>

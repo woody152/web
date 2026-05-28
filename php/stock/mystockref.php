@@ -34,7 +34,7 @@ function GetForeignMarketCloseTick($strDate, $strType)
 	}
 	if (SqlGetHistoryByDate(SqlGetStockId($strCheck), $strDate) === false)
 	{
-		DebugString(__FUNCTION__.' no data of '.$strCheck.' on '.$strDate);
+		// DebugString(__FUNCTION__.' no data of '.$strCheck.' on '.$strDate);
 		return false;
 	}
 

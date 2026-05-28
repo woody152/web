@@ -7,10 +7,23 @@ class StockAccount extends TitleAccount
     var $group_sql;
     var $ref = false;		// MysqlReference class
     
-    public function __construct($strQueryItem = false, $arLoginTitle = false) 
+    public function __construct($strQueryItem = false) 
     {
-        parent::__construct($strQueryItem, $arLoginTitle);
-        
+        parent::__construct($strQueryItem,
+							['ahhistory',
+							 'calibrationhistory',
+							 'debug',
+							 'editstockgroup',
+							 'editstocktransaction',
+							 'exhaustiveholdings',
+							 'fundhistory',
+							 'fundposition',
+							 'fundshare',
+							 'netvalueclose',
+							 'netvaluehistory',
+							 'stockhistory',
+							 'thanousparadox',
+							]);
         $this->strName = StockGetSymbol($this->GetPage());
 	    $this->group_sql = new StockGroupSql();
     }

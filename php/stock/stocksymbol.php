@@ -1,7 +1,5 @@
 <?php
 
-// SZ164212 SH501226 SZ159696
-
 /* https://finance.sina.com.cn/money/globalindex/ 
 https://finance.sina.com.cn/money/globalindex/asia.shtml
 gb_dji,gb_ixic,gb_inx,
@@ -38,37 +36,19 @@ rt_hkHSSI,hkHSSI_i,rt_hkCSCSHQ
 指数LOF,161726,生物医药LOF,95%,生物医药,399441,1.00%,开放申购,1.50%,
 指数LOF,167301,保险主题LOF,95%,保险主题,399809,0.80%,开放申购,1.50%,
 指数LOF,161725,白酒基金LOF,95%,中证白酒,399997,1.00%,开放申购,1.50%,
-T+0 QDII 欧美,164824,印度基金LOF,95%,印度EFP指数,INDA,1.20%,开放申购,1.50%,
-T+0 QDII 欧美,501312,海外科技LOF,95%,海外科技,QQQ,,,
-T+0 QDII 欧美,160140,美国REIT精选LOF,95%,道琼斯美国精选REIT指数,VNQ,1.20%,开放申购,1.50%,
-T+0 QDII 欧美,162415,美国消费LOF,94%,标普可选消费品精选版块指数,XLY,1.20%,暂停申购,1.50%,
 T+0 QDII 欧美,160125,南方香港LOF,95%,恒生指数,HSI,1.30%,开放申购,1.50%,
-T+0 QDII 欧美,161127,标普生物科技LOF,94%,标普生物科技精选行业指数,XBI,1.20%,暂停申购,1.50%,
-T+0 QDII 欧美,161125,标普500LOF,95%,标普500,SPY,1.20%,暂停申购,1.50%,
-T+0 QDII 欧美,161126,标普医疗保健LOF,95%,标普500医疗保健等权重指数,RSPH,1.20%,暂停申购,1.50%,
-T+0 QDII 欧美,501225,全球芯片LOF,95%,全球芯片,SOXX,1.50%,暂停申购,1.50%,
-T+0 QDII 欧美,161128,标普信息科技LOF,95%,标普500信息科技指数,VGT,1.20%,暂停申购,1.50%,
-T+0 QDII 欧美,161130,纳斯达克100LOF,95%,纳斯达克100,QQQ,1.20%,暂停申购,1.50%,
-T+0 QDII 欧美,501300,美元债LOF,95%,美国债券综合指数,AGG,0.95%,开放申购,1.50%,
-T+0 QDII 欧美,160644,港股互联网LOF,95%,中证海外中国互联网指数,H11136.CSI,1.77%,开放申购,1.50%,
-T+0 QDII 欧美,164906,中概互联网LOF,95%,中证海外中国互联网指数,H11136.CSI,1.20%,开放申购,1.50%,
 T+0 QDII 亚洲,160322,港股精选LOF,95%,恒生综指,HSCI,1.00%,开放申购,1.50%,
 T+0 QDII 亚洲,501310,价值基金LOF,95%,标普中国价值,spchval,1.00%,开放申购,1.50%,
 T+0 QDII 亚洲,501305,港股高股息LOF,95%,港股通高股息,930914.CSI,1.50%,开放申购,1.50%,
 T+0 QDII 亚洲,501303,恒生中型股LOF,95%,恒生综合中型股,HSMI,1.00%,开放申购,1.50%,
 T+0 QDII 亚洲,501302,恒生指数基金LOF,95%,恒生指数,HSI,1.00%,开放申购,1.50%,
-T+0 QDII 亚洲,160924,恒生指数LOF,95%,恒生指数,HSI,1.00%,开放申购,1.50%,
-T+0 QDII 亚洲,164705,恒生LOF,95%,恒生指数,HSI,1.00%,开放申购,1.50%,
 T+0 QDII 亚洲,501021,香港中小LOF,95%,香港中小,HSMCI,1.00%,开放申购,1.50%,
 T+0 QDII 亚洲,501306,港股高股息LOFC,95%,港股通高股息,930914.CSI,1.20%,开放申购,1.50%,
-T+0 QDII 亚洲,161831,恒生国企LOF,95%,恒生中国企业,HSCEI,1.20%,开放申购,1.50%,
 T+0 QDII 亚洲,501307,银华高股息LOF,95%,SHS高股息,930917.CSI,1.00%,开放申购,1.50%,
 T+0 QDII 亚洲,501301,香港大盘LOF,95%,恒生中国30,HSCCI,1.00%,开放申购,1.50%,
-T+0 QDII 亚洲,160717,H股LOF,95%,恒生中国企业,HSCEI,1.20%,开放申购,1.50%,
 T+0 QDII 亚洲,501311,新经济港股通LOF,95%,恒生港股通新经济,HSSCNE,1.00%,开放申购,1.50%,
 T+0 QDII 亚洲,501025,香港银行LOF,95%,HK银行,000869,1.00%,开放申购,1.50%,
 T+0 QDII 亚洲,161124,港股小盘LOF,95%,恒生小型股,HSSI,1.20%,开放申购,1.50%,
-
 */
 
 define('SINA_FOREX_PREFIX', 'fx_s');
@@ -105,7 +85,7 @@ function GetSecondaryListingArray()
 
 function ChinaIndexGetAshrArray()
 {
-    return ['SH501043', 'SH510300', 'SH510310', 'SH510330', 'SZ159919', 'SZ160706', 'SZ161005', 'SZ163407'];
+    return ['SH501043', 'SH510300', 'SH510310', 'SH510330', 'SZ159919', 'SZ160706', 'SZ161005', 'SZ163407', 'SZ168401'];
 }
 
 function in_arrayAshrSymbol($strSymbol)
@@ -118,11 +98,17 @@ function ChinaIndexGetSz100Array()
     return ['SZ161227', 'SZ161812'];
 }
 
+function ChinaIndexGetCoalArray()
+{
+    return ['SZ161032', 'SZ168204'];
+}
+
 function ChinaIndexGetSymbolArray()
 {
     return array_merge(ChinaIndexGetAshrArray(),
                        ChinaIndexGetSz100Array(),
-                       ['SH502000', 'SZ160225', 'SZ160632', 'SZ160639', 'SZ161032', 'SZ161725', 'SZ161726', 'SZ162412', 'SZ163109', 'SZ163113', 'SZ167301', 'SZ168204']);
+                       ChinaIndexGetCoalArray(),
+                       ['SH502000', 'SZ160225', 'SZ160632', 'SZ160639', 'SZ161725', 'SZ161726', 'SZ162412', 'SZ163109', 'SZ163113', 'SZ167301']);
 }
 
 function in_arrayChinaIndex($strSymbol)

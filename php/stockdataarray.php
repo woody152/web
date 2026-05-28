@@ -1,23 +1,42 @@
 <?php
 require_once('stock.php');
 
-function _addIndexArray(&$ar, $strIndex, $strEtf, $strDate, $cal_sql)
+function _addIndexArray(&$ar, $strIndex, $strEtf, $strDate, $cal_sql, $pos_sql)
 {
 	if (!isset($ar[$strEtf]))
 	{
-		$arData = array();
-		
 		$strEtfId = SqlGetStockId($strEtf);
-		$arData['calibration'] = $cal_sql->GetCloseFrom($strEtfId, $strDate);
+
+		$arData = [];
+		$arData['calibration'] = rtrim0($cal_sql->GetCloseFrom($strEtfId, $strDate));
 		$strDate = $cal_sql->GetDateFrom($strEtfId, $strDate);
 		$arData['date'] = $strDate;
-		$arData['netvalue'] = SqlGetNetValueByDate($strEtfId, $strDate);
-
-		$pos_sql = GetPositionSql();
+		$arData['netvalue'] = rtrim0(SqlGetNetValueByDate($strEtfId, $strDate));
 		$arData['position'] = strval($pos_sql->ReadPos($strEtfId));
 
 		$arData['symbol_hedge'] = $strIndex;
 		$ar[$strEtf] = $arData;
+	}
+}
+
+function _addFundPairArray(&$ar, $strIndex, $cal_sql, $pos_sql, $last_sql)
+{
+	if (!isset($ar[$strIndex]))
+	{
+		$pair_sql = GetFundPairSql();
+       	if ($strPair = $pair_sql->GetPairSymbol($strIndex))	
+        {
+			$strIndexId = SqlGetStockId($strIndex);
+
+			$arData = [];
+			$arData['calibration'] = rtrim0($cal_sql->GetCloseNow($strIndexId));
+			$arData['date'] = $cal_sql->GetDateNow($strIndexId);
+			$arData['netvalue'] = strval($last_sql->ReadVal($strIndexId));
+			$arData['position'] = strval($pos_sql->ReadPos($strIndexId));
+
+			$arData['symbol_hedge'] = $strPair;
+			$ar[$strIndex] = $arData;
+		}
 	}
 }
 
@@ -33,6 +52,9 @@ function GetStockDataArray($strSymbols, $arRange = false)
 	}
     StockPrefetchArrayExtendedData($arSymbol);
 	
+	$cal_sql = GetCalibrationSql();
+	$pos_sql = GetPositionSql();
+	$last_sql = new LastCalibrationSql();
 	$ar = array();
 	foreach ($arSymbol as $strSymbol)
 	{
@@ -45,7 +67,6 @@ function GetStockDataArray($strSymbols, $arRange = false)
 				$fund_ref = StockGetFundReference($strSymbol);
 				$cny_ref = $fund_ref->IsEtfA() ? false : $fund_ref->GetCnyRef();
 				$strStockId = $ref->GetStockId();
-				$cal_sql = GetCalibrationSql();
 				if ($record = $cal_sql->GetRecordNow($strStockId))
 				{
 					$arData['calibration'] = rtrim0($record['close']);
@@ -60,7 +81,8 @@ function GetStockDataArray($strSymbols, $arRange = false)
 							$strIndex = $est_ref->GetSymbol();
 							if ($strEtf = GetLeverageHedgeSymbol($strSymbol))
 							{
-								_addIndexArray($ar, $strIndex, $strEtf, $strDate, $cal_sql);
+								_addIndexArray($ar, $strIndex, $strEtf, $strDate, $cal_sql, $pos_sql);
+								_addFundPairArray($ar, $strIndex, $cal_sql, $pos_sql, $last_sql);
 								$strIndex = $strEtf;
 							}
 						}
@@ -92,6 +114,7 @@ function GetStockDataArray($strSymbols, $arRange = false)
 						$arHolding['price'] = rtrim0($his_sql->GetClose($strHoldingId, $strDate));
 						$strHoldingSymbol = $sql->GetStockSymbol($strHoldingId);
 						$arSymbolHedge[$strHoldingSymbol] = $arHolding;
+						if (str_starts_with($strHoldingSymbol, YAHOO_INDEX_CHAR) === false)	_addFundPairArray($ar, $strHoldingSymbol, $cal_sql, $pos_sql, $last_sql);
 					}
 					if (count($arSymbolHedge) > 0)	$arData['symbol_hedge'] = $arSymbolHedge;
 				}
@@ -102,7 +125,7 @@ function GetStockDataArray($strSymbols, $arRange = false)
 		}
 		$ar[$strSymbol] = $arData;
     }
-    //DebugPrint($ar);
+//    DebugPrint($ar);
     return $ar;
 }
 

@@ -147,11 +147,14 @@ function StockCompareEstResult($strStockId, $strNetValue, $strDate, $strSymbol)
 
 function StockUpdateEstResult($strStockId, $fNetValue, $strDate)
 {
-	$net_sql = GetNetValueHistorySql();
-	if ($net_sql->GetRecord($strStockId, $strDate) == false)
-    {   // Only update when net value is NOT ready
-    	$fund_est_sql = GetFundEstSql();
-		$fund_est_sql->WriteDaily($strStockId, $strDate, strval($fNetValue));
+	if ($fNetValue)
+	{
+		$net_sql = GetNetValueHistorySql();
+		if ($net_sql->GetRecord($strStockId, $strDate) == false)
+    	{   // Only update when net value is NOT ready
+    		$fund_est_sql = GetFundEstSql();
+			$fund_est_sql->WriteDaily($strStockId, $strDate, strval($fNetValue));
+		}
 	}
 }
 

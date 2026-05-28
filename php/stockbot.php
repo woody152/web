@@ -165,6 +165,8 @@ function LogBotVisit($strType, $strMsg, $strSrc)
 	$msg_sql->InsertText($strMsg);
 	$src_sql->InsertSrc($strSrc);
 	$visitor_sql->InsertBotVisitor($msg_sql->GetId($strMsg), GetIpId($strIp), $src_sql->GetId($strSrc));
+	
+	return $strIp;
 }
 
 ?>
