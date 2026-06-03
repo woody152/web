@@ -107,7 +107,7 @@ function GetBlogTitle($iDate, $bChinese = true, $bLink = true)
 		break;
 		
 	case 20161014:
-		$strTitle = $bChinese ? 'Palmmicro'.$strDisplay.'sz162411' : 'Palmmicro '.$strDisplay.' sz162411';
+		$strTitle = $bChinese ? 'Palmmicro'.$strDisplay : 'Palmmicro '.$strDisplay;
 		break;
 		
 	case 20150818:

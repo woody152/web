@@ -1,13 +1,38 @@
 import requests
 import json
+import time
 from typing import Union, List, Dict, Any
 
-import time
 from _mytoken import BOT_TOKEN
 from _mytoken import ROT_TOKEN
 
+from palmmicroapi import PalmmicroAPI
+
+def _handlePalmmicroData(arData):
+	arCNY = {'CNY': 6.765}
+	arXOP = {'XOP': 130.68}
+	arSPY = {'SPY': 619.21}
+	arES = {'hf_ES': 6214.0}
+	api = PalmmicroAPI(arData)
+	print(api.get_config())
+	print(round(api.EstNetValue('SZ162411'), 3), '直接算SZ162411官方估值')
+	fSZ162411 = api.EstNetValue('SZ162411', arXOP)
+	fXOP = api.ReverseEst({'SZ162411':fSZ162411})
+	print(f"直接算SZ162411: {fSZ162411:.3f}, 反向算XOP: {fXOP:.2f}")
+	print(round(api.EstNetValue('SZ159518', arCNY), 3), '直接算SZ159518参考估值')
+	fSZ159518 = api.EstNetValue('SZ159518', arXOP | arCNY)
+	fXOP = api.ReverseEst({'SZ159518':fSZ159518} | arCNY)
+	print(f"直接算SZ159518: {fSZ159518:.3f}, 反向算XOP: {fXOP:.2f}")
+	print(round(api.EstNetValue('SZ161125'), 3), '直接算SZ161125官方估值')
+	print(round(api.EstNetValue('SZ161125', arSPY), 3), '需要二次计算SZ161125估值，先把SPY转换成^GSPC')
+	print(round(api.EstNetValue('SZ161125', arES), 3), '需要二次计算SZ161125估值，先把ES转换成^GSPC')
+	print(round(api.EstNetValue('SZ159612', arSPY | arCNY), 3), '需要二次计算SZ159612估值，先把SPY转换成^GSPC')
+	print(round(api.EstNetValue('SZ159612', arES | arCNY), 3), '需要二次计算SZ159612估值，先把ES转换成^GSPC')
+	api.EstNetValue('SZ160723')
+
+
 def post_json_array_to_telegram(
-    data_array: List[Any], 
+    data_array: Dict[str, Any], 
     bot_token: str, 
     timeout: int = 30
 ) -> Union[List[Any], Dict[str, Any], None]:
@@ -110,6 +135,6 @@ def FetchPalmmicroData(strSymbols):
     if result is not None:
         # 可以进一步处理result
         if isinstance(result, dict):
-            print(result['text'])
+            _handlePalmmicroData(result['text'])
     else:
         print("函数执行失败，请检查上面的错误信息。")

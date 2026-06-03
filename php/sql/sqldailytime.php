@@ -27,16 +27,6 @@ class DailyTimeSql extends DailyCloseSql
         $strTime = DebugGetTime();
 		return $this->UpdateById(array('close' => $strClose, 'time' => $strTime), $strId);
     }
-/*
-    function GetTimeNow($strKeyId = false)
-    {
-    	if ($record = $this->GetRecordNow($strKeyId))
-    	{
-    		return $record['time'];
-    	}
-    	return false;
-    }
-*/    
 }
 
 class CalibrationSql extends DailyTimeSql
@@ -81,8 +71,6 @@ class CalibrationSql extends DailyTimeSql
     		$fVal = floatval($strClose);
     		if (abs($fOldAvg - $fVal) > MIN_FLOAT_VAL)
     		{
-//    			DebugString($record['close'].' '.$strClose); 
-//    			return $this->UpdateDaily($record['id'], $strClose);
 				$iNum = intval($record['num']);
 				$fTotal = $iNum * $fOldAvg + $fVal;
 				$iNum ++;

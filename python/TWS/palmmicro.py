@@ -23,6 +23,7 @@ from _tgprivate import WECHAT_SZ161226_KEY
 from _tgprivate import WECHAT_SZ162411_KEY
 from _tgprivate import WECHAT_SZ162415_KEY
 from _tgprivate import WECHAT_SZ164701_KEY
+from _tgprivate import WECHAT_SZ164824_KEY
 from _tgprivate import WECHAT_SZ164906_KEY
 from _tgprivate import WECHAT_SZ165513_KEY
 
@@ -115,6 +116,7 @@ class Palmmicro:
         self.arSendMsg['SZ162411'] = GetSendMsgArray(WECHAT_SZ162411_KEY)
         self.arSendMsg['SZ162415'] = GetSendMsgArray(WECHAT_SZ162415_KEY)
         self.arSendMsg['SZ164701'] = GetSendMsgArray(WECHAT_SZ164701_KEY)
+        self.arSendMsg['SZ164824'] = GetSendMsgArray(WECHAT_SZ164824_KEY)
         self.arSendMsg['SZ164906'] = GetSendMsgArray(WECHAT_SZ164906_KEY)
         self.arSendMsg['SZ165513'] = GetSendMsgArray(WECHAT_SZ165513_KEY)
         self.arAG0 = GetMktDataArray('nf_AG0')
@@ -255,6 +257,7 @@ class Palmmicro:
         fQuantity = _get_floor_quantity(float(arSymData[strType + '_size']))
         fNetValue = float(arSymData['netvalue'])
         fCNYholdings = float(arSymData['CNYholdings'])
+        fPosition = float(arSymData['position'])
         fAmount = fQuantity * fNetValue / fCNYholdings
         if strSymbol != 'SZ164701':
             fMktAmount = float(arSymData['symbol_hedge'][strMktSymbol]['price']) * float(iMktSize)
@@ -291,7 +294,7 @@ class Palmmicro:
         strDebug = self._getSymDebugString(strSymbol, int(fQuantity), strType, strMktType) + strDebug
         fTotal *= self._getCNY(arSymData) / fCNYholdings
         fTotal -= 1.0
-        fTotal *= float(arSymData['position'])
+        fTotal *= fPosition
         fTotal += 1.0
         fTotal *= fNetValue
         fPrice = float(arSymData[strType + '_price'])
@@ -349,7 +352,7 @@ class Palmmicro:
             #unique = set(arMsg)
             #str = '\n\n'.join(unique)
             str = '\n\n'.join(arMsg)
-            return GetBeijingTimeDisplay() + '\n\n' + str
+            return GetBeijingTimeDisplay() + ' | ' + str
         return ''
 
     def __send_msg(self, group):
@@ -379,13 +382,15 @@ class Palmmicro:
             arSendMsg = self.arSendMsg[strSymbol]
             if arSendMsg[strMsgType] != strMsg:
                 arSendMsg[strMsgType] = strMsg
-            arSendMsg['array_msg'].clear()
-            for strType in ['SELL', 'BUY']:
-                str = arSendMsg['msg_' + strType]
-                if str != '':
-                    arSendMsg['array_msg'].append(str)
-            if self.IsFree(strSymbol):
-                self.__send_msg(strSymbol)
+                arSendMsg['array_msg'].clear()
+                for strLoop in ['SELL', 'BUY']:
+                    str = arSendMsg['msg_' + strLoop]
+                    if str != '':
+                        if strLoop != strType:
+                            str += ' | 延迟'
+                        arSendMsg['array_msg'].append(str)
+                if self.IsFree(strSymbol):
+                    self.__send_msg(strSymbol)
 
     def SendOldMsg(self):
         for group, value in self.arSendMsg.items():

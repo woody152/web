@@ -385,7 +385,7 @@ function GetOverNightSymbolArray()
                        array('SZ162719'),
                        GetQdiiOilSymbolArray(),
                        GetQdiiGoldSymbolArray(),
-                       array('SZ161226', 'SZ161125', 'SZ161126', 'SZ161130', 'SZ162415', 'SZ164906'),
+                       array('SZ161226', 'SZ161125', 'SZ161126', 'SZ161130', 'SZ162415', 'SZ164824', 'SZ164906'),
                        QdiiGetXbiSymbolArray());
 }
 

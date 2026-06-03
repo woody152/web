@@ -16,8 +16,6 @@ function _echo20161014($bChinese)
 	$str162411 = GetRemarkElement('162411');
 	$str1 = GetRemarkElement('1');
 	$strPA3288 = GetInternalLink('/pa3288/index.html', 'PA3288');
-	$strQuoteSz162411 = GetQuoteElement('sz162411');
-	$strQuotePalmmicro = GetQuoteElement('palmmicro');
 	$strImage = GetWechatPay(3, $bChinese);
 	
 	EchoBlogDate($bChinese);
@@ -39,7 +37,6 @@ I had no choice but to optimize, store as much data locally as possible, and red
 <br />Back to the company's products, this Wechat public account and this website serve as a specific application example to provide an overall solution for data collection, storage and query for the $strPA3288 Internet of Things module under development. 
 On this basis, we can provide a full set of products and software and hardware technologies to help customers build their own IoT data management and analysis application systems.
 <br />Although there are not many functions yet, you can already scan the QR code below to add a Palmmicro Wechat public account. 
-Choosing $strQuoteSz162411 as the Wechat account is not only in line with the currently provided data, but also a no-brainer choice, because I like to use the name $strQuotePalmmicro so much that it has long been occupied by my own private Wechat account. 
 <br />$strImage
 </p>
 END;

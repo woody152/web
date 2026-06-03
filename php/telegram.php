@@ -2,9 +2,10 @@
 require('_tgprivate.php');
 require_once('stockbot.php');
 require_once('stockdataarray.php');
+require_once('tutorial/iprules.php');
 
 // 电报公共模板, 返回输入信息
-define('TG_DEBUG_VER', '版本045');		
+define('TG_DEBUG_VER', '版本047');		
 
 define('BOT_EOL', "\r\n");
 define('MAX_BOT_MSG_LEN', 2048);
@@ -12,6 +13,16 @@ define('MAX_BOT_MSG_LEN', 2048);
 define('TG_API_URL', 'https://api.telegram.org/bot'.TG_TOKEN.'/');
 define('TG_ADMIN_CHAT_ID', '992671436');		// @sz152
 define('TG_CAST_CHAT_ID', '-1001346320717');	// @palmmicrochan
+
+function _inBlackList($strIp)
+{
+	$ar = ['36.143.159.189', '66.90.98.35', '119.135.210.182', '203.10.99.42'];
+	foreach ($ar as $str)
+	{
+		if (isIpInSubnetAuto($strIp, $str))		return true;
+	}
+	return false;
+}
 
 class TelegramCallback
 {
@@ -78,10 +89,9 @@ class TelegramCallback
 			$strIp = LogBotVisit(TABLE_TELEGRAM_BOT, $strText, $strChatId);
 			if ($strToken = UrlGetQueryValue('token'))
 			{
-				if ($strIp == '203.10.99.42')	// '66.90.98.35'
+				if (_inBlackList($strIp))
 				{
-        			// $this->Debug($strIp.' API访问太频繁');
-		        	$this->ReplyText('API访问太频繁', $strMessageId, $strChatId);
+		        	$this->ReplyText($strIp.' API访问太频繁', $strMessageId, $strChatId);
 					return;
 				}
 				if ($strToken == TG_TOKEN || $strToken == WECHAT_QMT_KEY)

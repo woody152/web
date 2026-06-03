@@ -3,7 +3,7 @@ require('php/_palmmicro.php');
 
 function GetMetaDescription()
 {
-	return '记录Palmmicro微信公众号sz162411的开发、调试以及趋于沉默的过程。大V太难当，十万+自媒体之梦就此破灭。';
+	return '记录Palmmicro微信公众号palmmicrowx的开发、调试以及趋于沉默的过程。大V太难当，十万+自媒体之梦就此破灭。';
 }
 
 function _echo20161014()
@@ -19,8 +19,6 @@ function _echo20161014()
 	$str162411cn = GetRemarkElement('华宝油气');
 	$str1 = GetRemarkElement('1');
 	$strPA3288 = GetInternalLink('/pa3288/indexcn.html', 'PA3288');
-	$strQuoteSz162411 = GetQuoteElement('sz162411');
-	$strQuotePalmmicro = GetQuoteElement('palmmicro');
 	$strImage = GetWechatPay(3);
 	
 	EchoBlogDate();
@@ -34,7 +32,7 @@ function _echo20161014()
 <br />开发过程中碰到一个问题，微信消息有必须在5秒之内返回的限制。而根据Google Analytics过去三十天5934次对华宝油气页面的Page Timings统计，平均反应时间是10秒，这样大概率会超过微信的5秒限制，导致消息回应失败。反应时间慢的主要原因是计算前可能需要先访问新浪股票数据和美元人民币中间价等不同网站。
 只好挽起袖子搞优化，尽可能的多在本地存数据，减少每次查询中对外部网站的访问。最后勉强把最长的回应时间控制在4228毫秒，总算满足了要求。
 <br />回到公司的产品上来，这个微信公众号和本网站一起作为一个具体应用实例，为开发中的{$strPA3288}物联网IoT模块提供一个数据采集、存储和查询的总体解决方案。在这个基础上，我们可以提供全套的产品和软硬件技术，帮助客户建立自己的物联网数据管理分析应用系统。
-<br />虽然目前还没有多少功能，大家已经可以扫描下面的二维码添加Palmmicro微信公众订阅号。选用{$strQuoteSz162411}作为微信号既符合目前提供的数据，又是个没有办法的选择，因为我太喜欢用{$strQuotePalmmicro}这个名字，以至于它早早就被我自己的私人晒娃微信号占用了。 
+<br />虽然目前还没有多少功能，大家已经可以扫描下面的二维码添加Palmmicro微信公众订阅号。 
 <br />$strImage
 </p>
 END;
