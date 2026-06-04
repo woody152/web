@@ -9,7 +9,7 @@ class BotMsgSql extends KeyNameSql
 {
     public function __construct()
     {
-        parent::__construct(TABLE_BOT_MSG, 'text', 256, true);
+        parent::__construct(TABLE_BOT_MSG, 'text', 2048, true);
     }
 
     function GetText($strTextId)
@@ -32,7 +32,7 @@ class BotSrcSql extends KeyNameSql
 
     function GetSrc($strSrcId)
     {
-    	return $this->GetKey($strFromId);
+    	return $this->GetKey($strSrcId);
 	}
 
     function InsertSrc($strSrc)

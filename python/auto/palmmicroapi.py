@@ -54,35 +54,57 @@ class PalmmicroAPI:
 		fPos = float(ar['position'])
 		return (1.0 - fPos) * float(ar['netvalue']) + fPos * fEst * fCny  / float(ar['calibration'])
 
-	def EstNetValue(self, strSymbol, arSrc = None):
-		if strSymbol not in self.config:
-			return False  
-		ar = self.config[strSymbol]
-		if 'calibration' in ar:
-			strHedgeSymbol = ar['symbol_hedge']
-			if strHedgeSymbol in self.config:   # strSymbol in [SZ161125, SZ161130]
-				if arSrc != None:	# 需要二次计算
-					arHedge = self.config[strHedgeSymbol]
-					if strHedgeSymbol in arSrc:	# strHedgeSymbol in [SPY, QQQ]
-						fIndex = self._reverse_calc_with_calibration(arHedge, strHedgeSymbol, {strHedgeSymbol:arSrc[strHedgeSymbol]})
-					else:	# strFutureSymbol in [hf_ES, hf_NQ]
-						strIndexSymbol = arHedge['symbol_hedge']
-						arIndex = self.config[strIndexSymbol]
-						strFutureSymbol = arIndex['symbol_hedge']
-						fIndex = self._calc_with_calibration(arIndex, {strFutureSymbol:arSrc[strFutureSymbol]})
-					arCopy = arSrc.copy()
-					arCopy[strHedgeSymbol] = fIndex
-					return self._calc_with_calibration(ar, arCopy)
-				else:
-					return self._calc_with_calibration(ar)	# 直接算官方估值
+	@staticmethod
+	def _calc_with_holdings(ar, arSrc = None):
+		fCny = 1.0
+		fTotal = 0.0
+		for strHolding, arHolding in ar['symbol_hedge'].items():
+			if arSrc != None:
+				fEst = arSrc[strHolding]
 			else:
-				return self._calc_with_calibration(ar, arSrc)	# 直接算
-		else:
-			print(strSymbol, '需要按持仓计算')
-		return True
+				fEst = float(arHolding['est_price'])
+			fTotal += float(arHolding['ratio']) * fEst / float(arHolding['price'])
+		fTotal /= 100.0
+		return float(ar['netvalue']) * (1.0 + float(ar['position']) * (fTotal * float(ar['CNY']) / float(ar['CNYholdings']) - 1.0))
+
+	def EstNetValue(self, strSymbol, arSrc = None):
+		fEst = 0.0
+		if strSymbol in self.config:
+			ar = self.config[strSymbol]
+			if 'calibration' in ar:
+				strHedgeSymbol = ar['symbol_hedge']
+				if strHedgeSymbol in self.config:   # strSymbol in [SZ161125, SZ161130]
+					if arSrc != None:	# 需要二次计算
+						arHedge = self.config[strHedgeSymbol]
+						if strHedgeSymbol in arSrc:	# strHedgeSymbol in [SPY, QQQ]
+							fIndex = self._reverse_calc_with_calibration(arHedge, strHedgeSymbol, {strHedgeSymbol:arSrc[strHedgeSymbol]})
+						else:	# strFutureSymbol in [hf_ES, hf_NQ]
+							strIndexSymbol = arHedge['symbol_hedge']
+							arIndex = self.config[strIndexSymbol]
+							strFutureSymbol = arIndex['symbol_hedge']
+							fIndex = self._calc_with_calibration(arIndex, {strFutureSymbol:arSrc[strFutureSymbol]})
+						arCopy = arSrc.copy()
+						arCopy[strHedgeSymbol] = fIndex
+						fEst = self._calc_with_calibration(ar, arCopy)
+					else:
+						fEst = self._calc_with_calibration(ar)	# 直接算官方估值
+				else:
+					fEst = self._calc_with_calibration(ar, arSrc)	# 直接算
+			else:
+				fEst = self._calc_with_holdings(ar, arSrc)	# 需要按持仓计算
+		return fEst
         
 	def ReverseEst(self, arSrc):
 		for strSymbol in arSrc:
 			if strSymbol != 'CNY':
 				break
-		return self._reverse_calc_with_calibration(self.config[strSymbol], strSymbol, arSrc)
+		fEst = 0.0
+		if strSymbol in self.config:
+			ar = self.config[strSymbol]
+			if 'calibration' in ar:
+				fEst = self._reverse_calc_with_calibration(ar, strSymbol, arSrc)
+				strHedgeSymbol = ar['symbol_hedge']
+				if strHedgeSymbol in self.config:   # strSymbol in [SZ161125, SZ161130]
+					arHedge = self.config[strHedgeSymbol]
+					fEst = self._calc_with_calibration(arHedge, {arHedge['symbol_hedge']:fEst})
+		return fEst

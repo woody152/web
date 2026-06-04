@@ -65,7 +65,7 @@ class MyEWrapper(EWrapper):
         self.arDebug = {}
 
     def nextValidId(self, orderId: int):
-        self.arQDII = {'SH501018', 'SZ160719', 'SZ160723', 'SZ161116', 'SZ161125', 'SZ161127', 'SZ161129', 'SZ161130', 'SZ161226', 'SZ162411', 'SZ162415', 'SZ164701', 'SZ164824', 'SZ164906', 'SZ165513'}
+        self.arQDII = {'SH501018', 'SZ160719', 'SZ160723', 'SZ161116', 'SZ161125', 'SZ161127', 'SZ161129', 'SZ161130', 'SZ161226', 'SZ162411', 'SZ162415', 'SZ163208', 'SZ164701', 'SZ164824', 'SZ164906', 'SZ165513'}
         #self.arQQQ = {'SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941'}
         self.arXOPETF = {'SH513350', 'SZ159518'}
         self.arXBIETF = {'SZ159502'}
@@ -80,13 +80,14 @@ class MyEWrapper(EWrapper):
             self.arOrder['SLV'] = GetOrderArray()
             self.arOrder['USO'] = GetOrderArray()
             self.arOrder['XBI'] = GetOrderArray()
+            self.arOrder['XLE'] = GetOrderArray()
             self.arOrder['XLY'] = GetOrderArray()
             self.arOrder['XOP'] = GetOrderArray()
         else:
             #self.arOrder['TLT'] = GetOrderArray([80.90, 84.19, 85.21, 86.40, 86.62, 86.72, 87.59, 89.76, 91.88], 100, 1, 8)
-            self.arOrder['SPX'] = GetOrderArray([5191.35, 6205.75, 6970.57, 7197.98, 7244.48, 7443.16, 7498.77, 7566.00, 7641.85, 7735.39])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0013, 7, 8)
-            self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0104, -1, -1)
+            self.arOrder['SPX'] = GetOrderArray([5191.35, 6205.75, 6970.57, 7197.98, 7272.00, 7461.61, 7527.23, 7588.36, 7651.23, 7735.39])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0014, 6, -1)
+            self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0097, -1, 7)
         self.palmmicro = Palmmicro()
         self.client.StartStreaming(orderId)
         self.arMkt = {}
@@ -110,8 +111,8 @@ class MyEWrapper(EWrapper):
 
     def __get_sell_symbol(self, strSymbol):
         if strSymbol.startswith('MES'):
-            #return 'MES' + self.strNextFuture
-            return 'MES' + self.strCurFuture
+            return 'MES' + self.strNextFuture
+            #return 'MES' + self.strCurFuture
         else:
             return strSymbol
 

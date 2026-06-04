@@ -134,7 +134,7 @@ function GetStockDataArray($strSymbols, $arRange = false)
 		}
 		$ar[$strSymbol] = $arData;
     }
-	DebugPrint($ar);
+	//DebugPrint($ar);
     return $ar;
 }
 

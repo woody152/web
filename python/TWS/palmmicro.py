@@ -22,6 +22,7 @@ from _tgprivate import WECHAT_SZ161130_KEY
 from _tgprivate import WECHAT_SZ161226_KEY
 from _tgprivate import WECHAT_SZ162411_KEY
 from _tgprivate import WECHAT_SZ162415_KEY
+from _tgprivate import WECHAT_SZ163208_KEY
 from _tgprivate import WECHAT_SZ164701_KEY
 from _tgprivate import WECHAT_SZ164824_KEY
 from _tgprivate import WECHAT_SZ164906_KEY
@@ -115,6 +116,7 @@ class Palmmicro:
         self.arSendMsg['SZ161226'] = GetSendMsgArray(WECHAT_SZ161226_KEY)
         self.arSendMsg['SZ162411'] = GetSendMsgArray(WECHAT_SZ162411_KEY)
         self.arSendMsg['SZ162415'] = GetSendMsgArray(WECHAT_SZ162415_KEY)
+        self.arSendMsg['SZ163208'] = GetSendMsgArray(WECHAT_SZ163208_KEY)
         self.arSendMsg['SZ164701'] = GetSendMsgArray(WECHAT_SZ164701_KEY)
         self.arSendMsg['SZ164824'] = GetSendMsgArray(WECHAT_SZ164824_KEY)
         self.arSendMsg['SZ164906'] = GetSendMsgArray(WECHAT_SZ164906_KEY)
