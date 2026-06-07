@@ -13,19 +13,19 @@ require_once('internallink.php');
 require_once('_private.php');
 require_once('sql/_sqlcommon.php');
 
-define('DB_DATABASE', 'n5gl0n39mnyn183l_camman');
+const DB_DATABASE = 'n5gl0n39mnyn183l_camman';
 
-define('TABLE_MEMBER', 'member');
-define('TABLE_PAGE', 'page');
-define('TABLE_PAGE_COMMENT', 'pagecomment');
-define('TABLE_PROFILE', 'profile');
-define('TABLE_STOCK_DIVIDEND', 'stockdividend');
-define('TABLE_STOCK_GROUP', 'stockgroup');
-define('TABLE_STOCK_GROUP_ITEM', 'stockgroupitem');
-define('TABLE_STOCK_SPLIT', 'stocksplit');
-define('TABLE_VISITOR', 'visitor');
-define('TABLE_TELEGRAM_BOT', 'telegrambot');
-define('TABLE_WECHAT_BOT', 'wechatbot');
+const TABLE_MEMBER = 'member';
+const TABLE_PAGE = 'page';
+const TABLE_PAGE_COMMENT = 'pagecomment';
+const TABLE_PROFILE = 'profile';
+const TABLE_STOCK_DIVIDEND = 'stockdividend';
+const TABLE_STOCK_GROUP = 'stockgroup';
+const TABLE_STOCK_GROUP_ITEM = 'stockgroupitem';
+const TABLE_STOCK_SPLIT = 'stocksplit';
+const TABLE_VISITOR = 'visitor';
+const TABLE_TELEGRAM_BOT = 'telegrambot';
+const TABLE_WECHAT_BOT = 'wechatbot';
 
 $g_link = false;
 
@@ -161,7 +161,7 @@ function _errorHandler($errno, $errstr, $errfile, $errline)
     {
     	$str = file_get_contents($strFileName);
     	$ar = explode(',', $str);
-//    	$strError = $ar[0];
+		// $strError = $ar[0];
     	$iCount = (GetNowTick() - filemtime($strFileName) < 100) ? intval($ar[1]) + 1 : 1;
     }
     else	$iCount = 1;
@@ -173,11 +173,11 @@ function _errorHandler($errno, $errstr, $errfile, $errline)
    		$strNewLine = GetHtmlNewLine();
    		
    		$strSubject = ($errno == '1024') ? '调试消息' : "PHP错误: [$errno]";
-   		$str = str_replace(PHP_EOL, $strNewLine, $errstr).$strNewLine.'位于'.$errfile.'第'.$errline.'行';
+   		$str = str_replace(PHP_EOL, $strNewLine, $errstr).$strNewLine.'位于'.UrlGetPathName($errfile).'第'.$errline.'行';
    		$strDebug = "$strSubject $str ($strCount)";
     
    		$str .= $strNewLine.GetExternalLink(UrlGetServer().UrlGetCur());
-//   		if (isset($_SESSION['SESS_ID']))		$str .= $strNewLine.GetMemberLink($_SESSION['SESS_ID']);	// need MySQL successful
+		// if (isset($_SESSION['SESS_ID']))		$str .= $strNewLine.GetMemberLink($_SESSION['SESS_ID']);	// need MySQL successful
 
 		$strIp = UrlGetIp();
 		$str .= $strNewLine.GetVisitorLink($strIp);
@@ -192,10 +192,9 @@ function SqlConnectDatabase()
 	error_reporting(E_ALL);
 	set_error_handler('_errorHandler');
 
-//	if (UrlGetIp() != '222.125.92.104')		die('Failed to connect to server');
+	// if (UrlGetIp() != '222.125.92.104')		die('Failed to connect to server');
 
 	global $g_link;
-
 	$g_link = mysqli_connect('mysql', 'n5gl0n39mnyn183l_woody', DB_PASSWORD);	// Connect to mysql server
 	if (!$g_link)		die('Failed to connect to server');
 
@@ -207,5 +206,3 @@ function SqlConnectDatabase()
 		SqlCreateDatabase(DB_DATABASE);
 	}
 }
-
-?>

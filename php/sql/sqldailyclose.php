@@ -71,7 +71,7 @@ class DailyCloseSql extends KeySql
     	return $this->GetSingleData($this->BuildWhere_key_date($strKeyId, $strDate));
     }
 
-    function _getCloseString($callback, $strKeyId, $strDate = false)
+    private function _getCloseString($callback, $strKeyId, $strDate = false)
     {
     	if ($record = $this->$callback($strKeyId, $strDate))
     	{
@@ -142,7 +142,7 @@ class DailyCloseSql extends KeySql
 
 	function MakeFieldArray($strKeyId, $strDate, $strClose)
     {
-    	return array_merge($this->MakeFieldKeyId($strKeyId), array('date' => $strDate, 'close' => $strClose));
+    	return array_merge($this->MakeFieldKeyId($strKeyId), ['date' => $strDate, 'close' => $strClose]);
     }
     
     public function InsertDaily($strKeyId, $strDate, $strClose)
@@ -155,7 +155,7 @@ class DailyCloseSql extends KeySql
 
     public function UpdateDaily($strId, $strClose)
     {
-		return $this->UpdateById(array('close' => $strClose), $strId);
+		return $this->UpdateById(['close' => $strClose], $strId);
     }
 
     public function WriteDaily($strKeyId, $strDate, $strClose)
@@ -164,7 +164,6 @@ class DailyCloseSql extends KeySql
     	{
     		if (abs(floatval($record['close']) - floatval($strClose)) > MIN_FLOAT_VAL)
     		{
-//    			DebugString($record['close'].' '.$strClose); 
     			return $this->UpdateDaily($record['id'], $strClose);
     		}
     	}
@@ -214,7 +213,7 @@ class DailyCloseSql extends KeySql
 
     function GetSwitchDates($strKeyId)
     {
-	    $arDate = array();
+	    $arDate = [];
 	    $bFirst = true;
         if ($result = $this->GetAll($strKeyId)) 
         {
@@ -311,5 +310,3 @@ class SharesDiffSql extends DailyCloseSql
         parent::__construct('sharesdiff');
     }
 }
-
-?>

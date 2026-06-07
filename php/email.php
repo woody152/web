@@ -1,5 +1,5 @@
 <?php
-define('ADMIN_EMAIL', 'woody@palmmicro.com');
+const ADMIN_EMAIL = 'woody@palmmicro.com';
 
 function EmailHtml($strWho, $strSubject, $strContents) 
 {
@@ -8,12 +8,12 @@ function EmailHtml($strWho, $strSubject, $strContents)
 	$strMessage = GetHtmlElement(GetHtmlElement($strSubject, 'title'), 'head');
 	$strMessage .= GetHtmlElement(GetHtmlElement(GetHtmlElement($strContents), 'div'), 'body');
 	$strMessage = GetHtmlElement($strMessage, 'html');
-/*		
+    /*		
 	$strMessage = "<html>
                      <head><title>$strSubject</title></head>
                      <body><div><p>$strContents</p></div></body>
-                     </html>";
-*/
+                   </html>";
+    */
 
     $strHeaders = 'MIME-Version: 1.0'.$strEOL;
     $strHeaders .= 'Content-type:text/html;charset=UTF-8'.$strEOL;	// 发送HTML电子邮件时始终设置content-type
@@ -23,5 +23,3 @@ function EmailHtml($strWho, $strSubject, $strContents)
 
     return mail($strWho, $strSubject, wordwrap($strMessage, 70, $strEOL), $strHeaders);
 }
-
-?>

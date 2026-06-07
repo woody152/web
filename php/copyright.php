@@ -1,6 +1,5 @@
 <?php
 // Provide enhanced function replacement of /js/copyright.js
-// CopyRight functions
 
 function _getCopyright($strCn, $strUs, $bChinese, $strBeginYear = false)
 {
@@ -31,5 +30,3 @@ function EchoCopyRight($bMobile, $bChinese)
 
 END;
 }
-
-?>

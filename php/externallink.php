@@ -3,7 +3,6 @@ require_once('stocklink.php');
 require_once('externalurl.php');
 require_once('stock/stocksymbol.php');
 
-// ****************************** External link functions *******************************************************
 function GetOfficialLink($strHttp, $strDisplay)
 {
     return GetExternalLink($strHttp, $strDisplay.'官网');
@@ -367,5 +366,3 @@ function GetAdrLink()
 {
 	return GetExternalLink(GetAastocksAdrUrl(), '阿思達克ADR');
 }
-
-?>

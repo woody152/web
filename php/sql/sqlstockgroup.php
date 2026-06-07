@@ -37,7 +37,7 @@ class StockGroupItemSql extends KeyTableSql
     {
     	if ($result = $this->GetAll())
     	{
-    		$ar = array();
+    		$ar = [];
     		while ($record = mysqli_fetch_assoc($result)) 
     		{
     			if ($bCheckTransaction)
@@ -176,7 +176,6 @@ function SqlAlterStockGroupItemTable()
 }
 */
 
-// ****************************** Stock Group functions *******************************************************
 function SqlGetStockGroupId($strGroupItemId)
 {
 	$sql = new StockGroupItemSql();
@@ -191,9 +190,9 @@ function SqlGetStockGroupItemSymbolArray($item_sql)
 {
     if ($arStockId = $item_sql->GetStockIdArray())
     {
-    	$arA = array();
-    	$arH = array();
-    	$arUS = array();
+    	$arA = [];
+    	$arH = [];
+    	$arUS = [];
     	$sql = GetStockSql();
      	foreach ($arStockId as $str => $strStockId)
     	{
@@ -204,7 +203,7 @@ function SqlGetStockGroupItemSymbolArray($item_sql)
     			{
     				if ($sym->IsSymbolA())		$arA[$str] = $strSymbol;
     				else if ($sym->IsSymbolH())	$arH[$str] = $strSymbol;
-    				else							$arUS[$str] = $strSymbol;
+    				else						$arUS[$str] = $strSymbol;
     			}
     		}
 		}
@@ -212,7 +211,7 @@ function SqlGetStockGroupItemSymbolArray($item_sql)
    		asort($arH);
    		asort($arUS);
    		return $arA + $arH + $arUS;
-//    	return array_merge($arA, $arH, $arUS);	// Can NOT use array_merge for all-digit keys
+		// return array_merge($arA, $arH, $arUS);	// Can NOT use array_merge for all-digit keys
     }
     return false;
 }
@@ -229,7 +228,6 @@ function SqlGetStocksArray($strGroupId, $bCheckTransaction = false)
     		if ($strSymbol = $sql->GetStockSymbol($strStockId))	$ar[] = $strSymbol;
     	}
     }
-//	sort($ar);
     return $ar;
 }
 
@@ -260,7 +258,7 @@ function SqlDeleteStockGroupByMemberId($strMemberId)
 function SqlUpdateStockGroup($strGroupId, $arNew)
 {
 	$sql = new StockGroupItemSql($strGroupId);
-    $arOld = array();
+    $arOld = [];
     if ($arStockId = $sql->GetStockIdArray())
     {
     	foreach ($arStockId as $str => $strStockId)
@@ -334,5 +332,3 @@ function SqlGetMyStockGroupItemId($strMemberId, $strStockId)
    	}
 	return false;
 }
-
-?>

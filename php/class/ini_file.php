@@ -40,7 +40,7 @@ class  INIFile {
 		{
 			clearstatcache();
 			if(!file_exists($inifilename)){
-				$this->Error("This file does not exist: $inifilename!");
+				$this->Error('file does not exist: '.UrlGetPathName($inifilename));
 				return;
 			}
 		}

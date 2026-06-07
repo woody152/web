@@ -14,7 +14,7 @@ function _echoMoneyItem($strGroup, $fValue, $fProfit, $fConvertValue, $fConvertP
 {
 	global $acct;
 	
-	$ar = array($strGroup);
+	$ar = [$strGroup];
 	$ar[] = GetNumberDisplay($fConvertProfit);
 	
 	$strConvertValue = GetNumberDisplay($fConvertValue);
@@ -39,27 +39,24 @@ function _echoMoneyItem($strGroup, $fValue, $fProfit, $fConvertValue, $fConvertP
     	$ar[] = $strProfit;
     }
     
-//    if ($strValue != '')
-//    {
-    	$ar[] = $strValue;
-        if ($strGroup == DISP_ALL_CN)
-        {
-        	if ($strMemberId = $acct->GetMemberId())
-        	{
-				$strEmail = SqlGetEmailById($strMemberId);
-				switch ($strEmail)
-				{
-				case ADMIN_EMAIL:
-					$ar[] = GetNumberDisplay($fConvertProfit - 1679328.22);
-					break;
+   	$ar[] = $strValue;
+	if ($strGroup == DISP_ALL_CN)
+    {
+       	if ($strMemberId = $acct->GetMemberId())
+       	{
+			$strEmail = SqlGetEmailById($strMemberId);
+			switch ($strEmail)
+			{
+			case ADMIN_EMAIL:
+				$ar[] = GetNumberDisplay($fConvertProfit - 1679328.22);
+				break;
 				
-				case 'mix@palmmicro.com':
-					$ar[] = GetNumberDisplay($fConvertProfit / 2 - $fProfit);
-					break;
-				}
+			case 'mix@palmmicro.com':
+				$ar[] = GetNumberDisplay($fConvertProfit / 2 - $fProfit);
+				break;
 			}
-        }
-//    }
+		}
+    }
    
     EchoTableColumn($ar);
 }
@@ -94,14 +91,15 @@ function StockSaveDebugFile($strPathName, $strUrl, $iInterval = SECONDS_IN_MIN, 
 {
 	if (StockNeedFile($strPathName, $iInterval) == false)	return false; 	// do not update too often
 	
+	$strShortName = UrlGetPathName($strPathName);
 	if ($str = url_get_contents($strUrl, $arExtraHeaders, $strFileName))
 	{
 		file_put_contents($strPathName, $str);
-		DebugString($strUrl.' saved to '.basename($strPathName));
+		DebugString($strUrl.' saved to '.$strShortName);
 		return $str;
 	}
 
-	DebugString('mark failed '.$strPathName);
+	DebugString('mark failed '.$strShortName);
 	file_put_contents($strPathName, 'failed');
 	return false;
 }
@@ -206,5 +204,3 @@ function in_array_ref($ref, $arRef)
 	}
 	return true;
 }
-
-?>

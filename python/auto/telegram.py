@@ -9,10 +9,17 @@ from _mytoken import ROT_TOKEN
 from palmmicroapi import PalmmicroAPI
 
 def _handlePalmmicroData(arData):
-	arCNY = {'CNY': 6.7793}
-	arXOP = {'XOP': 130.68}
-	arSPY = {'SPY': 619.24}
-	arES = {'hf_ES': 6213.5}
+	arCNY = {'CNY': 6.7878}
+	arXOP = {'XOP': 136.25}
+	arSPY = {'SPY': 619.11}
+	arES = {'hf_ES': 6208.0}
+	arGLD = {'GLD': 381.91}
+	arGC = {'hf_GC': 4184.12}
+	arSLV = {'SLV': 57.34}
+	arSI = {'hf_SI': 63.51}
+	arUSO = {'USO': 78.43}
+	arCL = {'hf_CL': 53.31}
+	arINDA = {'INDA': 44.44}
 	api = PalmmicroAPI(arData)
 	print(api.get_config())
     
@@ -41,9 +48,18 @@ def _handlePalmmicroData(arData):
 	fSPY = api.ReverseEst({'SZ159612':f159612} | arCNY)
 	print(f"把ES转换成^GSPC后二次计算159612: {f159612:.3f}, 反向算SPY: {fSPY:.2f}")
 	
-	print(round(api.EstNetValue('SZ160723'), 3), '按持仓算160723官方估值')
 	print(round(api.EstNetValue('SZ164701'), 3), '按持仓算164701官方估值')
+	print(round(api.EstNetValue('SZ164701', arGLD | arSLV), 3), '按持仓算164701')
+	print(round(api.EstNetValue('SZ164701', arGC | arSI), 3), '把GC和SI转换成GLD和SLV后，按持仓算164701')
+    
+	print(round(api.EstNetValue('SZ160723'), 3), '按持仓算160723官方估值')
+	print(round(api.EstNetValue('SZ160723', arUSO), 3), '按持仓算160723')
+	print(round(api.EstNetValue('SZ160723', arCL), 3), '把CL转换成USO后，按持仓算160723')
 
+	print(round(api.EstNetValue('SZ164824'), 3), '按持仓算164824官方估值')
+	print(round(api.EstNetValue('SZ164824', arINDA), 3), '按持仓算164824')
+    
+	print(round(api.EstNetValue('SZ161226'), 3), '直接算161226官方估值')
 
 def post_json_array_to_telegram(
     data_array: Dict[str, Any], 

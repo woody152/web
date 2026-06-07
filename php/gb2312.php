@@ -43,7 +43,7 @@ function GbToUtf8($str)
     {
         $strChar = substr($str, $i++, 1);
         $iChar = ord($strChar);
-//        if ($iChar < 0xA1)
+        // if ($iChar < 0xA1)
         if ($iChar < 0x80)
         {
             $strUtf8 .= $strChar;
@@ -58,5 +58,3 @@ function GbToUtf8($str)
     }
     return $strUtf8;
 }
-
-?>

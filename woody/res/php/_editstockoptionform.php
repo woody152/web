@@ -24,15 +24,17 @@ function _getStockOptionDate($strSubmit, $ref, $strSymbol)
 
 	case STOCK_OPTION_CALIBRATION:
 	case STOCK_OPTION_NETVALUE:
-		if ($strSymbol == 'KWEB')
+		switch ($strSymbol)
 		{
+		case 'KWEB':
 			if ($strDate = $his_sql->GetDatePrev($strStockId, $ref->GetDate()))		return $strDate;
-		}
-		else
-		{
+			break;
+		
+		default:
 			$net_sql = GetNetValueHistorySql();
 			if ($strDate = $net_sql->GetDateNow($strStockId))		return $strDate;
 			if ($strDate = $his_sql->GetDateNow($strStockId))		return $strDate;
+			break;
 		}
 	 	return $strYMD;
 
@@ -81,7 +83,6 @@ function _getStockOptionName($ref, $strSymbol)
 
 function _getStockOptionAmount($strLoginId, $strStockId)
 {
-//   	if ($str = SqlGetFundPurchaseAmount($strLoginId, $strStockId))
 	if ($strGroupItemId = SqlGetMyStockGroupItemId($strLoginId, $strStockId))
 	{
 		$amount_sql = new GroupItemAmountSql();
@@ -403,5 +404,3 @@ class SymbolEditAccount extends SymbolAccount
 END;
 	}
 }
-
-?>

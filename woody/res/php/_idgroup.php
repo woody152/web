@@ -8,7 +8,7 @@ class GroupIdAccount extends StockAccount
         parent::__construct('groupid');
     }
     
-    function GetGroupId()
+    public function GetGroupId()
     {
     	$strGroupId = $this->GetQuery();
     	if (is_numeric($strGroupId) == false)		return false;
@@ -38,5 +38,3 @@ class GroupIdAccount extends StockAccount
     	return $this->GetWhoseAllDisplay();
     }
 }
-
-?>

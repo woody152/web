@@ -6,8 +6,8 @@ require_once('../../php/stock/szse.php');
 
 class GroupAccount extends StockAccount
 {
-    var $group = false;	//  MyStockGroup
-    var $arStockRef = array();
+	private $group = false;	//  MyStockGroup
+	private $arStockRef = [];
 	
     function GetStockRefArray()
     {
@@ -19,7 +19,7 @@ class GroupAccount extends StockAccount
     	return $this->group;
     }
     
-    function GetGroupId()
+    public function GetGroupId()
     {
     	if ($group = $this->GetGroup())
     	{
@@ -41,7 +41,7 @@ class GroupAccount extends StockAccount
         $strGroupName = $this->GetName();
         if ($strGroupId = $sql->GetGroupId($strLoginId, $strGroupName))
         {
-        	$arNew = array();
+        	$arNew = [];
             foreach ($arRef as $ref)
             {
             	$arNew[] = $ref->GetStockId();
@@ -76,5 +76,3 @@ class GroupAccount extends StockAccount
         return false;
 	}
 }
-
-?>

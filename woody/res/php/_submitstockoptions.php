@@ -1,6 +1,5 @@
 <?php
 require_once('_stock.php');
-//require_once('_editstockoptionform.php');
 require_once('_kraneholdingscsv.php');
 require_once('_sseholdings.php');
 require_once('_szseholdings.php');
@@ -8,7 +7,7 @@ require_once('_updateholdings.php');
 
 function _updateStockHistoryAdjCloseBySplit($ref, $strSymbol, $strStockId, $his_sql, $strYMD, $fRatio)
 {
-    $ar = array();
+    $ar = [];
     if ($result = $his_sql->GetFromDate($strStockId, $strYMD)) 
     {
         while ($record = mysqli_fetch_assoc($result)) 
@@ -28,7 +27,7 @@ function _updateStockHistoryAdjCloseBySplit($ref, $strSymbol, $strStockId, $his_
 
 function _updateStockHistoryAdjCloseByDividend($ref, $strSymbol, $strStockId, $his_sql, $strYMD, $strDividend)
 {
-    $ar = array();
+    $ar = [];
     if ($result = $his_sql->GetFromDate($strStockId, $strYMD)) 
     {
         while ($record = mysqli_fetch_assoc($result)) 
@@ -78,17 +77,6 @@ function _updateFundPurchaseAmount($strEmail, $strSymbol, $strVal)
 			$amount_sql = new GroupItemAmountSql();
 			$amount_sql->WriteString($strGroupItemId, $strVal);
 		}
-/*    	if ($str = SqlGetFundPurchaseAmount($strMemberId, $strStockId))
-    	{
-    		if ($str != $strVal)
-    		{
-    			SqlUpdateFundPurchase($strMemberId, $strStockId, $strVal);
-    		}
-    	}
-    	else
-    	{
-    		SqlInsertFundPurchase($strMemberId, $strStockId, $strVal);
-    	}*/
 	}
 }
 
@@ -225,7 +213,6 @@ function _updateStockOptionSplitGroupTransactions($strGroupId, $strStockId, $str
     	if (in_array($strStockId, $arStockId))
     	{
     		$record = $sql->GetRecord($strStockId);
-//    		$strGroupItemId = $sql->GetId($strStockId);
     		$strGroupItemId = $record['id'];
     		$iQuantity = intval($record['quantity']);
     		$sql->trans_sql->Insert($strGroupItemId, strval(0 - $iQuantity), strval($fPrice));
@@ -263,7 +250,7 @@ function _updateStockOptionSplit($ref, $strSymbol, $strStockId, $his_sql, $strDa
 	else
 	{
 		$fRatio = floatval($ar[0])/floatval($ar[1]);
-//		DebugVal($fRatio, $strSymbol);
+		// DebugVal($fRatio, $strSymbol);
 		if ($sql->InsertDaily($strStockId, $strDate, strval($fRatio)))
 		{
 			_updateStockOptionSplitTransactions($ref, $strStockId, $his_sql, $strDate, $fRatio);
@@ -368,8 +355,6 @@ function _updateStockOptionCalibration($strSymbol, $strStockId, $strDate, $strVa
 			}
 			else if (in_arrayChinaIndex($strSymbol))	
 			{
-				//DebugString(__FUNCTION__.' unhandled China index symbol: '.$strSymbol);
-				//return;
 				$strCNY = '1.0';
 			}
 			else if (in_arrayQdii($strSymbol))		$strCNY = SqlGetNetValueByDate(SqlGetStockId('USCNY'), $strDate);
@@ -390,22 +375,6 @@ function _updateStockOptionCalibration($strSymbol, $strStockId, $strDate, $strVa
 	_updateOptionDailySql(GetCalibrationSql(), $strStockId, $strDate, $strVal);
 }
 
-/*
-function _updateQuarterReportHoldings($strStockId, $strDate, $strVal)
-{
-	$date_sql = new HoldingsDateSql();
-	if ($strHoldingDate = $date_sql->ReadDate($strStockId))
-	{
-		if (strtotime($strDate) < strtotime($strHoldingDate))
-		{
-			$quarter_sql = new QuarterReportSql();
-			$quarter_sql->WriteDaily($strStockId, $strDate, $strVal);
-			return true;		
-		}
-	}
-	return false;
-}
-*/
 class _SubmitOptionsAccount extends Account
 {
     public function Process($strLoginId)
@@ -419,8 +388,7 @@ class _SubmitOptionsAccount extends Account
 
 		$strVal = $_POST['val'];
 		if ($bAdmin === false)		$strVal = SqlCleanString($strVal);
-//		$strVal = str_replace('\\', '', $strVal);
-		DebugString(__CLASS__.'->'.__FUNCTION__.' '.$strVal);
+		// DebugString(__CLASS__.'->'.__FUNCTION__.' '.$strVal);
 		
     	StockPrefetchExtendedData($strSymbol);
         $ref = StockGetReference($strSymbol);
@@ -514,4 +482,3 @@ class _SubmitOptionsAccount extends Account
 	}
 }
 
-?>

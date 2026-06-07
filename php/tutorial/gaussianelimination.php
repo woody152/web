@@ -123,5 +123,3 @@ function SolveOverdetermined($equations)
     // 调用高斯消元法求解
     return GaussianElimination($normalEquations);
 }
-
-?>

@@ -2,9 +2,8 @@
 
 class StockAccount extends TitleAccount
 {
-    var $strName;
-
-    var $group_sql;
+	private $strName;
+	private $group_sql;
     var $ref = false;		// MysqlReference class
     
     public function __construct($strQueryItem = false) 
@@ -27,6 +26,11 @@ class StockAccount extends TitleAccount
         $this->strName = StockGetSymbol($this->GetPage());
 	    $this->group_sql = new StockGroupSql();
     }
+
+	public function GetGroupId()
+	{
+		return false;
+	}
 
     function GetGroupName($strGroupId)
     {
@@ -78,25 +82,20 @@ class StockAccount extends TitleAccount
     	return $str;
     }
     
-    function _checkPersonalGroupId($strGroupId)
-    {	
-    	if (method_exists($this, 'GetGroupId') == false)	return true;
-    	if ($this->GetGroupId() != $strGroupId)    			return true;
-    	return false;
-    }
-
-    function _getPersonalGroupLink($strGroupId)
+	private function _getPersonalGroupLink($strGroupId)
     {
     	$item_sql = new StockGroupItemSql($strGroupId);
-    	$arStockId = $item_sql->GetStockIdArray(true);
-    	if (count($arStockId) > 0)
-    	{
-    		if ($strLink = $this->GetGroupLink($strGroupId))	return $strLink.' ';
-    	}
+    	if ($arStockId = $item_sql->GetStockIdArray(true))
+		{
+	    	if (count($arStockId) > 0)
+    		{
+    			if ($strLink = $this->GetGroupLink($strGroupId))	return "$strLink ";
+    		}
+		}
     	return '';
     }
     
-    function _getPersonalLinks($strLoginId)
+	private function _getPersonalLinks($strLoginId)
     {
     	$str = '';
     	if ($result = $this->group_sql->GetAll($strLoginId)) 
@@ -104,7 +103,7 @@ class StockAccount extends TitleAccount
     		while ($record = mysqli_fetch_assoc($result)) 
     		{
     			$strGroupId = $record['id'];
-    			if ($this->_checkPersonalGroupId($strGroupId))		$str .= $this->_getPersonalGroupLink($strGroupId);
+    			if ($this->GetGroupId() != $strGroupId)		$str .= $this->_getPersonalGroupLink($strGroupId);
     		}
     		mysqli_free_result($result);
     	}
@@ -112,7 +111,7 @@ class StockAccount extends TitleAccount
     	return $str;
     }
 
-    function _getStockExchangeLinks($ref)
+	private function _getStockExchangeLinks($ref)
     {
 		if ($ref->IsShenZhenLof())		$str = GetShenZhenLofLink();
 		else if ($ref->IsShenZhenEtf())	$str = GetShenZhenEtfListLink($ref);
@@ -167,10 +166,10 @@ class StockAccount extends TitleAccount
 	$strWechatPay
 END;
     }
-    
+
     function IsGroupReadOnly($strGroupId)
     {
-    	if ($strGroupId)		return ($this->GetGroupMemberId($strGroupId) == $this->GetLoginId()) ? false : true;
+    	if ($strGroupId)	return ($this->GetGroupMemberId($strGroupId) == $this->GetLoginId()) ? false : true;
     	return false;
     }
     
@@ -183,10 +182,8 @@ END;
     		{
     			if ($ref->IsFundA())
     			{
-//    				SqlCreateFundPurchaseTable();
     				$strSymbol = $ref->GetSymbol();
     				$strStockId = $ref->GetStockId();
-//    				if (($strAmount = SqlGetFundPurchaseAmount($this->GetLoginId(), $strStockId)) === false)		$strAmount = FUND_PURCHASE_AMOUNT;
 					$amount_sql = new GroupItemAmountSql();
 					if ($strGroupItemId = SqlGetStockGroupItemId($strGroupId, $strStockId))
 					{
@@ -217,13 +214,13 @@ END;
 	
     	$strMoney = '单一货币';
 		$profit_col = new TableColumnProfit();
-		if (EchoTableParagraphBegin(array(new TableColumnGroupName(),
-										  new TableColumnProfit(DISP_ALL_CN),
-										  new TableColumnHolding(DISP_ALL_CN),
-										  new TableColumnProfit($strMoney),
-										  new TableColumnHolding($strMoney),
-										  new TableColumnTest()
-										 ), 'money', GetMyStockGroupLink().$profit_col->GetDisplay()))
+		if (EchoTableParagraphBegin([new TableColumnGroupName(),
+									 new TableColumnProfit(DISP_ALL_CN),
+									 new TableColumnHolding(DISP_ALL_CN),
+									 new TableColumnProfit($strMoney),
+									 new TableColumnHolding($strMoney),
+									 new TableColumnTest()
+									], 'money', GetMyStockGroupLink().$profit_col->GetDisplay()))
 		{
 			foreach ($arGroup as $group)	_EchoMoneyGroupData($this, $group, $strUSDCNY, $strHKDCNY);
     		EchoTableParagraphEnd();
@@ -232,8 +229,7 @@ END;
 
     function EchoMoneyParagraph($group, $uscny_ref = false, $hkcny_ref = false)
     {
-    	$this->EchoMoneyParagraphs(array($group), $uscny_ref, $hkcny_ref);
+		$this->EchoMoneyParagraphs([$group], $uscny_ref, $hkcny_ref);
     }
 }    
 
-?>

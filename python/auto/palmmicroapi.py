@@ -1,3 +1,14 @@
+import re
+
+def convert_symbol(symbol):
+	# 匹配 ^XXX-YY 格式，并提取 XXX 部分
+	pattern = r'^\^([A-Z]+)-[A-Z]{2}$'
+	match = re.match(pattern, symbol)
+	if match:
+		return match.group(1)  # 返回符号主体部分
+	else:
+		return symbol  # 不符合格式则返回原字符串
+
 class PalmmicroAPI:
 	def __init__(self, config_dict):
 		"""
@@ -21,19 +32,27 @@ class PalmmicroAPI:
 		self.config[key] = value
 
 	@staticmethod
-	def _reverse_calc_with_calibration(ar, strSymbol, arSrc):
-		if 'CNY' in arSrc:
-			fCny = arSrc['CNY']
-		elif 'CNY' in ar:
-			fCny = float(ar['CNY'])
+	def _get_CNY(ar, arSrc):
+		fCny = 1.0
+		if arSrc != None:
+			if 'CNY' in arSrc:
+				fCny = arSrc['CNY']
+			elif 'CNY' in ar:
+				fCny = float(ar['CNY'])
 		else:
-			fCny = 1.0
+			if 'CNYest' in ar:
+				fCny = float(ar['CNYest'])
+		return fCny
+
+	@staticmethod
+	def _reverse_calc_with_calibration(ar, strSymbol, arSrc):
+		fCny = PalmmicroAPI._get_CNY(ar, arSrc)
 		fPos = float(ar['position'])
 		return (arSrc[strSymbol] - (1.0 - fPos) * float(ar['netvalue'])) * float(ar['calibration']) / fPos / fCny
 
 	@staticmethod
 	def _calc_with_calibration(ar, arSrc = None):
-		fCny = 1.0
+		fCny = PalmmicroAPI._get_CNY(ar, arSrc)
 		fEst = 0.0
 		if arSrc != None:
 			strHedgeSymbol = ar['symbol_hedge']
@@ -42,30 +61,28 @@ class PalmmicroAPI:
 			else:
 				if 'est_netvalue' in ar:
 					fEst = float(ar['est_netvalue'])
-			if 'CNY' in arSrc:
-				fCny = arSrc['CNY']
-			elif 'CNY' in ar:
-				fCny = float(ar['CNY'])
 		else:
 			if 'est_netvalue' in ar:
 				fEst = float(ar['est_netvalue'])
-			if 'CNYest' in ar:
-				fCny = float(ar['CNYest'])
 		fPos = float(ar['position'])
 		return (1.0 - fPos) * float(ar['netvalue']) + fPos * fEst * fCny  / float(ar['calibration'])
 
 	@staticmethod
 	def _calc_with_holdings(ar, arSrc = None):
-		fCny = 1.0
+		fCny = PalmmicroAPI._get_CNY(ar, arSrc)
 		fTotal = 0.0
 		for strHolding, arHolding in ar['symbol_hedge'].items():
 			if arSrc != None:
-				fEst = arSrc[strHolding]
+				strReal = convert_symbol(strHolding)
+				if strReal in arSrc:
+					fPrice = arSrc[strReal]
+				else:
+					fPrice = float(arHolding['est_price'])
 			else:
-				fEst = float(arHolding['est_price'])
-			fTotal += float(arHolding['ratio']) * fEst / float(arHolding['price'])
+				fPrice = float(arHolding['est_price'])
+			fTotal += float(arHolding['ratio']) * fPrice / float(arHolding['price'])
 		fTotal /= 100.0
-		return float(ar['netvalue']) * (1.0 + float(ar['position']) * (fTotal * float(ar['CNY']) / float(ar['CNYholdings']) - 1.0))
+		return float(ar['netvalue']) * (1.0 + float(ar['position']) * (fTotal * fCny / float(ar['CNYholdings']) - 1.0))
 
 	def EstNetValue(self, strSymbol, arSrc = None):
 		fEst = 0.0
@@ -91,7 +108,17 @@ class PalmmicroAPI:
 				else:
 					fEst = self._calc_with_calibration(ar, arSrc)	# 直接算
 			else:
-				fEst = self._calc_with_holdings(ar, arSrc)	# 需要按持仓计算
+				if arSrc != None:
+					arCopy = arSrc.copy()
+					for strSymbol, fPrice in arSrc.items():
+						for strHolding in ar['symbol_hedge']:
+							if strHolding in self.config:	# strHolding in [GLD, SLV, USO]
+								arHolding = self.config[strHolding]
+								if arHolding['symbol_hedge'] == strSymbol:
+									arCopy[strHolding] = self._calc_with_calibration(arHolding, arSrc)
+					fEst = self._calc_with_holdings(ar, arCopy)	# 需要按持仓计算
+				else:
+					fEst = self._calc_with_holdings(ar)	#按持仓计算官方估值
 		return fEst
         
 	def ReverseEst(self, arSrc):

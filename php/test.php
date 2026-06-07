@@ -75,17 +75,6 @@ function TestConvertTables()
     }
 }
 
-function DebugLogFile()
-{
-    $strFileName = UrlGetRootDir().'logs/scripts.log';
-    clearstatcache();
-	if (file_exists($strFileName))
-	{
-		DebugString(file_get_contents($strFileName));
-		unlink($strFileName);
-	}
-}
-
 function DebugClearPath($strSection)
 {
     $strPath = DebugGetPath($strSection);
@@ -114,11 +103,8 @@ function DebugClearPath($strSection)
     echo GetContentType();
 
 	file_put_contents(DebugGetFile(), DEBUG_UTF8_BOM.'Start debug:'.PHP_EOL);
-	DebugString(UrlGetRootDir());
 	DebugString('PHP version: '.phpversion());
-	DebugLogFile();
-	echo strval(rand()).' Hello, world!'.GetHtmlNewLine();
-	
+
 	DebugClearPath('csv');
 	DebugClearPath('image');
 
@@ -139,4 +125,3 @@ function DebugClearPath($strSection)
 //	TestConvertTables();
 	
 	phpinfo();
-?>
