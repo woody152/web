@@ -37,7 +37,5 @@ function EchoBody($bChinese = true, $bDisplay = true)
 	if ($bDisplay)	_LayoutBottom($bChinese, $bAdsense);
 	else			LayoutTail($bChinese);
 	
-//	DebugNow('总时间');
+	// DebugNow('总时间');
 }
-
-?>

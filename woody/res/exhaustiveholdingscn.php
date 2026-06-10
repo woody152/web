@@ -347,7 +347,7 @@ function EchoAll()
     	EchoEditInputForm('进行'.EXHAUSTIVE_HOLDINGS_DISPLAY.'计算的'.TableColumnGetNetValue().'涨跌%阈值', $strInput);
     	if ($strInput != '')
     	{
-			_echoExhaustiveHoldingsParagraph($acct->GetPage(), $ref->GetSymbol(), floatval($strInput) / 100.0, $acct->GetNum() / 4, $acct->IsAdmin());
+			_echoExhaustiveHoldingsParagraph($acct->GetPage(), $ref->GetSymbol(), floatval($strInput) / 100.0, $acct->GetNum(), $acct->IsAdmin());
 		}
     }
     $acct->EchoLinks();
@@ -371,4 +371,4 @@ function GetTitle()
     $acct = new SymbolAccount();
 
 require('../../php/ui/_dispcn.php');
-?>
+

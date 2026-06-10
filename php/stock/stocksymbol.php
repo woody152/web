@@ -73,14 +73,13 @@ function StrHasPrefix($str, $strPrefix)
 
 function GetSecondaryListingArray()
 {
-	return array(
-				   'BABA' => '09988',
-				   'BIDU' => '09888',
-				   'BILI' => '09626',
-				   'JD' => '09618',
-				   'NTES' => '09999',
-				   'TCOM' => '09961',
-				  );
+	return ['BABA' => '09988',
+			'BIDU' => '09888',
+			'BILI' => '09626',
+			'JD' => '09618',
+			'NTES' => '09999',
+			'TCOM' => '09961',
+           ];
 }
 
 function ChinaIndexGetAshrArray()
@@ -118,7 +117,7 @@ function in_arrayChinaIndex($strSymbol)
 
 function ChinaFutureGetSymbolArray()
 {
-    return array('SH518800', 'SH518880', 'SZ159934', 'SZ159937', 'SZ159985', 'SZ161226');
+    return ['SH518800', 'SH518880', 'SZ159934', 'SZ159937', 'SZ159985', 'SZ161226'];
 }
 
 function in_arrayChinaFuture($strSymbol)
@@ -128,7 +127,7 @@ function in_arrayChinaFuture($strSymbol)
 
 function QdiiGetOilEtfSymbolArray()
 {
-    return array('SZ160416', 'SZ162719'); 
+    return ['SZ160416', 'SZ162719']; 
 }
 
 function in_arrayOilEtfQdii($strSymbol)
@@ -138,7 +137,7 @@ function in_arrayOilEtfQdii($strSymbol)
 
 function QdiiGetQqqMatchArray()
 {
-    return array('SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941', 'SZ161130'); 
+    return ['SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941', 'SZ161130']; 
 }
 
 function in_arrayQqqMatch($strSymbol)
@@ -148,7 +147,7 @@ function in_arrayQqqMatch($strSymbol)
 
 function QdiiGetQqqSymbolArray()
 {
-    return array_merge(QdiiGetQqqMatchArray(), array('SH513300'));
+    return array_merge(QdiiGetQqqMatchArray(), ['SH513300']);
 }
 
 function in_arrayQqqQdii($strSymbol)
@@ -158,7 +157,7 @@ function in_arrayQqqQdii($strSymbol)
 
 function QdiiGetSpyMatchArray()
 {
-    return array('SH513500', 'SH513650', 'SZ159612', 'SZ161125'); 
+    return ['SH513500', 'SH513650', 'SZ159612', 'SZ161125']; 
 }
 
 function in_arraySpyMatch($strSymbol)
@@ -168,7 +167,7 @@ function in_arraySpyMatch($strSymbol)
 
 function QdiiGetSpySymbolArray()
 {
-    return array_merge(QdiiGetSpyMatchArray(), array('SZ159655'));
+    return array_merge(QdiiGetSpyMatchArray(), ['SZ159655']);
 }
 
 function in_arraySpyQdii($strSymbol)
@@ -178,7 +177,7 @@ function in_arraySpyQdii($strSymbol)
 
 function QdiiGetXopSymbolArray()
 {
-    return array('SH513350', 'SZ159518', 'SZ162411'); 
+    return ['SH513350', 'SZ159518', 'SZ162411']; 
 }
 
 function in_arrayXopQdii($strSymbol)
@@ -188,7 +187,7 @@ function in_arrayXopQdii($strSymbol)
 
 function QdiiGetXbiSymbolArray()
 {
-    return array('SZ159502', 'SZ161127'); 
+    return ['SZ159502', 'SZ161127']; 
 }
 
 function in_arrayXbiQdii($strSymbol)
@@ -198,7 +197,7 @@ function in_arrayXbiQdii($strSymbol)
 
 function QdiiGetSymbolArray()
 {
-    $ar = array_merge(array('SH501300', 'SH513290', 'SH513400', 'SZ160140', 'SZ161126', 'SZ161128', 'SZ162415', 'SZ164906') 
+    $ar = array_merge(['SH501300', 'SH513290', 'SH513400', 'SZ160140', 'SZ161126', 'SZ161128', 'SZ162415', 'SZ164906']
     				   , QdiiGetXbiSymbolArray()
     				   , QdiiGetXopSymbolArray()
     				   , QdiiGetOilEtfSymbolArray()
@@ -214,7 +213,7 @@ function in_arrayQdii($strSymbol)
 
 function QdiiHkGetTechSymbolArray()
 {
-    return array('SH513010', 'SH513130', 'SH513180', 'SH513260', 'SH513380', 'SH513580', 'SH513890', 'SH520570', 'SH520590', 'SH520920', 'SZ159740', 'SZ159741', 'SZ159742');
+    return ['SH513010', 'SH513130', 'SH513180', 'SH513260', 'SH513380', 'SH513580', 'SH513890', 'SH520570', 'SH520590', 'SH520920', 'SZ159740', 'SZ159741', 'SZ159742'];
 }
 
 function in_arrayTechQdiiHk($strSymbol)
@@ -224,7 +223,7 @@ function in_arrayTechQdiiHk($strSymbol)
 
 function QdiiHkGetHSharesSymbolArray()
 {
-    return array('SH510900', 'SZ159850', 'SZ159954', 'SZ159960', 'SZ160717', 'SZ161831');
+    return ['SH510900', 'SZ159850', 'SZ159954', 'SZ159960', 'SZ160717', 'SZ161831'];
 }
 
 function in_arrayHSharesQdiiHk($strSymbol)
@@ -234,7 +233,7 @@ function in_arrayHSharesQdiiHk($strSymbol)
 
 function QdiiHkGetHangSengSymbolArray()
 {
-    return array('SH501302', 'SH513210', 'SH513600', 'SH513660', 'SZ159312', 'SZ159920', 'SZ160924', 'SZ164705');
+    return ['SH501302', 'SH513210', 'SH513600', 'SH513660', 'SZ159312', 'SZ159920', 'SZ160924', 'SZ164705'];
 }
 
 function in_arrayHangSengQdiiHk($strSymbol)
@@ -244,12 +243,12 @@ function in_arrayHangSengQdiiHk($strSymbol)
 
 function QdiiHkGetIndexSymbolArray()
 {
-    return array('^HSI', '^HSCE', '^HSTECH');
+    return ['^HSI', '^HSCE', '^HSTECH'];
 }
  
 function QdiiHkGetSymbolArray()
 {
-    $ar = array_merge(array('SH501025', 'SZ161124') 
+    $ar = array_merge(['SH501025', 'SZ161124'] 
     				   , QdiiHkGetTechSymbolArray()
     				   , QdiiHkGetHSharesSymbolArray()
     				   , QdiiHkGetHangSengSymbolArray());
@@ -285,7 +284,7 @@ function in_arrayQdiiJp($strSymbol)
 
 function QdiiEuGetDaxSymbolArray()
 {
-    return array('SH513030', 'SZ159561');
+    return ['SH513030', 'SZ159561'];
 }
 
 function in_arrayDaxQdiiEu($strSymbol)
@@ -295,7 +294,7 @@ function in_arrayDaxQdiiEu($strSymbol)
 
 function QdiiEuGetSymbolArray()
 {
-    $ar = array_merge(array('SH513080') 
+    $ar = array_merge(['SH513080'] 
     				   , QdiiEuGetDaxSymbolArray());
 //    sort($ar);
     return $ar;
@@ -308,17 +307,17 @@ function in_arrayQdiiEu($strSymbol)
 
 function GetChinaInternetSymbolArray()
 {
-	return array('SH513050', 'SH513220', 'SZ159605', 'SZ159607');
+	return ['SH513050', 'SH513220', 'SZ159605', 'SZ159607'];
 }
 
 function GetMsciUs50SymbolArray()
 {
-	return array('SH513850', 'SZ159577');
+	return ['SH513850', 'SZ159577'];
 }
 
 function GetHkMixSymbolArray()
 {
-	return array('SH513090', 'SH513230', 'SH513750', 'SH513990', 'SZ159567', 'SZ159570', 'SZ159615', 'SZ159751', 'SZ159792');
+	return ['SH513090', 'SH513230', 'SH513750', 'SH513990', 'SZ159567', 'SZ159570', 'SZ159615', 'SZ159751', 'SZ159792'];
 }
 
 function in_arrayHkMix($strSymbol)
@@ -348,7 +347,7 @@ function in_arrayLofMix($strSymbol)
 
 function QdiiMixGetSymbolArray()
 {
-    $ar = array_merge(array('SH513360', 'SZ159509', 'SZ159529')
+    $ar = array_merge(['SH513360', 'SZ159509', 'SZ159529']
                        , GetLofMixSymbolArray()
     				   , GetChinaInternetSymbolArray()
     				   , GetHkMixSymbolArray()
@@ -382,10 +381,10 @@ function in_arrayAll($strSymbol)
 function GetOverNightSymbolArray()
 {
 	return array_merge(QdiiGetXopSymbolArray(),
-                       array('SZ162719'),
+                       ['SZ162719'],
                        GetQdiiOilSymbolArray(),
                        GetQdiiGoldSymbolArray(),
-                       array('SZ161226', 'SZ161125', 'SZ161126', 'SZ161130', 'SZ162415', 'SZ164824', 'SZ164906'),
+                       ['SZ161226', 'SZ161125', 'SZ161126', 'SZ161130', 'SZ162415', 'SZ164824', 'SZ164906'],
                        QdiiGetXbiSymbolArray());
 }
 
@@ -826,7 +825,6 @@ class StockSymbol
         return false;
     }
 
-
     function IsSinaFutureUS()
     {
     	return StrHasPrefix($this->strSymbol, SINA_FUTURE_PREFIX); 
@@ -998,11 +996,6 @@ class StockSymbol
     	return 2;
     }
 
-    function GetDefaultPosition()
-    {
-		return $this->IsLofA() ? 0.95 : 1.0;  
-    }
-    
     function IsTradable()
     {
     	if ($this->IsSinaGlobalIndex())	return false;
@@ -1186,5 +1179,3 @@ class StockSymbol
         $this->strSymbol = $strSymbol;
     }
 }
-
-?>

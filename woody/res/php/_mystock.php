@@ -144,9 +144,9 @@ function _echoMyStockData($ref, $strStockId, $bAdmin)
     else
     {
     	list($ab_ref, $ah_ref, $adr_ref) = StockGetPairReferences($strSymbol);
-		if ($ab_ref)				EchoAbParagraph(array($ab_ref));
-		if ($ah_ref)				EchoAhParagraph(array($ah_ref));
-		if ($adr_ref)				EchoAdrhParagraph(array($adr_ref));
+		if ($ab_ref)			EchoAbParagraph([$ab_ref]);
+		if ($ah_ref)			EchoAhParagraph([$ah_ref]);
+		if ($adr_ref)			EchoAdrhParagraph([$adr_ref]);
    		if ($ref->IsSymbolA())	EchoTradingParagraph($ref, $ah_ref, $adr_ref);
    		
 		if ($ah_ref)
@@ -159,7 +159,7 @@ function _echoMyStockData($ref, $strStockId, $bAdmin)
 		else						
 		{
 			if ($strSymbol == 'fx_susdcnh')	EchoSmaParagraph($ref, false, $ref, '_callbackCnhSma');
-			else								EchoSmaParagraph($ref);
+			else							EchoSmaParagraph($ref);
 		}
    	}
    	
@@ -197,8 +197,8 @@ function GetMyStockLinks($ref)
 			$str .= GetStockCategoryLinks($strSymbol);
 
 			$netvalue_ref = new NetValueReference($strSymbol);
-			$strName = $netvalue_ref->GetChineseName();
-			if (stripos($strName, '博时') !== false)				$strFund = GetBoShiSoftwareLinks($strDigitA);
+			$strName = $netvalue_ref->GetStockName();
+			if (stripos($strName, '博时') !== false)			$strFund = GetBoShiSoftwareLinks($strDigitA);
 			else if (stripos($strName, '易方达') !== false)		$strFund = GetEFundSoftwareLinks($strDigitA);
 			else if (stripos($strName, '招商') !== false)		$strFund = GetCmfSoftwareLinks($strDigitA);
 			else if (stripos($strName, '广发') !== false)		$strFund = GetGuangFaSoftwareLinks($strDigitA);
@@ -253,5 +253,5 @@ function GetTitle()
 }
 
     $acct = new SymbolAccount();
-?>
+
 

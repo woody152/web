@@ -69,13 +69,13 @@ function GetSinaQuotes($arSymbol)
 	$iCount = count($arSymbol);
 	if (DebugIsAdmin() && $iCount > 1)
 	{
-//		DebugVal($iCount, 'total prefetch - '.$strSinaSymbols);
+		// DebugVal($iCount, 'total prefetch - '.$strSinaSymbols);
 	}
 	else
 	{
 		if (StockNeedFile($strFileName) == false)
 		{	// pause 1 minute after curl error response
-//			DebugString('Ignored: '.$strSinaSymbols, true);
+			// DebugString('Ignored: '.$strSinaSymbols, true);
 			return false;
 		}
 	}
@@ -190,7 +190,7 @@ function _addHoldingsSymbol(&$ar, $strSymbol)
 
 function _getAllSymbolArray($strSymbol)
 {
-   	$ar = array($strSymbol);
+   	$ar = [$strSymbol];
    	$sym = new StockSymbol($strSymbol);
     if ($sym->IsFundA())
     {
@@ -272,14 +272,13 @@ function _getAllSymbolArray($strSymbol)
          	if ($strSymbol == 'ASHR' || $strSymbol == 'hf_CHA50CFD')	$ar[] = 'fx_susdcnh';
       	}
     }
-//   	DebugPrint($ar, __FUNCTION__, true);
+	// DebugPrint($ar, __FUNCTION__, true);
     return $ar;
 }
 
 function StockPrefetchArrayExtendedData($ar)
 {
-    $arAll = array();
-    
+    $arAll = [];
 	$sql = GetStockSql();
     foreach ($ar as $strSymbol)
     {
@@ -375,7 +374,7 @@ function StockGetPairReferences($strSymbol)
     	if ($ah_ref = _getAhPairReference($h_ref->GetSymbol()))		$ab_ref = _getAbPairReference($ah_ref->GetSymbol());
     }
     
-    return array($ab_ref, $ah_ref, $adr_ref);
+	return [$ab_ref, $ah_ref, $adr_ref];
 }
 
 function UseSameDayNetValue($sym)
@@ -413,7 +412,6 @@ function GetStockHedge($strSymbol, $strStockId, $strLev = false)
 				$strDate = $record['date'];
 				if ($strLevCal = $cal_sql->GetClose($strLevId, $strDate))
 				{
-//					DebugString(__FUNCTION__.$strLev.' '.$strDate, true);
 		    		mysqli_free_result($result);
 					return StockCalcHedge(floatval($record['close']), $fPos) / StockCalcHedge(floatval($strLevCal), $pos_sql->ReadPos($strLevId));
 				}
@@ -430,5 +428,3 @@ function GetStockHedge($strSymbol, $strStockId, $strLev = false)
 	}
    	return 1.0;
 }
-
-?>

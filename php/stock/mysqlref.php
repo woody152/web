@@ -2,13 +2,13 @@
 
 class MysqlReference extends StockReference
 {
-    var $strSqlId = false;      // ID in mysql database
+    private $strSqlId = false;      // ID in mysql database
 	var $bConvertGB2312 = false;
 
     var $fFactor = 1.0;			// 'close' field in calibrationhistory table
-    var $fRatio = 1.0;
+    private $fRatio = 1.0;
     
-    var $iNetValueCount = 0;
+    private $iNetValueCount = 0;
     
     public function __construct($strSymbol) 
     {
@@ -17,24 +17,26 @@ class MysqlReference extends StockReference
         $this->LoadData();
         if (IsZeroString($this->strPrice))	$this->strPrice = $this->strPrevPrice;
 
-    	if ($this->strSqlId)
-    	{	// Already set, like in CnyReference
-    	}
-    	else
-    	{
-    		$this->_loadSqlId($this->GetSymbol());
-    	}
-
+		// CnyReference and NetValueReference set StockId in LoadData()
+    	if ($this->strSqlId === false)	$this->SetStockId();
     	if ($this->strSqlId)
     	{
     		$net_sql = GetNetValueHistorySql();
     		$this->iNetValueCount = $net_sql->Count($this->strSqlId);
     		
     		$pos_sql = GetPositionSql();
-    		$this->fRatio = ($fRatio = $pos_sql->ReadVal($this->strSqlId)) ? $fRatio : $this->GetDefaultPosition();
+    		if ($fRatio = $pos_sql->ReadVal($this->strSqlId))
+			{
+				$this->fRatio = $fRatio;
+			}
+			else if ($this->IsLofA())
+			{
+				$this->fRatio = 0.95;
+				$pos_sql->WritePos($this->strSqlId, $this->fRatio);
+			}
     	}
     }
-    
+
     public function LoadData()
     {
     	$this->SetHasData(false);
@@ -100,22 +102,26 @@ class MysqlReference extends StockReference
 		return false;
 	}
 
-    function _loadSqlId($strSymbol)
+    function SetStockId()
     {
+		$strSymbol = $this->GetSymbol();
 		$sql = GetStockSql();
-        if ($this->HasData())
-        {
-            $sql->InsertSymbol($strSymbol, $this->GetChineseName());
-        }
     	$this->strSqlId = $sql->GetId($strSymbol);
+		if ($this->strSqlId === false)
+		{
+	        if ($this->HasData())
+			{
+	            if ($sql->InsertSymbol($strSymbol, $this->GetStockName()))	$this->strSqlId = $sql->GetId($strSymbol);
+			}	
+		}	
     }
     
-    function GetStockId()
+    public function GetStockId()
     {
         return $this->strSqlId;
     }
-    
-    function GetFactor()
+
+	function GetFactor()
     {
     	return $this->fFactor;
     }
@@ -154,26 +160,13 @@ class MysqlReference extends StockReference
     	return false;
     }
     
-    function GetEnglishName()
+    function GetStockName()
     {
     	if ($this->bConvertGB2312)
     	{
-    		return GbToUtf8($this->strName);
+    		$this->strName = GbToUtf8($this->strName);
+			$this->bConvertGB2312 = false;
     	}
    		return $this->strName;
-    }
-    
-    function GetChineseName()
-    {
-    	if (empty($this->strChineseName))
-    	{
-    		return $this->GetEnglishName();	// 数据中只有唯一一个中文或者英文名字的情况下, 优先放strName字段.
-    	}
-
-    	if ($this->bConvertGB2312)
-    	{
-    		return GbToUtf8($this->strChineseName);
-    	}
-    	return $this->strChineseName;
     }
 }

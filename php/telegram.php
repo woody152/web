@@ -5,7 +5,7 @@ require_once('stockdataarray.php');
 require_once('tutorial/iprules.php');
 
 // 电报公共模板, 返回输入信息
-const TG_DEBUG_VER = '版本049';
+const TG_DEBUG_VER = '版本051';
 const BOT_EOL = "\r\n";
 const MAX_BOT_MSG_LEN = 2048;
 
@@ -42,7 +42,7 @@ class TelegramCallback
 	function DirectReply($method, $parameters) 
 	{
 		if (!is_string($method))			return false; 
-		if (!$parameters) 		    		$parameters = array();
+		if (!$parameters) 		    		$parameters = [];
 		else if (!is_array($parameters))	return false;
 
 		$parameters['method'] = $method;
@@ -55,7 +55,7 @@ class TelegramCallback
 
 	function ReplyText($text, $strMessageId, $strChatId) 
 	{
-		$this->DirectReply('sendMessage', array('chat_id' => $strChatId, 'reply_to_message_id' => $strMessageId, 'text' => $text));
+		$this->DirectReply('sendMessage', ['chat_id' => $strChatId, 'reply_to_message_id' => $strMessageId, 'text' => $text]);
 	}
 	
 	private function _sendText($strText, $strChatId) 
@@ -106,7 +106,7 @@ class TelegramCallback
 				}
 				else
 				{
-					$str = '无效token: '.$strToken;
+					$str = "无效token: $strToken";
 					$this->Debug($str);
 					DebugString(__CLASS__.__FUNCTION__.$str);
 				}
@@ -172,7 +172,7 @@ class TelegramStock extends TelegramCallback
         }
         else
         {
-        	$this->Debug('未知查询：'.$strText);
+        	$this->Debug("未知查询: $strText");
         }
     }
 }
@@ -180,4 +180,4 @@ class TelegramStock extends TelegramCallback
     $acct = new TelegramStock();
     $acct->Run();
 	// $acct->SetCallback();
-	
+

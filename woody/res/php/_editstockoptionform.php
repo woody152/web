@@ -60,10 +60,8 @@ function _getStockOptionDate($strSubmit, $ref, $strSymbol)
 function _getStockOptionNewName($ref, $strName)
 {
 	$str = '';
-	$strChinese = $ref->GetChineseName();
-	$strEnglish = $ref->GetEnglishName();
-	if ($strChinese != $strName)									$str .= '-'.$strChinese;
-    if ($strEnglish != $strName && $strEnglish != $strChinese)	$str .= '-'.$strEnglish;
+	$strNew = $ref->GetStockName();
+	if ($strNew != $strName)	$str .= "-$strNew";
     return $str;
 }
 

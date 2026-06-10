@@ -9,7 +9,7 @@ from _mytoken import ROT_TOKEN
 from palmmicroapi import PalmmicroAPI
 
 def _handlePalmmicroData(arData):
-	arCNY = {'CNY': 6.7878}
+	arCNY = {'CNY': 6.7783}
 	arXOP = {'XOP': 136.25}
 	arSPY = {'SPY': 619.11}
 	arES = {'hf_ES': 6208.0}

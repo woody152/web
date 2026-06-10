@@ -7,13 +7,13 @@ require_once('sql/sqlipaddress.php');
 require_once('sql/sqlstocksymbol.php');
 require_once('sql/sqlstockgroup.php');
 
-define('DISP_ALL_US', 'All');
-define('DISP_EDIT_US', 'Edit');
-define('DISP_NEW_US', 'New');
+const DISP_ALL_US = 'All';
+const DISP_EDIT_US = 'Edit';
+const DISP_NEW_US = 'New';
 
-define('DISP_ALL_CN', '全部');
-define('DISP_EDIT_CN', '修改');
-define('DISP_NEW_CN', '新建');
+const DISP_ALL_CN = '全部';
+const DISP_EDIT_CN = '修改';
+const DISP_NEW_CN = '新建';
 
 function GetAllDisplay($bChinese = true)
 {
@@ -22,20 +22,20 @@ function GetAllDisplay($bChinese = true)
 
 class Account
 {
-    var $strMemberId = false;
-    var $strPageId;
+    private $strMemberId = false;
+    private $strPageId;
     
-    var $strLoginEmail = false;
+    private $strLoginEmail = false;
 
-    var $ip_crawler_sql;
-    var $ip_malicious_sql;
-    var $ip_visit_sql;
-    var $ip_login_sql;
+    private $ip_crawler_sql;
+    private $ip_malicious_sql;
+    private $ip_visit_sql;
+    private $ip_login_sql;
     
-    var $page_sql;
-    var $visitor_sql;
+    private $page_sql;
+    private $visitor_sql;
 
-    var $bAllowCurl = true;
+    private $bAllowCurl = true;
     
     public function __construct() 
     {
@@ -99,7 +99,7 @@ class Account
 		InitGlobalStockSql();
     }
 
-	function _allowCrawler($ymd, $tick_sql, $strIp)
+	private function _allowCrawler($ymd, $tick_sql, $strIp)
 	{
 		if ($ymd->IsWeekDay())
 		{
@@ -304,11 +304,11 @@ class Account
 
 class TitleAccount extends Account
 {
-	var $strPage;
-	var $strQuery;
+	private $strPage;
+	private $strQuery;
 	
-    var $iStart;
-    var $iNum;
+    private $iStart;
+    private $iNum;
     
     public function __construct($strQueryItem = false, $arLoginTitle = false) 
     {
@@ -349,9 +349,7 @@ class TitleAccount extends Account
     function GetStartNumDisplay($bChinese = true)
     {
    		if (($this->iStart == 0) && ($this->iNum == 0))	$str = GetAllDisplay($bChinese);
-   		else 													$str = strval($this->iStart + 1).'-'.strval($this->iStart + $this->iNum); 
+   		else 											$str = strval($this->iStart + 1).'-'.strval($this->iStart + $this->iNum); 
     	return "($str)";
     }
 }
-
-?>

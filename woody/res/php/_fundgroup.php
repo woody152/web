@@ -62,12 +62,10 @@ class FundGroupAccount extends GroupAccount
     		$netvalue_ref = $ref->GetNetValueRef();
     	}
 
-    	$str = $netvalue_ref->GetChineseName();
+    	$str = $netvalue_ref->GetStockName();
     	$str = str_replace('(人民币份额)', '', $str);
     	$str = str_replace('(人民币)', '', $str);
     	return RefGetStockDisplay($stock_ref).$str;
-//    	return $stock_ref->GetSymbol().$str;
     }
 }
 
-?>

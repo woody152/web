@@ -16,8 +16,7 @@ class NetValueReference extends MysqlReference
     
     public function LoadData()
     {
-    	$strSymbol = $this->GetSymbol();
-    	$this->strSqlId = SqlGetStockId($strSymbol);
+    	$this->SetStockId();
         if ($this->IsFundA())
         {
         	$this->LoadSinaFundData();
@@ -29,5 +28,3 @@ class NetValueReference extends MysqlReference
         }
     }
 }
-
-?>

@@ -13,7 +13,6 @@ class StockReference extends StockSymbol
     var $strDate;                     // 2014-11-13
     var $strTime;			            // 08:55:00        
     
-    var $strChineseName;
     var $strName = '';
     
     var $strOpen;                     // open price
@@ -294,8 +293,8 @@ class StockReference extends StockSymbol
         $this->strLow = $ar[5];
         $this->strVolume = $ar[12];
         
-        $this->strName = $ar[0];
-        $this->strChineseName = $ar[1];
+        // $this->strName = $ar[0]; // English name
+        $this->strName = $ar[1];    // Chinese name
     }
     
     function _onSinaDataCN($ar)
@@ -542,5 +541,3 @@ class ExtendedTradingReference extends StockReference
 		return ($this->GetHour() <= 9) ? '盘前交易' : '盘后交易';
     }
 }
-
-?>
