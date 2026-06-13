@@ -79,7 +79,7 @@ function _getArbitrageTestStr($iShares, $strGroupId, $strStockId, $strSymbol)
 function _echoPortfolioTableItem($trans)
 {
 	static $fCny = 0.0;
-	$ar = array();
+	$ar = [];
 	
     $ref = $trans->ref;
     $strSymbol = $ref->GetSymbol();
@@ -140,14 +140,14 @@ function _echoPortfolioTableItem($trans)
 function EchoPortfolioParagraph($arTrans)
 {
 	$profit_col = new TableColumnProfit();
-	if (EchoTableParagraphBegin(array(new TableColumnSymbol(),
-									  $profit_col,
-									  new TableColumnHolding(),
-									  new TableColumnQuantity(),
-									  new TableColumnPrice('平均'),
-									  new TableColumnChange(),
-									  new TableColumnTest()
-									 ), 'myportfolio', '个股'.$profit_col->GetDisplay()))
+	if (EchoTableParagraphBegin([new TableColumnSymbol(),
+								 $profit_col,
+								 new TableColumnHolding(),
+								 new TableColumnQuantity(),
+								 new TableColumnPrice('平均'),
+								 new TableColumnChange(),
+								 new TableColumnTest()
+								], 'myportfolio', '个股'.$profit_col->GetDisplay()))
 	{
 		foreach ($arTrans as $trans)
 		{
@@ -156,5 +156,3 @@ function EchoPortfolioParagraph($arTrans)
     	EchoTableParagraphEnd();
 	}								 
 }
-
-?>

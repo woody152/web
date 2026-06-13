@@ -4,7 +4,7 @@ require_once('tutorial/math.php');
 
 function GetStandardBenfordArray($iTotal = 1)
 {
-	$ar = array();
+	$ar = [];
 	for ($i = 1; $i <= 9; $i ++)
 	{
 		$ar[] = log10(1.0 + 1.0 / $i) * $iTotal;
@@ -123,5 +123,3 @@ class BenfordImageFile extends PageImageFile
     	return $str;
 	}
 }
-
-?>

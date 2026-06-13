@@ -24,7 +24,7 @@ function _menuStockSoftware($bChinese)
     
     foreach ($arFunction as $strKey => $strFunction)
     {
-    	$arTitle = array();
+    	$arTitle = [];
     	$arSymbol = call_user_func($strFunction);
     	foreach ($arSymbol as $strSymbol)	$arTitle[] = strtolower($strSymbol);
     	
@@ -53,5 +53,3 @@ function _LayoutBottom($bChinese = true, $bAdsense = true)
     VisitorLogin($bChinese);
     LayoutTail($bChinese, $bAdsense);
 }
-
-?>

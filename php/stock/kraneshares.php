@@ -40,5 +40,3 @@ function GetKraneNetValue($ref, $strPrevDate)
    	}
     return false;
 }
-
-?>

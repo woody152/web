@@ -4,7 +4,7 @@ require_once('_editgroupform.php');
 
 function _getStockIdArray($strSymbols)
 {
-	$arStockId = array();
+	$arStockId = [];
     $arSymbol = GetInputSymbolArray($strSymbols);
     StockPrefetchArrayExtendedData($arSymbol);
 	foreach ($arSymbol as $strSymbol)
@@ -111,5 +111,3 @@ class _SubmitGroupAccount extends StockAccount
 		}
 	}
 }
-
-?>

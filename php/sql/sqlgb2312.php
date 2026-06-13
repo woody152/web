@@ -85,7 +85,7 @@ class GB2312Sql extends TableSql
     
     function Insert($strGB, $strUTF)
     {
-    	return $this->InsertArray(array('id' => $strGB, 'utf' => $strUTF));
+    	return $this->InsertArray(['id' => $strGB, 'utf' => $strUTF]);
     }
     
     function GetUTF($strGB)
@@ -124,8 +124,7 @@ class GB2312Sql extends TableSql
     					$iUtf |= ($iChar3 & 0x3F);
     					$strUTF = dechex($iUtf);
     					$strGB = $this->GetId($strUTF);
-//    					DebugString($strUTF.' '.$strGB);
-    					
+    					// DebugString($strUTF.' '.$strGB);
     					if ($strFirst = get_first_pin_yin($strGB))
     					{
     						$strName .= $strFirst;
@@ -141,6 +140,3 @@ class GB2312Sql extends TableSql
     	return $strName;
     }
 }
-
-
-?>

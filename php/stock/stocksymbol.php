@@ -104,10 +104,11 @@ function ChinaIndexGetCoalArray()
 
 function ChinaIndexGetSymbolArray()
 {
-    return array_merge(ChinaIndexGetAshrArray(),
-                       ChinaIndexGetSz100Array(),
-                       ChinaIndexGetCoalArray(),
-                       ['SH502000', 'SZ160225', 'SZ160632', 'SZ160639', 'SZ161725', 'SZ161726', 'SZ162412', 'SZ163109', 'SZ163113', 'SZ167301']);
+    return [...ChinaIndexGetAshrArray(),
+            ...ChinaIndexGetSz100Array(),
+            ...ChinaIndexGetCoalArray(),
+            'SH502000', 'SZ160225',
+            'SZ160632', 'SZ160639', 'SZ161725', 'SZ161726', 'SZ162412', 'SZ163109', 'SZ163113', 'SZ167301'];
 }
 
 function in_arrayChinaIndex($strSymbol)
@@ -125,14 +126,14 @@ function in_arrayChinaFuture($strSymbol)
     return in_array($strSymbol, ChinaFutureGetSymbolArray());
 }
 
-function QdiiGetOilEtfSymbolArray()
+function QdiiGetOilSymbolArray()
 {
     return ['SZ160416', 'SZ162719']; 
 }
 
 function in_arrayOilEtfQdii($strSymbol)
 {
-    return in_array($strSymbol, QdiiGetOilEtfSymbolArray());
+    return in_array($strSymbol, QdiiGetOilSymbolArray());
 }
 
 function QdiiGetQqqMatchArray()
@@ -147,7 +148,7 @@ function in_arrayQqqMatch($strSymbol)
 
 function QdiiGetQqqSymbolArray()
 {
-    return array_merge(QdiiGetQqqMatchArray(), ['SH513300']);
+    return [...QdiiGetQqqMatchArray(), 'SH513300'];
 }
 
 function in_arrayQqqQdii($strSymbol)
@@ -167,7 +168,7 @@ function in_arraySpyMatch($strSymbol)
 
 function QdiiGetSpySymbolArray()
 {
-    return array_merge(QdiiGetSpyMatchArray(), ['SZ159655']);
+    return [...QdiiGetSpyMatchArray(), 'SZ159655'];
 }
 
 function in_arraySpyQdii($strSymbol)
@@ -197,13 +198,12 @@ function in_arrayXbiQdii($strSymbol)
 
 function QdiiGetSymbolArray()
 {
-    $ar = array_merge(['SH501300', 'SH513290', 'SH513400', 'SZ160140', 'SZ161126', 'SZ161128', 'SZ162415', 'SZ164906']
-    				   , QdiiGetXbiSymbolArray()
-    				   , QdiiGetXopSymbolArray()
-    				   , QdiiGetOilEtfSymbolArray()
-    				   , QdiiGetQqqSymbolArray()
-    				   , QdiiGetSpySymbolArray());
-    return $ar;
+    return ['SH501300', 'SH513290', 'SH513400', 'SZ160140', 'SZ161126', 'SZ161128', 'SZ162415', 'SZ164906',
+    	    ...QdiiGetXbiSymbolArray(),
+    	    ...QdiiGetXopSymbolArray(),
+            ...QdiiGetOilSymbolArray(),
+            ...QdiiGetQqqSymbolArray(),
+            ...QdiiGetSpySymbolArray()];
 }
 
 function in_arrayQdii($strSymbol)
@@ -248,12 +248,10 @@ function QdiiHkGetIndexSymbolArray()
  
 function QdiiHkGetSymbolArray()
 {
-    $ar = array_merge(['SH501025', 'SZ161124'] 
-    				   , QdiiHkGetTechSymbolArray()
-    				   , QdiiHkGetHSharesSymbolArray()
-    				   , QdiiHkGetHangSengSymbolArray());
-//    sort($ar);
-    return $ar;
+	return ['SH501025', 'SZ161124',
+			...QdiiHkGetTechSymbolArray(),
+			...QdiiHkGetHSharesSymbolArray(),
+			...QdiiHkGetHangSengSymbolArray()];
 }
 
 function in_arrayQdiiHk($strSymbol)
@@ -273,8 +271,7 @@ function in_arrayNkyQdiiJp($strSymbol)
 
 function QdiiJpGetSymbolArray()
 {
-    $ar = array_merge(['SH513800'], QdiiJpGetNkySymbolArray());
-    return $ar;
+    return ['SH513800', ...QdiiJpGetNkySymbolArray()];
 }
 
 function in_arrayQdiiJp($strSymbol)
@@ -294,10 +291,7 @@ function in_arrayDaxQdiiEu($strSymbol)
 
 function QdiiEuGetSymbolArray()
 {
-    $ar = array_merge(['SH513080'] 
-    				   , QdiiEuGetDaxSymbolArray());
-//    sort($ar);
-    return $ar;
+    return ['SH513080', ...QdiiEuGetDaxSymbolArray()];
 }
 
 function in_arrayQdiiEu($strSymbol)
@@ -330,14 +324,14 @@ function GetQdiiGoldSymbolArray()
 	return ['SZ160216', 'SZ161815', 'SZ160719', 'SZ161116', 'SZ164701', 'SZ165513'];
 }
 
-function GetQdiiOilSymbolArray()
+function QdiiGetUsoSymbolArray()
 {
 	return ['SZ163208', 'SH501018', 'SZ160723', 'SZ161129'];
 }
 
 function GetLofMixSymbolArray()
 {
-	return array_merge(['SH501225', 'SH501312', 'SZ160644', 'SZ164824'], GetQdiiOilSymbolArray(), GetQdiiGoldSymbolArray());
+	return ['SH501225', 'SH501312', 'SZ160644', 'SZ164824', ...QdiiGetUsoSymbolArray(), ...GetQdiiGoldSymbolArray()];
 }
 
 function in_arrayLofMix($strSymbol)
@@ -347,13 +341,11 @@ function in_arrayLofMix($strSymbol)
 
 function QdiiMixGetSymbolArray()
 {
-    $ar = array_merge(['SH513360', 'SZ159509', 'SZ159529']
-                       , GetLofMixSymbolArray()
-    				   , GetChinaInternetSymbolArray()
-    				   , GetHkMixSymbolArray()
-    				   , GetMsciUs50SymbolArray());
-//    sort($ar);
-    return $ar;
+    return ['SH513360', 'SZ159509', 'SZ159529',
+			...GetLofMixSymbolArray(),
+			...GetChinaInternetSymbolArray(),
+			...GetHkMixSymbolArray(),
+			...GetMsciUs50SymbolArray()];
 }
 
 function in_arrayQdiiMix($strSymbol)
@@ -363,14 +355,13 @@ function in_arrayQdiiMix($strSymbol)
 
 function GetAllSymbolArray()
 {
-	return array_merge(QdiiGetSymbolArray()
-			            , QdiiMixGetSymbolArray()
-			            , QdiiHkGetSymbolArray()
-			            , QdiiJpGetSymbolArray()
-			            , QdiiEuGetSymbolArray()
-					    , ChinaIndexGetSymbolArray()
-					    , ChinaFutureGetSymbolArray()
-					    );
+	return [...QdiiGetSymbolArray(),
+			...QdiiMixGetSymbolArray(),
+			...QdiiHkGetSymbolArray(),
+			...QdiiJpGetSymbolArray(),
+			...QdiiEuGetSymbolArray(),
+			...ChinaIndexGetSymbolArray(),
+			...ChinaFutureGetSymbolArray()];
 }
 
 function in_arrayAll($strSymbol)
@@ -380,12 +371,12 @@ function in_arrayAll($strSymbol)
 
 function GetOverNightSymbolArray()
 {
-	return array_merge(QdiiGetXopSymbolArray(),
-                       ['SZ162719'],
-                       GetQdiiOilSymbolArray(),
-                       GetQdiiGoldSymbolArray(),
-                       ['SZ161226', 'SZ161125', 'SZ161126', 'SZ161130', 'SZ162415', 'SZ164824', 'SZ164906'],
-                       QdiiGetXbiSymbolArray());
+	return [...QdiiGetXopSymbolArray(),
+            'SZ162719',
+            ...QdiiGetUsoSymbolArray(),
+            ...GetQdiiGoldSymbolArray(),
+            'SZ161226', 'SZ161125', 'SZ161126', 'SZ161130', 'SZ162415', 'SZ164824', 'SZ164906',
+            ...QdiiGetXbiSymbolArray()];
 }
 
 function IsChinaStockDigit($strDigit)

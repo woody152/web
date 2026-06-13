@@ -5,7 +5,7 @@ class MyPairReference extends MyStockReference
     var $pair_ref = false;
     var $cny_ref = false;
     
-	var $fLastCalibrationVal = false;
+	private $fLastCalibrationVal = false;
 	
     public function __construct($strSymbol, $pair_sql) 
     {
@@ -274,5 +274,3 @@ class FundPairReference extends MyPairReference
    		return false;
     }
 }
-
-?>

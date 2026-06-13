@@ -30,7 +30,7 @@ function StockOptionDecodeHoldings($strVal, &$arRatio)
 
 function UpdateStockOptionHoldings($strStockId, $strDate, $strVal)
 {
-	$arRatio = array();
+	$arRatio = [];
 	if ($fPos = StockOptionDecodeHoldings($strVal, $arRatio))
 	{
 		$pos_sql = GetPositionSql();
@@ -48,41 +48,4 @@ function UpdateStockOptionHoldings($strStockId, $strDate, $strVal)
 	}
 }
 
-/*
-function UpdateStockOptionHoldings($strStockId, $strDate, $strVal)
-{
-	$sql = GetStockSql();
-	$holdings_sql = GetHoldingsSql();
-	$date_sql = new HoldingsDateSql();
-	
-	$date_sql->WriteDate($strStockId, $strDate);
-	$holdings_sql->DeleteAll($strStockId);
 
-	$fPos = 0.0;
-	$arRatio = array();
-	if ($ar = DebugDecode($strVal))
-	{
-		foreach ($ar as $strHolding => $strRatio)
-		{
-			if ($strRatio != '0')
-			{
-				$strHolding = StockGetSymbol($strHolding);
-				$strHoldingId = $sql->GetId($strHolding);
-				$fRatio = floatval($strRatio);
-				$arRatio[$strHoldingId] = $fRatio;
-				$fPos += $fRatio;
-				//$holdings_sql->InsertHoldingId($strStockId, $sql->GetId($strHolding), $strRatio);
-			}
-		}
-
-		foreach ($arRatio as $strHoldingId => $fRatio)
-		{
-			$holdings_sql->InsertHoldingId($strStockId, $strHoldingId, strval(100.0*$fRatio/$fPos));
-		}
-		$pos_sql = GetPositionSql();
-		$pos_sql->WritePos($strStockId, $fPos/100.0);
-	}
-}
-*/
-
-?>

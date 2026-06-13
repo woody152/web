@@ -7,18 +7,16 @@ require_once('../../php/ui/ahparagraph.php');
 
 function RefSort($arRef)
 {
-	$arA = array();
-    $arH = array();
-    $arUS = array();
-
+	$arA = [];
+    $arH = [];
+    $arUS = [];
     foreach ($arRef as $ref)
     {
     	if ($ref->IsSymbolA())			$arA[] = $ref;
 		else if ($ref->IsSymbolH())     $arH[] = $ref;
 		else			                $arUS[] = $ref;
 	}
-	
-	return array_merge(RefSortBySymbol($arA), RefSortBySymbol($arH), RefSortBySymbol($arUS));
+	return [...RefSortBySymbol($arA), ...RefSortBySymbol($arH), ...RefSortBySymbol($arUS)];
 }
 
 function _echoHoldingItem($ref, $arRatio, $fNetValueChange, $arHistory, $fAdjust)
@@ -29,7 +27,7 @@ function _echoHoldingItem($ref, $arRatio, $fNetValueChange, $arHistory, $fAdjust
 	
 	if ($ref == false)
 	{
-		$ar = array(DISP_ALL_CN, number_format($fTotalOld, 2), '', number_format(($fNetValueChange - 1.0) * 100, 2).'%', number_format($fTotalNew, 2), number_format($fTotalChange * $fAdjust, 2));
+		$ar = [DISP_ALL_CN, number_format($fTotalOld, 2), '', number_format(($fNetValueChange - 1.0) * 100, 2).'%', number_format($fTotalNew, 2), number_format($fTotalChange * $fAdjust, 2)];
 	    EchoTableColumn($ar);
 	    return;
 	}
@@ -43,7 +41,7 @@ function _echoHoldingItem($ref, $arRatio, $fNetValueChange, $arHistory, $fAdjust
 	$fChange = ($fClose > MIN_FLOAT_VAL) ? $fPrice / $fClose : 0.0;
 	$fChange /= $fAdjust;
 	
-	$ar = array();
+	$ar = [];
 	$ar[] = RefGetMyStockLink($ref);
 	
 	$fRatio = floatval($arRatio[$strStockId]);
@@ -66,6 +64,43 @@ function _echoHoldingItem($ref, $arRatio, $fNetValueChange, $arHistory, $fAdjust
     RefEchoTableColumn($ref, $ar);
 }
 
+function _echoHoldingParagraph($strPage, $ref, $bAdmin)
+{
+	$arHoldingRef = $ref->GetHoldingsRefArray();
+	EchoReferenceParagraph([$ref, ...RefSort($arHoldingRef)], $bAdmin);
+
+	$str = STOCK_DISP_HOLDING.'和测算示意 ';
+	$str .= '总数'.strval($ref->CountHoldings());
+	$str .= ' '.$ref->GetHoldingsRatioDisplay();
+	if (EchoTableParagraphBegin([new TableColumnSymbol(),
+								 new TableColumnPercentage('旧'),
+								 new TableColumnPrice('旧'),
+								 new TableColumnChange('此后'),
+								 new TableColumnPercentage('新'),
+								 new TableColumnPercentage('影响'),
+								 new TableColumn('汇率调整', 100)
+								], $strPage, $str))
+	{
+		$arAdrhRef = [];
+		$arRatio = $ref->GetHoldingsRatioArray();
+		$fNetValueChange = $ref->GetNetValueChange();
+		$arHistory = $ref->GetHoldingDateHistory(GetStockHistorySql());
+		$fAdjustUSD = $ref->GetAdjustUSD();
+		$fAdjustHKD = $ref->GetAdjustHKD();
+		foreach ($arHoldingRef as $holding_ref)
+		{
+			_echoHoldingItem($holding_ref, $arRatio, $fNetValueChange, $arHistory, RefAdjustForex($holding_ref, $fAdjustHKD, $fAdjustUSD));
+			if ($holding_ref->IsSymbolH())
+			{
+				if ($strAdrSymbol = SqlGetHadrPair($holding_ref->GetSymbol()))	$arAdrhRef[] = new AdrPairReference($strAdrSymbol);	
+			}
+		}
+		_echoHoldingItem(false, $arRatio, $fNetValueChange, $arHistory, RefAdjustForex($ref, $fAdjustHKD, $fAdjustUSD));
+		EchoTableParagraphEnd();
+	}
+	EchoAdrhParagraph($arAdrhRef, LayoutUseWide());
+}
+
 function EchoAll()
 {
 	global $acct;
@@ -76,42 +111,8 @@ function EchoAll()
    		$ref = new HoldingsReference($strSymbol);
     	if ($ref->GetHoldingsDate())
     	{
-    		$arHoldingRef = $ref->GetHoldingsRefArray();
-    		$str = '持仓和测算示意 ';
-			$str .= '总数'.strval($ref->CountHoldings());
-    		$str .= ' '.$ref->GetHoldingsRatioDisplay();
-    		
 		    EchoHoldingsEstParagraph($ref);
-    		EchoReferenceParagraph(array_merge(array($ref), RefSort($arHoldingRef)), $acct->IsAdmin());
-
-    		if (EchoTableParagraphBegin(array(new TableColumnSymbol(),
-											  new TableColumnPercentage('旧'),
-											  new TableColumnPrice('旧'),
-											  new TableColumnChange('此后'),
-											  new TableColumnPercentage('新'),
-											  new TableColumnPercentage('影响'),
-											  new TableColumn('汇率调整', 100)
-											 ), $acct->GetPage(), $str))
-			{
-				$arAdrhRef = array();
-				$arRatio = $ref->GetHoldingsRatioArray();
-				$fNetValueChange = $ref->GetNetValueChange();
-				$arHistory = $ref->GetHoldingDateHistory(GetStockHistorySql());
-				$fAdjustUSD = $ref->GetAdjustUSD();
-				$fAdjustHKD = $ref->GetAdjustHKD();
-				foreach ($arHoldingRef as $holding_ref)
-				{
-					_echoHoldingItem($holding_ref, $arRatio, $fNetValueChange, $arHistory, RefAdjustForex($holding_ref, $fAdjustHKD, $fAdjustUSD));
-					if ($holding_ref->IsSymbolH())
-					{
-						if ($strAdrSymbol = SqlGetHadrPair($holding_ref->GetSymbol()))	$arAdrhRef[] = new AdrPairReference($strAdrSymbol);	
-					}
-				}
-				_echoHoldingItem(false, $arRatio, $fNetValueChange, $arHistory, RefAdjustForex($ref, $fAdjustHKD, $fAdjustUSD));
-				EchoTableParagraphEnd();
-			}
-			
-			EchoAdrhParagraph($arAdrhRef, LayoutUseWide());
+			_echoHoldingParagraph($acct->GetPage(), $ref, $acct->IsAdmin());
 		}
     }
     $acct->EchoLinks();
@@ -135,4 +136,3 @@ function GetTitle()
     $acct = new SymbolAccount();
 
 require('../../php/ui/_dispcn.php');
-?>

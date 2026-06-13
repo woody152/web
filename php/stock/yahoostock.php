@@ -484,5 +484,3 @@ function UpdateYahooHistoryChart($ref)
    	}
     return false;
 }
-
-?>

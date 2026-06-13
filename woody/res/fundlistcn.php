@@ -11,7 +11,7 @@ function EchoAll()
     $ar = $pair_sql->GetSymbolArray();
     StockPrefetchArrayExtendedData($ar);
     
-    $arRef = array();
+    $arRef = [];
     foreach ($ar as $strSymbol)
     {
     	$arRef[] = new FundPairReference($strSymbol);
@@ -36,4 +36,4 @@ function GetTitle()
 	$acct = new StockAccount();
 
 require('../../php/ui/_dispcn.php');
-?>
+

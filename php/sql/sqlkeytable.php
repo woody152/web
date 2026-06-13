@@ -3,8 +3,8 @@ require_once('sqlkeyname.php');
 
 class KeyTableSql extends TableSql
 {
-	var $strKey;
-	var $strKeyId;
+	private $strKey;
+	private $strKeyId;
 	
     public function __construct($strTableName, $strKeyId, $strKeyPrefix) 
     {
@@ -25,7 +25,7 @@ class KeyTableSql extends TableSql
     
     function MakeFieldKeyId()
     {
-    	return array($this->strKey => $this->strKeyId);
+    	return [$this->strKey => $this->strKeyId];
     }
     
     public function BuildOrderBy()
@@ -87,5 +87,3 @@ class KeyTableSql extends TableSql
     	return false;
     }
 }
-
-?>

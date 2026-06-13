@@ -46,8 +46,8 @@ function GetEmptyElement()
 
 function GetLinkElement($strContent, $strPathName, $arExtraAttribute = false)
 {
-	$ar = array('href' => GetDoubleQuotes($strPathName));
-	if ($arExtraAttribute)	$ar = array_merge($ar, $arExtraAttribute); 
+	$ar = ['href' => GetDoubleQuotes($strPathName)];
+	if ($arExtraAttribute)	$ar += $arExtraAttribute; 
 	return GetHtmlElement($strContent, 'a', $ar);
 }
 
@@ -63,7 +63,7 @@ function GetUnderlineElement($strContent)
 
 function GetFontElement($strContent, $strColor = 'red', $strStyle = false)
 {
-	$ar = array('color' => $strColor);
+	$ar = ['color' => $strColor];
 	if ($strStyle)	$ar['style'] = GetDoubleQuotes($strStyle);
 	return GetHtmlElement($strContent, 'font', $ar);
 }
@@ -134,7 +134,7 @@ function HtmlGetOption($ar, $strCompare = false)
     {
     	$strSelected = ($strVal == $strCompare) ? ' '.HtmlElementSelected() : '';
 //       	$str .= "<OPTION value={$strKey}{$strSelected}>$strVal</OPTION>";
-		$str .= GetHtmlElement($strVal, 'OPTION', array('value' => $strKey.$strSelected));
+		$str .= GetHtmlElement($strVal, 'OPTION', ['value' => $strKey.$strSelected]);
     }
     return $str;
 }
@@ -152,5 +152,3 @@ function ConvertToHtmlDisplay($str)
 	return nl2br($str);
 }
 
-
-?>

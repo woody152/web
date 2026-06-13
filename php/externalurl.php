@@ -2,7 +2,8 @@
 
 function GetIpInfoUrl()
 {
-	return 'http://ipinfo.io/';
+	// return 'http://ipinfo.io/';
+	return 'http://ip-api.com/';
 }
 
 function GetYahooStockUrl($strYahooSymbol)
@@ -350,6 +351,3 @@ function GetChinaMoneyJsonUrl()
 {
 	return GetChinaMoneyUrl().'r/cms/www/chinamoney/data/fx/ccpr.json';
 }
-
-
-?>

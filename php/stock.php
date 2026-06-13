@@ -34,7 +34,7 @@ function StockGetSymbol($str)
 function GetInputSymbolArray($strSymbols)
 {
 	$strSymbols = str_replace(array(',', '，', '、', "\\n", "\\r", "\\r\\n"), ' ', $strSymbols);
-    $arSymbol = array();
+    $arSymbol = [];
     foreach (explode(' ', $strSymbols) as $str)
     {
     	if (!empty($str))		$arSymbol[] = StockGetSymbol($str);
@@ -282,7 +282,7 @@ function StockPrefetchArrayExtendedData($ar)
 	$sql = GetStockSql();
     foreach ($ar as $strSymbol)
     {
-   		if ($sql->GetId($strSymbol))		$arAll = array_merge($arAll, _getAllSymbolArray($strSymbol));
+   		if ($sql->GetId($strSymbol))		array_push($arAll, ..._getAllSymbolArray($strSymbol));
    		else								$arAll[] = $strSymbol;	// new stock symbol	
     }
     StockPrefetchArrayData($arAll);
@@ -304,10 +304,10 @@ function StockGetReference($strSymbol)
 
 function StockGetQdiiReference($strSymbol)
 {
-    if (in_arrayQdii($strSymbol))					return new QdiiReference($strSymbol);
-    else if (in_arrayQdiiHk($strSymbol))			return new QdiiHkReference($strSymbol);
-    else if (in_arrayQdiiJp($strSymbol))			return new QdiiJpReference($strSymbol);
-    else if (in_arrayQdiiEu($strSymbol))			return new QdiiEuReference($strSymbol);
+    if (in_arrayQdii($strSymbol))			return new QdiiReference($strSymbol);
+    else if (in_arrayQdiiHk($strSymbol))	return new QdiiHkReference($strSymbol);
+    else if (in_arrayQdiiJp($strSymbol))	return new QdiiJpReference($strSymbol);
+    else if (in_arrayQdiiEu($strSymbol))	return new QdiiEuReference($strSymbol);
     return false;
 }
 
@@ -327,24 +327,24 @@ function GetStockRef($fund_ref)
 function _getAbPairReference($strSymbol)
 {
 	$pair_sql = GetAbPairSql();
-	if ($pair_sql->GetPairSymbol($strSymbol))						return new AbPairReference($strSymbol);
-	else if ($strSymbolA = $pair_sql->GetSymbol($strSymbol))		return new AbPairReference($strSymbolA);
+	if ($pair_sql->GetPairSymbol($strSymbol))					return new AbPairReference($strSymbol);
+	else if ($strSymbolA = $pair_sql->GetSymbol($strSymbol))	return new AbPairReference($strSymbolA);
 	return false;
 }
 
 function _getAdrPairReference($strSymbol)
 {
 	$pair_sql = GetAdrPairSql();
-	if ($pair_sql->GetPairSymbol($strSymbol))						return new AdrPairReference($strSymbol);
-	else if ($strAdr = $pair_sql->GetSymbol($strSymbol))			return new AdrPairReference($strAdr);
+	if ($pair_sql->GetPairSymbol($strSymbol))				return new AdrPairReference($strSymbol);
+	else if ($strAdr = $pair_sql->GetSymbol($strSymbol))	return new AdrPairReference($strAdr);
 	return false;
 }
 
 function _getAhPairReference($strSymbol)
 {
 	$pair_sql = GetAhPairSql();
-	if ($pair_sql->GetPairSymbol($strSymbol))						return new AhPairReference($strSymbol);
-	else if ($strSymbolA = $pair_sql->GetSymbol($strSymbol))		return new AhPairReference($strSymbolA);
+	if ($pair_sql->GetPairSymbol($strSymbol))					return new AhPairReference($strSymbol);
+	else if ($strSymbolA = $pair_sql->GetSymbol($strSymbol))	return new AhPairReference($strSymbolA);
 	return false;
 }
 
@@ -381,7 +381,7 @@ function UseSameDayNetValue($sym)
 {
 	$strSymbol = $sym->GetSymbol();
 	if (in_arrayQdii($strSymbol))			return false;
-	else if (in_arrayQdiiMix($strSymbol))	return	in_arrayHkMix($strSymbol);
+	else if (in_arrayQdiiMix($strSymbol))	return in_arrayHkMix($strSymbol);
 	return true;
 }
 

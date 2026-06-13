@@ -49,7 +49,7 @@ class StockGroup
 
 class MyStockGroup extends StockGroup
 {
-    var $arStockTransaction = array();
+    var $arStockTransaction = [];
     
     function GetStockTransactionArray()
     {
@@ -142,5 +142,3 @@ class MyStockGroup extends StockGroup
         }
     }
 }
-
-?>

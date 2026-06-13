@@ -25,8 +25,8 @@ define('QDII_HK_DISPLAY', '港股QDII');
 define('QDII_JP_DISPLAY', '日本QDII');
 define('QDII_EU_DISPLAY', '欧洲QDII');
 
-define('HOLDINGS_DISPLAY', '基金持仓');
-define('QUARTER_REPORT_DISPLAY', '季报持仓');
+define('HOLDINGS_DISPLAY', '基金'.STOCK_DISP_HOLDING);
+define('QUARTER_REPORT_DISPLAY', '季报'.STOCK_DISP_HOLDING);
 
 define('STOCK_OPTION_ADR', '修改H股对应ADR代码');
 define('STOCK_OPTION_AH', '修改A股对应H股代码');
@@ -47,29 +47,27 @@ define('STOCK_OPTION_SPLIT', '拆股或合股');
 
 function GetStockCategoryArray()
 {
-    return array('biotech' => BIOTECH_GROUP_DISPLAY,
-                 'chinainternet' => CHINAINTERNET_GROUP_DISPLAY,
-                 'commodity' => COMMODITY_GROUP_DISPLAY,
-                 'hangseng' => HANGSENG_GROUP_DISPLAY,
-                 'hshares' => HSHARES_GROUP_DISPLAY,
-                 'hstech' => HSTECH_GROUP_DISPLAY,
-                 'mscius50' => MSCIUS50_GROUP_DISPLAY,
-                 'oilfund' => OIL_GROUP_DISPLAY,
-                 'qqqfund' => QQQ_GROUP_DISPLAY,
-                 'spyfund' => SPY_GROUP_DISPLAY
-                 );
+    return ['biotech' => BIOTECH_GROUP_DISPLAY,
+            'chinainternet' => CHINAINTERNET_GROUP_DISPLAY,
+            'commodity' => COMMODITY_GROUP_DISPLAY,
+            'hangseng' => HANGSENG_GROUP_DISPLAY,
+            'hshares' => HSHARES_GROUP_DISPLAY,
+            'hstech' => HSTECH_GROUP_DISPLAY,
+            'mscius50' => MSCIUS50_GROUP_DISPLAY,
+            'oilfund' => OIL_GROUP_DISPLAY,
+            'qqqfund' => QQQ_GROUP_DISPLAY,
+            'spyfund' => SPY_GROUP_DISPLAY];
 }
 
 function GetStockMenuArray()
 {
-    return array('chinaindex' => CHINA_INDEX_DISPLAY,
-    			 'chinafuture' => CHINA_FUTURE_DISPLAY,
-                 'qdii' => QDII_DISPLAY,
-                 'qdiimix' => QDII_MIX_DISPLAY,
-                 'qdiihk' => QDII_HK_DISPLAY,
-                 'qdiijp' => QDII_JP_DISPLAY,
-                 'qdiieu' => QDII_EU_DISPLAY
-                 );
+    return ['chinaindex' => CHINA_INDEX_DISPLAY,
+    		'chinafuture' => CHINA_FUTURE_DISPLAY,
+            'qdii' => QDII_DISPLAY,
+            'qdiimix' => QDII_MIX_DISPLAY,
+            'qdiihk' => QDII_HK_DISPLAY,
+            'qdiijp' => QDII_JP_DISPLAY,
+            'qdiieu' => QDII_EU_DISPLAY];
 }
 
 function GetStockMenuLinks()
@@ -228,25 +226,25 @@ function GetFundAccountLink($strSymbol, $iNum = false)
     return GetStockSymbolLink('fundaccount', $strSymbol, ($iNum ? strval($iNum) : FUND_ACCOUNT_DISPLAY));
 }
 
-define('FUND_POSITION_DISPLAY', STOCK_DISP_POSITION.'估算');
+const FUND_POSITION_DISPLAY = STOCK_DISP_POSITION.'估算';
 function GetFundPositionLink($strSymbol, $bDisplaySymbol = false)
 {
     return GetStockSymbolLink('fundposition', $strSymbol, ($bDisplaySymbol ? $strSymbol : FUND_POSITION_DISPLAY));
 }
 
-define('FUND_SHARE_DISPLAY', '基金场内份额');
+const FUND_SHARE_DISPLAY = '基金场内份额';
 function GetFundShareLink($strSymbol)
 {
     return GetStockSymbolLink('fundshare', $strSymbol, FUND_SHARE_DISPLAY);
 }
 
-define('EXHAUSTIVE_HOLDINGS_DISPLAY', '穷举'.STOCK_DISP_HOLDING.'比例');
+const EXHAUSTIVE_HOLDINGS_DISPLAY = '穷举'.STOCK_DISP_HOLDING.'比例';
 function GetExhaustiveHoldingsLink($strSymbol)
 {
     return GetStockSymbolLink('exhaustiveholdings', $strSymbol, EXHAUSTIVE_HOLDINGS_DISPLAY);
 }
 
-define('ROTATION_TRADING_DISPLAY', '轮动交易');
+const ROTATION_TRADING_DISPLAY = '轮动交易';
 function GetRotationTradingLink($strSymbol)
 {
     return GetStockSymbolLink('rotationtrading', $strSymbol, ROTATION_TRADING_DISPLAY);
@@ -254,89 +252,90 @@ function GetRotationTradingLink($strSymbol)
 
 function GetStockOptionArray()
 {
-    $ar = array(
-                  'editcalibration' => STOCK_OPTION_CALIBRATION,
-                  'editfund' => STOCK_OPTION_FUND,
-                  'editnetvalue' => STOCK_OPTION_NETVALUE,
-                  'editpremium' => STOCK_OPTION_PREMIUM,
-                  'editquarterreport' => STOCK_OPTION_REPORT,
-                  'editsharesdiff' => STOCK_OPTION_SHARE_DIFF,
-    			  'editstock' => STOCK_OPTION_EDIT,
-                  'editstockadr' => STOCK_OPTION_ADR,
-                  'editstockah' => STOCK_OPTION_AH,
-                  'editstockamount' => STOCK_OPTION_AMOUNT,
-                  'editstockclose' => STOCK_OPTION_CLOSE,
-                  'editstockdividend' => STOCK_OPTION_DIVIDEND,
-                  'editstockema' => STOCK_OPTION_EMA,
-                  'editstockha' => STOCK_OPTION_HA,
-                  'editstockholdings' => STOCK_OPTION_HOLDINGS,
-                  'editstocksplit' => STOCK_OPTION_SPLIT,
-                 );
-	return $ar;
+    return ['editcalibration' => STOCK_OPTION_CALIBRATION,
+            'editfund' => STOCK_OPTION_FUND,
+            'editnetvalue' => STOCK_OPTION_NETVALUE,
+            'editpremium' => STOCK_OPTION_PREMIUM,
+            'editquarterreport' => STOCK_OPTION_REPORT,
+            'editsharesdiff' => STOCK_OPTION_SHARE_DIFF,
+    		'editstock' => STOCK_OPTION_EDIT,
+            'editstockadr' => STOCK_OPTION_ADR,
+            'editstockah' => STOCK_OPTION_AH,
+            'editstockamount' => STOCK_OPTION_AMOUNT,
+            'editstockclose' => STOCK_OPTION_CLOSE,
+            'editstockdividend' => STOCK_OPTION_DIVIDEND,
+            'editstockema' => STOCK_OPTION_EMA,
+            'editstockha' => STOCK_OPTION_HA,
+            'editstockholdings' => STOCK_OPTION_HOLDINGS,
+            'editstocksplit' => STOCK_OPTION_SPLIT];
 }
 
-function GetStockOptionLink($strOption, $strSymbol)
+function GetStockOptionLink($strOption, $strSymbol, $strDisplay = false)
 {
     $ar = GetStockOptionArray();
     $strPage = array_search($strOption, $ar);
-    return GetStockSymbolLink($strPage, $strSymbol, $strOption);
+    return GetStockSymbolLink($strPage, $strSymbol, $strDisplay ?: $strOption);
 }
 
 function GetStockEditDeleteLink($strSymbol, $bAdmin)
 {
 	$str = GetStockOptionLink(STOCK_OPTION_EDIT, $strSymbol);
-	if ($bAdmin)	$str .= ' '.GetDeleteLink(PATH_STOCK.'deletesymbol.php?symbol='.$strSymbol, '股票'.$strSymbol);
+	if ($bAdmin)	$str .= ' '.GetDeleteLink(PATH_STOCK.'deletesymbol.php?symbol='.$strSymbol, "股票{$strSymbol}");
 	return $str;
 }
 
-define('AUTO_TRACTOR_DISPLAY', '拖拉机自动化');
+function GetStockOptionHoldingsLink($strSymbol, $strDisplay = false)
+{
+    return GetStockOptionLink(STOCK_OPTION_HOLDINGS, $strSymbol, $strDisplay);
+}
+
+const AUTO_TRACTOR_DISPLAY = '拖拉机自动化';
 function GetAutoTractorLink($strQuery = false)
 {
     return GetStockPageLink('autotractor', AUTO_TRACTOR_DISPLAY, $strQuery);
 }
 
-define('MY_PORTFOLIO_DISPLAY', STOCK_DISP_HOLDING.STOCK_DISP_PROFIT);
+const MY_PORTFOLIO_DISPLAY = STOCK_DISP_HOLDING.STOCK_DISP_PROFIT;
 function GetMyPortfolioLink($strQuery = false)
 {
     return GetStockPageLink('myportfolio', MY_PORTFOLIO_DISPLAY, $strQuery);
 }
 
-define('AB_COMPARE_DISPLAY', 'A股和B股对比');
+const AB_COMPARE_DISPLAY = 'A股和B股对比';
 function GetAbCompareLink()
 {
     return GetStockPageLink('abcompare', AB_COMPARE_DISPLAY);
 }
 
-define('AH_COMPARE_DISPLAY', 'A股和H股对比');
+const AH_COMPARE_DISPLAY = 'A股和H股对比';
 function GetAhCompareLink()
 {
     return GetStockPageLink('ahcompare', AH_COMPARE_DISPLAY);
 }
 
-define('FUND_LIST_DISPLAY', '基金指数对照表');
+const FUND_LIST_DISPLAY = '基金指数对照表';
 function GetFundListLink()
 {
     return GetStockPageLink('fundlist', FUND_LIST_DISPLAY);
 }
 
-define('ADRH_COMPARE_DISPLAY', 'ADR和H股对比');
+const ADRH_COMPARE_DISPLAY = 'ADR和H股对比';
 function GetAdrhCompareLink()
 {
     return GetStockPageLink('adrhcompare', ADRH_COMPARE_DISPLAY);
 }
 
-define('STOCK_GROUP_DISPLAY', '股票分组');
+const STOCK_GROUP_DISPLAY = '股票分组';
 function GetMyStockGroupLink($strQuery = false, $strDisplay = false)
 {
     if ($strDisplay == false)	$strDisplay = STOCK_GROUP_DISPLAY;
 	return GetStockPageLink('mystockgroup', $strDisplay, $strQuery);
 }
 
-define('STOCK_TRANSACTION_DISPLAY', '交易记录');
 function StockGetTransactionLink($strGroupId, $strSymbol, $strDisplay = false)
 {
-    $strQuery = 'groupid='.$strGroupId;
-    if ($strSymbol)	$strQuery .= '&symbol='.$strSymbol;
+    $strQuery = "groupid=$strGroupId";
+    if ($strSymbol)		$strQuery .= "&symbol=$strSymbol";
     
     if ($strDisplay == false)
     {
@@ -346,16 +345,10 @@ function StockGetTransactionLink($strGroupId, $strSymbol, $strDisplay = false)
 	return GetStockPageLink('mystocktransaction', $strDisplay, $strQuery);
 }
 
+const STOCK_TRANSACTION_DISPLAY = '交易记录';
 function StockGetAllTransactionLink($strGroupId, $ref = false)
 {
-	if ($ref)
-	{
-		$strSymbol = $ref->GetSymbol();
-	}
-	else
-	{
-		$strSymbol = false;
-	}
+	$strSymbol = $ref ? $ref->GetSymbol() : false;
     return StockGetTransactionLink($strGroupId, $strSymbol, STOCK_TRANSACTION_DISPLAY);
 }
 
@@ -373,21 +366,18 @@ function StockGetGroupTransactionLinks($strGroupId)
     return rtrim($str, ' ');
 }
 
-// ****************************** Other internal link related functions *******************************************************
 function GetGroupStockLink($strSymbol, $bFull = false)
 {
-    if (in_arrayAll($strSymbol))		return GetStockPageLink(strtolower($strSymbol), ($bFull ? SqlGetStockName($strSymbol).'('.$strSymbol.')' : $strSymbol));
+    if (in_arrayAll($strSymbol))	return GetStockPageLink(strtolower($strSymbol), ($bFull ? SqlGetStockName($strSymbol).'('.$strSymbol.')' : $strSymbol));
     return false;
 }
 
 function StockGetMenuLink($strSymbol, $iTotal, $iStart, $iNum)
 {
-    return GetMenuLink('symbol='.$strSymbol, $iTotal, $iStart, $iNum);
+    return GetMenuLink("symbol=$strSymbol", $iTotal, $iStart, $iNum);
 }
 
 function StockGetAllLink($strSymbol)
 {
-    return CopyPhpLink('symbol='.$strSymbol.'&start=0&num=0', '全部记录');
+    return CopyPhpLink("symbol=$strSymbol&start=0&num=0", '全部记录');
 }
-
-?>

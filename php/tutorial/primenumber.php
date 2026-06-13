@@ -5,7 +5,7 @@ function LookUpPrimeNumber($iNum)
 	$pn_sql = new TableSql('primenumber');
 	if ($pn_sql->CountData() == 0)
 	{
-		$aiPrime = array();
+		$aiPrime = [];
 		for ($i = 2; ($i * $i) <= PHP_INT_MAX; $i ++)
 		{
 			$bPrime = true;
@@ -26,7 +26,7 @@ function LookUpPrimeNumber($iNum)
 		}
 	}
 
-	$aiNum = array();
+	$aiNum = [];
     if ($result = $pn_sql->GetByMaxId(intval(sqrt($iNum))))
     {
         while ($record = mysqli_fetch_assoc($result)) 
@@ -47,7 +47,7 @@ function LookUpPrimeNumber($iNum)
 
 function OnePassPrimeNumber($iNum)
 {
-	$aiNum = array();
+	$aiNum = [];
 	for ($i = 2; ($i * $i) <= $iNum; $i ++)
 	{
 		while (($iNum % $i) == 0)
@@ -60,4 +60,3 @@ function OnePassPrimeNumber($iNum)
 	return $aiNum;
 }
 
-?>

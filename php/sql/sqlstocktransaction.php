@@ -1,7 +1,6 @@
 <?php
 require_once('sqltable.php');
 
-// ****************************** StockTransactionSql class *******************************************************
 class StockTransactionSql extends TableSql
 {
     public function __construct()
@@ -19,7 +18,7 @@ class StockTransactionSql extends TableSql
     	return _SqlBuildWhere('groupitem_id', $strGroupItemId);
     }
     
-    function GetAll($arGroupItemId, $iStart = 0, $iNum = 0)
+    function GetAll($arGroupItemId = false, $iStart = 0, $iNum = 0)
     {
     	if ($strWhere = $this->_buildWhereOr_groupitem($arGroupItemId))
     	{
@@ -30,7 +29,7 @@ class StockTransactionSql extends TableSql
 
     function GetRecord($strGroupItemId, $iStart = 0, $iNum = 0)
     {
-    	return $this->GetAll(array($strGroupItemId), $iStart, $iNum);
+    	return $this->GetAll([$strGroupItemId], $iStart, $iNum);
     }
     
     function CountAll($arGroupItemId)
@@ -61,7 +60,7 @@ class StockTransactionSql extends TableSql
     function _makePrivateFieldArray($strGroupItemId, $strQuantity, $strPrice, $strFees, $strRemark)
     {
     	$strDateTime = DebugGetDateTime();
-    	return array('groupitem_id' => $strGroupItemId, 'quantity' => $strQuantity, 'price' => $strPrice, 'fees' => $strFees, 'filled' => $strDateTime, 'remark' => $strRemark);
+    	return ['groupitem_id' => $strGroupItemId, 'quantity' => $strQuantity, 'price' => $strPrice, 'fees' => $strFees, 'filled' => $strDateTime, 'remark' => $strRemark];
     }
 
     function Insert($strGroupItemId, $strQuantity, $strPrice, $strFees = '0.0', $strRemark = '')
@@ -80,10 +79,8 @@ class StockTransactionSql extends TableSql
     {
     	if ($strWhere = $this->_buildWhere_groupitem($strSrcGroupItemId))
     	{
-    		return $this->UpdateArray(array('groupitem_id' => $strDstGroupItemId), $strWhere);
+    		return $this->UpdateArray(['groupitem_id' => $strDstGroupItemId], $strWhere);
     	}
     	return false;
     }
 }
-
-?>

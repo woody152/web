@@ -2,19 +2,19 @@
 require('_wxprivate.php');
 
 // 微信公众号公共模板, 返回输入信息
-define('WX_DEBUG_VER', '版本209');		
+const WX_DEBUG_VER = '版本210';		
 
-define('BOT_EOL', "\r\n");
-define('MAX_BOT_MSG_LEN', 2048);
+const BOT_EOL = "\r\n";
+const MAX_BOT_MSG_LEN = 2048;
 
-define('WX_MSG_TYPE_EVENT', 'event');
-define('WX_MSG_TYPE_FILE', 'file');
-define('WX_MSG_TYPE_IMAGE', 'image');
-define('WX_MSG_TYPE_LINK', 'link');
-define('WX_MSG_TYPE_LOCATION', 'location');
-define('WX_MSG_TYPE_SHORTVIDEO', 'shortvideo');
-define('WX_MSG_TYPE_TEXT', 'text');
-define('WX_MSG_TYPE_VOICE', 'voice');
+const WX_MSG_TYPE_EVENT = 'event';
+const WX_MSG_TYPE_FILE = 'file';
+const WX_MSG_TYPE_IMAGE = 'image';
+const WX_MSG_TYPE_LINK = 'link';
+const WX_MSG_TYPE_LOCATION = 'location';
+const WX_MSG_TYPE_SHORTVIDEO = 'shortvideo';
+const WX_MSG_TYPE_TEXT = 'text';
+const WX_MSG_TYPE_VOICE = 'voice';
 
 class WeixinCallback
 {
@@ -214,5 +214,3 @@ class WeixinCallback
     	return $this->GetUnknownText('未知信息类型'.$strType, $strUserName);
     }
 }
-
-?>

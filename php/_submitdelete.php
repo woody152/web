@@ -28,7 +28,7 @@ function SqlClearStockGroupItem()
 	$sql = GetStockSql();
 	$group_sql = new StockGroupSql();
 	$iCount = 0;
-	$ar = array();
+	$ar = [];
    	if ($result = $item_sql->GetAll())
    	{
    		while ($record = mysqli_fetch_assoc($result)) 
@@ -60,7 +60,7 @@ function SqlCleanStockTransaction()
 	
 	$item_sql = new StockGroupItemSql();
 	$iCount = 0;
-	$ar = array();
+	$ar = [];
    	if ($result = $trans_sql->GetData())
    	{
    		while ($record = mysqli_fetch_assoc($result)) 
@@ -125,4 +125,3 @@ class _AdminDeleteAccount extends Account
 
    	$acct = new _AdminDeleteAccount();
 	$acct->AdminRun();
-?>

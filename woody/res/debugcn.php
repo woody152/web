@@ -38,10 +38,10 @@ function _echoDebugParagraph($arDebug, $str)
 
 function _echoStockDebug()
 {
-    $arIp = array();
-    $arUrl = array();
-    $arCurl = array();
-    $arMysql = array();
+    $arIp = [];
+    $arUrl = [];
+    $arCurl = [];
+    $arMysql = [];
     
     $strLocalIp = UrlGetIp();
     if ($file = fopen(DebugGetFile(), 'r'))

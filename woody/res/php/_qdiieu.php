@@ -7,7 +7,7 @@ class _QdiiEuAccount extends QdiiGroupAccount
     {
         $strSymbol = $this->GetName();
         $arLev = $this->GetLeverageSymbols(QdiiEuGetEstSymbol($strSymbol));
-        StockPrefetchArrayExtendedData(array_merge($arLev, array($strSymbol)));
+        StockPrefetchArrayExtendedData([...$arLev, $strSymbol]);
 
         $this->ref = new QdiiEuReference($strSymbol);
 		$this->QdiiCreateGroup($arLev);
@@ -17,10 +17,12 @@ class _QdiiEuAccount extends QdiiGroupAccount
 function EchoAll()
 {
    	global $acct;
+	/** @var _QdiiEuAccount $acct */
+	
    	$ref = $acct->GetRef();
    	
     EchoFundEstParagraph($ref);
-    EchoReferenceParagraph(array_merge($acct->GetStockRefArray(), $ref->GetForexRefArray()), $acct->IsAdmin());
+    EchoReferenceParagraph([...$acct->GetStockRefArray(), ...$ref->GetForexRefArray()], $acct->IsAdmin());
     $acct->EchoCommonParagraphs();
     if ($group = $acct->EchoTransaction()) 
     {
@@ -40,4 +42,3 @@ function GetQdiiEuLinks($sym)
 
    	$acct = new _QdiiEuAccount();
    	$acct->Create();
-?>

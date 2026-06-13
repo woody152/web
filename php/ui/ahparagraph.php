@@ -7,9 +7,10 @@ function _callbackSortPair($ref)
 
 function _echoPairItem($ref, $pos_sql, $bWide)
 {
-	$ar = array($ref->GetMyStockLink());
+	$ar = [];
+	$ar[] = $ref->GetMyStockLink();
 	
-	if ($bWide)		$ar = array_merge($ar, GetStockReferenceArray($ref, $bWide));
+	if ($bWide)		array_push($ar, ...GetStockReferenceArray($ref, $bWide));
 	if ($pair_ref = $ref->GetPairRef())
 	{
 		$ar[] = $pair_ref->GetMyStockLink();
@@ -45,21 +46,20 @@ function _echoPairParagraph($ar, $strId, $str, $arRef, $bWide)
 
 function _getPairColumn($bWide)
 {
-	$ar = array(new TableColumnSymbol());
-	if ($bWide)	$ar = array_merge($ar, GetStockReferenceColumn());
+	$ar = [];
+	$ar[] = new TableColumnSymbol();
+	if ($bWide)		array_push($ar, ...GetStockReferenceColumn());
 	return $ar;
 }
 
 function EchoAbParagraph($arRef, $bWide = false)
 {
 	$str = GetAbCompareLink();
-	$ar = array_merge(_getPairColumn($bWide), 
-			array(new TableColumnSymbol(STOCK_DISP_BSHARES),
-			      new TableColumnPrice(STOCK_DISP_BSHARES),
-				  new TableColumnRMB(STOCK_DISP_BSHARES),
-				  new TableColumnRatio('A/B')
-				  )
-			);
+	$ar = [..._getPairColumn($bWide), 
+		   new TableColumnSymbol(STOCK_DISP_BSHARES),
+		   new TableColumnPrice(STOCK_DISP_BSHARES),
+		   new TableColumnRMB(STOCK_DISP_BSHARES),
+		   new TableColumnRatio('A/B')];
 	_echoPairParagraph($ar, 'ab', $str, $arRef, $bWide);
 }
 
@@ -67,28 +67,22 @@ function EchoAhParagraph($arRef, $bWide = false)
 {
 	$str = GetAhCompareLink();
 	if (count($arRef) == 1)	$str .= ' '.GetAhHistoryLink($arRef[0]->GetSymbol());
-	$ar = array_merge(_getPairColumn($bWide), 
-			array(new TableColumnSymbol(STOCK_DISP_HSHARES),
-			     new TableColumnPrice(STOCK_DISP_HSHARES),
-				 new TableColumnRMB(STOCK_DISP_HSHARES),
-				 new TableColumnRatio('A/H')
-				 )
-			);
+	$ar = [..._getPairColumn($bWide), 
+		   new TableColumnSymbol(STOCK_DISP_HSHARES),
+		   new TableColumnPrice(STOCK_DISP_HSHARES),
+		   new TableColumnRMB(STOCK_DISP_HSHARES),
+		   new TableColumnRatio('A/H')];
 	_echoPairParagraph($ar, 'ah', $str, $arRef, $bWide);
 }
 
 function EchoAdrhParagraph($arRef, $bWide = false)
 {
 	$str = GetAdrhCompareLink();
-	$ar = array_merge(_getPairColumn($bWide), 
-			array(new TableColumnSymbol(STOCK_DISP_HSHARES),
-			     new TableColumnPrice(STOCK_DISP_HSHARES),
-				 new TableColumnUSD(STOCK_DISP_HSHARES),
-				 new TableColumnRatio('ADR/H'),
-				 new TableColumnPosition()
-				 )
-			);
+	$ar = [..._getPairColumn($bWide), 
+		   new TableColumnSymbol(STOCK_DISP_HSHARES),
+		   new TableColumnPrice(STOCK_DISP_HSHARES),
+		   new TableColumnUSD(STOCK_DISP_HSHARES),
+		   new TableColumnRatio('ADR/H'),
+		   new TableColumnPosition()];
 	_echoPairParagraph($ar, 'adr', $str, $arRef, $bWide);
 }
-
-?>

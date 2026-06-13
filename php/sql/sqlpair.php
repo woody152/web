@@ -23,7 +23,7 @@ class PairSql extends IntSql
     	return $this->GetSingleData($this->_buildWhere($strPairId));
     }
     
-    public function GetAll($strPairId)
+    public function GetAll($strPairId = false)
     {
     	return $this->GetData($this->_buildWhere($strPairId));
     }
@@ -59,4 +59,3 @@ class PairSql extends IntSql
     }
 }
 
-?>

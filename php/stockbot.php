@@ -19,13 +19,11 @@ function _getMatchString($strKey)
 		if (strlen($char) > 1)	$str .= '%'; 
     }
 	if (substr($str, -1, 1) != '%')	$str .= '%';
-//	DebugString(__FUNCTION__.' '.$str);
 	return $str;
 }
 
 function _botGetStockArray($strKey)
 {
-//  if (!empty($strKey))     // "0" (0 as a string) is considered to be empty
 	$iLen = strlen($strKey); 
     if ($iLen > 0)
     {
@@ -50,10 +48,10 @@ function _botGetStockArray($strKey)
     				$strLimit = '1';
     			}
     		}
-    		else																	$strWhere = $strSymbolWhere;
+    		else															$strWhere = $strSymbolWhere;
     	}
     	else if (mb_detect_encoding($strKey, 'ASCII', true) == false)		$strWhere = $strNameWhere;
-		else																		$strWhere = $strSymbolWhere.' OR '.$strNameWhere;
+		else																$strWhere = $strSymbolWhere.' OR '.$strNameWhere;
 
     	return SqlGetStockSymbolAndId($strWhere, $strLimit);
     }
@@ -72,7 +70,6 @@ function _botGetStockText($strSymbol)
    		{	
     		if ($est_ref = $fund_ref->GetEstRef())
     		{
-//    			$str .= BOT_EOL.TextFromStockReference($fund_ref->GetCnyRef()); 
     			$str .= BOT_EOL.TextFromStockReference($est_ref); 
     			if ($realtime_ref = $fund_ref->GetRealtimeRef())	$str .= BOT_EOL.TextFromStockReference($realtime_ref);
     		}
@@ -129,12 +126,9 @@ function StockBotGetStr($strText, $strVersion)
 	$strText = trim($strText, " ,.:;~`{}[]'\"\n\r\t\v\0");
 	$strText = SqlCleanString($strText);
 
-//   	$fStart = microtime(true);
 	if ($ar = _botGetStockArray($strText))
 	{
-//		DebugString($strText.':'.DebugGetStopWatchDisplay($fStart, 3));
-		
-		$arSymbol = array();
+		$arSymbol = [];
 		foreach ($ar as $strSymbol => $strId)		$arSymbol[] = $strSymbol;
 		if ($iCount = count($arSymbol))
 		{
@@ -168,5 +162,3 @@ function LogBotVisit($strType, $strMsg, $strSrc)
 	
 	return $strIp;
 }
-
-?>

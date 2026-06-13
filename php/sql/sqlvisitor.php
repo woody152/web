@@ -41,7 +41,7 @@ class VisitorSql extends KeySql
 
     function MakeDateTimeArray($strDate = false, $strTime = false)
     {
-    	$ar = array();
+    	$ar = [];
     	$ar['date'] = $strDate ? $strDate : DebugGetDate();
     	$ar['time'] = $strTime ? $strTime : DebugGetTime();
     	return $ar;
@@ -49,7 +49,9 @@ class VisitorSql extends KeySql
     
     function MakeVisitorInsertArray($strDstId, $strSrcId, $strDate, $strTime)
     {
-		$ar = array_merge($this->MakeDateTimeArray($strDate, $strTime), $this->MakeFieldKeyId($strDstId));
+		// $ar = [...$this->MakeDateTimeArray($strDate, $strTime), ...$this->MakeFieldKeyId($strDstId)];
+		$ar = $this->MakeDateTimeArray($strDate, $strTime);
+		$ar += $this->MakeFieldKeyId($strDstId);
     	$ar[$this->strSrcKey] = $strSrcId;
     	return $ar;
     }
@@ -110,7 +112,7 @@ class VisitorSql extends KeySql
 
     function CountUniqueDst($strSrcId)
     {
-    	$ar = array();
+    	$ar = [];
     	
     	if ($result = $this->GetDataBySrc($strSrcId)) 
     	{
@@ -125,5 +127,3 @@ class VisitorSql extends KeySql
     	return count($ar);
     }
 }
-
-?>

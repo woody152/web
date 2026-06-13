@@ -72,5 +72,3 @@ class LinearImageFile extends PageImageFile
     	return $str;
     }
 }
-
-?>

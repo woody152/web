@@ -1,32 +1,32 @@
 <?php
-define('PATH_STOCK', '/woody/res/');
+const PATH_STOCK = '/woody/res/';
 
-define('MENU_DIR_FIRST', 'First');
-define('MENU_DIR_PREV', 'Prev');
-define('MENU_DIR_NEXT', 'Next');
-define('MENU_DIR_LAST', 'Last');
+const MENU_DIR_FIRST = 'First';
+const MENU_DIR_PREV = 'Prev';
+const MENU_DIR_NEXT = 'Next';
+const MENU_DIR_LAST = 'Last';
 
-define('DEFAULT_PAGE_NUM', 100);
+const DEFAULT_PAGE_NUM = 100;
 
 function GetMenuArray()
 {
-    return array(MENU_DIR_FIRST => '第一页', MENU_DIR_PREV => '上一页', MENU_DIR_NEXT => '下一页', MENU_DIR_LAST => '最后一页');
+    return [MENU_DIR_FIRST => '第一页', MENU_DIR_PREV => '上一页', MENU_DIR_NEXT => '下一页', MENU_DIR_LAST => '最后一页'];
 }
 
 function GetNameTag($strName, $strDisplay = false)
 {
-	return GetHtmlElement(($strDisplay ? $strDisplay : strtoupper($strName)), 'a', array('name' => GetDoubleQuotes($strName)));
+	return GetHtmlElement($strDisplay ?: strtoupper($strName), 'a', ['name' => GetDoubleQuotes($strName)]);
 }
 
 function GetNameLink($strName, $strDisplay = false, $strLink = '')
 {
-	return GetLinkElement(($strDisplay ? $strDisplay : strtoupper($strName)), $strLink.'#'.$strName);
+	return GetLinkElement($strDisplay ?: strtoupper($strName), "$strLink#$strName");
 }
 
 function GetOnClickLink($strPath, $strQuestion, $strDisplay)
 {
     $strQuestion = str_replace('"', '', $strQuestion);
-	return GetLinkElement($strDisplay, UrlGetServer().$strPath, array('onclick' => GetDoubleQuotes("return confirm('$strQuestion')")));
+	return GetLinkElement($strDisplay, UrlGetServer().$strPath, ['onclick' => GetDoubleQuotes("return confirm('$strQuestion')")]);
 }
 
 function GetDeleteLink($strPath, $strCn, $strUs = '', $bChinese = true)
@@ -34,29 +34,29 @@ function GetDeleteLink($strPath, $strCn, $strUs = '', $bChinese = true)
     if ($bChinese)
     {
         $strDisplay = '删除';
-        $strQuestion = '确认删除'.$strCn.'？';
+        $strQuestion = "确认删除{$strCn}?";
     }
     else
     {
         $strDisplay = 'Delete';
-        $strQuestion = 'Confirm delete '.$strUs.'?';
+        $strQuestion = "Confirm delete $strUs?";
     }
     return GetOnClickLink($strPath, $strQuestion, $strDisplay);
 }
 
 function GetInternalLink($strPath, $strDisplay = false)
 {
-	return GetLinkElement(($strDisplay ? $strDisplay : basename($strPath)), UrlGetServer().$strPath);
+	return GetLinkElement($strDisplay ?: basename($strPath), UrlGetServer().$strPath);
 }
 
 function GetExternalLink($strHttp, $strDisplay = false)
 {
-	return GetLinkElement(($strDisplay ? $strDisplay : $strHttp), $strHttp, array('target' => '_blank'));
+	return GetLinkElement($strDisplay ?: $strHttp, $strHttp, ['target' => '_blank']);
 }
 
 function GetFileLink($strPathName, $bFullPath = false)
 {
-    return GetExternalLink(($bFullPath ? UrlGetPathName($strPathName) : $strPathName), basename($strPathName));
+    return GetExternalLink($bFullPath ? UrlGetPathName($strPathName) : $strPathName, basename($strPathName));
 }
 
 function GetDebugFileLink()
@@ -77,7 +77,7 @@ function GetFileDebugLink($strPathName)
 		if (file_exists($strPathName))
 		{
 			$strLink = GetFileLink($strPathName, true);
-			$strDelete = GetOnClickLink('/php/_submitdelete.php?file='.$strPathName, '确认删除调试文件'.$strPathName.'？', DebugFormat_date('m-d H:i:s', filemtime($strPathName)));
+			$strDelete = GetOnClickLink("/php/_submitdelete.php?file=$strPathName", "确认删除调试文件{$strPathName}?", DebugFormat_date('m-d H:i:s', filemtime($strPathName)));
 			return "$strLink($strDelete)";
 		}
 	}
@@ -90,7 +90,7 @@ function GetPhpLink($strPathPage, $strQuery, $strDisplay, $bChinese = true)
     $str .= UrlGetPhp($bChinese);
     if ($strQuery)
     {
-        $str .= '?'.$strQuery;
+        $str .= "?$strQuery";
     }
     return GetInternalLink($str, $strDisplay);
 }
@@ -162,21 +162,21 @@ function GetMenuLink($strQueryId, $iTotal, $iStart, $iNum, $bChinese = true)
 
 function GetNewLink($strPathPage, $strNew, $bChinese = true)
 {
-    return GetPhpLink($strPathPage, 'new='.$strNew, ($bChinese ? DISP_NEW_CN : DISP_NEW_US), $bChinese);
+    return GetPhpLink($strPathPage, "new=$strNew", $bChinese ? DISP_NEW_CN : DISP_NEW_US, $bChinese);
 }
 
 function GetEditLink($strPathPage, $strEdit, $bChinese = true)
 {
-    return GetPhpLink($strPathPage, 'edit='.$strEdit, ($bChinese ? DISP_EDIT_CN : DISP_EDIT_US), $bChinese);
+    return GetPhpLink($strPathPage, "edit=$strEdit", $bChinese ? DISP_EDIT_CN : DISP_EDIT_US, $bChinese);
 }
 
 function GetPageLink($strPath, $strPage, $strQuery, $strDisplay, $bChinese = true)
 {
-    if ((UrlGetPage() == $strPage) && (UrlGetQueryString() == $strQuery))
+    if (UrlGetPage() == $strPage && UrlGetQueryString() == $strQuery)
     {
         return GetInfoElement($strDisplay);
     }
-    return GetPhpLink($strPath.$strPage, $strQuery, $strDisplay, $bChinese);
+    return GetPhpLink("{$strPath}$strPage", $strQuery, $strDisplay, $bChinese);
 }
 
 function GetCategoryLinks($arCategory, $strPath = PATH_STOCK, $bChinese = true)
@@ -188,5 +188,3 @@ function GetCategoryLinks($arCategory, $strPath = PATH_STOCK, $bChinese = true)
     }
     return rtrim($str, ' ');
 }
-
-?>

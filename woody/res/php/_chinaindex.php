@@ -3,13 +3,13 @@ require_once('_fundgroup.php');
 
 class _ChinaIndexAccount extends FundGroupAccount
 {
-	var $us_ref = false;
-	var $a50_ref = false;
+	private $us_ref = false;
+	private $a50_ref = false;
 	
     function Create() 
     {
         $strSymbol = $this->GetName();
-		$ar = array($strSymbol);
+		$ar = [$strSymbol];
 
         if (in_arrayAshrSymbol($strSymbol))
         {
@@ -45,31 +45,41 @@ class _ChinaIndexAccount extends FundGroupAccount
 		if ($strA50)	$arRef[] = $this->a50_ref;
         $this->CreateGroup($arRef);
     }
+
+	function GetUsRef()
+	{
+		return $this->us_ref;
+	}
+
+	function GetA50Ref()
+	{
+		return $this->a50_ref;
+	}
 }
 
 function _RealtimeCallback()
 {
     global $acct;
+	/** @var _ChinaIndexAccount $acct */
     
-    $a50_ref = $acct->a50_ref;
+    $a50_ref = $acct->GetA50Ref();
     return $a50_ref->EstToPair();
 }
 
 function EchoAll()
 {
     global $acct;
+	/** @var _ChinaIndexAccount $acct */
 
     $ref = $acct->GetRef();
-    $us_ref = $acct->us_ref;
-    $a50_ref = $acct->a50_ref;
-
-    if ($us_ref)	$cnh_ref = $us_ref->GetCnyRef();
-	else			$cnh_ref = false;
+    $a50_ref = $acct->GetA50Ref();
+    $us_ref = $acct->GetUsRef();
+    $cnh_ref = $us_ref ? $us_ref->GetCnyRef() : false;
     
 	$arRef = [$ref];
 	if ($us_ref)	$arRef[] = $us_ref;
 	EchoFundArrayEstParagraph($arRef, '');
-    EchoReferenceParagraph(array_merge($acct->GetStockRefArray(), array($cnh_ref)), $acct->IsAdmin());
+    EchoReferenceParagraph([...$acct->GetStockRefArray(), $cnh_ref], $acct->IsAdmin());
 
 	if ($a50_ref)	$arRef[] = $a50_ref;
     EchoFundListParagraph($arRef);
@@ -96,9 +106,10 @@ function EchoAll()
 function GetChinaIndexLinks($sym)
 {
     global $acct;
+	/** @var _ChinaIndexAccount $acct */
 
 	$str = '';
-    if ($us_ref = $acct->us_ref)
+    if ($us_ref = $acct->GetUsRef())
 	{
 		if ($us_ref->GetSymbol() == 'ASHR')
 		{
@@ -113,14 +124,13 @@ function GetChinaIndexLinks($sym)
 function GetMetaDescription()
 {
     global $acct;
+	/** @var _ChinaIndexAccount $acct */
 
     $ref = $acct->GetRef();
-    $us_ref = $acct->us_ref;
-    
     $strDescription = RefGetStockDisplay($ref);
     $strEst = RefGetStockDisplay($ref->GetPairRef());
     $str = "用{$strEst}估算{$strDescription}".STOCK_DISP_NETVALUE.'，同时提供五档交易、历史价格相对于净值的溢价和场内份额等数据。';
-	if ($us_ref)
+	if ($us_ref = $acct->GetUsRef())
 	{
     	$strUS = RefGetStockDisplay($us_ref);
     	$strCNY = RefGetStockDisplay($us_ref->GetCnyRef());
@@ -131,4 +141,3 @@ function GetMetaDescription()
 
    	$acct = new _ChinaIndexAccount();
    	$acct->Create();
-?>

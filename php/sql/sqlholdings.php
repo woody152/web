@@ -24,7 +24,7 @@ class HoldingsSql extends KeySql
     
     function InsertHoldingId($strStockId, $strHoldingId, $strRatio)
     {
-    	return $this->InsertArrays($this->MakeFieldKeyId($strStockId), array('holding_id' => $strHoldingId, 'ratio' => $strRatio));
+    	return $this->InsertArrays($this->MakeFieldKeyId($strStockId), ['holding_id' => $strHoldingId, 'ratio' => $strRatio]);
     }
     
     function InsertHoldingsArray($strStockId, $ar)
@@ -37,7 +37,7 @@ class HoldingsSql extends KeySql
     
     function GetHoldingsArray($strStockId)
     {
-    	$ar = array();
+    	$ar = [];
     	if ($result = $this->GetAll($strStockId)) 
     	{
     		while ($record = mysqli_fetch_assoc($result)) 
@@ -50,5 +50,3 @@ class HoldingsSql extends KeySql
     	return $ar;
     }
 }
-
-?>

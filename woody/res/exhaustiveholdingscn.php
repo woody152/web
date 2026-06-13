@@ -9,7 +9,7 @@ require_once('../../php/tutorial/gaussianelimination.php');
 
 function _echoCurrentHoldingsItem($ref)
 {
-	$ar = array();
+	$ar = [];
 	foreach ($ref->GetHoldingsRatioArray() as $strHoldingId => $strRatio)
 	{
 		$ar[] = GetNumberDisplay(floatval($strRatio), 0);
@@ -33,7 +33,7 @@ function __getPosDisplay($ref, $fPos, $arRatio, &$bMatch, $bAdmin)
 	{
 		if ($bAdmin && $bMatch === false)
 		{
-			$arJson = array();
+			$arJson = [];
 			foreach ($arRatio as $strHoldingId => $fRatio)
 			{
 				$strHolding = SqlGetStockSymbol($strHoldingId);
@@ -50,8 +50,8 @@ function __getPosDisplay($ref, $fPos, $arRatio, &$bMatch, $bAdmin)
 function _echoQuarterHoldingsItem($ref, $strDate, $strClose, $arExtraHoldings, $bAdmin)
 {
 	$bMatch = false;
-	$ar = array($strDate);
-	$arRatio = array();
+	$ar = [$strDate];
+	$arRatio = [];
 	if ($fPos = StockOptionDecodeHoldings($strClose, $arRatio))
 	{
 		$arExtraHoldings += $ref->GetHoldingsRatioArray();
@@ -76,9 +76,10 @@ function _echoQuarterHoldingsItem($ref, $strDate, $strClose, $arExtraHoldings, $
 
 function _echoExhaustiveHoldingsItem($ref, $iCount, $fInput, $strDate, $fNetValue, $strPrevDate, $bAdmin)
 {
-	static $arEq = array();
+	static $arEq = [];
 
-	$ar = array($strDate, $ref->GetNetValueDisplay($fNetValue));
+	$ar = [$strDate];
+	$ar[] = $ref->GetNetValueDisplay($fNetValue);
 
 	$strStockId = $ref->GetStockId();
 	$net_sql = GetNetValueHistorySql();
@@ -98,7 +99,7 @@ function _echoExhaustiveHoldingsItem($ref, $iCount, $fInput, $strDate, $fNetValu
 		$fEnd = end($arPro);
 		// x + y = 1; ax + by - (f/n)z = 1/n 			 ==> (a - b)x -            (f/n)z = 1/n - b
 		// x + y + z = 1; ax + by + cz - (f/n)w = 1/n	 ==> (a - c)x + (b - c)y - (f/n)w = 1/n - c
-		$arLine = array();
+		$arLine = [];
 		for ($i = 0; $i < $iCount - 1; $i ++)	$arLine[] = $arPro[$i] - $fEnd;
 		$arLine[] = -$fPercent / $fCny;
 		$arLine[] = 1.0 / $fCny - $fEnd;
@@ -110,7 +111,7 @@ function _echoExhaustiveHoldingsItem($ref, $iCount, $fInput, $strDate, $fNetValu
 				$arXY = SolveOverdetermined($arEq);
 				$iIndex = 0;
 				$bMatch = true;
-				$arNewRatio = array();
+				$arNewRatio = [];
 				$fTotal = 0.0;
 				foreach ($ref->GetHoldingsRatioArray() as $strHoldingId => $strRatio)
 				{
@@ -142,11 +143,12 @@ function _echoExhaustiveHoldingsItem($ref, $iCount, $fInput, $strDate, $fNetValu
 
 function _echoVerifyHoldingsItem($ref, $iCount, $fInput, $strDate, $fNetValue, $strPrevDate, $bAdmin)
 {
-	static $arEq = array();
+	static $arEq = [];
 
 	$strStockId = $ref->GetStockId();
 	$net_sql = GetNetValueHistorySql();
-	$ar = array($strDate, $ref->GetNetValueDisplay($fNetValue));
+	$ar = [$strDate];
+	$ar[] = $ref->GetNetValueDisplay($fNetValue);
 	$ar[] = $ref->GetPercentageDisplay(floatval($net_sql->GetClose($strStockId, $strPrevDate)), $fNetValue);
 
 	$bReturn = false;
@@ -163,7 +165,7 @@ function _echoVerifyHoldingsItem($ref, $iCount, $fInput, $strDate, $fNetValue, $
 		if (count($arEq) == $iCount)
 		{
 			$bReturn = true;
-			$arLine = array();
+			$arLine = [];
 			for ($i = 0; $i < $iCount; $i ++)	$arLine[] = 1.0;
 			$arLine[] = 0.0;
 			$arLine[] = 1.0;
@@ -173,7 +175,7 @@ function _echoVerifyHoldingsItem($ref, $iCount, $fInput, $strDate, $fNetValue, $
 				$arXY = CramersRule($arEq);
 				$iIndex = 0;
 				$bMatch = true;
-				$arNewRatio = array();
+				$arNewRatio = [];
 				foreach ($ref->GetHoldingsRatioArray() as $strHoldingId => $strRatio)
 				{
 					$fVal = $arXY[$iIndex] * 100.0;
@@ -272,13 +274,13 @@ function _echoVerifyHoldingsData($ref, $iCount, $fInput, $bAdmin)
 
 function _getQuarterHoldingsExtra($ref, $quarter_sql)
 {
-	$arExtra = array();
+	$arExtra = [];
     if ($result = $quarter_sql->GetAll($ref->GetStockId())) 
     {
 		$arHoldingsRatio = $ref->GetHoldingsRatioArray();
         while ($record = mysqli_fetch_assoc($result)) 
         {
-			$arRatio = array();
+			$arRatio = [];
 			if (StockOptionDecodeHoldings($record['close'], $arRatio))
 			{
 				$arExtra += array_diff_key($arRatio, $arHoldingsRatio + $arExtra);
@@ -296,10 +298,10 @@ function _echoExhaustiveHoldingsParagraph($strPage, $strSymbol, $fInput, $iNum, 
     {
 		$ar = [];
     	$arHoldingRef = $ref->GetHoldingsRefArray();
-		foreach ($arHoldingRef as $holding_ref)	$ar[] = new TableColumnStock($holding_ref);
+		foreach ($arHoldingRef as $holding_ref)		$ar[] = new TableColumnStock($holding_ref);
 		$ar[] = new TableColumnPosition();
 
-		if (EchoTableParagraphBegin($ar, 'current', '当前使用的持仓数据'))
+		if (EchoTableParagraphBegin($ar, 'current', '当前使用的'.GetStockOptionHoldingsLink($strSymbol, STOCK_DISP_HOLDING)))
 		{
     		_echoCurrentHoldingsItem($ref);
 			EchoTableParagraphEnd();
@@ -313,7 +315,7 @@ function _echoExhaustiveHoldingsParagraph($strPage, $strSymbol, $fInput, $iNum, 
 			$arExtraColumn[] = new TableColumn(SqlGetStockSymbol($strExtraId));
 		}	
 
-		if (EchoTableParagraphBegin(array_merge([new TableColumnDate()], $arExtraColumn, $ar), 'quarter', QUARTER_REPORT_DISPLAY))
+		if (EchoTableParagraphBegin([new TableColumnDate(), ...$arExtraColumn, ...$ar], 'quarter', QUARTER_REPORT_DISPLAY))
 		{
     		_echoQuarterHoldingsData($ref, $quarter_sql, $arExtraHoldings, $bAdmin);
 			EchoTableParagraphEnd();
@@ -322,13 +324,13 @@ function _echoExhaustiveHoldingsParagraph($strPage, $strSymbol, $fInput, $iNum, 
 		$iCount = count($arHoldingRef);
     	if ($iCount <= 4)
     	{
-			if (EchoTableParagraphBegin(array_merge(GetNetValueTableColumn(), [new TableColumnError()], $ar), $strPage, GetFundLinks($strSymbol)))
+			if (EchoTableParagraphBegin([...GetNetValueTableColumn(), new TableColumnError(), ...$ar], $strPage, GetFundLinks($strSymbol)))
 			{
 	    		_echoExhaustiveHoldingsData($ref, $iCount, $fInput, $iNum, $bAdmin);
 				EchoTableParagraphEnd();
 			}
 
-			if (EchoTableParagraphBegin(array_merge(GetNetValueTableColumn(), $ar), 'verify', '验证最激进数据'))
+			if (EchoTableParagraphBegin([...GetNetValueTableColumn(), ...$ar], 'verify', '验证最激进数据'))
 			{
 	    		_echoVerifyHoldingsData($ref, $iCount, $fInput, $bAdmin);
 				EchoTableParagraphEnd();
@@ -371,4 +373,3 @@ function GetTitle()
     $acct = new SymbolAccount();
 
 require('../../php/ui/_dispcn.php');
-

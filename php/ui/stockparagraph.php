@@ -3,7 +3,9 @@ require_once('stocktable.php');
 
 function _echoStockTableItem($strSymbol, $strName, $bAdmin)
 {
-	$ar = array(GetMyStockLink($strSymbol), GetXueqiuLink(new StockSymbol($strSymbol), $strName));
+	$ar = [];
+	$ar[] = GetMyStockLink($strSymbol);
+	$ar[] = GetXueqiuLink(new StockSymbol($strSymbol), $strName);
 	if ($bAdmin)
 	{
 		$ar[] = GetStockEditDeleteLink($strSymbol, $bAdmin);
@@ -29,7 +31,7 @@ function EchoStockParagraph($iStart, $iNum, $bAdmin)
 	$sql = GetStockSql();
     $strMenuLink = GetMenuLink(false, $sql->CountData(), $iStart, $iNum);
     
-	$ar = array(new TableColumnSymbol(), new TableColumnName());
+	$ar = [new TableColumnSymbol(), new TableColumnName()];
 	if ($bAdmin)
 	{
 		$ar[] = new TableColumn('', 270);
@@ -41,5 +43,3 @@ function EchoStockParagraph($iStart, $iNum, $bAdmin)
     	EchoTableParagraphEnd($strMenuLink);
 	}
 }
-
-?>

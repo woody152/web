@@ -99,10 +99,10 @@ class TelegramCallback
 				}
 				else if ($strToken == WECHAT_ROT_KEY)
 				{
-					$this->ReplyText(GetStockDataArray($strText, array_merge(QdiiGetQqqMatchArray(),
-																			 QdiiGetSpyMatchArray(),
-																			 QdiiGetXopSymbolArray(),
-																			 QdiiGetXbiSymbolArray())), $strMessageId, $strChatId);
+					$this->ReplyText(GetStockDataArray($strText, [...QdiiGetQqqMatchArray(),
+																  ...QdiiGetSpyMatchArray(),
+																  ...QdiiGetXopSymbolArray(),
+																  ...QdiiGetXbiSymbolArray()]), $strMessageId, $strChatId);
 				}
 				else
 				{
@@ -180,4 +180,3 @@ class TelegramStock extends TelegramCallback
     $acct = new TelegramStock();
     $acct->Run();
 	// $acct->SetCallback();
-

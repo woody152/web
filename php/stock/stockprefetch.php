@@ -116,8 +116,8 @@ function PrefetchLoadSinaData($strFileName)
 
 function _prefetchSinaData($arSym)
 {
-    $arFileName = array();
-    $arSymbol = array();
+    $arFileName = [];
+    $arSymbol = [];
     
     foreach ($arSym as $str => $sym)
     {
@@ -155,10 +155,8 @@ function _prefetchSinaData($arSym)
 
 function PrefetchSinaStockData($arSymbol)
 {
-//    DebugPrint($arSymbol, __FUNCTION__, true);
-    
-    $arUnknown = array();
-    $arPrefetch = array();
+    $arUnknown = [];
+    $arPrefetch = [];
     foreach ($arSymbol as $strSymbol)
     {
         if ($strSymbol)
@@ -190,10 +188,7 @@ function PrefetchSinaStockData($arSymbol)
             }
         }
     }
-//    ksort($arPrefetch);
-//    DebugPrint($arPrefetch, __FUNCTION__, true);
     _prefetchSinaData($arPrefetch);
     return $arUnknown;
 }
 
-?>

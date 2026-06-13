@@ -1,6 +1,6 @@
 <?php
-define('URL_PHP', '.php');
-define('URL_CNPHP', 'cn.php');
+const URL_PHP = '.php';
+const URL_CNPHP = 'cn.php';
 
 function filter_valid_ip($strIp)
 {
@@ -34,7 +34,7 @@ function UrlGetIp()
 
 function UrlGetRefererHeader($strReferer)
 {
-	return array('Referer: '.$strReferer);
+	return ["Referer: $strReferer"];
 }
 
 function url_get_contents($strUrl, $arExtraHeaders = false, $strFileName = false)
@@ -42,22 +42,21 @@ function url_get_contents($strUrl, $arExtraHeaders = false, $strFileName = false
 	global $acct;
 	if (method_exists($acct, 'AllowCurl'))
 	{
-		if ($acct->AllowCurl() == false)		return false;
+		if ($acct->AllowCurl() == false)
+		{
+			// DebugString("$strUrl not allowed");
+			return false;
+		}
 	}
 	
     $ch = curl_init();  
     $timeout = 2;  
     curl_setopt($ch, CURLOPT_URL, $strUrl);
     
-	$arHeaders = array('User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36',
-//							'x-test: true',
-//							'x-test2: true',
-//							'stream: True'
-							);
-    
+	$arHeaders = ['User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36'];
     if ($arExtraHeaders)	
     {
-    	$arHeaders = array_merge($arHeaders, $arExtraHeaders);
+    	array_push($arHeaders, ...$arExtraHeaders);
 //    	DebugPrint($arHeaders);
     }
     curl_setopt($ch, CURLOPT_HTTPHEADER, $arHeaders);
@@ -75,11 +74,13 @@ function url_get_contents($strUrl, $arExtraHeaders = false, $strFileName = false
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
     }
     	
-    if (($img = curl_exec($ch)) === false)
+	$img = curl_exec($ch);
+    if ($img === false)
     {
-    	DebugString($strUrl.'读取错误：'.curl_error($ch));
-    	if ($strFileName)		file_put_contents($strFileName, $strUrl);
+    	DebugString("$strUrl 读取错误: ".curl_error($ch));
+    	if ($strFileName)	file_put_contents($strFileName, $strUrl);
     }
+	// else	DebugPrint($img, $strUrl);
     return $img;
 }
 
@@ -177,7 +178,7 @@ function UrlGetQueryString()
 				&& (strpos($strQuery, 'xueqiu_status_source=') === false)
 				)
 			{
-				$str .= $strQuery.'&';
+				$str .= "$strQuery&";
 			}
 		}
 		if ($str != '')	return rtrim($str, '&');
@@ -189,22 +190,14 @@ function UrlAddQuery($strAdd)
 {
     if ($strQuery = UrlGetQueryString())
     {
-    	return $strQuery.'&'.$strAdd;
+    	return "$strQuery&$strAdd";
     }
     return $strAdd;
 }
 
 function UrlPassQuery()
 {
-	if ($strQuery = UrlGetQueryString())
-	{
-	    $strPassQuery = '?'.$strQuery;
-	}
-	else
-	{
-	    $strPassQuery = '';
-	}
-	return $strPassQuery;
+	return ($strQuery = UrlGetQueryString()) ? "?$strQuery" : '';
 }
 
 function UrlGetQueryValue($strQueryItem)
@@ -244,7 +237,7 @@ function UrlGetCur()
 
 function UrlIsValid($str)
 {
-   	if (str_starts_with($str, '//'))			return false;
+   	if (str_starts_with($str, '//'))		return false;
    	if (strpos($str, '..') !== false)		return false;
    	if (stripos($str, URL_PHP) === false)	return false;
    	return true;
@@ -311,7 +304,6 @@ function _getPage($str)
    	}
    	
    	// https://www.palmmicro.com/woody/res/sz12411 ==> sz12411
-//   	DebugString($str);
     if (_cnEndString($str))
    	{
    	    return substr($str, 0, strlen($str) - 2);
@@ -349,5 +341,3 @@ function UrlGetUniqueString()
     $str = ($strQuery = UrlGetQueryString()) ? md5($strQuery) : ''; 
 	return UrlGetPage().$str;
 }
-
-?>

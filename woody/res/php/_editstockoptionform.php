@@ -235,7 +235,7 @@ function _getStockOptionHoldings($strStockId)
 	$holdings_sql = GetHoldingsSql();
 	$ar = $holdings_sql->GetHoldingsArray($strStockId);
 
-	$arSymbolRatio = array();
+	$arSymbolRatio = [];
 	foreach ($ar as $strHoldingId => $strRatio)
 	{
 		$strSymbol = SqlGetStockSymbol($strHoldingId);

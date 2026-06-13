@@ -74,17 +74,6 @@ function GetWechatPay($iType = 0, $bChinese = true)
 		$strRemark = '觉得这个网站有用？可以用支付宝打赏支持一下！';
 		$strImage = GetImgElement(ResizeJpg('/woody/image/alipay_full.jpg'), $strRemark);
 		break;
-/*        	
-	case 5:
-		$strRemark = '香港保诚保险投保微信群二维码';
-		$strImage = GetImgElement(ResizeJpg('/debug/wechat/25e7591ce033c357.jpg'), $strRemark);
-		break;
-       	
-	case 6:
-		$strRemark = '扫描Palmmicro微信插件二维码然后关注，可以直接在微信中接收企业微信义工群的消息。';
-		$strImage = GetImgElement(ResizeJpg('/debug/wechat/a39e5891dad44379.jpg'), $strRemark);
-		break;
-*/		
 	}
 	
 	return $strImage.GetHtmlNewLine().GetRemarkElement($strRemark);
@@ -291,5 +280,3 @@ END2;
     }
     EchoCopyRight($_SESSION['mobile'], $bChinese);
 }
-
-?>

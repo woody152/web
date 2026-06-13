@@ -48,7 +48,7 @@ function strval_round_implode($arVal, $strSeparator = ', ')
 
 function explode_float($str, $strSeparator = ',')
 {
-	$arF = array();
+	$arF = [];
 	$ar = explode($strSeparator, $str);
 	foreach ($ar as $str)
 	{
@@ -264,5 +264,3 @@ function unlinkConfigFile($strSymbol)
 {
 	unlinkEmptyFile(DebugGetConfigFileName($strSymbol));
 }
-
-?>

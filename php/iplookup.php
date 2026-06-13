@@ -7,7 +7,8 @@ require_once('ui/commentparagraph.php');
 
 function _getIpInfoIpLookUpUrl($strIp)
 {
-    return GetIpInfoUrl().$strIp.'/json';
+//    return GetIpInfoUrl().$strIp.'/json';
+	return GetIpInfoUrl().'json/'.$strIp.'?fields=status,country,regionName,city,lat,lon,org,reverse';
 }
 
 function strstr_array($strHaystack, $arNeedle)
@@ -36,30 +37,40 @@ function _ipLookupMemberTable($strIp, $strNewLine, $bChinese)
 
 class IpLookupAccount extends CommentAccount
 {
-    function _ipInfoLookUp($strIp)
-    { 
-    	if ($str = url_get_contents(_getIpInfoIpLookUpUrl($strIp)))
+    private function _ipInfoLookUp($strIp)
+    {
+		$strUrl = _getIpInfoIpLookUpUrl($strIp);
+    	if ($str = url_get_contents($strUrl))
     	{
-    		DebugString($str);
+    		DebugString("$strUrl: $str");
     		$ar = json_decode($str, true);
-    		if (isset($ar['hostname']))
+	   		// if (isset($ar['hostname']))
+			if (isset($ar['reverse']))
     		{
-    			$strHostName = $ar['hostname'];
-    			if ($strHostName == 'No Hostname')		unset($ar['hostname']);
-    			else
-    			{
-    				if (strstr_array($strHostName, array('bot', 'crawl', 'proxy', 'spider')))
+    			// $strHostName = $ar['hostname'];
+    			$strHostName = $ar['reverse'];
+    			switch ($strHostName)
+				{
+				// case 'No Hostname':
+				case '':
+					// unset($ar['hostname']);
+					break;
+
+				default:
+    				if (strstr_array($strHostName, ['bot', 'crawl', 'proxy', 'spider']))
     				{
-    					if ($this->SetCrawler($strIp))	DebugString('自动标注爬虫:'.$strHostName);
+    					if ($this->SetCrawler($strIp))	DebugString("自动标注爬虫: $strHostName");
     				}
+					break;
     			}
     		}
+			// DebugPrint($ar);
     		return $ar;
     	}
     	return false;
     }
 
-    function _pageCommentLookup($strIp, $bChinese)
+    private function _pageCommentLookup($strIp, $bChinese)
     {
 		$comment_sql = $this->GetCommentSql();
     	$strWhere = $this->BuildWhereByIp($strIp);
@@ -76,11 +87,11 @@ class IpLookupAccount extends CommentAccount
 	    	}
 	    	mysqli_free_result($result);
 	    }
-	    $str .= $strNewLine.strval($iTotal).' '.GetAllCommentLink('ip='.$strIp, $bChinese).$strNewLine;
+	    $str .= $strNewLine.strval($iTotal).' '.GetAllCommentLink("ip=$strIp", $bChinese).$strNewLine;
 	    return $str;
 	}
 
-	function _visitorLookup($strIp, $bChinese)
+	private function _visitorLookup($strIp, $bChinese)
 	{
 		$strNewLine = GetHtmlNewLine();
 		$str = '';
@@ -100,14 +111,22 @@ class IpLookupAccount extends CommentAccount
     	$str = GetVisitorLink($strIp, $bChinese).' '.GetAllVisitorLink(TABLE_VISITOR, $bChinese);
     	if ($this->IsAdmin())		$str .= ' '.GetAllVisitorLink(TABLE_TELEGRAM_BOT, $bChinese).' '.GetAllVisitorLink(TABLE_WECHAT_BOT, $bChinese);
 		$strNewLine = GetHtmlNewLine();
-    	$str .= $strNewLine.GetExternalLink(_getIpInfoIpLookUpUrl($strIp), 'ipinfo.io').': ';
+    	$str .= $strNewLine.GetExternalLink(_getIpInfoIpLookUpUrl($strIp), 'IP地址详情').': ';
     	if ($arInfo = $this->_ipInfoLookUp($strIp))
     	{
-    		if (isset($arInfo['error']) == false)
+    		/*if (isset($arInfo['error']) == false)
     		{
     			$str .= $arInfo['country'].' '.$arInfo['region'].' '.$arInfo['city'].' ['.$arInfo['loc'].'] '.$arInfo['org'];
     			if (isset($arInfo['postal']))	$str .= ' '.$arInfo['postal'];
     			if (isset($arInfo['hostname']))	$str .= ' '.$arInfo['hostname'];
+    		}*/
+    		if (isset($arInfo['status']))
+    		{
+				if ($arInfo['status'] == 'success')
+				{
+    				$str .= $arInfo['country'].' '.$arInfo['regionName'].' '.$arInfo['city'].' ['.$arInfo['lat'].', '.$arInfo['lon'].'] ';
+					$str .= $arInfo['org'].' '.$arInfo['reverse'];
+				}
     		}
     	}
     	$str .= DebugGetStopWatchDisplay($fStart);
@@ -118,5 +137,3 @@ class IpLookupAccount extends CommentAccount
     	return $str;
     }
 }
-
-?>

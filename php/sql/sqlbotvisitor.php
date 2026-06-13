@@ -2,8 +2,8 @@
 require_once('sqlkeyname.php');
 require_once('sqlvisitor.php');
 
-define('TABLE_BOT_MSG', 'botmsg');
-define('TABLE_BOT_SRC', 'botsrc');
+const TABLE_BOT_MSG = 'botmsg';
+const TABLE_BOT_SRC = 'botsrc';
 
 class BotMsgSql extends KeyNameSql
 {
@@ -70,5 +70,3 @@ class BotVisitorSql extends VisitorSql
     	return _SqlBuildWhere($this->strFromKey, $strFromId);
     }
 }
-
-?>

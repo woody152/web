@@ -4,8 +4,8 @@ define('STOCK_TRANSACTION_MERGE_CN', '合并交易');
 
 function StockMergeTransactionForm($acct, $arGroup)
 {
-    $arGroupName = array();
-    $arGroupItemList = array();
+    $arGroupName = [];
+    $arGroupItemList = [];
 	foreach ($arGroup as $strGroupId => $strGroupItemId)
 	{
 		$item_sql = new StockGroupItemSql($strGroupId);
@@ -60,5 +60,3 @@ function StockMergeTransactionForm($acct, $arGroup)
 	</table>
 END;
 }
-
-?>

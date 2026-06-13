@@ -1,6 +1,5 @@
 <?php
 
-// ****************************** ImageFile class  *******************************************************
 class ImageFile
 {
     var $strPathName;
@@ -232,5 +231,3 @@ class PageImageFile extends ImageFile
     	return $this->DrawPolyLine($ar, 'DashedLine');
     }
 }
-
-?>

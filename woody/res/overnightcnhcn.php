@@ -75,7 +75,7 @@ function _echoOverNightCnhItem($strSymbol, $strInput, $bSell)
    	}
 	$fCnh = _convertCnhInput($ref, $stock_ref, $strInput);
    	
-	$ar = array();
+	$ar = [];
 	$ar[] = $ref->GetStockLink();
    	if ($strQuantity = $stock_ref->GetAvailableQuantity($bSell))
    	{
@@ -94,7 +94,6 @@ function _echoOverNightCnhItem($strSymbol, $strInput, $bSell)
    		{
 			if ($fHedge = GetStockHedge($strSymbol, $strStockId))
 			{
-//				$fHedgeQuantity = floor($fHintQuantity / $fHedge);
 				$fHedgeQuantity = round($fHintQuantity / $fHedge);
 				$fHintQuantity = $fHedgeQuantity * $fHedge;
 				$strHedge = GetNumberDisplay($fHedge, 0);
@@ -105,7 +104,6 @@ function _echoOverNightCnhItem($strSymbol, $strInput, $bSell)
    		{
    			$strDate = $ref->GetHoldingsDate();
 			$fCny = floatval($ref->GetNetValueString()) * $fHintQuantity * $fPos;
-//			$fCny = floatval(SqlGetNetValueByDate($ref->GetStockId(), $strDate)) * $fHintQuantity * $fPos;
 			$sql = GetStockSql();
 			$his_sql = GetStockHistorySql();
 			$cny_ref = $ref->GetCnyRef();
@@ -197,4 +195,3 @@ function GetTitle()
 	$acct = new StockAccount();
 
 require('../../php/ui/_dispcn.php');
-?>

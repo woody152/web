@@ -5,8 +5,8 @@ require_once('_szseholdings.php');
 
 class _QdiiMixAccount extends FundGroupAccount
 {
-	var $inr_ref = false;
-    var $cnh_ref;
+	private $inr_ref = false;
+    private $cnh_ref;
 
     function Create()
     {
@@ -18,11 +18,11 @@ class _QdiiMixAccount extends FundGroupAccount
         $this->ref = new HoldingsReference($strSymbol);
         $this->_updateStockHoldings($strSymbol);
 
-        $arRef = array($this->ref);
+        $arRef = [$this->ref];
         if ($this->ref->UseRealtimeEst())
         {
         	$ar_realtime_ref = $this->ref->GetRealtimeRefArray();
-        	$arRef = array_merge($arRef, $ar_realtime_ref);
+        	array_push($arRef, ...$ar_realtime_ref);
         	foreach ($ar_realtime_ref as $ref)
         	{
         		$pair_ref = $ref->GetPairRef();
@@ -92,36 +92,43 @@ class _QdiiMixAccount extends FundGroupAccount
     		$this->ref = new HoldingsReference($strSymbol);
     	}
     }
+
+	function GetCnhRef()
+	{
+		return $this->cnh_ref;
+	}
+
+	function GetInrRef()
+	{
+		return $this->inr_ref;
+	}
 }
 
 function EchoAll()
 {
     global $acct;
+	/** @var _QdiiMixAccount $acct */
     
     $ref = $acct->GetRef();
-    $uscny_ref = $ref->GetCnyRef();
-    $hkcny_ref = $ref->GetHkcnyRef();
-    $arForex = [$acct->cnh_ref];
-    if ($uscny_ref !== false)
+    $arForex = [];
+	$arForex[] = $acct->GetCnhRef();
+    if ($uscny_ref = $ref->GetCnyRef())
     {
     	$arForex[] = $ref->GetUsdcnyRef();
     	$arForex[] = $uscny_ref;
     }
-    if ($hkcny_ref !== false)
+    if ($hkcny_ref = $ref->GetHkcnyRef())
     {
     	$arForex[] = $ref->GetHkdcnyRef();
     	$arForex[] = $hkcny_ref;
     }
-	if ($acct->inr_ref !== false)
+	if ($inr_ref = $acct->GetInrRef())
 	{
-    	$arForex[] = $acct->inr_ref;
+    	$arForex[] = $inr_ref;
 	}	
     
 	EchoHoldingsEstParagraph($ref);
-    EchoReferenceParagraph(array_merge($acct->GetStockRefArray(), 
-    									//$ref->GetHoldingsRefArray(), 
-    								   $arForex),
-						   $acct->IsAdmin());
+    EchoReferenceParagraph([...$acct->GetStockRefArray(), ...$arForex], $acct->IsAdmin());
 	EchoFundTradingParagraph($ref);
     if ($ref->UseRealtimeEst())		EchoFundListParagraph($ref->GetRealtimeRefArray());
 
@@ -151,4 +158,3 @@ function GetMetaDescription()
 
    	$acct = new _QdiiMixAccount();
    	$acct->Create();
-?>

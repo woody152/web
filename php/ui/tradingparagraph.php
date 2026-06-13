@@ -1,20 +1,20 @@
 <?php
 require_once('stocktable.php');
 
-define('TRADING_QUOTE_NUM', 5);
+const TRADING_QUOTE_NUM = 5;
 
 function _getTradingTableColumn()
 {
-	return array(new TableColumn('交易', 50),
-				  new TableColumnPrice(),
-				  new TableColumnQuantity());
+	return [new TableColumn('交易', 50),
+			new TableColumnPrice(),
+			new TableColumnQuantity()];
 }
 
 function _echoTradingTableItem($strColor, $strAskBid, $strPrice, $strQuantity, $ref, $fEstPrice, $fEstPrice2, $fEstPrice3, $callback)
 {
 	if ($strQuantity == '0')	return;
 	
-    $ar = array($strAskBid);
+    $ar = [$strAskBid];
 
 	$fPrice = floatval($strPrice);
     $ar[] = $ref->GetPriceDisplay($fPrice, floatval($ref->GetPrevPrice()));
@@ -44,7 +44,6 @@ function _getTradingIndex($i)
 function _echoTradingTableData($ref, $fEstPrice, $fEstPrice2, $fEstPrice3, $callback)
 {
 	$now_ymd = GetNowYMD();
-	//DebugString(__FUNCTION__.' '.$now_ymd->GetYMD().' '.$ref->GetDate(), true);
    	$fPrice = floatval(($ref->IsStockMarketTrading($now_ymd, false) && ($now_ymd->GetYMD() == $ref->GetDate())) ? $ref->GetPrevPrice() : $ref->GetPrice());
    	$iPrecision = $ref->GetPrecision();
    	$strColor = 'orange';
@@ -137,7 +136,6 @@ function EchoFundTradingParagraph($fund, $callback = false)
     {
     	$strText = call_user_func($callback);
     	$strNoTag = strip_tags($strText);
-//    	DebugString(__FUNCTION__.': '.$strNoTag, true);
 		$iLen = strlen($strNoTag)*11;
 		if (!$_SESSION['mobile'])	$iLen = min($iLen, LayoutGetDisplayWidth() - TableColumnGetTotalWidth($arColumn));
     	$arColumn[] = new TableColumn($strText, $iLen);
@@ -192,6 +190,3 @@ function EchoTradingParagraph($ref, $ah_ref = false, $adr_ref = false)
     }
     _echoTradingParagraph($str, $arColumn, $ref, $fValH, $fValAdr); 
 }
-
-
-?>

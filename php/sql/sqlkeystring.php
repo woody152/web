@@ -58,7 +58,7 @@ class KeyStringSql extends KeySql
 
     function UpdateString($strId, $strString)
     {
-		return $this->UpdateById(array($this->strStringName => $strString), $strId);
+		return $this->UpdateById([$this->strStringName => $strString], $strId);
     }
     
     function GetString($strId)
@@ -97,5 +97,3 @@ class CommonPhraseSql extends KeyStringSql
         parent::__construct('commonphrase');
     }
 }
-
-?>

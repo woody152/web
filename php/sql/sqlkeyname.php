@@ -21,7 +21,7 @@ class KeyNameSql extends TableSql
     	
 		if ($this->GetRecord($strKey) == false)
 		{
-			return $this->InsertArray(array($this->strKeyName => $strKey));
+			return $this->InsertArray([$this->strKeyName => $strKey]);
    		}
    		return false;
     }
@@ -52,5 +52,3 @@ class KeyNameSql extends TableSql
    		return $this->GetData(false, '`'.$this->strKeyName.'` ASC', _SqlBuildLimit($iStart, $iNum));
     }
 }
-
-?>

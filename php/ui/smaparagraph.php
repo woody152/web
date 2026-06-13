@@ -4,7 +4,7 @@ require_once('calibrationhistoryparagraph.php');
 
 function _getSmaRow($strKey)
 {
-    $arRow = array('D' => '日', 'W' => '周', 'M' => '月', 'BOLLUP' => '布林上轨', 'BOLLDN' => '布林下轨', 'EMA50' => '小牛熊分界', 'EMA200' => '牛熊分界');
+    $arRow = ['D' => '日', 'W' => '周', 'M' => '月', 'BOLLUP' => '布林上轨', 'BOLLDN' => '布林下轨', 'EMA50' => '小牛熊分界', 'EMA200' => '牛熊分界'];
     $strFirst = substr($strKey, 0, 1);
     if ($strFirst == 'E')		return $arRow[$strKey];
 
@@ -30,7 +30,7 @@ function _echoSmaTableItem($his, $strKey, $strVal, $cb_ref, $callback, $callback
 {
     $stock_ref = $his->GetRef();
 
-    $ar = array();
+    $ar = [];
     $ar[] = _getSmaRow($strKey);
 
 	$fVal = floatval($strVal);
@@ -113,7 +113,7 @@ function EchoSmaParagraph($ref, $str = false, $cb_ref = false, $callback = false
 	$premium_col = new TableColumnPremium();
 	$next_col = new TableColumnEst('T+1');
 	$afterhour_col = new TableColumnEst('盘后');
-	$ar = array(new TableColumn('均线', 90), new TableColumnEst(), $premium_col, $next_col, $premium_col);
+	$ar = [new TableColumn('均线', 90), new TableColumnEst(), $premium_col, $next_col, $premium_col];
 	if ($bAfterHour)	$ar[] = $afterhour_col;
 	if ($callback)
     {
@@ -221,5 +221,3 @@ function EchoFutureSmaParagraph($ref, $callback2 = false)
 		}
 	}
 }
-
-?>

@@ -15,7 +15,7 @@ function _getPriceOption($strGroupItemId, $strPrice)
     $sym = GetGroupItemSym($strGroupItemId);
     if ($sym->IsTradable())
     {
-    	$ar = array();
+    	$ar = [];
     	$iPrecision = $sym->GetPrecision();
     	$fPrice = round($strPrice, $iPrecision);
     	$iPow = pow(10, $iPrecision);
@@ -31,7 +31,7 @@ function _getPriceOption($strGroupItemId, $strPrice)
 
 function _getGroupItemPriceArray($item_sql)
 {
-    $ar = array();
+    $ar = [];
     if ($arStockId = $item_sql->GetStockIdArray())
     {
     	$his_sql = GetStockHistorySql();
@@ -45,7 +45,7 @@ function _getGroupItemPriceArray($item_sql)
 
 function _getPriceOptionJsArray($arPrice)
 {
-    $ar = array();
+    $ar = [];
     foreach ($arPrice as $strGroupItemId => $strPrice)
     {
     	if ($arOption = _getPriceOption($strGroupItemId, $strPrice))
@@ -58,7 +58,7 @@ function _getPriceOptionJsArray($arPrice)
 
 function _getGroupCommonPhrase($acct, $strGroupId)
 {
-    $ar = array();
+    $ar = [];
    	$sql = new CommonPhraseSql();
 	if ($result = $sql->GetAll($acct->GetGroupMemberId($strGroupId))) 
 	{
@@ -113,7 +113,7 @@ function _getSuggestedRemark($item_sql, $strGroupItemId)
 
 function _getGroupItemQuantityArray($item_sql)
 {
-    $ar = array();
+    $ar = [];
     if ($arStockId = $item_sql->GetStockIdArray())
     {
 		$trans_sql = $item_sql->GetTransSql();
@@ -295,4 +295,3 @@ function StockEditTransactionForm($acct, $strSubmit, $strGroupId = false, $strGr
 	</form>
 END;
 }
-?>

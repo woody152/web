@@ -10,7 +10,7 @@ function _echoNetValueCloseItem($csv, $his_sql, $shares_sql, $arHistory, $fNetVa
 	$fClosePrev = floatval($strClosePrev);
    	if ($csv)	$csv->Write($strDate, $ref->GetPercentageString($fClosePrev, $fClose), $ref->GetPercentageString($fNetValue, $fClose), strval($fNetValue));
 
-   	$ar = array($strDate);
+   	$ar = [$strDate];
    	$ar[] = $ref->GetPriceDisplay($fClose, $fNetValue);
    	$ar[] = $ref->GetNetValueDisplay($fNetValue);
 	$ar[] = $ref->GetPercentageDisplay($fNetValue, $fClose);
@@ -50,18 +50,16 @@ function EchoNetValueCloseParagraph($ref, $str = false, $csv = false, $iStart = 
    	$strMenuLink = IsTableCommonDisplay($iStart, $iNum) ? '' : StockGetMenuLink($strSymbol, $his_sql->Count($strStockId), $iStart, $iNum);
    	if ($str == false)	$str = GetYahooNetValueLink($strSymbol).'的'.GetNetValueCloseLink($strSymbol);
 
-	if (EchoTableParagraphBegin(array(new TableColumnDate(),
-									  new TableColumnPrice(),
-									  new TableColumnNetValue(),
-									  new TableColumnPremium('y'),
-									  new TableColumnChange('x'),
-									  new TableColumnShare(),
-									  new TableColumnTurnover()
-									 ), $strSymbol.'netvalueclose', $str.' '.$strMenuLink))
+	if (EchoTableParagraphBegin([new TableColumnDate(),
+								 new TableColumnPrice(),
+								 new TableColumnNetValue(),
+								 new TableColumnPremium('y'),
+								 new TableColumnChange('x'),
+								 new TableColumnShare(),
+								 new TableColumnTurnover()
+								], "{$strSymbol}netvalueclose", "$str $strMenuLink"))
 	{
 	    _echoNetValueCloseData($his_sql, $ref, $strStockId, $csv, $iStart, $iNum);
     	EchoTableParagraphEnd($strMenuLink);
 	}
 }
-
-?>

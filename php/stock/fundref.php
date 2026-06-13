@@ -178,7 +178,7 @@ class FundReference extends MysqlReference
 
     function GetForexRefArray()
     {
-    	return array($this->forex_ref, $this->cny_ref);
+    	return [$this->forex_ref, $this->cny_ref];
     }
     	
     function _getCalibrationBaseVal()
@@ -200,5 +200,3 @@ class FundReference extends MysqlReference
     }
     
 }
-
-?>

@@ -3,10 +3,10 @@ require_once('_qdiigroup.php');
 require_once('_kraneholdingscsv.php');
 require_once('../../php/stock/kraneshares.php');
 
-class QdiiAccount extends QdiiGroupAccount
+class _QdiiAccount extends QdiiGroupAccount
 {
-    var $oil_ref = false;
-    var $cnh_ref;
+    private $oil_ref = false;
+    private $cnh_ref;
 
     function Create() 
     {
@@ -30,7 +30,7 @@ class QdiiAccount extends QdiiGroupAccount
 		{
 			$strOil = false;
 		}
-        StockPrefetchArrayExtendedData(array_merge($arLev, $ar));
+        StockPrefetchArrayExtendedData([...$arLev, ...$ar]);
         
         $this->ref = new QdiiReference($strSymbol);
         $this->cnh_ref = new MyStockReference($strCNH);
@@ -57,21 +57,30 @@ class QdiiAccount extends QdiiGroupAccount
 
 		$this->QdiiCreateGroup($arLev);
     }
+
+	function GetOilRef()
+	{
+		return $this->oil_ref;
+	}
+
+	function GetCnhRef()
+	{
+		return $this->cnh_ref;
+	}
 } 
 
 function EchoAll()
 {
    	global $acct;
-   	$ref = $acct->GetRef();
+	/** @var _QdiiAccount $acct */
+
+	$ref = $acct->GetRef();
    	$est_ref = $ref->GetEstRef();
     
     EchoFundEstParagraph($ref);
     if (method_exists($est_ref, 'GetHoldingsDate'))		EchoHoldingsEstParagraph($est_ref);
     
-    EchoReferenceParagraph(array_merge($acct->GetStockRefArray(),
-									   [$acct->oil_ref, $acct->cnh_ref],
-									   $ref->GetForexRefArray()),
-						   $acct->IsAdmin());
+    EchoReferenceParagraph([...$acct->GetStockRefArray(), $acct->GetOilRef(), $acct->GetCnhRef(), ...$ref->GetForexRefArray()], $acct->IsAdmin());
     $acct->EchoCommonParagraphs();
     if ($group = $acct->EchoTransaction()) 
     {
@@ -87,7 +96,6 @@ function GetQdiiLinks($sym)
    	global $acct;
    	
 	$strSymbol = $sym->GetSymbol();
-   	
    	$ref = $acct->GetRef();
    	
    	if ($realtime_ref = $ref->GetRealtimeRef())		$strRealtimeSymbol = $realtime_ref->GetSymbol();
@@ -127,6 +135,5 @@ function GetQdiiLinks($sym)
 	return $str.GetQdiiRelated($sym->GetDigitA());
 }
 
-   	$acct = new QdiiAccount();
+   	$acct = new _QdiiAccount();
    	$acct->Create();
-?>

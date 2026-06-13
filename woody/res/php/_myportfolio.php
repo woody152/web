@@ -8,30 +8,30 @@ require_once('../../php/ui/referenceparagraph.php');
 
 class _MyPortfolio extends StockGroup
 {
-    var $arStockGroup = array();
+    var $arStockGroup = [];
 }
 
 function _transSortBySymbol($arTrans)
 {
-    $ar = array();
+    $ar = [];
     foreach ($arTrans as $trans)
     {
     	$ref = $trans->GetRef();
         $strSymbol = $ref->GetSymbol();
         if (isset($ar[$strSymbol]))		array_push($ar[$strSymbol], $trans);
-        else					        $ar[$strSymbol] = array($trans);
+        else					        $ar[$strSymbol] = [$trans];
     }
     ksort($ar);
     
-    $arSort = array();
-    foreach ($ar as $str => $arTrans)	$arSort = array_merge($arSort, $arTrans);
+    $arSort = [];
+    foreach ($ar as $str => $arTrans)	array_push($arSort, ...$arTrans);
     return $arSort;
 }
 
 function _transEchoReferenceParagraph($arTrans, $bAdmin)
 {
-	$arRef = array();
-	$arSymbol = array();
+	$arRef = [];
+	$arSymbol = [];
 	
 	foreach ($arTrans as $trans)
 	{
@@ -50,17 +50,17 @@ function _transEchoReferenceParagraph($arTrans, $bAdmin)
 
 function _echoMergeParagraph($arMerge)
 {
-	if (EchoTableParagraphBegin(array(new TableColumnSymbol(),
-									  new TableColumnQuantity(),
-									  new TableColumnTest()
-									 ), 'merge', '合并'.TableColumnGetQuantity()))
+	if (EchoTableParagraphBegin([new TableColumnSymbol(),
+								 new TableColumnQuantity(),
+								 new TableColumnTest()
+								], 'merge', '合并'.TableColumnGetQuantity()))
 	{
 		foreach ($arMerge as $strSymbol => $trans)
 		{
 			$iTotal = $trans->GetTotalShares();
 			if ($iTotal != 0)
 			{
-				$ar = array();
+				$ar = [];
 		
 				$ref = $trans->GetRef();
 				$ar[] = RefGetMyStockLink($ref);
@@ -84,8 +84,8 @@ function _echoMergeParagraph($arMerge)
 
 function _transEchoMergeParagraph($arTrans)
 {
-	$arMerge = array();
-	$arSymbol = array();
+	$arMerge = [];
+	$arSymbol = [];
 	$prev_trans = false;
 	$cur_trans = false;
 	
@@ -120,15 +120,15 @@ function _transEchoMergeParagraph($arTrans)
 
 function _echoPortfolio($portfolio, $sql, $strMemberId, $bAdmin)
 {
-	$arTransA = array();
-	$arTransH = array();
-	$arTransUS = array();
+	$arTransA = [];
+	$arTransH = [];
+	$arTransUS = [];
 	
 	if ($result = $sql->GetAll($strMemberId)) 
 	{
 		while ($record = mysqli_fetch_assoc($result)) 
 		{
-		    $group = new MyStockGroup($record['id'], array());
+		    $group = new MyStockGroup($record['id'], []);
 		    if ($group->GetTotalRecords() > 0)
 		    {
 		        $portfolio->arStockGroup[] = $group;
@@ -148,7 +148,7 @@ function _echoPortfolio($portfolio, $sql, $strMemberId, $bAdmin)
 		mysqli_free_result($result);
 	}
 
-	$arTrans = array_merge(_transSortBySymbol($arTransA), _transSortBySymbol($arTransH), _transSortBySymbol($arTransUS));
+	$arTrans = [..._transSortBySymbol($arTransA), ..._transSortBySymbol($arTransH), ..._transSortBySymbol($arTransUS)];
     _transEchoReferenceParagraph($arTrans, $bAdmin);
 	EchoPortfolioParagraph($arTrans);
     _transEchoMergeParagraph($arTrans);
@@ -156,12 +156,12 @@ function _echoPortfolio($portfolio, $sql, $strMemberId, $bAdmin)
 
 function _onPrefetch($sql, $strMemberId) 
 {
-    $arSymbol = array();
+    $arSymbol = [];
 	if ($result = $sql->GetAll($strMemberId)) 
 	{
 		while ($record = mysqli_fetch_assoc($result)) 
 		{
-		    $arSymbol = array_merge($arSymbol, SqlGetStocksArray($record['id'], true));
+		    array_push($arSymbol, ...SqlGetStocksArray($record['id'], true));
 		}
 		mysqli_free_result($result);
 	}
@@ -204,6 +204,3 @@ function GetMetaDescription()
 	{
 		$acct->Auth();
 	}
-
-?>
-

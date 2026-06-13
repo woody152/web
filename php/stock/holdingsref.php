@@ -22,13 +22,13 @@ class HoldingsReference extends MyStockReference
     var $hkcny_ref = false;
     var $hkdcny_ref = false;
     
-    var $ar_holdings_ref = array();
-    var $ar_realtime_ref = array();
+    var $ar_holdings_ref = [];
+    var $ar_realtime_ref = [];
 
     var $strNetValue;
     var $strHoldingsDate = false;
-    var $arHoldingsDateHistory = array();
-    var $arHoldingsRatio = array();
+    var $arHoldingsDateHistory = [];
+    var $arHoldingsRatio = [];
     
     var $strEstDate;
     var $fOfficialEstAdjust = 0.0;
@@ -45,7 +45,6 @@ class HoldingsReference extends MyStockReference
     {
         parent::__construct($strSymbol);
        	$this->netvalue_ref = new NetValueReference($strSymbol);
-//       	$this->uscny_ref = new CnyReference('USCNY');
 
         $strStockId = $this->GetStockId();
     	$date_sql = new HoldingsDateSql();
@@ -152,7 +151,7 @@ class HoldingsReference extends MyStockReference
     	$this->strHoldingsDate = $strDate;
     	
     	unset($this->arHoldingsDateHistory);
-    	$this->arHoldingsDateHistory = array();
+    	$this->arHoldingsDateHistory = [];
     }
     
     function GetHoldingsRatioArray()
@@ -173,7 +172,7 @@ class HoldingsReference extends MyStockReference
 	function GetProportionArray($strDate, $strPrevDate)
     {
 	   	$his_sql = GetStockHistorySql();
-	    $ar = array();
+	    $ar = [];
 		foreach ($this->ar_holdings_ref as $ref)
 	    {
             if ($fProportion = $his_sql->GetProportion($ref->GetStockId(), $strDate, $strPrevDate))
@@ -227,7 +226,7 @@ class HoldingsReference extends MyStockReference
     	return count($this->ar_realtime_ref) > 0 ? true : false;
     }
 
-    function _adjustToCNY($old_ref, $new_ref, $strDate = false)
+    private function _adjustToCNY($old_ref, $new_ref, $strDate = false)
     {
     	if ($old_ref === false)		return 1.0;
     	
@@ -345,11 +344,10 @@ class HoldingsReference extends MyStockReference
     function GetNetValueChange()
     {
     	$fNetValue = $this->_estNetValue();
-//    	DebugString(__CLASS__.'->'.__FUNCTION__.': '.strval($fNetValue).' '.$this->strNetValue, true);
     	return $fNetValue / floatval($this->strNetValue);
     }
 
-    function _needAdjustOfficialDate($strDate)
+    private function _needAdjustOfficialDate($strDate)
     {
 		if ($this->uscny_ref)
 		{
@@ -385,14 +383,13 @@ class HoldingsReference extends MyStockReference
     		if ($strNetValue = SqlGetNetValueByDate($strStockId, $strDate))
     		{
     			$this->fOfficialEstAdjust = floatval($strNetValue) - $this->fOfficialNetValue;
-//    			DebugVal($this->fOfficialEstAdjust, __FUNCTION__, true);
     		}
     		StockUpdateEstResult($strStockId, $this->fOfficialNetValue, $strDate);
     	}
    		return $this->fOfficialNetValue;
     }
     
-    function _needFairNetValue()
+    private function _needFairNetValue()
     {
     	if ($this->IsEtfA())								return true;
     	
@@ -438,4 +435,3 @@ class HoldingsReference extends MyStockReference
     }
 }
 
-?>

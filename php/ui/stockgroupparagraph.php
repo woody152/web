@@ -3,11 +3,10 @@ require_once('stocktable.php');
 
 function _stockGroupGetStockLinks($strGroupId)
 {
-	static $arSymbol = array();
+	static $arSymbol = [];
 	
     $strStocks = '';
 	$arStock = SqlGetStocksArray($strGroupId);
-//	sort($arStock);
 	foreach ($arStock as $strSymbol)
 	{
 		$sym = new StockSymbol($strSymbol);
@@ -30,7 +29,7 @@ function _echoStockGroupTableItem($strGroupId, $acct, $bReadOnly, $bAdmin)
 {
 	$strGroupName = $acct->GetGroupName($strGroupId);
     $strEdit = '';
-    $strDelete = GetDeleteLink(PATH_STOCK.'submitgroup.php?delete='.$strGroupId, $strGroupName.'股票分组和相关交易记录');
+    $strDelete = GetDeleteLink(PATH_STOCK.'submitgroup.php?delete='.$strGroupId, $strGroupName.STOCK_GROUP_DISPLAY.'和相关'.STOCK_TRANSACTION_DISPLAY);
     if ($bReadOnly)
     {
     	if ($bAdmin == false)	$strDelete = '';
@@ -38,22 +37,21 @@ function _echoStockGroupTableItem($strGroupId, $acct, $bReadOnly, $bAdmin)
     else
     {
     	$strEdit = GetEditLink(PATH_STOCK.'editstockgroup', $strGroupId);
-    	if ($bAdmin)				 $strDelete = GetDeleteLink('/php/_submitdelete.php?groupname='.$strGroupName, '全部名称为'.$strGroupName.'的股票分组');
+    	if ($bAdmin)	$strDelete = GetDeleteLink("/php/_submitdelete.php?groupname=$strGroupName", "全部名称为{$strGroupName}的".STOCK_GROUP_DISPLAY);
     }
 
-    $ar = array();
+    $ar = [];
     $ar[] = $acct->GetGroupLink($strGroupId);
     $ar[] = _stockGroupGetStockLinks($strGroupId);
-    $ar[] = $strEdit.' '.$strDelete;
+    $ar[] = "$strEdit $strDelete";
     EchoTableColumn($ar);
 }
 
 function _echoNewStockGroupTableItem($strStockId, $strLoginId = false)
 {
-    $ar = array();
-    
 	$strSymbol = SqlGetStockSymbol($strStockId);
-	$ar[] = ($strLoginId) ? '' : GetGroupStockLink($strSymbol);
+    $ar = [];
+	$ar[] = $strLoginId ? '' : GetGroupStockLink($strSymbol);
    	$ar[] = GetMyStockLink($strSymbol);
    	if ($strLoginId)
    	{
@@ -89,10 +87,10 @@ function _echoStockGroupTableData($acct, $strStockId, $strMemberId, $bAdmin)
 
 function EchoStockGroupParagraph($acct, $strGroupId = false, $strStockId = false)
 {
-	if (EchoTableParagraphBegin(array(new TableColumnGroupName(),
-									  new TableColumnSymbol(false, 450),
-									  new TableColumn()
-									 ), TABLE_STOCK_GROUP, GetMyStockGroupLink()))
+	if (EchoTableParagraphBegin([new TableColumnGroupName(),
+								 new TableColumnSymbol(false, 450),
+								 new TableColumn()
+								], TABLE_STOCK_GROUP, GetMyStockGroupLink()))
 	{
 		$bAdmin = $acct->IsAdmin();
 		if ($strGroupId)
@@ -113,5 +111,3 @@ function EchoStockGroupParagraph($acct, $strGroupId = false, $strStockId = false
     	EchoTableParagraphEnd();
 	}
 }
-
-?>

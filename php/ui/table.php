@@ -1,7 +1,7 @@
 <?php
 require_once('plaintext.php');
 
-define('TABLE_COMMON_DISPLAY', 10);
+const TABLE_COMMON_DISPLAY = 10;
 
 function IsTableCommonDisplay($iStart, $iNum)
 {
@@ -16,14 +16,14 @@ function GetTableRow($str)
 function GetTableColumnHead($iWidth, $strDisplay)
 {
 	$strWidth = strval($iWidth);
-//	return "<td class=c1 width=$strWidth align=center>$strDisplay</td>";
-	return GetHtmlElement($strDisplay, 'th', array('class' => 'c1', 'width' => $strWidth, 'align' => 'left'));
+	// return "<td class=c1 width=$strWidth align=center>$strDisplay</td>";
+	return GetHtmlElement($strDisplay, 'th', ['class' => 'c1', 'width' => $strWidth, 'align' => 'left']);
 }
 
 class TableColumn
 {
-	var $strText;
-	var $iWidth;
+	private $strText;
+	private $iWidth;
 	
 	public function __construct($strText = '', $iWidth = 80, $strColor = false, $strPrefix = false)
 	{
@@ -132,7 +132,7 @@ function SelectColumnItem($strDisplay, $strLink, $strId, &$arId)
 
 function EchoTableColumn($ar, $strColor = false, $strFirstHint = false)
 {
-	$arAttribute = array('class' => 'c1');
+	$arAttribute = ['class' => 'c1'];
 	if ($strColor)	$arAttribute['style'] = '"background-color:'.$strColor.'"';
 	
     $strColumn = '';
@@ -170,5 +170,3 @@ function EchoTableParagraphEnd($str = '')
     </p>
 END;
 }
-
-?>

@@ -8,11 +8,12 @@ function _echoFundEstTableItem($ref, $bFair, $bWide = false)
 {
     if (RefHasData($ref) == false)      return;
 
-    $ar = array($ref->GetStockLink());	// .' '.$ref->GetStockId()
+    $ar = [];
+	$ar[] = $ref->GetStockLink();	// .' '.$ref->GetStockId()
     if ($bWide)
     {
     	$stock_ref = GetStockRef($ref);
-    	$ar = array_merge($ar, GetStockReferenceArray($stock_ref, $bWide));
+    	array_push($ar, ...GetStockReferenceArray($stock_ref, $bWide));
     }
     
     $fOfficialPrice = $ref->GetOfficialNetValue();
@@ -53,8 +54,9 @@ function _callbackSortFundEst($ref)
 
 function _getFundEstTableColumn($arRef, &$bFair, $bWide = false)
 {
-	$ar = array(new TableColumnSymbol());
-	if ($bWide)	$ar = array_merge($ar, GetStockReferenceColumn());
+	$ar = [];
+	$ar[] = new TableColumnSymbol();
+	if ($bWide)	array_push($ar, ...GetStockReferenceColumn());
 	$ar[] = new TableColumnOfficialEst();
 	$ar[] = new TableColumnDate(STOCK_DISP_EST);
 	$ar[] = new TableColumnPremium();	// STOCK_DISP_OFFICIAL
@@ -85,7 +87,7 @@ function _getFundEstTableColumn($arRef, &$bFair, $bWide = false)
 
 function _getOrderByDisplay($strOrder)
 {
-	return '按'.$strOrder.'排序';
+	return "按{$strOrder}排序";
 }
 
 function _echoFundEstParagraph($arColumn, $bFair, $arRef, $str, $bWide = false)
@@ -99,24 +101,29 @@ function _echoFundEstParagraph($arColumn, $bFair, $arRef, $str, $bWide = false)
 			$str .= '共'.strval($iCount).'项';
 			if ($strSort = UrlGetQueryValue('sort'))
 			{
-				if ($strSort == 'symbol')				
+				switch ($strSort)
 				{
+				case 'symbol':				
 					$arRef = RefSortBySymbol($arRef);
 					$str .= _getOrderByDisplay(TableColumnGetSymbol());
-				}
-				else if ($strSort == 'premium')
-				{
+					break;
+				
+				case 'premium':
 					$arRef = RefSortByNumeric($arRef, '_callbackSortFundEst');
 					$str .= _getOrderByDisplay(STOCK_DISP_OFFICIAL.TableColumnGetPremium());
+					break;
 				}
 			}
-			else	$str .= ' '.CopyPhpLink(UrlAddQuery('sort=symbol'), _getOrderByDisplay(STOCK_DISP_SYMBOL)).' '.CopyPhpLink(UrlAddQuery('sort=premium'), _getOrderByDisplay(STOCK_DISP_OFFICIAL.STOCK_DISP_PREMIUM));
+			else
+			{
+				$str .= ' '.CopyPhpLink(UrlAddQuery('sort=symbol'), _getOrderByDisplay(STOCK_DISP_SYMBOL)).' '.CopyPhpLink(UrlAddQuery('sort=premium'), _getOrderByDisplay(STOCK_DISP_OFFICIAL.STOCK_DISP_PREMIUM));
+			}
 		}
 	}
 	
 	if (EchoTableParagraphBegin($arColumn, 'estimation', $str))
 	{
-	    foreach ($arRef as $ref)		_echoFundEstTableItem($ref, $bFair, $bWide);
+	    foreach ($arRef as $ref)	_echoFundEstTableItem($ref, $bFair, $bWide);
     	EchoTableParagraphEnd();
 	}	
 }
@@ -131,14 +138,13 @@ function _getFundPositionStr($ref)
 {
 	$str = '';
 	$fPosition = $ref->GetPosition();
-	//if ($fPosition < 1.0)									
 	$str .= GetFundPositionLink($ref->GetSymbol()).'值使用'.number_format($fPosition, 2).'。';
 	return $str;
 }
 
 function EchoFundEstParagraph($ref)
 {
-	$arRef = array($ref);
+	$arRef = [$ref];
 	$arColumn = _getFundEstTableColumn($arRef, $bFair);
 	
 	$str = _getFundPositionStr($ref);
@@ -159,7 +165,7 @@ function EchoFundEstParagraph($ref)
 
 function EchoHoldingsEstParagraph($ref)
 {
-	$arRef = array($ref);
+	$arRef = [$ref];
 	$arColumn = _getFundEstTableColumn($arRef, $bFair);
 	
 	$str = _getFundPositionStr($ref);
@@ -170,5 +176,3 @@ function EchoHoldingsEstParagraph($ref)
 	_echoFundEstParagraph($arColumn, $bFair, $arRef, $str);
    	EchoNetValueHistoryParagraph($ref, false, 0, 1);
 }
-
-?>

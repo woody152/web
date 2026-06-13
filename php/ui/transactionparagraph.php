@@ -64,7 +64,7 @@ function _echoSingleTransactionTableData($sql, $ref, $iStart, $iNum, $bReadOnly,
 
 function _echoAllTransactionTableData($sql, $iStart, $iNum, $bReadOnly, $bAdmin)
 {
-    $ar = array();
+    $ar = [];
     if ($result = $sql->GetAllStockTransaction($iStart, $iNum)) 
     {
         while ($record = mysqli_fetch_assoc($result)) 
@@ -138,5 +138,3 @@ function EchoTransactionParagraph($acct, $strGroupId, $ref = false, $bAll = true
     	EchoTableParagraphEnd($strMenuLink);
 	}
 }
-
-?>

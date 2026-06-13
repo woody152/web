@@ -28,12 +28,10 @@ class StockHistorySql extends DailyCloseSql
     {
     	if ($strAdjClose == false)	$strAdjClose = $strClose;
     	
-    	$ar = array('date' => $strDate,
-    				'close' => $strClose,
-    				'volume' => $strVolume,
-    				'adjclose' => $strAdjClose
-    			   );
-    	
+    	$ar = ['date' => $strDate,
+    		   'close' => $strClose,
+    		   'volume' => $strVolume,
+    		   'adjclose' => $strAdjClose];
     	if ($record = $this->GetRecord($strStockId, $strDate))
     	{
     		unset($ar['date']);
@@ -43,18 +41,21 @@ class StockHistorySql extends DailyCloseSql
     		
     		if (count($ar) > 0)	return $this->UpdateById($ar, $record['id']);
     	}
-    	else	return $this->InsertArrays($this->MakeFieldKeyId($strStockId), $ar);
+    	else
+		{
+			return $this->InsertArrays($this->MakeFieldKeyId($strStockId), $ar);
+		}
     	return false;
     }
     
     function UpdateClose($strId, $strClose)
     {
-		return $this->UpdateById(array('close' => $strClose, 'adjclose' => $strClose), $strId);
+		return $this->UpdateById(['close' => $strClose, 'adjclose' => $strClose], $strId);
     }
 
     function UpdateAdjClose($strId, $strAdjClose)
     {
-		return $this->UpdateById(array('adjclose' => $strAdjClose), $strId);
+		return $this->UpdateById(['adjclose' => $strAdjClose], $strId);
     }
 
     function DeleteByZeroVolume($strStockId)
@@ -137,9 +138,7 @@ class StockSql extends KeyNameSql
     function WriteSymbol($strSymbol, $strName)
     {
     	$strName = SqlCleanString($strName);
-    	$ar = array('symbol' => $strSymbol,
-    				  'name' => $strName);
-    	
+    	$ar = ['symbol' => $strSymbol, 'name' => $strName];
     	if ($record = $this->GetRecord($strSymbol))
     	{	
     		unset($ar['symbol']);
@@ -147,7 +146,7 @@ class StockSql extends KeyNameSql
     	}
     	else
     	{
-  			DebugString('新增:'.$strSymbol.'-'.$strName);
+  			DebugString("新增: $strSymbol - $strName");
     		return $this->InsertArray($ar);
     	}
     	return false;
@@ -212,7 +211,7 @@ function SqlGetStockSymbol($strStockId)
 function SqlGetStockSymbolAndId($strWhere, $strLimit = false)
 {
 	$sql = GetStockSql();
-    $ar = array();
+    $ar = [];
     
    	if ($result = $sql->GetData($strWhere, 'symbol ASC', $strLimit)) 
    	{
@@ -278,8 +277,7 @@ function GetStockEmaSql($iDays)
 
 function SqlDeleteStockEma($strStockId)
 {
-	$ar = array(50, 200);
-	
+	$ar = [50, 200];
 	foreach ($ar as $iDays)
 	{
 		$ema_sql = GetStockEmaSql($iDays);
@@ -387,5 +385,3 @@ function SqlGetHadrPair($strSymbolH)
 	$pair_sql = GetAdrPairSql();
 	return $pair_sql->GetSymbol($strSymbolH);
 }
-
-?>

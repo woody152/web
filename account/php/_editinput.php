@@ -190,7 +190,7 @@ function _getLinearRegressionStockArrays(&$arX, &$arY, $strInput, $strSeparator,
     else	$iGap = 20;
     
     StockPrefetchArrayExtendedData($arInput);
-    $arRef = array();
+    $arRef = [];
 	foreach ($arInput as $strSymbol)
 	{
 		$ref = StockGetReference($strSymbol);
@@ -202,8 +202,8 @@ function _getLinearRegressionStockArrays(&$arX, &$arY, $strInput, $strSeparator,
 	}
 	if (count($arRef) != 2)	return '';
 	
-	$arCloseX = array();
-	$arCloseY = array();
+	$arCloseX = [];
+	$arCloseY = [];
 	$x_ref = $arRef[0];
 	$y_ref = $arRef[1];
 	$strStockIdY = $y_ref->GetStockId();
@@ -320,8 +320,8 @@ function _getLinearRegressionArrays(&$arX, &$arY, $strInput, $strSeparator, $str
 
 function _getLinearRegressionString($strInput, $bChinese)
 {
-	$arX = array();
-	$arY = array();
+	$arX = [];
+	$arY = [];
 	
 	if ($strFunction = strstr($strInput, '(', true))
 	{
@@ -347,10 +347,10 @@ function _getLinearRegressionString($strInput, $bChinese)
    	$str .= $strNewLine.$strData;
 	$str .= $strNewLine;
 	$str .= $bChinese ? '求解超定线性方程组验证：' : 'Verify by Solve Overdetermined: ';
-	$arEq = array();
+	$arEq = [];
 	for ($i = 0; $i < count($arX); $i ++)
 	{
-		$arEq[] = array(1.0, $arX[$i], $arY[$i]);
+		$arEq[] = [1.0, $arX[$i], $arY[$i]];
 	}	
 	try
 	{
@@ -365,7 +365,7 @@ function _getLinearRegressionString($strInput, $bChinese)
 
 function ___get_xyz()
 {
-	return array('x', 'y', 'z', 'w');
+	return ['x', 'y', 'z', 'w'];
 }
 
 function __getLinearEquationString($ar)
@@ -400,7 +400,7 @@ function __getExceptionMessage($e, $bChinese)
 }
 function _getCramersRuleString($strInput, $bChinese)
 {
-	$ar = json_decode('['.$strInput.']', true);
+	$ar = json_decode("[$strInput]", true);
 	if (json_last_error() !== JSON_ERROR_NONE) 
 	{
     	return $bChinese ? '解析方程组系数失败' : json_last_error_msg();
@@ -462,52 +462,52 @@ function _getPrimeNumberString($strNumber, $bChinese)
 
 function _getSinaJsChineseStockArray($bChinese)
 {
-	if ($bChinese)	return	 array('GB2312编码的股票名字', STOCK_DISP_OPEN, '昨日收盘价', '当前价格，收盘后数据可以当成今日收盘价？', STOCK_DISP_HIGH, STOCK_DISP_LOW, '当前买价，跟序号11买一字段相同。', '当前卖价，跟序号21卖一字段相同。', '成交'.STOCK_DISP_QUANTITY, '总成交金额', 
-										'买一股数', '买一价格，跟序号6相同。', '二', '二', '三', '三', '四', '四', '五', '五', '卖一股数', '卖一价格，跟序号7相同。', '二', '二', '三', '三', '四', '四', '五', '五', '日期', '时间', '结束符？');
-	return	 array('GB2312 coded stock name', 'Today open', 'Last close', 'Current price, used as today close after market close?', 'Today high', 'Today low', 'Current bid, same as index 11 bid1.', 'Current ask, same as index 21 ask1.', 'Total quantity', 'Total amount', 
-					'Bid1 quantity', 'Bid1 price, same as index 6.', '2', '2', '3', '3', '4', '4', '5', '5', 'Ask1 quantity', 'Ask1 price, same as index 7.', '2', '2', '3', '3', '4', '4', '5', '5', 'Date', 'Time', 'End of data?');
+	if ($bChinese)	return ['GB2312编码的股票名字', STOCK_DISP_OPEN, '昨日收盘价', '当前价格，收盘后数据可以当成今日收盘价？', STOCK_DISP_HIGH, STOCK_DISP_LOW, '当前买价，跟序号11买一字段相同。', '当前卖价，跟序号21卖一字段相同。', '成交'.STOCK_DISP_QUANTITY, '总成交金额', 
+							'买一股数', '买一价格，跟序号6相同。', '二', '二', '三', '三', '四', '四', '五', '五', '卖一股数', '卖一价格，跟序号7相同。', '二', '二', '三', '三', '四', '四', '五', '五', '日期', '时间', '结束符？'];
+	return ['GB2312 coded stock name', 'Today open', 'Last close', 'Current price, used as today close after market close?', 'Today high', 'Today low', 'Current bid, same as index 11 bid1.', 'Current ask, same as index 21 ask1.', 'Total quantity', 'Total amount', 
+			'Bid1 quantity', 'Bid1 price, same as index 6.', '2', '2', '3', '3', '4', '4', '5', '5', 'Ask1 quantity', 'Ask1 price, same as index 7.', '2', '2', '3', '3', '4', '4', '5', '5', 'Date', 'Time', 'End of data?'];
 }
 
 function _getSinaJsFundArray($bChinese)
 {
-	if ($bChinese)	return	 array('GB2312编码的名字', '目前'.STOCK_DISP_NETVALUE, '累计'.STOCK_DISP_NETVALUE, '昨日'.STOCK_DISP_NETVALUE, '日期', '？');
-	return	 array('GB2312 coded name', 'Current net value', 'Accumulated net value', 'Previous net value', 'Date', '?');
+	if ($bChinese)	return ['GB2312编码的名字', '目前'.STOCK_DISP_NETVALUE, '累计'.STOCK_DISP_NETVALUE, '昨日'.STOCK_DISP_NETVALUE, '日期', '？'];
+	return ['GB2312 coded name', 'Current net value', 'Accumulated net value', 'Previous net value', 'Date', '?'];
 }
 
 function _getSinaJsAmericanArray($bChinese)
 {
-	if ($bChinese)	return	 array('GB2312编码的中文名字', '当前价格，收盘后数据可以当成今日收盘价？', '相对昨日收盘价的变化百分比', '中国时区日期和时间', '相对昨日收盘价的变化', STOCK_DISP_OPEN, STOCK_DISP_HIGH, STOCK_DISP_LOW, '52周'.STOCK_DISP_HIGH, '52周'.STOCK_DISP_LOW, 
-										'成交'.STOCK_DISP_QUANTITY, '10日均量', '市值', '每股收益', '市盈率', '？', '贝塔系数', '股息', '收益率', '股本', '？', '盘前盘后交易', '盘前盘后交易变化百分比', '盘前盘后交易变化', '美东时区盘前盘后交易日期和时间',
-										'美东时区日期和时间', '昨日收盘价', '盘前盘后交易成交'.STOCK_DISP_QUANTITY, '未知，从此项开始以下为2020年9月22日新增。', '年份，可能是为了24和25项在年末时用strtotime函数会搞错年份而加。', '总成交金额，除以第10项换算成当日均价后跟雪球显示的不一致。');
-	return	 array('GB2312 coded Chinese name', 'Current price, used as today close after market close?', '% Change from last close', 'PRC date time', 'Change from last close', 'Open price', 'Today high', 'Today low', '52 weeks high', '52 weeks low', 
-										'Total quantity', '10 days average quantity', 'Market value', 'EPS', 'PE', '?', 'Beta', 'Dividends', 'Rate of return', 'Share capital', '?', 'Extended trading', 'Extended trading % change', 'Extended trading change', 'EDT extended trading date time',
-										'EDT date time', 'Last close', 'Extended trading quantity', '?', 'Year', 'Total amount');
+	if ($bChinese)	return ['GB2312编码的中文名字', '当前价格，收盘后数据可以当成今日收盘价？', '相对昨日收盘价的变化百分比', '中国时区日期和时间', '相对昨日收盘价的变化', STOCK_DISP_OPEN, STOCK_DISP_HIGH, STOCK_DISP_LOW, '52周'.STOCK_DISP_HIGH, '52周'.STOCK_DISP_LOW, 
+							'成交'.STOCK_DISP_QUANTITY, '10日均量', '市值', '每股收益', '市盈率', '？', '贝塔系数', '股息', '收益率', '股本', '？', '盘前盘后交易', '盘前盘后交易变化百分比', '盘前盘后交易变化', '美东时区盘前盘后交易日期和时间',
+							'美东时区日期和时间', '昨日收盘价', '盘前盘后交易成交'.STOCK_DISP_QUANTITY, '未知，从此项开始以下为2020年9月22日新增。', '年份，可能是为了24和25项在年末时用strtotime函数会搞错年份而加。', '总成交金额，除以第10项换算成当日均价后跟雪球显示的不一致。'];
+	return ['GB2312 coded Chinese name', 'Current price, used as today close after market close?', '% Change from last close', 'PRC date time', 'Change from last close', 'Open price', 'Today high', 'Today low', '52 weeks high', '52 weeks low', 
+			'Total quantity', '10 days average quantity', 'Market value', 'EPS', 'PE', '?', 'Beta', 'Dividends', 'Rate of return', 'Share capital', '?', 'Extended trading', 'Extended trading % change', 'Extended trading change', 'EDT extended trading date time',
+			'EDT date time', 'Last close', 'Extended trading quantity', '?', 'Year', 'Total amount'];
 }
 
 function _getSinaJsFutureArray($bChinese)
 {
-	if ($bChinese)	return	 array('当前价格', '相对昨日结算价的变化百分比', '当前买价', '当前卖价', STOCK_DISP_HIGH, STOCK_DISP_LOW, '时间', '昨日结算价', STOCK_DISP_OPEN, '持仓量', '当前买量？', '当前卖量？', '日期', 'GB2312编码的名字');
-	return	 array('Current price', 'The percentage of current price change', 'Bid price', 'Ask price', 'Today high', 'Today low', 'Time', 'Last settlement price', 'Open price', 'Volume', 'Bid quantity?', 'Ask quantity?', 'Date', 'GB2312 coded name');
+	if ($bChinese)	return ['当前价格', '相对昨日结算价的变化百分比', '当前买价', '当前卖价', STOCK_DISP_HIGH, STOCK_DISP_LOW, '时间', '昨日结算价', STOCK_DISP_OPEN, '持仓量', '当前买量？', '当前卖量？', '日期', 'GB2312编码的名字'];
+	return ['Current price', 'The percentage of current price change', 'Bid price', 'Ask price', 'Today high', 'Today low', 'Time', 'Last settlement price', 'Open price', 'Volume', 'Bid quantity?', 'Ask quantity?', 'Date', 'GB2312 coded name'];
 }
 
 function _getSinaJsForexArray($bChinese)
 {
-	if ($bChinese)	return	 array('时间', '?', '?', '昨日收盘价', '振幅*10000', STOCK_DISP_OPEN, STOCK_DISP_HIGH, STOCK_DISP_LOW, '当前价格', 'GB2312编码的名字', '相对昨日收盘价的变化百分比', '相对昨日收盘价的变化', '振幅百分比', '?', '?', '?', '?', '日期');
-	return	 array('Time', '?', '?', 'Last close', 'Amplitude*10000', 'Open price', 'Today high', 'Today low', 'Current price', 'GB2312 coded name', '% Change from last close', 'Change from last close', '% amplitude', '?', '?', '?', '?', 'Date');
+	if ($bChinese)	return ['时间', '?', '?', '昨日收盘价', '振幅*10000', STOCK_DISP_OPEN, STOCK_DISP_HIGH, STOCK_DISP_LOW, '当前价格', 'GB2312编码的名字', '相对昨日收盘价的变化百分比', '相对昨日收盘价的变化', '振幅百分比', '?', '?', '?', '?', '日期'];
+	return ['Time', '?', '?', 'Last close', 'Amplitude*10000', 'Open price', 'Today high', 'Today low', 'Current price', 'GB2312 coded name', '% Change from last close', 'Change from last close', '% amplitude', '?', '?', '?', '?', 'Date'];
 }
 
 function _getSinaJsHongkongArray($bChinese)
 {
-	if ($bChinese)	return	 array('英文名字', 'GB2312编码的中文名字', STOCK_DISP_OPEN, '昨日收盘价', STOCK_DISP_HIGH, STOCK_DISP_LOW, '当前价格，收盘后数据可以当成今日收盘价？', '相对昨日收盘价的变化', '相对昨日收盘价的变化百分比', '当前买价？', '当前卖价？', '总成交金额', '成交'.STOCK_DISP_QUANTITY, 
-										'市盈率？', '周息率？', '52周'.STOCK_DISP_HIGH, '52周'.STOCK_DISP_LOW, '日期', '时间');
-	return	 array('English name', 'GB2312 coded Chinese name', 'Open price', 'Last close', 'Today high', 'Today low', 'Current price, used as today close after market close?', 'Change from last close', '% Change from last close', 'Bid price?', 'Ask price?', 'Total amount', 'Total quantity', 
-					'PE?', 'Interest rate?', '52 weeks high', '52 weeks low', 'Date', 'Time');
+	if ($bChinese)	return ['英文名字', 'GB2312编码的中文名字', STOCK_DISP_OPEN, '昨日收盘价', STOCK_DISP_HIGH, STOCK_DISP_LOW, '当前价格，收盘后数据可以当成今日收盘价？', '相对昨日收盘价的变化', '相对昨日收盘价的变化百分比', '当前买价？', '当前卖价？', '总成交金额', '成交'.STOCK_DISP_QUANTITY, 
+							'市盈率？', '周息率？', '52周'.STOCK_DISP_HIGH, '52周'.STOCK_DISP_LOW, '日期', '时间'];
+	return ['English name', 'GB2312 coded Chinese name', 'Open price', 'Last close', 'Today high', 'Today low', 'Current price, used as today close after market close?', 'Change from last close', '% Change from last close', 'Bid price?', 'Ask price?', 'Total amount', 'Total quantity', 
+			'PE?', 'Interest rate?', '52 weeks high', '52 weeks low', 'Date', 'Time'];
 }
 
 function _getSinaJsChineseFutureArray($bChinese)
 {
-	if ($bChinese)	return	 array('名字', '时间HH:MM:SS', STOCK_DISP_OPEN, STOCK_DISP_HIGH, STOCK_DISP_LOW, '昨日收盘价', '买价', '卖价', '最新价', '结算价', '昨日结算价', '买量', '卖量', '持仓量', '成交'.STOCK_DISP_QUANTITY, '商品交易所简称', '品种名简称', '日期', '?', '?', '?', '?', '?', '?', '?', '?', '?', '当日均价VWAP');
-	return	 array('Name', 'Time HH:MM:SS', 'Open price', 'Today high', 'Today low', 'Last close', 'Bid', 'Ask', 'Current price', 'Settlement price', 'Last settlement price', 'Bid quantity', 'Ask quantity', 'Volume', 'Total quantity', 'Exchange short name', 'Short name', 'Date', '?', '?', '?', '?', '?', '?', '?', '?', '?', 'VWAP');
+	if ($bChinese)	return ['名字', '时间HH:MM:SS', STOCK_DISP_OPEN, STOCK_DISP_HIGH, STOCK_DISP_LOW, '昨日收盘价', '买价', '卖价', '最新价', '结算价', '昨日结算价', '买量', '卖量', '持仓量', '成交'.STOCK_DISP_QUANTITY, '商品交易所简称', '品种名简称', '日期', '?', '?', '?', '?', '?', '?', '?', '?', '?', '当日均价VWAP'];
+	return ['Name', 'Time HH:MM:SS', 'Open price', 'Today high', 'Today low', 'Last close', 'Bid', 'Ask', 'Current price', 'Settlement price', 'Last settlement price', 'Bid quantity', 'Ask quantity', 'Volume', 'Total quantity', 'Exchange short name', 'Short name', 'Date', '?', '?', '?', '?', '?', '?', '?', '?', '?', 'VWAP'];
 }
 
 function _getSinaSymbol($strFirst)
@@ -832,4 +832,3 @@ function GetTitle($bChinese = true)
 }
 
 	$acct = new IpLookupAccount(false, ['commonphrase', 'ip', 'sinajs']);
-?>

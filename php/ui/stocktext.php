@@ -1,9 +1,6 @@
 <?php
 require_once('stockdisp.php');
 
-// Text display UI
-
-// ****************************** MyStockReference class functions *******************************************************
 function _textPriceVolume($ref)
 {
     $str = ':'.$ref->GetPrice().' '.$ref->GetDate().' '.$ref->GetTimeHM().BOT_EOL;
@@ -120,5 +117,3 @@ function TextFromFundReference($ref)
     }
     return $str;
 }
-
-?>

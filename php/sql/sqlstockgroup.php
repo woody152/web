@@ -68,12 +68,12 @@ class StockGroupItemSql extends KeyTableSql
 
     function _makePrivateFieldArray($strQuantity = '0', $strCost = '0.0', $strRecord = '0')
     {
-		return array('quantity' => $strQuantity, 'cost' => $strCost, 'record' => $strRecord);
+		return ['quantity' => $strQuantity, 'cost' => $strCost, 'record' => $strRecord];
     }
     
     function Insert($strStockId)
     {
-    	return $this->InsertArrays($this->MakeFieldKeyId(), array('stock_id' => $strStockId), $this->_makePrivateFieldArray());
+    	return $this->InsertArrays($this->MakeFieldKeyId(), ['stock_id' => $strStockId], $this->_makePrivateFieldArray());
     }
 
     function Update($strId, $strQuantity, $strCost, $strRecord)
@@ -218,7 +218,7 @@ function SqlGetStockGroupItemSymbolArray($item_sql)
 
 function SqlGetStocksArray($strGroupId, $bCheckTransaction = false)
 {
-    $ar = array();
+    $ar = [];
 	$sql = GetStockSql();
 	$item_sql = new StockGroupItemSql($strGroupId);
     if ($arStockId = $item_sql->GetStockIdArray($bCheckTransaction))

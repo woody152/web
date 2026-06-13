@@ -3,7 +3,7 @@ require_once('sqltable.php');
 
 class KeySql extends TableSql
 {
-    var $strKey;
+    private $strKey;
 	
     public function __construct($strTableName, $strKeyPrefix = TABLE_PAGE) 
     {
@@ -37,7 +37,7 @@ class KeySql extends TableSql
     
     function MakeFieldKeyId($strKeyId)
     {
-    	return array($this->strKey => $strKeyId);
+    	return [$this->strKey => $strKeyId];
     }
     
     function BuildWhere_key_ex($strKeyId, $strExId, $strExVal)
@@ -82,4 +82,3 @@ class KeySql extends TableSql
     }
 }
 
-?>

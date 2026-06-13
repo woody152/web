@@ -3,7 +3,7 @@ require_once('sqltable.php');
 
 class ValSql extends TableSql
 {
-	var $strValName;
+	private $strValName;
 	
     public function __construct($strTableName, $strValName = 'close')
     {
@@ -25,12 +25,12 @@ class ValSql extends TableSql
     
     function Insert($strId, $strVal)
     {
-    	return $this->InsertArray(array('id' => $strId, $this->strValName => $strVal));
+    	return $this->InsertArray(['id' => $strId, $this->strValName => $strVal]);
     }
 
     function Update($strId, $strVal)
     {
-		return $this->UpdateById(array($this->strValName => $strVal), $strId);
+		return $this->UpdateById([$this->strValName => $strVal], $strId);
     }
     
     function WriteVal($strId, $strVal, $bString = false)
@@ -62,7 +62,7 @@ class ValSql extends TableSql
     
     function GetAllIdVal()
     {
-    	$ar = array();
+    	$ar = [];
     
     	if ($result = $this->GetData()) 
     	{
@@ -102,5 +102,3 @@ class LastCalibrationSql extends ValSql
         parent::__construct('lastcalibration');
     }
 }
-
-?>

@@ -36,7 +36,7 @@ class WeixinStock extends WeixinCallback
 		else	$strSymbol = $strContents;
 		
 		if (stripos($strContents, 'http') !== false)	$strDebug = $strContents;
-		else												$strDebug = GetXueqiuLink(new StockSymbol($strSymbol), $strContents).' '.GetMyStockLink($strSymbol, '更新数据');
+		else											$strDebug = GetXueqiuLink(new StockSymbol($strSymbol), $strContents).' '.GetMyStockLink($strSymbol, '更新数据');
 
 		_wxDebug($strUserName, GetRemarkElement('内容：').$strDebug, 'Wechat message');
 		$str = $strContents.BOT_EOL;
@@ -87,12 +87,10 @@ class WeixinStock extends WeixinCallback
     
 		if ($img = url_get_contents($strUrl))
 		{
-			$size = strlen($img);
 			$strFileName = DebugGetWechatImageName(substr(md5($strUserName.DebugGetTime()), 16)); 
 			$fp = @fopen($strFileName, 'w');  
 			fwrite($fp, $img);  
 			fclose($fp);  
-//      	unset($img, $url);
 
         	$strLink = GetInternalLink(UrlGetPathName($strFileName));
         	$strContents .= "(已经保存到{$strLink})";
@@ -104,4 +102,3 @@ class WeixinStock extends WeixinCallback
 
     $acct = new WeixinStock();
     $acct->Run();
-?>

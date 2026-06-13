@@ -324,5 +324,3 @@ function RefGetTableColumnNetValue($ref)
 	if ($ref->IsSinaFutureExceptGoldCN())	return new TableColumnSettlePrice($strStockDisplay);
 	return new TableColumnPrice($strStockDisplay, 90);						   	   
 }
-
-?>

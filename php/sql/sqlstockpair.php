@@ -6,7 +6,7 @@ class StockPairSql extends PairSql
     function GetSymbolArray($strPairSymbol = false)
     {
 		$sql = GetStockSql();
-		$arSymbol = array();
+		$arSymbol = [];
 		if ($strPairSymbol)
 		{
 			if ($strPairId = $sql->GetId($strPairSymbol))		$ar = $this->GetIdArray($strPairId);
@@ -79,5 +79,3 @@ class StockPairSql extends PairSql
 		return false;
 	}
 }
-
-?>

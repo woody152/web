@@ -23,12 +23,12 @@ class StockReference extends StockSymbol
     var $strSettlePrice = false;
     var $strVWAP;
     
-    var $arBidPrice = array();
-    var $arBidQuantity = array();
-    var $arAskPrice = array();
-    var $arAskQuantity = array();
+    var $arBidPrice = [];
+    var $arBidQuantity = [];
+    var $arAskPrice = [];
+    var $arAskQuantity = [];
 
-    var $bHasData = true;
+    private $bHasData = true;
     var $extended_ref = false;          // US stock extended trading StockReference
     
     public function __construct($strSymbol)
@@ -248,7 +248,6 @@ class StockReference extends StockSymbol
         	$iTime = $this->ConvertTick();
             $strDate = DebugGetDate($iTime, $strTimeZone);
             $strTime = DebugGetTime($iTime, $strTimeZone);
-//            DebugString(__FUNCTION__.': '.$strTimeZone.' '.$etf_ref->GetSymbol().' '.$etf_ref->GetDate().' '.$etf_ref->GetTimeHM().' vs '.$strDate.' '.$strTime, true);
         }
         if ($strDate != $etf_ref->GetDate())			return false;
         if (GetHM($strTime) != $etf_ref->GetTimeHM())	return false;
@@ -301,7 +300,6 @@ class StockReference extends StockSymbol
     {
         $this->strPrevPrice = $ar[2];
         $this->strPrice = $ar[3];
-//		$this->strPrice = ($ar[3] == '0.000') ? $ar[2] : $ar[3]; 
 		$this->strDate = $ar[30];
         $this->strTime = $ar[31];
         $this->strName = $ar[0];
@@ -343,11 +341,7 @@ class StockReference extends StockSymbol
         }
         $strTimeZone = $this->GetTimeZone();
         if ($strTimeZone != 'Asia/Shanghai')
-        {/*
-            $datetime = new DateTime($this->GetDateTime(), new DateTimeZone('Asia/Shanghai'));
-            $datetime->setTimezone(new DateTimeZone($strTimeZone));
-            $this->strDate = $datetime->format('Y-m-d');
-            $this->strTime = $datetime->format('H:i:s');*/
+        {
             if (date_default_timezone_get() != 'Asia/Shanghai')		date_default_timezone_set('Asia/Shanghai');
             $iTime = strtotime($this->GetDateTime());
             $this->strDate = DebugGetDate($iTime, $strTimeZone);
@@ -412,9 +406,7 @@ class StockReference extends StockSymbol
     function _onSinaFuture($ar)
     {
         $this->strPrice = $ar[0];
-//        $this->strTime = $ar[6];
         $this->strPrevPrice = $ar[7];
-//        $this->strDate = $ar[12];
 		$this->_convertDateTimeToUS($ar[12], $ar[6]);
 
         $this->strName = $ar[13];
@@ -422,8 +414,7 @@ class StockReference extends StockSymbol
         $this->strOpen = $ar[8];
         $this->strHigh = $ar[4];
         $this->strLow = $ar[5];
-//        $this->strVolume = $ar[9];	// 这是持仓量
-//        $this->strVolume = '0';
+        // $this->strVolume = $ar[9];	// 这是持仓量
     }
     
     function _onSinaFutureCN($ar)
@@ -499,7 +490,6 @@ class StockReference extends StockSymbol
 			$ar = explodeQuote($str);
 			if (count($ar) >= 10)
 			{
-//        		$this->strTime = $ar[0];
         		$this->strPrevPrice = $ar[3];
         		$this->strPrice = $ar[8];
         		if ($this->GetSymbol() == 'fx_sjpycny')
@@ -509,8 +499,6 @@ class StockReference extends StockSymbol
         		}
         		
         		$this->strName = $ar[9];
-//        		$this->strDate = $ar[10];
-//				$this->strDate = end($ar);
 				$this->_convertDateTimeToUS(end($ar), $ar[0]);
 				$this->strOpen = $ar[5];
 				$this->strHigh = $ar[6];
@@ -521,7 +509,6 @@ class StockReference extends StockSymbol
         $this->bHasData = false;
     }       
 }
-
 
 class ExtendedTradingReference extends StockReference
 {

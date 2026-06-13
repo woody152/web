@@ -25,7 +25,7 @@ class DailyTimeSql extends DailyCloseSql
     public function UpdateDaily($strId, $strClose)
     {
         $strTime = DebugGetTime();
-		return $this->UpdateById(array('close' => $strClose, 'time' => $strTime), $strId);
+		return $this->UpdateById(['close' => $strClose, 'time' => $strTime], $strId);
     }
 }
 
@@ -60,7 +60,7 @@ class CalibrationSql extends DailyTimeSql
     {
         $strTime = DebugGetTime();
         $strNum = strval($iNum);
-		return $this->UpdateById(array('close' => $strClose, 'time' => $strTime, 'num' => $strNum), $strId);
+		return $this->UpdateById(['close' => $strClose, 'time' => $strTime, 'num' => $strNum], $strId);
     }
     
     function WriteDailyAverage($strKeyId, $strDate, $strClose)
@@ -87,5 +87,3 @@ class CalibrationSql extends DailyTimeSql
     	return false;
     }
 }
-
-?>

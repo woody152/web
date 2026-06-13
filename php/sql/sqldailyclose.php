@@ -142,7 +142,7 @@ class DailyCloseSql extends KeySql
 
 	function MakeFieldArray($strKeyId, $strDate, $strClose)
     {
-    	return array_merge($this->MakeFieldKeyId($strKeyId), ['date' => $strDate, 'close' => $strClose]);
+    	return [...$this->MakeFieldKeyId($strKeyId), 'date' => $strDate, 'close' => $strClose];
     }
     
     public function InsertDaily($strKeyId, $strDate, $strClose)

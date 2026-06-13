@@ -121,7 +121,7 @@ class DebugCsvFile extends CsvFile
 
 class PageCsvFile extends DebugCsvFile
 {
-	var $arColumn = array();
+	var $arColumn = [];
 	var $iColumn;
 	
     public function __construct() 
@@ -145,11 +145,9 @@ class PageCsvFile extends DebugCsvFile
     {
     	unset($this->arColumn);	// array_splice($this->arColumn, 0);
     	
-    	$this->arColumn = array();
+    	$this->arColumn = [];
     	$this->iColumn = $iColumn;
     	$this->Read();
     	return $this->arColumn;
     }
 }
-
-?>

@@ -7,7 +7,7 @@ class _QdiiJpAccount extends QdiiGroupAccount
     {
         $strSymbol = $this->GetName();
         $arLev = $this->GetLeverageSymbols(QdiiJpGetEstSymbol($strSymbol));
-        StockPrefetchArrayExtendedData(array_merge($arLev, array($strSymbol)));
+        StockPrefetchArrayExtendedData([...$arLev, $strSymbol]);
 
         $this->ref = new QdiiJpReference($strSymbol);
 		$this->QdiiCreateGroup($arLev);
@@ -17,10 +17,11 @@ class _QdiiJpAccount extends QdiiGroupAccount
 function EchoAll()
 {
    	global $acct;
+	/** @var _QdiiJpAccount $acct */
    	$ref = $acct->GetRef();
    	
     EchoFundEstParagraph($ref);
-    EchoReferenceParagraph(array_merge($acct->GetStockRefArray(), $ref->GetForexRefArray()), $acct->IsAdmin());
+    EchoReferenceParagraph([...$acct->GetStockRefArray(), ...$ref->GetForexRefArray()], $acct->IsAdmin());
     $acct->EchoCommonParagraphs();
     if ($group = $acct->EchoTransaction()) 
     {
@@ -40,4 +41,3 @@ function GetQdiiJpLinks($sym)
 
    	$acct = new _QdiiJpAccount();
    	$acct->Create();
-?>

@@ -5,6 +5,7 @@ require_once('_updateinvesconetvalue.php');
 function _tradingUserDefined($strVal = false)
 {
 	global $acct;
+	/** @var QdiiGroupAccount $acct */
     
 	$arLev = $acct->GetLeverageRef();
 	$fund = $acct->GetRef();
@@ -48,7 +49,7 @@ function _callbackFundListHedge($strSymbol)
 
 class QdiiGroupAccount extends FundGroupAccount 
 {
-    var $ar_leverage_ref = array();
+    private $ar_leverage_ref = [];
     
     function QdiiCreateGroup($arLev)
     {
@@ -60,7 +61,7 @@ class QdiiGroupAccount extends FundGroupAccount
     	
         if (YahooUpdateNetValue($est_ref))
         {
-        	if ($est_ref->GetSymbol() == 'INDA')	$est_ref->DailyCalibration();
+        	// if ($est_ref->GetSymbol() == 'INDA')	$est_ref->DailyCalibration();
         }
         
         GetChinaMoney($stock_ref);
@@ -80,7 +81,7 @@ class QdiiGroupAccount extends FundGroupAccount
     		}
     		$leverage_ref->DailyCalibration();
     	}
-        $this->CreateGroup(array_merge($arRef, $this->ar_leverage_ref));
+        $this->CreateGroup([...$arRef, ...$this->ar_leverage_ref]);
     }
     
     function GetLeverageRef()
@@ -140,5 +141,3 @@ function GetMetaDescription()
     $str = '根据'.$strBase.'等其它网站的数据来源估算'.$acct->GetStockDisplay().STOCK_DISP_NETVALUE.'的网页工具。';
     return CheckMetaDescription($str);
 }
-
-?>

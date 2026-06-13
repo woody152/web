@@ -3,7 +3,7 @@ require_once('stocktable.php');
 
 function GetStockReferenceArray($ref, $bWide = false)
 {
-	$ar = array();
+	$ar = [];
 	
     if ($ref->HasData())
     {
@@ -30,7 +30,7 @@ function GetStockReferenceArray($ref, $bWide = false)
 // $ref from StockReference
 function _echoReferenceTableItem($ref, $strDescription, $bAdmin)
 {
-	$ar = array_merge(array($ref->GetExternalLink()), GetStockReferenceArray($ref));
+	$ar = [$ref->GetExternalLink(), ...GetStockReferenceArray($ref)];
 	$strFirstHint = false;
 	if ($strDescription)
 	{
@@ -77,11 +77,11 @@ END;
 
 function GetStockReferenceColumn()
 {
-	return array(new TableColumnPrice(),
-				   new TableColumnChange(),
-				   new TableColumnDate(),
-				   new TableColumnTime(),
-				   new TableColumnName());
+	return [new TableColumnPrice(),
+			new TableColumnChange(),
+			new TableColumnDate(),
+			new TableColumnTime(),
+			new TableColumnName()];
 }
 
 function EchoReferenceParagraph($arRef, $bAdmin = false)
@@ -89,7 +89,7 @@ function EchoReferenceParagraph($arRef, $bAdmin = false)
 	if ($_SESSION['mobile'])	$bAdmin = false;
 	
 	$str = '参考数据 '.GetTimeDisplay();
-	$ar = array_merge(array(new TableColumnSymbol()), GetStockReferenceColumn());
+	$ar = [new TableColumnSymbol(), ...GetStockReferenceColumn()];
 	array_pop($ar);
 	$ar[] = new TableColumnName(false, 270);
 	if ($bAdmin)	$ar[] = new TableColumn('调试数据', TableColumnGetLastWidth($ar));
@@ -100,5 +100,3 @@ function EchoReferenceParagraph($arRef, $bAdmin = false)
     	EchoTableParagraphEnd();
 	}	
 }
-
-?>

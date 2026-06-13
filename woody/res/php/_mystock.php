@@ -22,7 +22,7 @@ function _echoMyStockTransactions($acct, $ref, $strStockId)
 	$strMemberId = $acct->GetLoginId();
 	if ($strMemberId == false)	return;	
 	
-    $arGroup = array();
+    $arGroup = [];
     $sql = $acct->GetGroupSql();
 	if ($result = $sql->GetAll($strMemberId)) 
 	{
@@ -58,7 +58,7 @@ function _getFundOptionLinks($strSymbol)
 {
 	$str = ' '.GetStockOptionLink(STOCK_OPTION_NETVALUE, $strSymbol);
 	$str .= ' '.GetStockOptionLink(STOCK_OPTION_CALIBRATION, $strSymbol);
-	$str .= ' '.GetStockOptionLink(STOCK_OPTION_HOLDINGS, $strSymbol);
+	$str .= ' '.GetStockOptionHoldingsLink($strSymbol);
 	$str .= ' '.GetStockOptionLink(STOCK_OPTION_REPORT, $strSymbol);
 	return $str;
 }
@@ -253,5 +253,3 @@ function GetTitle()
 }
 
     $acct = new SymbolAccount();
-
-

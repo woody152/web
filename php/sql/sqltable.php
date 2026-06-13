@@ -2,7 +2,7 @@
 
 class TableSql
 {
-	var $strName;
+	private $strName;
 	
     public function __construct($strTableName) 
     {
@@ -30,7 +30,6 @@ class TableSql
     	$strTable = $this->Remove_id($str);
     	if ($strTable == 'ip')	
     	{
-//    		DebugString(__FUNCTION__.' ip INDEX', true);
     		return ' INDEX ( `ip_id` )';
     	}
 		return ' FOREIGN KEY (`'.$str.'`) REFERENCES `'.$strTable.'`(`id`) ON DELETE CASCADE ';
@@ -79,7 +78,6 @@ class TableSql
 
     function _query($strQuery, $strDie)
     {
-//    	DebugString($strQuery);
         return SqlDieByQuery($strQuery, $this->strName.' ['.$strQuery.'] '.$strDie);
 	}
 	
@@ -137,17 +135,19 @@ class TableSql
 
     function InsertArrays()
     {
-    	$arAll = array();
+    	$arAll = [];
     	foreach (func_get_args() as $ar)
     	{
-    		$arAll = array_merge($arAll, $ar);
+    		// array_push($arAll, ...$ar);
+			// $arAll = [...$arAll, ...$ar];
+			$arAll += $ar;
     	}
     	return $this->InsertArray($arAll);
     }
     
     function InsertId($strId)
     {
-        return $this->InsertArray(array('id' => $strId));
+        return $this->InsertArray(['id' => $strId]);
     }
     
     function UpdateArray($ar, $strWhere, $strLimit = false)
@@ -214,7 +214,7 @@ class TableSql
     
     function GetIdArray($strVal = false, $callback = 'GetAll')
     {
-		$ar = array();
+		$ar = [];
     	if (method_exists($this, $callback))
     	{
     		if ($result = $this->$callback($strVal))
@@ -245,10 +245,15 @@ class TableSql
     	return ($strWhere = _SqlBuildWhere_id($strId)) ? $this->DeleteData($strWhere) : false;
     }
 
+	public function GetAll()
+	{
+		return false;
+	}
+
     function DeleteInvalid($callback)
     {
-    	$ar = array();
-    	if ($result = $this->GetAll()) 
+    	$ar = [];
+    	if ($result = $this->GetAll())
     	{
     		while ($record = mysqli_fetch_assoc($result)) 
     		{
@@ -265,5 +270,3 @@ class TableSql
     	return $iCount;
     }
 }
-
-?>

@@ -57,7 +57,7 @@ function SqlUpdateLoginEmail($id, $strEmail)
 
 function SqlExecLogin($strEmail, $strPassword)
 {
-	if ($member = SqlGetSingleTableData(TABLE_MEMBER, _SqlBuildWhereAndArray(array('email' => $strEmail, 'password' => md5($strPassword)))))
+	if ($member = SqlGetSingleTableData(TABLE_MEMBER, _SqlBuildWhereAndArray(['email' => $strEmail, 'password' => md5($strPassword)])))
 	{	// Login Successful
 		return $member['id'];
 	}
@@ -160,5 +160,3 @@ function SqlDeleteProfileByMemberId($strMemberId)
 {
     return SqlDeleteTableData(TABLE_PROFILE, _SqlBuildWhere_member($strMemberId), '1');
 }
-
-?>

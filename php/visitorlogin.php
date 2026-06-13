@@ -28,5 +28,3 @@ function VisitorLogin($bChinese)
 	EchoHtmlElement(GetRemarkElement($str));
 	LayoutEnd();
 }
-
-?>

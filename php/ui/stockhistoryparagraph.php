@@ -3,7 +3,7 @@ require_once('stocktable.php');
 
 function _echoStockHistoryItem($record, $ref, $compare_ref, $forex_ref, $csv, $his_sql, $strCompareId, $strForexId, $bAdmin)
 {
-	$ar = array();
+	$ar = [];
 	
 	$strDate = $record['date'];
    	$ar[] = $bAdmin ? GetOnClickLink('/php/_submitdelete.php?'.'stockhistory'.'='.$record['id'], '确认删除'.$strDate.STOCK_HISTORY_DISPLAY.'？', $strDate) : $strDate;
@@ -62,7 +62,7 @@ function EchoStockHistoryParagraph($ref, $compare_ref = false, $forex_ref = fals
 	$his_sql = GetStockHistorySql();
     $strMenuLink = IsTableCommonDisplay($iStart, $iNum) ? '' : StockGetMenuLink($strSymbol, $his_sql->Count($strStockId), $iStart, $iNum);
     
-    $ar = array(new TableColumnDate(), new TableColumnPrice(), new TableColumnQuantity(false, 120));
+    $ar = [new TableColumnDate(), new TableColumnPrice(), new TableColumnQuantity(false, 120)];
 	$ar[] = $ref->IsSinaFuture() ? new TableColumnSettlePrice() : new TableColumnPrice('复权');
     if ($compare_ref)
     {
@@ -77,5 +77,3 @@ function EchoStockHistoryParagraph($ref, $compare_ref = false, $forex_ref = fals
     	EchoTableParagraphEnd($strMenuLink);
 	}
 }
-
-?>

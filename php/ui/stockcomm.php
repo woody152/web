@@ -20,8 +20,8 @@ function RefGetMyStockLink($ref)
 
 function RefSortByNumeric($arRef, $callback)
 {
-    $ar = array();
-    $arNum = array();
+    $ar = [];
+    $arNum = [];
     
     foreach ($arRef as $ref)
     {
@@ -31,7 +31,7 @@ function RefSortByNumeric($arRef, $callback)
     }
     asort($arNum, SORT_NUMERIC);
     
-    $arSort = array();
+    $arSort = [];
     foreach ($arNum as $strSymbol => $fNum)
     {
         $arSort[] = $ar[$strSymbol];
@@ -41,7 +41,7 @@ function RefSortByNumeric($arRef, $callback)
 
 function RefSortBySymbol($arRef)
 {
-    $ar = array();
+    $ar = [];
     foreach ($arRef as $ref)
     {
         $strSymbol = $ref->GetSymbol();
@@ -49,7 +49,7 @@ function RefSortBySymbol($arRef)
     }
     ksort($ar);
     
-    $arSort = array();
+    $arSort = [];
     foreach ($ar as $str => $ref)
     {
         $arSort[] = $ref;
@@ -71,5 +71,3 @@ function GetTurnoverDisplay($fVolume, $fShare, $iPrecision = 2)
 {
 	return GetNumberDisplay(100.0 * $fVolume / ($fShare * 10000.0), $iPrecision).'%';
 }
-
-?>

@@ -113,4 +113,3 @@ function GetTitle()
     $acct = new SymbolAccount();
 
 require('../../php/ui/_dispcn.php');
-?>

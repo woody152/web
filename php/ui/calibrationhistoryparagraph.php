@@ -5,7 +5,10 @@ function _echoCalibrationHistoryItem($fPosition, $ref, $record, $iMultiplier)
 {
 	$fCalibration = floatval($record['close']);
 	$strDate = $record['date'];
-	$ar = array($strDate, GetNumberDisplay($fCalibration, CALIBRATION_PRECISION), GetHM($record['time']), $record['num']);
+	$ar = [$strDate];
+	$ar[] = GetNumberDisplay($fCalibration, CALIBRATION_PRECISION);
+	$ar[] = GetHM($record['time']);
+	$ar[] = $record['num'];
 	if ($fPosition)
 	{
 		$ar[] = $ref->GetNetValueDisplay($ref->GetNetValue($strDate));
@@ -30,7 +33,7 @@ function EchoCalibrationHistoryParagraph($ref, $iStart = 0, $iNum = TABLE_COMMON
    		$strLink = GetFundListLink().' '.GetFundLinks($strSymbol).GetHtmlNewLine().$strMenuLink;
    	}
     
-   	$ar = array(new TableColumnDate(), new TableColumnCalibration(), new TableColumnTime(), new TableColumn('次数', 50));
+   	$ar = [new TableColumnDate(), new TableColumnCalibration(), new TableColumnTime(), new TableColumn('次数', 50)];
    	if ($ref->IsFundA())
    	{
     	$fPosition = $ref->GetPosition();
@@ -77,5 +80,3 @@ function EchoCalibrationHistoryParagraph($ref, $iStart = 0, $iNum = TABLE_COMMON
     	EchoTableParagraphEnd($strMenuLink);
 	}
 }
-
-?>

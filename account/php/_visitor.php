@@ -4,7 +4,7 @@ require_once('../php/iplookup.php');
 require_once('../php/ui/table.php');
 require_once('../php/sql/sqlbotvisitor.php');
 
-define('MAX_VISITOR_CONTENTS', 35);
+const MAX_VISITOR_CONTENTS = 35;
 function _getVisitorContentsDisplay($strContents)
 {
     if (strlen($strContents) > MAX_VISITOR_CONTENTS)
@@ -19,18 +19,16 @@ function _echoVisitorData($strId, $visitor_sql, $contents_sql, $iStart, $iNum, $
 {
 	global $acct;
 	
-    $arBlogId = array();
-    $arId = array();
+    $arBlogId = [];
+    $arId = [];
     $strType = $contents_sql->GetTableName();
-
     if ($result = $visitor_sql->GetDataBySrc($strId, $iStart, $iNum)) 
     {
    		$strDstIndex = $visitor_sql->GetDstKeyIndex();
    		$strSrcIndex = $visitor_sql->GetSrcKeyIndex();
         while ($record = mysqli_fetch_assoc($result)) 
         {
-			$ar = array($record['date'], GetHM($record['time']));
-
+			$ar = [$record['date'], GetHM($record['time'])];
 			$strDstId = $record[$strDstIndex];
 			if ($strType == TABLE_BOT_MSG)
 			{
@@ -62,7 +60,7 @@ function _echoVisitorData($strId, $visitor_sql, $contents_sql, $iStart, $iNum, $
 
 function _echoVisitorParagraph($strIp, $strId, $visitor_sql, $contents_sql, $iStart, $iNum, $bAdmin, $bChinese)
 {
-	$ar = array(new TableColumnDate(false, $bChinese), new TableColumnTime($bChinese), new TableColumn(($bChinese ? '内容' : 'Contents'), MAX_VISITOR_CONTENTS * 10));
+	$ar = [new TableColumnDate(false, $bChinese), new TableColumnTime($bChinese), new TableColumn(($bChinese ? '内容' : 'Contents'), MAX_VISITOR_CONTENTS * 10)];
     
 	$str = ' ';
     if ($strIp)
@@ -97,6 +95,7 @@ function _echoVisitorParagraph($strIp, $strId, $visitor_sql, $contents_sql, $iSt
 function EchoAll($bChinese = true)
 {
     global $acct;
+	/** @var IpLookupAccount $acct */
     
     $strIp = $acct->GetQuery();
 	if (filter_valid_ip($strIp) == false)
@@ -167,5 +166,4 @@ function GetMetaDescription($bChinese = true)
     return CheckMetaDescription($str);
 }
 
-   	$acct = new IpLookupAccount('ip', true);	// Auth to  restrict robot ip lookup
-?>
+   	$acct = new IpLookupAccount('ip', true);	// Auth to restrict robot ip lookup

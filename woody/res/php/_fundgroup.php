@@ -68,4 +68,3 @@ class FundGroupAccount extends GroupAccount
     	return RefGetStockDisplay($stock_ref).$str;
     }
 }
-

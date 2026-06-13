@@ -39,5 +39,3 @@ function EchoUrlSymbol()
         echo $strSymbol;
     }
 }
-
-?>
