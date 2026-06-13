@@ -126,6 +126,7 @@ function _echoAccountFundAmount($strMemberId, $bChinese)
 function EchoAll($bChinese = true)
 {
     global $acct;
+	/** @var _ProfileAccount $acct */
     
     $strMsg = $acct->GetMsg();
     if ($strMsg)    _echoAccountProfileMsg($strMsg, $bChinese);
@@ -154,8 +155,8 @@ function EchoAll($bChinese = true)
 	        $strSignature = '';
 	    }
 	    
-	    if ($bChinese)    _echoAccountProfileChinese($member, $strName, $strPhone, $strAddress, $strWeb, $strSignature);
-	    else    	        _echoAccountProfileEnglish($member, $strName, $strPhone, $strAddress, $strWeb, $strSignature);
+	    if ($bChinese)	_echoAccountProfileChinese($member, $strName, $strPhone, $strAddress, $strWeb, $strSignature);
+	    else			_echoAccountProfileEnglish($member, $strName, $strPhone, $strAddress, $strWeb, $strSignature);
 	}
 	
 	$acct->_echoAccountBlogComments($strMemberId, $bChinese);
@@ -190,7 +191,7 @@ function GetTitle($bChinese = true)
 function _changePassword($strPassword, $strPassword2)
 {
 	$member = SqlGetMemberById($_SESSION['SESS_ID']);
-	$arErrMsg = array();	// Array to store validation errors
+	$arErrMsg = [];
 
 	// Input Validations
 	if ($strPassword == '')							    $arErrMsg[] = ACCT_ERR_PASSWORD_INPUT;
@@ -209,7 +210,7 @@ function _changePassword($strPassword, $strPassword2)
 function _updateLoginEmail($strEmail)
 {
 	$member = SqlGetMemberById($_SESSION['SESS_ID']);
-	$arErrMsg = array();	// Array to store validation errors
+	$arErrMsg = [];
 
 	// Input Validations
 	if (filter_var_email($strEmail))
@@ -236,8 +237,8 @@ function _updateLoginEmail($strEmail)
 function _emailReport($strText, $strSubject, $strWho) 
 {
 	$strNewLine = GetHtmlNewLine();
-	$str = $strWho.':'.$strNewLine.$strSubject;
-    if ($strText)		$str .= $strNewLine.$strText;
+	$str = "$strWho:$strNewLine{$strSubject}";
+    if ($strText)	$str .= "$strNewLine{$strText}";
 	if (EmailHtml($strWho, $strSubject, $str) == false)
 	{
         DebugString('mail failed in _emailReport');
@@ -247,7 +248,7 @@ function _emailReport($strText, $strSubject, $strWho)
 
 class _ProfileAccount extends CommentAccount
 {
-	var $strMsg = false;
+	private $strMsg = false;
 	
 	function GetMsg()
 	{
@@ -277,7 +278,7 @@ class _ProfileAccount extends CommentAccount
 
 	function _loginAccount($strEmail, $strPassword)
 	{
-		$arErrMsg = array();	// Array to store validation errors
+		$arErrMsg = [];
 
 		// Input Validations
 		if (!filter_var_email($strEmail))		$arErrMsg[] = ACCT_ERR_EMAIL_INPUT;
@@ -295,7 +296,7 @@ class _ProfileAccount extends CommentAccount
 
 	function _registerAccount($strEmail, $strPassword, $strPassword2)
 	{
-		$arErrMsg = array();	// Array to store validation errors
+		$arErrMsg = [];
 
 		// Input Validations
 		if (filter_var_email($strEmail))
@@ -337,7 +338,7 @@ class _ProfileAccount extends CommentAccount
 	
 	function _remindPassword($strEmail)
 	{
-		$arErrMsg = array();	// Array to store validation errors
+		$arErrMsg = [];
 		if (filter_var_email($strEmail))
 		{
 			if (!SqlGetIdByEmail($strEmail))
@@ -377,7 +378,7 @@ class _ProfileAccount extends CommentAccount
 
 	function _closeAccount($strEmail)
 	{
-		$arErrMsg = array();	// Array to store validation errors
+		$arErrMsg = [];
 		if (filter_var_email($strEmail))
 		{
 			if ($strId = SqlGetIdByEmail($strEmail))
@@ -492,4 +493,3 @@ class _ProfileAccount extends CommentAccount
 
 	$acct = new _ProfileAccount();
 	$acct->Run();
-?>

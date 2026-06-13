@@ -83,64 +83,29 @@ function GetBlogLink($iDate, $bChinese = true, $bLink = true)
 
 function GetBlogTitle($iDate, $bChinese = true, $bLink = true)
 {
-	$strDisplay = GetBlogLink($iDate, $bChinese, $bLink); 
-	switch ($iDate)
+	$strDisplay = GetBlogLink($iDate, $bChinese, $bLink);
+	$strTitle = match($iDate)
 	{
-	case 20250223:
-		$strTitle = $bChinese ? '一个新的'.$strDisplay.'跨市场套利软件工具' : 'A New Arbitrage Software Tool for '.$strDisplay;
-		break;
-		
-	case 20230614:
-		$strTitle = $bChinese ? '纳斯达克100期货升水和'.$strDisplay.'的关系' : 'Nasdaq 100 Futures Premium and '.$strDisplay;
-		break;
-		
-	case 20201205:
-		$strTitle = $bChinese ? $strDisplay.'私募的作业' : 'Homework for '.$strDisplay.' Private Equity';
-		break;
-
-	case 20200915:
-		$strTitle = $bChinese ? '跟踪'.$strDisplay.'的SZ161130近期溢价申购套利回顾' : 'Recent Trading of SZ161130 Tracking '.$strDisplay;
-		break;
-		
-	case 20200424:
-		$strTitle = $bChinese ? '原油'.$strDisplay.'和油轮运价的对照计算' : 'Crude Oil '.$strDisplay.' and Tanker Rate';
-		break;
-		
-	case 20161014:
-		$strTitle = $bChinese ? 'Palmmicro'.$strDisplay : 'Palmmicro '.$strDisplay;
-		break;
-		
-	case 20150818:
-		$strTitle = $bChinese ? $strDisplay.STOCK_DISP_NETVALUE.'估算的PHP程序' : 'PHP Application to Estimate '.$strDisplay.' Net Value';
-		break;
-		
-	case 20141204:
-		$strTitle = $bChinese ? $strDisplay.'的由来' : 'The Origin of '.$strDisplay;
-		break;
-		
-	case 20141016:
-		$strTitle = $bChinese ? '从上证大型国有'.$strDisplay.'获利' : 'Trading Rules for Giant Chinese State-owned '.$strDisplay;
-		break;
-		
-	case 20110509:
-		$strTitle = $strDisplay.($bChinese ? '投放的广告' : ' AdSense');
-		break;
-		
-	case 20100905:
-		$strTitle = $bChinese ? '我的第一个'.$strDisplay.'程序' : 'My First '.$strDisplay.' Application';
-		break;
-		
-	case 20080326:
-		$strTitle = $bChinese ? $strDisplay.'域名的历史' : 'The History of '.$strDisplay.' Domain';
-		break;
-	}
+		20250223 => $bChinese ? "一个新的{$strDisplay}跨市场套利软件工具" : "A New Arbitrage Software Tool for $strDisplay",
+		20230614 => $bChinese ? "纳斯达克100期货升水和{$strDisplay}的关系" : "Nasdaq 100 Futures Premium and $strDisplay",
+		20201205 => $bChinese ? "{$strDisplay}私募的作业" : "Homework for $strDisplay Private Equity",
+		20200915 => $bChinese ? "跟踪{$strDisplay}的SZ161130近期溢价申购套利回顾" : "Recent Trading of SZ161130 Tracking $strDisplay",
+		20200424 => $bChinese ? "原油{$strDisplay}和油轮运价的对照计算" : "Crude Oil $strDisplay and Tanker Rate",
+		20161014 => $bChinese ? "Palmmicro{$strDisplay}" : "Palmmicro $strDisplay",
+		20150818 => $bChinese ? $strDisplay.STOCK_DISP_NETVALUE.'估算的PHP程序' : "PHP Application to Estimate $strDisplay Net Value",
+		20141204 => $bChinese ? "{$strDisplay}的由来" : "The Origin of $strDisplay",
+		20141016 => $bChinese ? "从上证大型国有{$strDisplay}获利" : "Trading Rules for Giant Chinese State-owned $strDisplay",
+		20110509 => $strDisplay.($bChinese ? '投放的广告' : ' AdSense'),
+		20100905 => $bChinese ? "我的第一个{$strDisplay}程序" : "My First $strDisplay Application",
+		20080326 => $bChinese ? "{$strDisplay}域名的历史" : "The History of $strDisplay Domain"
+	};
 
 	if ($bLink)
 	{
 		$strPage = UrlGetPage();
 		$strDate = strval($iDate);
 		$strDate = ($strPage == 'blog' || str_starts_with($strPage, 'photo')) ? GetBlogMonthDay($strDate, $bChinese) : GetBlogYmd($strDate, $bChinese); 
-		return $strDate.' '.$strTitle;
+		return "$strDate $strTitle";
 	}
 	return $strTitle;
 }
@@ -150,7 +115,7 @@ function IsDigitDate($strDate)
 	if (strlen($strDate) != 8)
 	{	// IMG_20231005_154925
 		$strPattern = '/IMG_(\d{8})_\d{6}/';
-//    	$arMatches = array();
+		// $arMatches = [];
 		return preg_match($strPattern, $strDate, $arMatches) ? $arMatches[1] : false;
 	}
 	return is_numeric($strDate) ? $strDate : false;
@@ -164,7 +129,7 @@ function GetPhotoDirLink($strDate, $bChinese = true, $bMonthDay = true)
 
 function GetPhotoParagraph($strPathName, $strText = '', $bChinese = true, $strExtra = '')
 {
-	$str = $strExtra.' '.ImgAutoQuote($strPathName, $strText, $bChinese);
+	$str = "$strExtra ".ImgAutoQuote($strPathName, $strText, $bChinese);
 	if ($strDate = IsDigitDate(basename($strPathName, '.jpg')))
 	{
 		$str = GetBlogMonthDay($strDate, $bChinese).' '.$str;
@@ -176,7 +141,7 @@ function ImgPortfolio20141016($bChinese = true)
 {
 	$strDate = '20141016';
 	$strYmd = GetBlogYmd($strDate, $bChinese);
-	return GetWoodyImgQuote($strDate.'.jpg', $strYmd.'A股持仓截屏', 'Screen shot of my Chinese A stock portfolio as of '.$strYmd.'.', $bChinese);
+	return GetWoodyImgQuote("{$strDate}.jpg", "{$strYmd}A股持仓截屏", "Screen shot of my Chinese A stock portfolio as of $strYmd.", $bChinese);
 }
 
 function ImgWoody20060701($bChinese = true)
@@ -187,24 +152,22 @@ function ImgWoody20060701($bChinese = true)
 function ImgWoody20190128($bChinese = true)
 {
 	$strYmd = GetBlogYmd('20190128', $bChinese);
-	return GetWoodyImgQuote('20190128.jpg', $strYmd.'San Gabriel的麻辣香锅', $strYmd.'. Woody. 301 W Valley Blvd, Ste 101, San Gabriel, CA.', $bChinese);
+	return GetWoodyImgQuote('20190128.jpg', "{$strYmd}San Gabriel的麻辣香锅", "$strYmd Woody. 301 W Valley Blvd, Ste 101, San Gabriel, CA.", $bChinese);
 }
 
 function ImgWorriedWoody($bChinese = true)
 {
-	return ImgAutoQuote('/woody/image/20141121/E55A5341.JPG', ($bChinese ? '我们两个都有点发愁' : 'Woody and Mia Lin are both worried!'), $bChinese);
+	return ImgAutoQuote('/woody/image/20141121/E55A5341.JPG', $bChinese ? '我们两个都有点发愁' : 'Woody and Mia Lin are both worried!', $bChinese);
 }
 
 function ImgSnowballCarnival($bChinese = true)
 {
-	return ImgAutoQuote('/woody/myphoto/2020/20201205.jpg', ($bChinese ? '2020年雪球嘉年华之夜' : '2020 Snowball carnival night'), $bChinese);
+	return ImgAutoQuote('/woody/myphoto/2020/20201205.jpg', $bChinese ? '2020年雪球嘉年华之夜' : '2020 Snowball carnival night', $bChinese);
 }
 
 function ImgCMENQ20230614($bChinese = true)
 {
 	$strDate = '20230614';
 	$strYmd = GetBlogYmd($strDate, $bChinese);
-	return ImgAutoQuote(PATH_BLOG_PHOTO.$strDate.'.jpg', ($bChinese ? $strYmd.'纳斯达克100期货和现货价格比较' : 'Nasdaq 100 futures and market price comparison on '.$strYmd.'.'), $bChinese);
+	return ImgAutoQuote(PATH_BLOG_PHOTO.$strDate.'.jpg', $bChinese ? "{$strYmd}纳斯达克100期货和现货价格比较" : "Nasdaq 100 futures and market price comparison on $strYmd.", $bChinese);
 }
-
-?>

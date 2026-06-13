@@ -7,15 +7,15 @@ require_once('ui/commentparagraph.php');
 
 function _getIpInfoIpLookUpUrl($strIp)
 {
-//    return GetIpInfoUrl().$strIp.'/json';
-	return GetIpInfoUrl().'json/'.$strIp.'?fields=status,country,regionName,city,lat,lon,org,reverse';
+	// return GetIpInfoUrl().$strIp.'/json';
+	return GetIpInfoUrl().'json/'.$strIp.'?fields=status,country,regionName,city,org,reverse';
 }
 
 function strstr_array($strHaystack, $arNeedle)
 {
 	foreach ($arNeedle as $strNeedle)
 	{
-		if (stripos($strHaystack, $strNeedle) !== false)		return true;
+		if (stripos($strHaystack, $strNeedle) !== false)	return true;
 	}
 	return false;
 }
@@ -28,7 +28,7 @@ function _ipLookupMemberTable($strIp, $strNewLine, $bChinese)
         while ($record = mysqli_fetch_assoc($result)) 
         {
             $strLink = GetMemberLink($record['id'], $bChinese);
-            $str .= $strNewLine.$strLink.($bChinese ? '登录于' : ' login on ').$record['login'];
+            $str .= "$strNewLine{$strLink}".($bChinese ? '登录于' : ' login on ').$record['login'];
         }
         mysqli_free_result($result);
     }
@@ -111,7 +111,7 @@ class IpLookupAccount extends CommentAccount
     	$str = GetVisitorLink($strIp, $bChinese).' '.GetAllVisitorLink(TABLE_VISITOR, $bChinese);
     	if ($this->IsAdmin())		$str .= ' '.GetAllVisitorLink(TABLE_TELEGRAM_BOT, $bChinese).' '.GetAllVisitorLink(TABLE_WECHAT_BOT, $bChinese);
 		$strNewLine = GetHtmlNewLine();
-    	$str .= $strNewLine.GetExternalLink(_getIpInfoIpLookUpUrl($strIp), 'IP地址详情').': ';
+    	$str .= $strNewLine.GetExternalLink(_getIpInfoIpLookUpUrl($strIp), '详情').': ';
     	if ($arInfo = $this->_ipInfoLookUp($strIp))
     	{
     		/*if (isset($arInfo['error']) == false)
@@ -122,17 +122,24 @@ class IpLookupAccount extends CommentAccount
     		}*/
     		if (isset($arInfo['status']))
     		{
-				if ($arInfo['status'] == 'success')
+				$strStatus = $arInfo['status'];
+				switch ($strStatus)
 				{
-    				$str .= $arInfo['country'].' '.$arInfo['regionName'].' '.$arInfo['city'].' ['.$arInfo['lat'].', '.$arInfo['lon'].'] ';
-					$str .= $arInfo['org'].' '.$arInfo['reverse'];
-				}
+				case 'success':
+					unset($arInfo['status']);
+					$str .= implode(', ', $arInfo);
+					break;
+
+				default:
+					$str .= $strStatus;
+					break;
+				}	
     		}
     	}
     	$str .= DebugGetStopWatchDisplay($fStart);
     
-    	$str .= _ipLookupMemberTable($strIp, $strNewLine, $bChinese);		// Search member login
-    	$str .= $this->_pageCommentLookup($strIp, $bChinese);  		// Search blog comment
+    	$str .= _ipLookupMemberTable($strIp, $strNewLine, $bChinese);	// Search member login
+    	$str .= $this->_pageCommentLookup($strIp, $bChinese);  			// Search blog comment
     	$str .= $this->_visitorLookup($strIp, $bChinese);
     	return $str;
     }

@@ -16,7 +16,7 @@ function SqlDeleteStockGroup($strGroupName)
 {
 	$group_sql = new StockGroupSql();
 	$iCount = $group_sql->CountByString($strGroupName); 
-	DebugVal($iCount, 'Total stock group named '.$strGroupName);
+	DebugVal($iCount, "Total stock group named $strGroupName");
 	if ($iCount > 0)	$group_sql->DeleteByString($strGroupName);
 }
 
@@ -38,8 +38,8 @@ function SqlClearStockGroupItem()
    			{
    				$iCount ++;
    				$ar[] = $record['id'];
-   				$strDebug = 'Missing group id: '.$strGroupId;
-   				if ($strSymbol = $sql->GetStockSymbol($record['stock_id']))	$strDebug .= ' with '.$strSymbol.' '.$sql->GetStockName($strSymbol);
+   				$strDebug = "Missing group id: $strGroupId";
+   				if ($strSymbol = $sql->GetStockSymbol($record['stock_id']))	$strDebug .= " with $strSymbol ".$sql->GetStockName($strSymbol);
    				DebugString($strDebug);
     		}
     	}
@@ -70,7 +70,7 @@ function SqlCleanStockTransaction()
    			{
    				$iCount ++;
    				$ar[] = $record['id'];
-   				DebugString('Missing stock group item id: '.$strItemId);
+   				DebugString("Missing stock group item id: $strItemId");
     		}
     	}
    		mysqli_free_result($result);
@@ -85,7 +85,7 @@ function SqlCleanStockTransaction()
 
 class _AdminDeleteAccount extends Account
 {
-	function DeleteVisitorByIp($strIp)
+	private function _deleteVisitorByIp($strIp)
 	{
 		if ($strId = GetIpId($strIp))
 		{
@@ -100,8 +100,9 @@ class _AdminDeleteAccount extends Account
 
     public function AdminProcess()
     {
-    	if ($strPathName = UrlGetQueryValue('file'))
+    	if ($strName = UrlGetQueryValue('file'))
     	{
+			$strPathName = UrlModifyRootFileName($strName);
     		unlinkEmptyFile($strPathName);
     		trigger_error('Deleted debug file: '.GetFileLink($strPathName, true)); 
     	}
@@ -113,7 +114,7 @@ class _AdminDeleteAccount extends Account
     	}
     	else if ($strIp = UrlGetQueryValue('ip'))
     	{
-    		$this->DeleteVisitorByIp($strIp);
+    		$this->_deleteVisitorByIp($strIp);
     	}
     	else
     	{

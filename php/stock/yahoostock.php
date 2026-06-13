@@ -322,7 +322,7 @@ function _yahooStockGetData($strSymbol, $strStockId)
     		if ($net_sql->WriteDaily($strStockId, $strDate, $strNetValue))
     		{
     			DebugString(__FUNCTION__.' Update net value for '.$strSymbol.' '.$strDate.' '.$strNetValue);
-    			return array($strNetValue, $strDate);
+    			return [$strNetValue, $strDate];
     		}
 		}
    	}

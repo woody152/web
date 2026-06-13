@@ -7,23 +7,21 @@ function _getEditEmailSubmit($strPage, $bChinese)
 {
     if ($bChinese)
     {
-        $ar = array('closeaccount' => EDIT_EMAIL_CLOSE_CN,
-                      'login' => EDIT_EMAIL_LOGIN_CN,
-                      'password' => EDIT_EMAIL_PASSWORD_CN,
-                      'register' => EDIT_EMAIL_REGISTER_CN,
-                      'reminder' => EDIT_EMAIL_REMINDER_CN,
-                      'updateemail' => EDIT_EMAIL_UPDATE_CN,
-                     );
+        $ar = ['closeaccount' => EDIT_EMAIL_CLOSE_CN,
+               'login' => EDIT_EMAIL_LOGIN_CN,
+               'password' => EDIT_EMAIL_PASSWORD_CN,
+               'register' => EDIT_EMAIL_REGISTER_CN,
+               'reminder' => EDIT_EMAIL_REMINDER_CN,
+               'updateemail' => EDIT_EMAIL_UPDATE_CN];
     }
     else
     {
-         $ar = array('closeaccount' => EDIT_EMAIL_CLOSE,
-                      'login' => EDIT_EMAIL_LOGIN,
-                      'password' => EDIT_EMAIL_PASSWORD,
-                      'register' => EDIT_EMAIL_REGISTER,
-                      'reminder' => EDIT_EMAIL_REMINDER,
-                      'updateemail' => EDIT_EMAIL_UPDATE,
-                     );
+        $ar = ['closeaccount' => EDIT_EMAIL_CLOSE,
+               'login' => EDIT_EMAIL_LOGIN,
+               'password' => EDIT_EMAIL_PASSWORD,
+               'register' => EDIT_EMAIL_REGISTER,
+               'reminder' => EDIT_EMAIL_REMINDER,
+               'updateemail' => EDIT_EMAIL_UPDATE];
     }
 	return $ar[$strPage];
 }
@@ -97,4 +95,3 @@ function GetTitle($bChinese = true)
 		$acct->Auth();
 		break;
     }
-?>

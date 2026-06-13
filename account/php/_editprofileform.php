@@ -1,17 +1,17 @@
 <?php
 
-define('ACCOUNT_PROFILE_EDIT', 'Edit Account Profile');
-define('ACCOUNT_PROFILE_EDIT_CN', '修改帐号资料');
+const ACCOUNT_PROFILE_EDIT = 'Edit Account Profile';
+const ACCOUNT_PROFILE_EDIT_CN = '修改帐号资料';
 
 function EditProfileForm($strSubmit, $strMemberId)
 {
     if ($strSubmit == ACCOUNT_PROFILE_EDIT_CN)
     {
-        $arColumn = array('名字', '电话', '地址', '网址', '签名档', '接收palmmicro邮件', '否', '是');
+        $arColumn = ['名字', '电话', '地址', '网址', '签名档', '接收palmmicro邮件', '否', '是'];
     }
     else
     {
-        $arColumn = array('Name', 'Phone', 'Address', 'Web', 'Signature', 'Receive palmmicro email', 'No', 'Yes');
+        $arColumn = ['Name', 'Phone', 'Address', 'Web', 'Signature', 'Receive palmmicro email', 'No', 'Yes'];
     }
 
     $strPassQuery = UrlPassQuery();
@@ -73,5 +73,3 @@ function EditProfileForm($strSubmit, $strMemberId)
 </form>
 END;
 }
-
-?>

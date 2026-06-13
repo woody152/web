@@ -1,6 +1,6 @@
 <?php
 
-define('MAX_COMMENT_DISPLAY', 5);
+const MAX_COMMENT_DISPLAY = 5;
 
 function EchoCommentLinkParagraph($str, $strQuery, $bChinese)
 {
@@ -11,7 +11,7 @@ function EchoCommentLinkParagraph($str, $strQuery, $bChinese)
 
 class CommentAccount extends TitleAccount
 {
-	var $comment_sql;
+	private $comment_sql;
 	
     public function __construct($strQueryItem = false, $arLoginTitle = false) 
     {
@@ -86,12 +86,12 @@ class CommentAccount extends TitleAccount
 
     	$strIp = GetIpLink(GetIp($record['ip_id']), $bChinese);
 		$strUri = $this->GetPageUri($record['page_id']);
-//		$strTimeLink = "<a href=\"$strUri#{$record['id']}\">$strTime</a>";
+		// $strTimeLink = "<a href=\"$strUri#{$record['id']}\">$strTime</a>";
 		$strTimeLink = GetNameLink($record['id'], $strTime, $strUri);
 		
 		if (strpos($strWhere, 'page_id') !== false)
 		{
-//			$strTimeLink = "<b><a name=\"{$record['id']}\">$strTime</a></b>";
+			// $strTimeLink = "<b><a name=\"{$record['id']}\">$strTime</a></b>";
 			$strTimeLink = GetNameTag($record['id'], $strTime);
 		}
 		else if (strpos($strWhere, 'member_id') !== false)
@@ -134,5 +134,3 @@ END;
     	}
     }
 }
-
-?>

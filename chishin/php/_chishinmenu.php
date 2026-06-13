@@ -6,7 +6,7 @@ require_once('../php/ui/link.php');
 
 function _menuChishinBlogGroup($bChinese)
 {
-    $arBlog = array('20170512', '20170517', '20170523', '20170524', '20180426', '20180429', '20180504', '20180508', '20180512', '20180513', '20180515', '20180519', '20180521');
+    $arBlog = ['20170512', '20170517', '20170523', '20170524', '20180426', '20180429', '20180504', '20180508', '20180512', '20180513', '20180515', '20180519', '20180521'];
     
 	MenuBegin();
     MenuDirFirstLast($arBlog);
@@ -25,4 +25,3 @@ function _LayoutBottom($bChinese = true, $bAdsense = true)
 }
 
    	$acct = new EditCommentAccount();
-?>

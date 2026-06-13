@@ -15,7 +15,11 @@ const TG_CAST_CHAT_ID = '-1001346320717';	// @palmmicrochan
 
 function _inBlackList($strIp)
 {
-	$ar = ['36.143.159.189', '66.90.98.35', '203.10.99.42'];
+	$ar = ['36.143.159.189',
+		   '66.90.98.35',
+		   '119.135.210.182',
+		   '120.229.113.243',
+		   '203.10.99.42'];
 	foreach ($ar as $str)
 	{
 		if (isIpInSubnetAuto($strIp, $str))		return true;
