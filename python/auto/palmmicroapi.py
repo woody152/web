@@ -1,35 +1,73 @@
+import math
 import re
+from typing import Any, Dict, Optional
 
-def convert_symbol(symbol):
+def _get_floor_quantity(fQuantity: float) -> float:
+    fQuantity /= 100.0
+    return math.floor(fQuantity) * 100.0
+
+def convert_symbol(strSymbol: str) -> str:
 	# 匹配 ^XXX-YY 格式，并提取 XXX 部分
 	pattern = r'^\^([A-Z]+)-[A-Z]{2}$'
-	match = re.match(pattern, symbol)
+	match = re.match(pattern, strSymbol)
 	if match:
 		return match.group(1)  # 返回符号主体部分
 	else:
-		return symbol  # 不符合格式则返回原字符串
+		return strSymbol  # 不符合格式则返回原字符串
 
 class PalmmicroAPI:
-	def __init__(self, config_dict):
+	MAX_HEDGE_QUANTITY = 100000
+
+	# 定义并初始化字典静态变量 arMultiplier，使用 strSymbol 作为键（整数倍率）
+	arMultiplier: Dict[str, int] = {'hf_CL': 100,	# MCL:100, CL:1000
+									'hf_ES': 5,		# MES
+									'hf_GC': 10,	# MGC:10, GC:1000
+									'hf_NQ': 2,		# MNQ
+									'nf_AG0': 15,
+									'default': 1}	# 默认倍率
+	
+
+	def __init__(self, config_dict: Dict[str, Any]) -> None:
 		"""
-        使用字典初始化API
-        
-        参数:
-            config_dict: 包含配置参数的字典
-        """
+		使用字典初始化API
+
+		参数:
+			config_dict: 包含配置参数的字典
+		"""
 		self.config = config_dict
-    
+
 	def get_config(self):
 		"""返回当前配置字典"""
 		return self.config
-    
-	def get_param(self, key, default=None):
+
+	def get_param(self, key, default = None):
 		"""获取指定配置参数的值"""
 		return self.config.get(key, default)
-    
+	
+	def get_next_param(self, ar, default = None):
+		return self.config.get(ar['symbol_hedge'], default)
+
 	def set_param(self, key, value):
 		"""设置/更新配置参数"""
 		self.config[key] = value
+
+	@classmethod
+	def get_multiplier(cls, strSymbol):
+		"""根据 strSymbol 获取倍率"""
+		return cls.arMultiplier.get(strSymbol, cls.arMultiplier.get('default', 1))
+
+	@classmethod
+	def set_multiplier(cls, strSymbol, value):
+		"""设置指定 symbol 的倍率（确保为整数）"""
+		if not isinstance(value, int):
+			try:
+				value = int(value)
+			except ValueError:
+				print(f"✗ 错误: {value} 无法转换为整数")
+				return False
+		cls.arMultiplier[strSymbol] = value
+		print(f"✓ 已设置倍率 {strSymbol}: {value} (整数)")
+		return True
 
 	@staticmethod
 	def _get_CNY(ar, arSrc):
@@ -84,54 +122,85 @@ class PalmmicroAPI:
 		fTotal /= 100.0
 		return float(ar['netvalue']) * (1.0 + float(ar['position']) * (fTotal * fCny / float(ar['CNYholdings']) - 1.0))
 
-	def EstNetValue(self, strSymbol, arSrc = None):
+	def EstNetValue(self, strSymbol: str, arSrc: Optional[Dict[str, float]] = None) -> float:
 		fEst = 0.0
-		if strSymbol in self.config:
-			ar = self.config[strSymbol]
+		ar = self.get_param(strSymbol)
+		if ar != None:
 			if 'calibration' in ar:
 				strHedgeSymbol = ar['symbol_hedge']
-				if strHedgeSymbol in self.config:   # strSymbol in [SZ161125, SZ161130]
+				arHedge = self.get_param(strHedgeSymbol)
+				if arHedge != None:
+					arCopy = None
 					if arSrc != None:	# 需要二次计算
-						arHedge = self.config[strHedgeSymbol]
-						if strHedgeSymbol in arSrc:	# strHedgeSymbol in [SPY, QQQ]
+						fIndex = None
+						if strHedgeSymbol in arSrc:		# strHedgeSymbol in [SPY, QQQ]
 							fIndex = self._reverse_calc_with_calibration(arHedge, strHedgeSymbol, {strHedgeSymbol:arSrc[strHedgeSymbol]})
-						else:	# strFutureSymbol in [hf_ES, hf_NQ]
-							strIndexSymbol = arHedge['symbol_hedge']
-							arIndex = self.config[strIndexSymbol]
-							strFutureSymbol = arIndex['symbol_hedge']
-							fIndex = self._calc_with_calibration(arIndex, {strFutureSymbol:arSrc[strFutureSymbol]})
-						arCopy = arSrc.copy()
-						arCopy[strHedgeSymbol] = fIndex
-						fEst = self._calc_with_calibration(ar, arCopy)
-					else:
-						fEst = self._calc_with_calibration(ar)	# 直接算官方估值
+						else:
+							arIndex = self.get_next_param(arHedge)
+							if arIndex != None:
+								strFutureSymbol = arIndex['symbol_hedge']
+								if strFutureSymbol in arSrc:	# strFutureSymbol in [hf_ES, hf_NQ]
+									fIndex = self._calc_with_calibration(arIndex, {strFutureSymbol:arSrc[strFutureSymbol]})
+						if fIndex != None:
+							arCopy = arSrc.copy()
+							arCopy[strHedgeSymbol] = fIndex
 				else:
-					fEst = self._calc_with_calibration(ar, arSrc)	# 直接算
+					arCopy = arSrc
+				fEst = self._calc_with_calibration(ar, arCopy)		# 直接算
 			else:
+				arCopy = None
 				if arSrc != None:
 					arCopy = arSrc.copy()
-					for strSymbol, fPrice in arSrc.items():
+					for strSymbol in arSrc:
 						for strHolding in ar['symbol_hedge']:
-							if strHolding in self.config:	# strHolding in [GLD, SLV, USO]
-								arHolding = self.config[strHolding]
+							arHolding = self.get_param(strHolding)
+							if arHolding != None:
 								if arHolding['symbol_hedge'] == strSymbol:
 									arCopy[strHolding] = self._calc_with_calibration(arHolding, arSrc)
-					fEst = self._calc_with_holdings(ar, arCopy)	# 需要按持仓计算
-				else:
-					fEst = self._calc_with_holdings(ar)	#按持仓计算官方估值
+				fEst = self._calc_with_holdings(ar, arCopy)		# 需要按持仓计算
 		return fEst
-        
-	def ReverseEst(self, arSrc):
+
+	def ReverseEst(self, arSrc: Dict[str, float]) -> float:
 		for strSymbol in arSrc:
 			if strSymbol != 'CNY':
 				break
 		fEst = 0.0
-		if strSymbol in self.config:
-			ar = self.config[strSymbol]
+		ar = self.get_param(strSymbol)
+		if ar != None:
 			if 'calibration' in ar:
 				fEst = self._reverse_calc_with_calibration(ar, strSymbol, arSrc)
-				strHedgeSymbol = ar['symbol_hedge']
-				if strHedgeSymbol in self.config:   # strSymbol in [SZ161125, SZ161130]
-					arHedge = self.config[strHedgeSymbol]
+				arHedge = self.get_next_param(ar)
+				if arHedge != None:
 					fEst = self._calc_with_calibration(arHedge, {arHedge['symbol_hedge']:fEst})
 		return fEst
+
+	def CalcQuantity(self, strSymbol: str, arSrc: Dict[str, int]) -> Dict[str, int]:
+		arDst = {}
+		ar = self.get_param(strSymbol)
+		if ar != None:
+			if 'calibration' in ar:
+				strHedgeSymbol = ar['symbol_hedge']
+				fHedge = float(ar['hedge']) * float(self.get_multiplier(strHedgeSymbol))
+				iHedgeQuantity = self.MAX_HEDGE_QUANTITY	
+				arHedge = self.get_param(strHedgeSymbol)
+				if strHedgeSymbol in arSrc:
+					iHedgeQuantity = arSrc[strHedgeSymbol]
+				elif arHedge != None:
+					arIndex = self.get_next_param(arHedge)
+					if arIndex != None:
+						strFutureSymbol = arIndex['symbol_hedge']
+						if strFutureSymbol in arSrc:
+							fHedge = float(ar['calibration']) * float(self.get_multiplier(strFutureSymbol)) / float(ar['position'])
+							iHedgeQuantity = arSrc[strFutureSymbol]
+							strHedgeSymbol = strFutureSymbol
+				if strSymbol in arSrc:
+					fQuantity = _get_floor_quantity(float(arSrc[strSymbol]))
+					iPeerQuantity = int(math.floor(fQuantity / fHedge))
+				else:
+					iPeerQuantity = self.MAX_HEDGE_QUANTITY
+				iHedgeQuantity = min(iHedgeQuantity, iPeerQuantity)
+				arDst[strHedgeSymbol] = iHedgeQuantity
+				arDst[strSymbol] = int((float(iHedgeQuantity) * fHedge + 50.0) / 100.0) * 100
+			else:
+				pass
+		return arDst
