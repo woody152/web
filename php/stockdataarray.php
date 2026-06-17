@@ -6,7 +6,8 @@ function _addIndexArray(&$ar, $strIndex, $strSymbol, $strDate, $sql, $cal_sql, $
 	if (!isset($ar[$strSymbol]))
 	{
 		$strStockId = $sql->GetId($strSymbol);
-		$record = $cal_sql->GetRecordFromDate($strStockId, $strDate);
+		// $record = $cal_sql->GetRecordFromDate($strStockId, $strDate);
+		$record = $cal_sql->GetRecordNow($strStockId);
 		$strDate = $record['date'];
 
 		$arData = [];

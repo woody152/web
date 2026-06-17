@@ -9,28 +9,30 @@ from _mytoken import ROT_TOKEN
 from palmmicroapi import PalmmicroAPI
 
 def _handlePalmmicroData(arData):
-	arCNY = {'CNY': 6.7604}
+	arCNY = {'CNY': 6.7587}
 	arXOP = {'XOP': 141.07}
-	arQuantity162411 = {'SZ162411':1144105}
+	arQuantity162411 = {'SZ162411':810506}
 	arQuantityXOP = {'XOP':1000}
-	arSPY = {'SPY': 618.87}
-	arES = {'hf_ES': 6199.5}
-	arQuantity161125 = {'SZ161125':156611}
-	arGLD = {'GLD': 373.45}
+	arSPY = {'SPY': 618.9}
+	arES = {'hf_ES': 6198.5}
+	arQuantity161125 = {'SZ161125':1001045}
+	arGLD = {'GLD': 373.7}
 	arGC = {'hf_GC': 4091.51}
-	arSLV = {'SLV': 56.18}
+	arSLV = {'SLV': 56.21}
 	arSI = {'hf_SI': 62.22}
-	arUSO = {'USO': 84.3}
+	arUSO = {'USO': 85.81}
 	arCL = {'hf_CL': 56.52}
-	arINDA = {'INDA': 44.79}
+	arINDA = {'INDA': 45.13}
 	api = PalmmicroAPI(arData)
-	print(api.get_config())
+	#print(api.get_config())
     
 	print(round(api.EstNetValue('SZ162411'), 3), '直接算162411官方估值')
 	f162411 = api.EstNetValue('SZ162411', arXOP)
 	fXOP = api.ReverseEst({'SZ162411':f162411})
 	ar162411 = api.CalcQuantity('SZ162411', arQuantity162411 | arQuantityXOP)
-	print(f"直接算162411: {ar162411['SZ162411']}@{f162411:.3f}, 反向算XOP: {ar162411['XOP']}@{fXOP:.2f}")
+	i162411 = ar162411['SZ162411']
+	iXOP = ar162411['XOP']
+	print(f"直接算162411: {i162411}@{f162411:.3f}, 反向算XOP: {iXOP}@{fXOP:.2f}, 对冲值: {i162411/iXOP:.0f}")
 	ar162411 = api.CalcQuantity('SZ162411', arQuantity162411)
 	print(f"只输入162411数量时建议: {ar162411['SZ162411']}, 对应XOP: {ar162411['XOP']}")
 	ar162411 = api.CalcQuantity('SZ162411', arQuantityXOP)
@@ -41,18 +43,24 @@ def _handlePalmmicroData(arData):
 	print(round(api.EstNetValue('SZ159518', arCNY), 3), '直接算159518参考估值')
 	f159518 = api.EstNetValue('SZ159518', arXOP | arCNY)
 	fXOP = api.ReverseEst({'SZ159518':f159518} | arCNY)
-	ar159518 = api.CalcQuantity('SZ159518', {'SZ159518':86900} | arQuantityXOP)
-	print(f"直接算159518: {ar159518['SZ159518']}@{f159518:.3f}, 反向算XOP: {ar159518['XOP']}@{fXOP:.2f}")
+	ar159518 = api.CalcQuantity('SZ159518', {'SZ159518':1415100} | arQuantityXOP)
+	i159518 = ar159518['SZ159518']
+	iXOP = ar159518['XOP']
+	print(f"直接算159518: {i159518}@{f159518:.3f}, 反向算XOP: {iXOP}@{fXOP:.2f}, 对冲值: {i159518/iXOP:.0f}")
     
 	print(round(api.EstNetValue('SZ161125'), 3), '直接算161125官方估值')
 	f161125 = api.EstNetValue('SZ161125', arSPY)
 	fSPY = api.ReverseEst({'SZ161125':f161125})
 	ar161125 = api.CalcQuantity('SZ161125', arQuantity161125 | {'SPY':100})
-	print(f"把SPY转换成^GSPC后二次计算161125: {ar161125['SZ161125']}@{f161125:.3f}, 反向算SPY: {ar161125['SPY']}@{fSPY:.2f}")
+	i161125 = ar161125['SZ161125']
+	iSPY = ar161125['SPY']
+	print(f"把SPY转换成^GSPC后二次计算161125: {i161125}@{f161125:.3f}, 反向算SPY: {iSPY}@{fSPY:.2f}, 对冲值: {i161125/iSPY:.0f}")
 	f161125 = api.EstNetValue('SZ161125', arES)
 	fSPY = api.ReverseEst({'SZ161125':f161125})
 	ar161125 = api.CalcQuantity('SZ161125', arQuantity161125 | {'hf_ES': 1})
-	print(f"把ES转换成^GSPC后二次计算161125: {ar161125['SZ161125']}@{f161125:.3f}, 反向算SPY: {fSPY:.2f}, 对应ES: {ar161125['hf_ES']}")
+	i161125 = ar161125['SZ161125']
+	iES = ar161125['hf_ES']
+	print(f"把ES转换成^GSPC后二次计算161125: {i161125}@{f161125:.3f}, 反向算SPY: {fSPY:.2f}, 对应ES: {iES}, 对冲值: {i161125/iES/api.get_multiplier('hf_ES'):.0f}")
     
 	f159612 = api.EstNetValue('SZ159612', arSPY | arCNY)
 	fSPY = api.ReverseEst({'SZ159612':f159612} | arCNY)
@@ -62,11 +70,15 @@ def _handlePalmmicroData(arData):
 	print(f"把ES转换成^GSPC后二次计算159612: {f159612:.3f}, 反向算SPY: {fSPY:.2f}")
 	
 	print(round(api.EstNetValue('SZ164701'), 3), '按持仓算164701官方估值')
-	print(round(api.EstNetValue('SZ164701', arGLD | arSLV), 3), '按持仓算164701')
+	f164701 = api.EstNetValue('SZ164701', arGLD | arSLV)
+	ar164701 = api.CalcQuantity('SZ164701', {'SZ164701': 133041, 'GLD': 100, 'SLV': 100})
+	print(f"按持仓算164701: {ar164701['SZ164701']}@{f164701:.3f}, GLD: {ar164701['GLD']}, SLV: {ar164701['SLV']}")
 	print(round(api.EstNetValue('SZ164701', arGC | arSI), 3), '把GC和SI转换成GLD和SLV后, 按持仓算164701')
     
 	print(round(api.EstNetValue('SZ160723'), 3), '按持仓算160723官方估值')
-	print(round(api.EstNetValue('SZ160723', arUSO), 3), '按持仓算160723')
+	f160723 = api.EstNetValue('SZ160723', arUSO)
+	ar160723 = api.CalcQuantity('SZ160723', {'SZ160723': 1006853, 'USO': 100})
+	print(f"按持仓算160723: {ar160723['SZ160723']}@{f160723:.3f}, USO: {ar160723['USO']}, ^USO-EU: {ar160723['^USO-EU']}")
 	print(round(api.EstNetValue('SZ160723', arCL), 3), '把CL转换成USO后, 按持仓算160723')
 
 	print(round(api.EstNetValue('SZ164824'), 3), '按持仓算164824官方估值')
@@ -76,7 +88,9 @@ def _handlePalmmicroData(arData):
 	f161226 = api.EstNetValue('SZ161226', {'nf_AG0':12842.3});
 	fAG0 = api.ReverseEst({'SZ161226':f161226})
 	ar161226 = api.CalcQuantity('SZ161226', {'SZ161226':576813, 'nf_AG0':10})
-	print(f"直接算161226: {ar161226['SZ161226']}@{f161226:.3f}, 反向算AG0: {ar161226['nf_AG0']}@{fAG0:.2f}")
+	i161226 = ar161226['SZ161226']
+	iAG0 = ar161226['nf_AG0']
+	print(f"直接算161226: {i161226}@{f161226:.3f}, 反向算AG0: {iAG0}@{fAG0:.2f}, 对冲值: {i161226/iAG0/api.get_multiplier('nf_AG0'):.0f}")
 
 def post_json_array_to_telegram(
 	data_array: Dict[str, Any], 

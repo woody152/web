@@ -4,13 +4,6 @@ require_once('../../php/stockgroup.php');
 require_once('../../php/stockhis.php');
 require_once('../../php/ui/referenceparagraph.php');
 
-// 181000-11000+30000-30000=170000
-
-class _MyPortfolio extends StockGroup
-{
-    var $arStockGroup = [];
-}
-
 function _transSortBySymbol($arTrans)
 {
     $ar = [];
@@ -24,7 +17,7 @@ function _transSortBySymbol($arTrans)
     ksort($ar);
     
     $arSort = [];
-    foreach ($ar as $str => $arTrans)	array_push($arSort, ...$arTrans);
+    foreach ($ar as $arTrans)	array_push($arSort, ...$arTrans);
     return $arSort;
 }
 
@@ -65,16 +58,10 @@ function _echoMergeParagraph($arMerge)
 				$ref = $trans->GetRef();
 				$ar[] = RefGetMyStockLink($ref);
 				$ar[] = strval($iTotal);
-				switch ($strSymbol)
-				{
-				case 'KWEB':
-					$ar[] = strval($iTotal - 200 + 700);
-					break;
-
-				case 'XOP':
-					$ar[] = strval($iTotal - 00 - 00);
-					break;
-				}
+				$ar[] = strval(match($strSymbol)
+							   {'KWEB' => $iTotal - 200 + 900,
+								'XOP' => $iTotal - 00 - 00
+							   });
 				RefEchoTableColumn($ref, $ar);
 			}
 		}
@@ -123,6 +110,7 @@ function _echoPortfolio($portfolio, $sql, $strMemberId, $bAdmin)
 	$arTransA = [];
 	$arTransH = [];
 	$arTransUS = [];
+	$arStockGroup = [];
 	
 	if ($result = $sql->GetAll($strMemberId)) 
 	{
@@ -131,7 +119,7 @@ function _echoPortfolio($portfolio, $sql, $strMemberId, $bAdmin)
 		    $group = new MyStockGroup($record['id'], []);
 		    if ($group->GetTotalRecords() > 0)
 		    {
-		        $portfolio->arStockGroup[] = $group;
+		        $arStockGroup[] = $group;
 		        foreach ($group->arStockTransaction as $trans)
 		        {
 		            if ($trans->GetTotalRecords() > 0)
@@ -152,6 +140,7 @@ function _echoPortfolio($portfolio, $sql, $strMemberId, $bAdmin)
     _transEchoReferenceParagraph($arTrans, $bAdmin);
 	EchoPortfolioParagraph($arTrans);
     _transEchoMergeParagraph($arTrans);
+	return $arStockGroup;
 }
 
 function _onPrefetch($sql, $strMemberId) 
@@ -176,11 +165,10 @@ function EchoAll()
 	$sql = $acct->GetGroupSql();
     _onPrefetch($sql, $strMemberId);
 
-    $portfolio = new _MyPortfolio();
-    _echoPortfolio($portfolio, $sql, $strMemberId, $acct->IsAdmin());
-    
-    $portfolio->arStockGroup[] = $portfolio; 
-    $acct->EchoMoneyParagraphs($portfolio->arStockGroup, new CnyReference('USCNY'), new CnyReference('HKCNY'));
+    $portfolio = new StockGroup();
+    $arStockGroup = _echoPortfolio($portfolio, $sql, $strMemberId, $acct->IsAdmin());
+    $arStockGroup[] = $portfolio; 
+	$acct->EchoMoneyParagraphs($arStockGroup, new CnyReference('USCNY'), new CnyReference('HKCNY'));
     
     $acct->EchoLinks();
 }

@@ -2,7 +2,6 @@
 
 function GetIpInfoUrl()
 {
-	// return 'http://ipinfo.io/';
 	return 'http://ip-api.com/';
 }
 
@@ -31,7 +30,6 @@ http://hq.sinajs.cn/list=int_dji 道琼斯
 http://hq.sinajs.cn/list=int_nasdaq 纳斯达克
 http://hq.sinajs.cn/list=int_sp500 标普500
 http://hq.sinajs.cn/list=int_ftse 英金融时报指数
-http://blog.sina.com.cn/s/blog_7ed3ed3d0101gphj.html
 http://hq.sinajs.cn/list=sh600151,sz000830,s_sh000001,s_sz399001,s_sz399106,s_sz399107,s_sz399108
 期货 http://hq.sinajs.cn/rn=1318986550609&amp;list=hf_CL,hf_GC,hf_SI,hf_CAD,hf_ZSD,hf_S,hf_C,hf_W,hf_XAU
 http://hq.sinajs.cn/rn=1318986628214&amp;list=fx_susdcny,USDHKD,EURCNY,GBPCNY,USDJPY,EURUSD,GBPUSD,
@@ -42,7 +40,7 @@ https://w.sinajs.cn/rn=5130947756&list=rt_hkHSI_preipo,rt_hkHSCEI_preipo,rt_hkHS
 */
 function GetSinaDataUrl($strSinaSymbols)
 {
-	return 'http://hq.sinajs.cn/list='.$strSinaSymbols;
+	return "http://hq.sinajs.cn/list=$strSinaSymbols";
 //	return 'https://w.sinajs.cn/list='.$strSinaSymbols;
 }	
 
@@ -119,12 +117,12 @@ function GetJisiluDataUrl()
 // https://www.csindex.com.cn/#/indices/family/detail?indexCode=H11136
 function GetCsindexUrl($strSymbol)
 {
-	return 'https://www.csindex.com.cn/#/indices/family/detail?indexCode='.$strSymbol;
+	return "https://www.csindex.com.cn/#/indices/family/detail?indexCode=$strSymbol";
 }
 
 function GetSzseUrl($strSubDomain = 'www')
 {
-	return 'https://'.$strSubDomain.'.szse.cn/';
+	return "https://$strSubDomain.szse.cn/";
 }
 
 // https://reportdocs.static.szse.cn/files/text/etf/ETF15960520220315.txt?random=0.12210692394619271
@@ -141,32 +139,8 @@ function GetSzseHoldingsUrl($strFileName)
 
 function GetSseUrl($strSubDomain = 'www')
 {
-	return 'https://'.$strSubDomain.'.sse.com.cn/';
+	return "https://$strSubDomain.sse.com.cn/";
 }
-
-// https://www.sse.com.cn/disclosure/fund/etflist/
-/*
-function GetSseDisclosureUrl()
-{
-	return GetSseUrl().'disclosure/fund/etflist/';
-}
-
-
-function GetSseEtfType($strSymbol)
-{
-	$ar = array('SH513050' => '087', 'SH513090' => '254', 'SH513220' => '509', 'SH513230' => '459', 'SH513350' => '634', 'SH513360' => '395', 'SH513750' => '607', 'SH513850' => '577', 'SH513990' => '244');
-	if (isset($ar[$strSymbol]))		return $ar[$strSymbol];
-	return false;
-}
-*/
-
-// https://www.sse.com.cn/disclosure/fund/etflist/detail.shtml?type=087&fundid=513050&etfClass=33
-/*
-function GetSseDisclosureDetailUrl($sym, $strEtfType)
-{
-	return GetSseDisclosureUrl().'detail.shtml?type='.$strEtfType.'&fundid='.$sym->GetDigitA().'&etfClass=33';
-}
-*/
 
 // https://www.sse.com.cn/disclosure/fund/etflist/detail.shtml?fundid=513050&etfClass=33
 function GetSseDisclosureDetailUrl($sym)
@@ -303,7 +277,7 @@ function GetSpdrNetValueUrl($strSymbol)
 
 function GetInvescoUrl($strSubDomain = 'www')
 {
-	return 'https://'.$strSubDomain.'.invesco.com/';
+	return "https://$strSubDomain.invesco.com/";
 }
 
 // https://www.invesco.com/us/en/financial-products/etfs/invesco-qqq-trust-series-1.html

@@ -26,7 +26,7 @@ function _QdiiMixGetPosition($ref, $strDate, $strPrevDate, $fPrev, $fNetValue, $
 	{
 		$iIndex = 0;
 		$fTotal = 0.0;
-		foreach ($ref->GetHoldingsRatioArray() as $strHoldingsId => $strRatio)
+		foreach ($ref->GetHoldingsRatioArray() as $strRatio)
 		{
 			$fTotal += $arPro[$iIndex] * floatval($strRatio) / 100.0;
 			$iIndex ++;
@@ -39,7 +39,7 @@ function _QdiiMixGetPosition($ref, $strDate, $strPrevDate, $fPrev, $fNetValue, $
 function GetNetValueTableColumn($est_ref = false, $cny_ref = false)
 {
 	$change_col = new TableColumnChange();
-	$ar = array(new TableColumnDate(), new TableColumnNetValue(), $change_col);
+	$ar = [new TableColumnDate(), new TableColumnNetValue(), $change_col];
 	if ($cny_ref)
 	{
 		$ar[] = new TableColumnStock($cny_ref);
@@ -63,7 +63,7 @@ function EchoNetValueItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue
 {
 	$bWritten = false;
 	$bMatch = false;
-	$ar = array($strDate);
+	$ar = [$strDate];
 	
 	$fNetValue = floatval($strNetValue);
 	$ar[] = $ref->GetNetValueDisplay($fNetValue);
@@ -73,10 +73,8 @@ function EchoNetValueItem($csv, $ref, $cny_ref, $est_ref, $strDate, $strNetValue
 
 	if ($cny_ref)
 	{
-		if ($fCny = $cny_ref->GetVal($strDate))				$ar[] = $cny_ref->GetPriceDisplay($fCny);
-		else												$ar[] = '';
-		if ($fCnyPrev = $cny_ref->GetVal($strPrevDate))		$ar[] = $cny_ref->GetPercentageDisplay($fCnyPrev, $fCny);
-		else												$ar[] = '';
+		$ar[] = ($fCny = $cny_ref->GetVal($strDate)) ? $cny_ref->GetPriceDisplay($fCny) : '';
+		$ar[] = ($fCnyPrev = $cny_ref->GetVal($strPrevDate)) ? $cny_ref->GetPercentageDisplay($fCnyPrev, $fCny) : '';
 	}
 
 	$strOrgPos = number_format($ref->GetPosition(), 2);
@@ -151,7 +149,7 @@ function EchoNetValueHistoryParagraph($ref, $csv = false, $iStart = 0, $iNum = T
    		$strLink = GetFundLinks($strSymbol);
 		$strNewLine = GetHtmlNewLine();
    		if ($bAdmin)	$strLink .= $strNewLine.StockGetAllLink($strSymbol);
-   		$strLink .= $strNewLine.$strMenuLink;
+   		$strLink .= "{$strNewLine}$strMenuLink";
    	}
 	
    	if ($fund_ref = StockGetQdiiReference($strSymbol))
@@ -177,5 +175,3 @@ function EchoNetValueHistoryParagraph($ref, $csv = false, $iStart = 0, $iNum = T
     	EchoTableParagraphEnd($strMenuLink);
 	}
 }
-
-?>

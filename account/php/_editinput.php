@@ -95,10 +95,10 @@ function _getDiceCaptchaString($strInput, $bChinese)
 		$arDisplay = array_unique($arDisplay);
 
 		if ($bChinese)	$str = $strNum.'个骰子加起来等于'.$strTarget.'总共有'.$strCount.'种情况，排序合并后如下：';
-		else				$str = $strNum.' dices adding up to '.$strTarget.' can appear in '.$strCount.' ways, here is the result after sorting and merging:';
+		else			$str = $strNum.' dices adding up to '.$strTarget.' can appear in '.$strCount.' ways, here is the result after sorting and merging:';
 		foreach ($arDisplay as $strDisplay)
 		{
-			$str .= '<br/>'.$strDisplay;
+			$str .= GetHtmlNewLine().$strDisplay;
 		}
 		return $str;
 	}
@@ -229,8 +229,6 @@ function _getLinearRegressionStockArrays(&$arX, &$arY, $strInput, $strSeparator,
 		mysqli_free_result($result);
 	}
 
-//	$bSameDayX = true;
-//	$bSameDayY = true;
 	$bSameDayX = UseSameDayNetValue($x_ref);
 	$bSameDayY = UseSameDayNetValue($y_ref);
 	$iStart = ($bSameDayX && $bSameDayY) ? 0 : 1;
@@ -250,30 +248,7 @@ function _getLinearRegressionStockArrays(&$arX, &$arY, $strInput, $strSeparator,
 
 function _getLinearRegressionArrays(&$arX, &$arY, $strInput, $strSeparator, $strNewLine, $strFunction)
 {
-/*	$fCount = 0.0;
-	$ar = explode(';', $strInput);
-	foreach ($ar as $str)
-	{
-		$str = trim($str);
-		$arXY = explode(',', $str);
-		if (count($arXY) == 2)
-		{
-			$fX = floatval($arXY[0]);
-			$fCount = $fX;
-			$fY = floatval($arXY[1]);
-		}
-		else
-		{
-			$fX = $fCount;
-			$fY = floatval($str);
-		}
-		$fCount += 1.0;
-		
-		$arX[] = $fX;
-		$arY[] = empty($strFunction) ? $fY : call_user_func($strFunction, $fY);
-	}
-*/
-	$ar = json_decode('['.$strInput.']', true);
+	$ar = json_decode("[$strInput]", true);
 	if (json_last_error() !== JSON_ERROR_NONE) 
 	{
 	}
@@ -344,8 +319,7 @@ function _getLinearRegressionString($strInput, $bChinese)
 	{
 		$str = GetFontElement($bChinese ? '数据不足' : 'Not enough data');
 	}	
-   	$str .= $strNewLine.$strData;
-	$str .= $strNewLine;
+   	$str .= "$strNewLine{$strData}$strNewLine";
 	$str .= $bChinese ? '求解超定线性方程组验证：' : 'Verify by Solve Overdetermined: ';
 	$arEq = [];
 	for ($i = 0; $i < count($arX); $i ++)
@@ -462,23 +436,23 @@ function _getPrimeNumberString($strNumber, $bChinese)
 
 function _getSinaJsChineseStockArray($bChinese)
 {
-	if ($bChinese)	return ['GB2312编码的股票名字', STOCK_DISP_OPEN, '昨日收盘价', '当前价格，收盘后数据可以当成今日收盘价？', STOCK_DISP_HIGH, STOCK_DISP_LOW, '当前买价，跟序号11买一字段相同。', '当前卖价，跟序号21卖一字段相同。', '成交'.STOCK_DISP_QUANTITY, '总成交金额', 
-							'买一股数', '买一价格，跟序号6相同。', '二', '二', '三', '三', '四', '四', '五', '五', '卖一股数', '卖一价格，跟序号7相同。', '二', '二', '三', '三', '四', '四', '五', '五', '日期', '时间', '结束符？'];
+	if ($bChinese)	return ['GB2312编码的股票名字', STOCK_DISP_OPEN, '昨日收盘价', '当前价格，收盘后数据可以当成今日收盘价？', STOCK_DISP_HIGH, STOCK_DISP_LOW, '当前买价, 跟序号11买一字段相同。', '当前卖价, 跟序号21卖一字段相同。', '成交'.STOCK_DISP_QUANTITY, '总成交金额', 
+							'买一股数', '买一价格, 跟序号6相同。', '二', '二', '三', '三', '四', '四', '五', '五', '卖一股数', '卖一价格, 跟序号7相同。', '二', '二', '三', '三', '四', '四', '五', '五', '日期', '时间', '结束符？'];
 	return ['GB2312 coded stock name', 'Today open', 'Last close', 'Current price, used as today close after market close?', 'Today high', 'Today low', 'Current bid, same as index 11 bid1.', 'Current ask, same as index 21 ask1.', 'Total quantity', 'Total amount', 
 			'Bid1 quantity', 'Bid1 price, same as index 6.', '2', '2', '3', '3', '4', '4', '5', '5', 'Ask1 quantity', 'Ask1 price, same as index 7.', '2', '2', '3', '3', '4', '4', '5', '5', 'Date', 'Time', 'End of data?'];
 }
 
 function _getSinaJsFundArray($bChinese)
 {
-	if ($bChinese)	return ['GB2312编码的名字', '目前'.STOCK_DISP_NETVALUE, '累计'.STOCK_DISP_NETVALUE, '昨日'.STOCK_DISP_NETVALUE, '日期', '？'];
+	if ($bChinese)	return ['GB2312编码的名字', '目前'.STOCK_DISP_NETVALUE, '累计'.STOCK_DISP_NETVALUE, '昨日'.STOCK_DISP_NETVALUE, '日期', '?'];
 	return ['GB2312 coded name', 'Current net value', 'Accumulated net value', 'Previous net value', 'Date', '?'];
 }
 
 function _getSinaJsAmericanArray($bChinese)
 {
 	if ($bChinese)	return ['GB2312编码的中文名字', '当前价格，收盘后数据可以当成今日收盘价？', '相对昨日收盘价的变化百分比', '中国时区日期和时间', '相对昨日收盘价的变化', STOCK_DISP_OPEN, STOCK_DISP_HIGH, STOCK_DISP_LOW, '52周'.STOCK_DISP_HIGH, '52周'.STOCK_DISP_LOW, 
-							'成交'.STOCK_DISP_QUANTITY, '10日均量', '市值', '每股收益', '市盈率', '？', '贝塔系数', '股息', '收益率', '股本', '？', '盘前盘后交易', '盘前盘后交易变化百分比', '盘前盘后交易变化', '美东时区盘前盘后交易日期和时间',
-							'美东时区日期和时间', '昨日收盘价', '盘前盘后交易成交'.STOCK_DISP_QUANTITY, '未知，从此项开始以下为2020年9月22日新增。', '年份，可能是为了24和25项在年末时用strtotime函数会搞错年份而加。', '总成交金额，除以第10项换算成当日均价后跟雪球显示的不一致。'];
+							'成交'.STOCK_DISP_QUANTITY, '10日均量', '市值', '每股收益', '市盈率', '?', '贝塔系数', '股息', '收益率', '股本', '?', '盘前盘后交易', '盘前盘后交易变化百分比', '盘前盘后交易变化', '美东时区盘前盘后交易日期和时间',
+							'美东时区日期和时间', '昨日收盘价', '盘前盘后交易成交'.STOCK_DISP_QUANTITY, '未知, 从此项开始以下为2020年9月22日新增。', '年份, 可能是为了24和25项在年末时用strtotime函数会搞错年份而加。', '总成交金额, 除以第10项换算成当日均价后跟雪球显示的不一致。'];
 	return ['GB2312 coded Chinese name', 'Current price, used as today close after market close?', '% Change from last close', 'PRC date time', 'Change from last close', 'Open price', 'Today high', 'Today low', '52 weeks high', '52 weeks low', 
 			'Total quantity', '10 days average quantity', 'Market value', 'EPS', 'PE', '?', 'Beta', 'Dividends', 'Rate of return', 'Share capital', '?', 'Extended trading', 'Extended trading % change', 'Extended trading change', 'EDT extended trading date time',
 			'EDT date time', 'Last close', 'Extended trading quantity', '?', 'Year', 'Total amount'];
@@ -515,7 +489,6 @@ function _getSinaSymbol($strFirst)
 	$str = str_replace('var hq_str_', '', $strFirst);
 	$iEqualsIndex = strpos($str, '=');
 	if ($iEqualsIndex !== false)	$str = substr($str, 0, $iEqualsIndex);
-//	DebugString($str);
 	return $str;
 }
 
@@ -553,7 +526,7 @@ function _getSinaJsString($strInput, $bChinese)
 	    		{
 	    			$str .= GetRemarkElement(strval($iCount)).': ';
 	    			if ($strItem == '')	$str .= '('.($bChinese ? '空' : 'Empty').')';
-	    			else					$str .= GetQuoteElement(GbToUtf8($strItem));
+	    			else				$str .= GetQuoteElement(GbToUtf8($strItem));
 					if ($arMeaning && isset($arMeaning[$iCount]))	$str .= ' ==> '.GetInfoElement($arMeaning[$iCount]);
 	    			$str .= $strNewLine;
 	    			$iCount ++;
@@ -641,95 +614,35 @@ function _echoInputRelated($strPage, $bChinese)
 
 function _echoInputResult($acct, $strPage, $strInput, $bChinese)
 {
-    switch ($strPage)
-    {
-   	case 'benfordslaw':
-   		$str = _getBenfordsLawString($strInput, $bChinese);
-   		break;
-    		
-    case 'chisquaredtest':
-    	$str = _getChiSquaredTestString($strInput, $bChinese);
-    	break;
-    	
-    case 'commonphrase':
-    	$str = _getCommonPhraseString($strInput, $acct->GetLoginId(), $bChinese);
-    	break;
-    		
-   	case 'cramersrule':
-    	$str = _getCramersRuleString($strInput, $bChinese);
-    	break;
-    	
-    case 'dicecaptcha':
-    	$str = _getDiceCaptchaString($strInput, $bChinese);
-    	break;
-    	
-    case 'simpletest':
-    	$str = _getSimpleTestString($strInput, $bChinese);
-    	break;
-    		
-    case 'ip':
-		if (filter_valid_ip($strInput))		$str = $acct->IpLookupString($strInput, $bChinese);
-		else									$str = $bChinese ? '无效IP地址' : 'Invalid IP Address';
-    	break;
-    	
-   	case 'linearregression':
-    	$str = _getLinearRegressionString($strInput, $bChinese);
-    	break;
-    	
-    case 'primenumber':
-    	$str = _getPrimeNumberString($strInput, $bChinese);
-    	break;
-    	
-   	case 'sinajs':
-    	$str = _getSinaJsString($strInput, $bChinese);
-    	break;
-    }
-    
+    $str = match($strPage)
+		   {'benfordslaw' => _getBenfordsLawString($strInput, $bChinese),
+    		'chisquaredtest' => _getChiSquaredTestString($strInput, $bChinese),
+    		'commonphrase' => _getCommonPhraseString($strInput, $acct->GetLoginId(), $bChinese),
+   			'cramersrule' => _getCramersRuleString($strInput, $bChinese),
+    		'dicecaptcha' => _getDiceCaptchaString($strInput, $bChinese),
+    		'simpletest' => _getSimpleTestString($strInput, $bChinese),
+    		'ip' => filter_valid_ip($strInput) ? $acct->IpLookupString($strInput, $bChinese) : ($bChinese ? '无效IP地址' : 'Invalid IP Address'),
+   			'linearregression' => _getLinearRegressionString($strInput, $bChinese),
+    		'primenumber' => _getPrimeNumberString($strInput, $bChinese),
+   			'sinajs' => _getSinaJsString($strInput, $bChinese)
+    	   };
     $str .= ImgAccountTool($strPage, $bChinese);
     EchoHtmlElement($str);
 }
 
 function _getDefaultInput($strPage)
 {
-   	switch ($strPage)
-   	{
-   	case 'benfordslaw':
-   		$str = _getTaobaoDouble11Data();
-   		break;
-    		
-   	case 'chisquaredtest':
-   		$str = '200,200,200,200,200,200; 215,210,185,195,190,205';
-// 		$strInput = '164,96,68,53,43,36,32,28,25; 168,97,64,55,39,29,30,37,25';
-   		break;
-    		
-   	case 'commonphrase':
-   		$str = 'Hello, world!';
-    	break;
-    		
-    case 'cramersrule':
-    	$str = '[0.2506, 2.487, 1099], [2.450, 2.557, 7408]';
-    	break;
-    		
-    case 'dicecaptcha':
-    	$str = '4; 14';
-    	break;
-    	
-   	case 'ip':
-   		$str = UrlGetIp();
-    	break;
-    		
-    case 'linearregression':
-    	$str = _getTaobaoDouble11SqrtData();
-    	break;
-    		
-   	case 'sinajs':
-    	$str = 'sz162411,f_162411,gb_xop,hf_CL,fx_susdcnh,rt_hk00386,nf_AU0,b_TPX,rt_hkHSIII';
-   		break;
-   		
-    default:
-    	$str = strval(GetNowTick());
-    	break;
-    }
+	$str = match($strPage)
+   		   {'benfordslaw' => _getTaobaoDouble11Data(),
+   			'chisquaredtest' => '200,200,200,200,200,200; 215,210,185,195,190,205',
+   			'commonphrase' => 'Hello, world!',
+    		'cramersrule' => '[0.2506, 2.487, 1099], [2.450, 2.557, 7408]',
+    		'dicecaptcha' => '4; 14',
+   			'ip' => UrlGetIp(),
+    		'linearregression' => _getTaobaoDouble11SqrtData(),
+   			'sinajs' => 'sz162411,f_162411,gb_xop,hf_CL,fx_susdcny,rt_hk00386,nf_AU0,b_TPX,rt_hkHSIII',
+    		default => strval(GetNowTick())
+    	   };
     return $str;
 }
 
@@ -801,8 +714,8 @@ function GetMetaDescription($bChinese = true)
   		break;
   		
   	case 'ip':
-  		$str .= $bChinese ? '查询页面. 从ipinfo.io等网站查询IP地址对应的国家, 城市, 网络运营商和公司等信息. 同时也从palmmicro.com的用户登录和评论中提取对应记录.'
-    						: ' page, display country, city, service provider and company information from ipinfo.io.';
+  		$str .= $bChinese ? '查询页面. 从ip-api.com等网站查询IP地址对应的国家, 城市, 网络运营商和公司等信息. 同时也从palmmicro.com的用户登录和评论中提取对应记录.'
+    						: ' page, display country, city, service provider and company information from ip-api.com.';
   		break;
   		
    	case 'linearregression':
