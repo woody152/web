@@ -58,9 +58,10 @@ function _echoMergeParagraph($arMerge)
 				$ref = $trans->GetRef();
 				$ar[] = RefGetMyStockLink($ref);
 				$ar[] = strval($iTotal);
-				$ar[] = strval(match($strSymbol)
-							   {'KWEB' => $iTotal - 200 + 900,
-								'XOP' => $iTotal - 00 - 00
+				$ar[] = strval($iTotal + match($strSymbol)
+										 {'KWEB' => - 200 + 1100,
+										  'XOP' => - 00 - 00,
+										  default => 0
 							   });
 				RefEchoTableColumn($ref, $ar);
 			}

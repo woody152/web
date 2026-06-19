@@ -1,8 +1,11 @@
 #import array
 #import json
 import math
+from typing import Self
 import requests
 import time
+
+from palmmicroapi import PalmmicroAPI
 
 from nyc_time import GetBeijingTimeDisplay
 
@@ -96,7 +99,8 @@ def GetMktDataArray(strSymbol):
 
 class Palmmicro:
     def __init__(self):
-        self.arSym = {}
+        #self.arSym = {}
+        self.api = None
         self.iTimer = 0
         self.bNewSinaData = False
         self.fUSDCNY = 1.0;
@@ -148,8 +152,10 @@ class Palmmicro:
                             self.arAG0['SELL_size'] = int(arItem[12])
                         else:
                             strSymbol = strSymbol.upper()
-                            if strSymbol in self.arSym:
-                                arSymData = self.arSym[strSymbol]
+                            #if strSymbol in self.arSym:
+                                #arSymData = self.arSym[strSymbol]
+                            arSymData = self.api.get_param(strSymbol)
+                            if arSymData != None:
                                 arSymData['BUY_price'] = arItem[6]
                                 arSymData['SELL_price'] = arItem[7]
                                 arSymData['BUY_size'] = int(arItem[10])
@@ -192,7 +198,8 @@ class Palmmicro:
                 response_data = response.json()  # Parse the JSON response data
                 print('Response data:', response_data)
                 #self.arSym.clear()
-                self.arSym = response_data['text']
+                #self.arSym = response_data['text']
+                self.api = PalmmicroAPI(response_data['text'])
             else:
                 print('Failed to send POST request. Status code:', response.status_code)
         except requests.exceptions.RequestException as e:
@@ -203,17 +210,19 @@ class Palmmicro:
         if iCur - self.iTimer >= 19:
             self.iTimer = iCur
             strSymbols = ','.join(arSymbol)
-            if not self.arSym:
+            #if not self.arSym:
+            if self.api is None:
                 self._fetchPalmmicroData(strSymbols)
             self._fetchSinaData(strSymbols)
-        return self.arSym
+        #return self.arSym
+        return self.api.get_config()
 
     def _getMktDebugString(self, strHedgeSymbol, iSize, fPrice):
         return strHedgeSymbol + ' ' + str(iSize) + '@' + str(fPrice)
     
     def _getSymDebugString(self, strSymbol, iSize, strType, strMktType):
-        arSymData = self.arSym[strSymbol]
-        #return get_display(strMktType) + ' ' + strSymbol + ' ' + str(iSize) + '@' + arSymData[strType + '_price']
+        #arSymData = self.arSym[strSymbol]
+        arSymData = self.api.get_param(strSymbol)
         return get_display(strMktType) + ' ' + self._getMktDebugString(strSymbol, iSize, float(arSymData[strType + '_price']))
 
     def _getCNY(self, arSymData):
@@ -224,13 +233,17 @@ class Palmmicro:
     def CalcCalibrationArbitrage(self, arMktData, strMktSymbol, strMktType, strSymbol, strType):
         fMktPrice = arMktData[strMktType + '_price']
         iMktSize = arMktData[strMktType + '_size'] 
-        arSymData = self.arSym[strSymbol]
+        #arSymData = self.arSym[strSymbol]
+        arSymData = self.api.get_param(strSymbol)
         strSizeIndex = strType + '_size'
         if strSizeIndex in arSymData:
-            fCNY = self._getCNY(arSymData)
+            #fCNY = self._getCNY(arSymData)
             if arSymData[strSizeIndex] > 0 and fMktPrice > 0.001:
-                if strMktSymbol in self.arSym:
-                    arLevSymData = self.arSym[strMktSymbol]
+                #if strMktSymbol in self.arSym:
+                    #arLevSymData = self.arSym[strMktSymbol]
+                """
+                arLevSymData = self.api.get_param(strMktSymbol)
+                if arLevSymData != None:
                     fHedgePos = float(arLevSymData['position'])
                     fHedgePrice = _ref_get_peer_val2(strType, arSymData, arLevSymData, fCNY)
                 else:
@@ -238,13 +251,20 @@ class Palmmicro:
                     if strSymbol == 'SZ161226':
                         fCNY = 1.0
                     fHedgePrice = _ref_get_peer_val(strType, arSymData, fCNY)
+                """
+                arSrc = {strMktSymbol: fMktPrice}
+                if self.api.IsLOF(strSymbol) == False:
+                    arSrc |= {'CNY': self.fUSDCNY}
+                fPrice = self.api.EstNetValue(strSymbol, arSrc)
                 fHedge = float(arSymData['hedge'])
                 iHedgeSize = _get_hedge_quantity(strType, arSymData, fHedge)
-                #fRatio = fMktPrice / fHedgePrice - 1.0
+                """
                 fRatio = fHedgePrice / fMktPrice - 1.0
                 if fHedgePos:
                     fRatio /= fHedgePos
                 fRatio *= float(arSymData['position'])
+                """
+                fRatio = fPrice / float(arSymData[strType + '_price']) - 1.0
                 arSymData['discount'] = fRatio
                 iMktSize = min(iMktSize, iHedgeSize)
                 arSymData['quantity'] = iMktSize;
@@ -255,7 +275,8 @@ class Palmmicro:
         return False
 
     def CalcHoldingsArbitrage(self, arMkt, strMktSymbol, strMktType, iMktSize, strSymbol, strType):
-        arSymData = self.arSym[strSymbol]
+        #arSymData = self.arSym[strSymbol]
+        arSymData = self.api.get_param(strSymbol)
         fQuantity = _get_floor_quantity(float(arSymData[strType + '_size']))
         fNetValue = float(arSymData['netvalue'])
         fCNYholdings = float(arSymData['CNYholdings'])

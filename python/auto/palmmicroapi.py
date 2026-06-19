@@ -19,7 +19,7 @@ def convert_symbol(strSymbol: str) -> str:
 		return strSymbol  # 不符合格式则返回原字符串
 
 class PalmmicroAPI:
-	DEFAULT_QUANTITY = 1000000
+	DEFAULT_KEY_QUANTITY = 1000000
 	DEFAULT_HEDGE_QUANTITY = 10000
 
 	# 定义并初始化字典静态变量 arMultiplier，使用 strSymbol 作为键（整数倍率）
@@ -49,10 +49,12 @@ class PalmmicroAPI:
 		return self.config.get(key, default)
 
 	@staticmethod
-	def is_single(ar):
-		if 'calibration' in ar:
-			return True
-		return False
+	def IsLOF(strSymbol: str) -> bool:
+		return strSymbol.startswith(("SZ16", "SH50"))
+	
+	@staticmethod
+	def is_single(ar) -> bool:
+		return 'calibration' in ar
 
 	@staticmethod
 	def get_next_symbol(ar):
@@ -84,6 +86,10 @@ class PalmmicroAPI:
 		return True
 
 	@staticmethod
+	def _get_hedge(ar):
+		return float(ar['calibration']) / float(ar['position'])
+
+	@staticmethod
 	def _get_CNY(ar, arSrc):
 		fCny = 1.0
 		if arSrc != None:
@@ -103,7 +109,7 @@ class PalmmicroAPI:
 		return (arSrc[strSymbol] - (1.0 - fPos) * float(ar['netvalue'])) * float(ar['calibration']) / fPos / fCny
 
 	@staticmethod
-	def _calc_with_calibration(ar, arSrc = None):
+	def _calc_with_calibration(ar, arSrc):
 		fCny = PalmmicroAPI._get_CNY(ar, arSrc)
 		fEst = 0.0
 		if arSrc != None:
@@ -120,7 +126,7 @@ class PalmmicroAPI:
 		return (1.0 - fPos) * float(ar['netvalue']) + fPos * fEst * fCny  / float(ar['calibration'])
 
 	@staticmethod
-	def _calc_with_holdings(ar, arSrc = None):
+	def _calc_with_holdings(ar, arSrc):
 		fCny = PalmmicroAPI._get_CNY(ar, arSrc)
 		fTotal = 0.0
 		for strHolding, arHolding in ar['symbol_hedge'].items():
@@ -208,7 +214,7 @@ class PalmmicroAPI:
 			if arIndex != None:
 				strFutureSymbol = self.get_next_symbol(arIndex)
 				if strFutureSymbol in arSrc:
-					fHedge = float(ar['calibration']) * float(self.get_multiplier(strFutureSymbol)) / float(ar['position'])
+					fHedge = self._get_hedge(ar) * self.get_multiplier(strFutureSymbol)
 					iHedgeQuantity = arSrc[strFutureSymbol]
 					strHedgeSymbol = strFutureSymbol
 		if strSymbol in arSrc:
@@ -221,11 +227,18 @@ class PalmmicroAPI:
 		arDst[strSymbol] = _round_quantity(iHedgeQuantity * fHedge)
 		return arDst
 
+	@staticmethod
+	def _recalc_key_quantity(ar, arDst):
+		fTotal = 0.0
+		for strHolding, arHolding in ar['symbol_hedge'].items():
+			fTotal += arDst[strHolding] * float(arHolding['price'])
+		return _round_quantity(fTotal * float(ar['CNYholdings']) / float(ar['netvalue']) / float(ar['position']))
+
 	def __calc_holdings_quantity(self, strSymbol, ar, arSrc):
 		arDst = {}
 		arQuantity = {}
 		arReal = {}
-		fAmount = _get_floor_quantity(arSrc.get(strSymbol, self.DEFAULT_QUANTITY)) * float(ar['netvalue']) * float(ar['position']) / float(ar['CNYholdings'])
+		fAmount = _get_floor_quantity(arSrc.get(strSymbol, self.DEFAULT_KEY_QUANTITY)) * float(ar['netvalue']) * float(ar['position']) / float(ar['CNYholdings'])
 		for strHolding, arHolding in ar['symbol_hedge'].items():
 			fQuantity = fAmount * (float(arHolding['ratio']) / 100.0) / float(arHolding['price'])
 			arQuantity[strHolding] = fQuantity
@@ -235,19 +248,45 @@ class PalmmicroAPI:
 			else:
 				arReal[strReal] = fQuantity
 		fMax = 0.0
+		strMax = False
 		for strReal, fQuantity in arReal.items():
-			fCompare = fQuantity / arSrc.get(strReal, self.DEFAULT_HEDGE_QUANTITY)
+			if strReal in arSrc:
+				fRealQuantity = float(arSrc[strReal])
+			else:
+				fRealQuantity = self.DEFAULT_HEDGE_QUANTITY
+				arHolding = self.get_param(strReal)
+				if arHolding != None:
+					strNextSymbol = self.get_next_symbol(arHolding) 
+					if strNextSymbol in arSrc:
+						strFutureSymbol = strNextSymbol
+						iFutureQuantity = arSrc[strFutureSymbol]
+						arDst[strFutureSymbol] = arSrc[strFutureSymbol]
+						fRealQuantity = self._get_hedge(arHolding) * self.get_multiplier(strFutureSymbol) * iFutureQuantity
+						#print(f"RealQuantity {strFutureSymbol}: {fRealQuantity:.2f}")
+			fCompare = fQuantity / fRealQuantity
 			if fCompare > fMax:
 				fMax = fCompare
+				strMax = strReal
+		#print(f"Max {strMax}: {fMax:.2f}")
+		if fMax < 1.0 and strMax not in arSrc:
+			fMaxTotal = fMax * arDst[strFutureSymbol]
+			if fMaxTotal > 1.0:
+				arDst[strFutureSymbol] = int(math.floor(fMaxTotal))
+				fMax = fMaxTotal / arDst[strFutureSymbol]
+			else:
+				for strHolding in arQuantity: 
+					arDst[strHolding] = 0
+				arDst[strFutureSymbol] = 0
+				arDst[strSymbol] = 0
+				return arDst
 		if fMax > 1.0:
 			for strHolding, fQuantity in arQuantity.items():
 				arQuantity[strHolding] = fQuantity / fMax
-		fTotal = 0.0
-		for strHolding, arHolding in ar['symbol_hedge'].items():
-			iQuantity = math.floor(arQuantity[strHolding])
-			arDst[strHolding] = iQuantity
-			fTotal += iQuantity * float(arHolding['price'])
-		arDst[strSymbol] = _round_quantity(fTotal * float(ar['CNYholdings']) / float(ar['netvalue']) / float(ar['position']))
+		#print(f"float: {arQuantity}")			
+		for strHolding in ar['symbol_hedge']:
+			arDst[strHolding] = int(math.floor(arQuantity[strHolding]))
+		arDst[strSymbol] = self._recalc_key_quantity(ar, arDst)
+		#print(f"int: {arDst}")			
 		return arDst
 
 	def CalcQuantity(self, strSymbol: str, arSrc: Dict[str, int]) -> Dict[str, int]:

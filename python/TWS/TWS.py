@@ -20,8 +20,8 @@ def IsChinaMarketOpen():
         return True
     elif iTime >= 1300 and iTime < 1500:
         return True
-    return False
-    #return True
+    #return False
+    return True
 
 def IsMarketOpen():
     iTime = GetExchangeTime()
@@ -60,8 +60,8 @@ def AdjustOrderArray(arOrder, fAdjust, iBuyPos = -1, iSellPos = -1):
 class MyEWrapper(EWrapper):
     def __init__(self, client):
         self.client = client
-        self.strCurFuture = '202606'
-        self.strNextFuture = '202609'
+        self.strCurFuture = '202609'
+        self.strNextFuture = '202612'
         self.arDebug = {}
 
     def nextValidId(self, orderId: int):
@@ -85,9 +85,9 @@ class MyEWrapper(EWrapper):
             self.arOrder['XOP'] = GetOrderArray()
         else:
             #self.arOrder['TLT'] = GetOrderArray([80.90, 84.19, 85.21, 86.40, 86.62, 86.72, 87.59, 89.76, 91.88], 100, 1, 8)
-            self.arOrder['SPX'] = GetOrderArray([5191.35, 6197.88, 7021.13, 7257.74, 7411.76, 7440.13, 7476.83, 7695.93, 7844.37])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0006, 3, -1)
-            self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0098, -1, 6)
+            self.arOrder['SPX'] = GetOrderArray([5191.35, 6197.88, 7021.13, 7274.39, 7417.18, 7479.30, 7484.46, 7694.53, 7844.37])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0095, 3, 6)
+            self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0185, -1, -1)
         self.palmmicro = Palmmicro()
         self.client.StartStreaming(orderId)
         self.arMkt = {}
@@ -111,8 +111,8 @@ class MyEWrapper(EWrapper):
 
     def __get_sell_symbol(self, strSymbol):
         if strSymbol.startswith('MES'):
-            return 'MES' + self.strNextFuture
-            #return 'MES' + self.strCurFuture
+            #return 'MES' + self.strNextFuture
+            return 'MES' + self.strCurFuture
         else:
             return strSymbol
 
