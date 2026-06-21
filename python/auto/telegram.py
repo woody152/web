@@ -4,111 +4,119 @@ import time
 from typing import Union, List, Dict, Any
 
 from _mytoken import BOT_TOKEN
-from _mytoken import ROT_TOKEN
+#from _mytoken import ROT_TOKEN
 
 from palmmicroapi import PalmmicroAPI
 
+def __printHedge(api, ar: Dict[str, int], strSymbol, strSymbolUS):
+	if ar[strSymbolUS] != 0:
+		print(f"{strSymbolUS}对冲值: {ar[strSymbol]/ar[strSymbolUS]/api.get_multiplier(strSymbolUS):.0f}")
+
+def __printEst(strSymbol, fNetValue, strType = '官方', strMethod = '直接'):
+	print(f"{strMethod}算{strSymbol}{strType}估值: {fNetValue:.3f}")
+
+def __printHoldingEst(strSymbol, fNetValue, strType = '官方'):
+	__printEst(strSymbol, fNetValue, strType, '按持仓')
+
+def __testXOP(api, strSymbol, strSymbolUS, iQuantity, iQuantityUS, fPriceUS, arUSDCNY):
+	fNetValue = api.EstNetValue(strSymbol)
+	__printEst(strSymbol, fNetValue)
+	if api.IsLOF(strSymbol):
+		fNetValue = api.EstNetValue(strSymbol, {strSymbolUS: fPriceUS})
+		fPriceUS = api.ReverseEst({strSymbol: fNetValue})
+	else:
+		fNetValue = api.EstNetValue(strSymbol, arUSDCNY)
+		__printEst(strSymbol, fNetValue, '参考')
+		fNetValue = api.EstNetValue(strSymbol, {strSymbolUS: fPriceUS} | arUSDCNY)
+		fPriceUS = api.ReverseEst({strSymbol: fNetValue} | arUSDCNY)
+	ar = api.CalcQuantity(strSymbol, {strSymbol: iQuantity, strSymbolUS: iQuantityUS})
+	print(f"直接算{strSymbol}: {ar[strSymbol]}@{fNetValue:.3f}, 对应{strSymbolUS}: {ar[strSymbolUS]}, 反向算XOP@{fPriceUS:.2f}")
+	__printHedge(api, ar, strSymbol, strSymbolUS)
+	ar = api.CalcQuantity(strSymbol, {strSymbolUS: iQuantityUS})
+	print(f"只输入{strSymbolUS}数量时建议: {ar[strSymbol]}, 对应{strSymbolUS}: {ar[strSymbolUS]}")
+	__printHedge(api, ar, strSymbol, strSymbolUS)
+	ar = api.CalcQuantity(strSymbol, {strSymbol: iQuantity})
+	print(f"只输入{strSymbol}数量时建议: {ar[strSymbol]}, 对应XOP: {ar['XOP']}")
+	__printHedge(api, ar, strSymbol, 'XOP')
+	ar = api.CalcQuantity(strSymbol, {})
+	print(f"无输入数量或者出错时建议: {ar[strSymbol]}, 对应XOP: {ar['XOP']}")
+	__printHedge(api, ar, strSymbol, 'XOP')
+
+def __testSPY(api, strSymbol, strSymbolUS, iQuantity, iQuantityUS, fPriceUS, arUSDCNY):
+	fNetValue = api.EstNetValue(strSymbol)
+	__printEst(strSymbol, fNetValue)
+	if api.IsLOF(strSymbol):
+		fNetValue = api.EstNetValue(strSymbol, {strSymbolUS: fPriceUS})
+		fPriceUS = api.ReverseEst({strSymbol: fNetValue})
+	else:
+		fNetValue = api.EstNetValue(strSymbol, arUSDCNY)
+		__printEst(strSymbol, fNetValue, '参考')
+		fNetValue = api.EstNetValue(strSymbol, {strSymbolUS: fPriceUS} | arUSDCNY)
+		fPriceUS = api.ReverseEst({strSymbol: fNetValue} | arUSDCNY)
+	ar = api.CalcQuantity(strSymbol, {strSymbol: iQuantity, strSymbolUS: iQuantityUS})
+	print(f"把{strSymbolUS}转换成^GSPC后二次计算{strSymbol}: {ar[strSymbol]}@{fNetValue:.3f}, 对应{strSymbolUS}: {ar[strSymbolUS]}, 反向算SPY@{fPriceUS:.2f}")
+	__printHedge(api, ar, strSymbol, strSymbolUS)
+
 def _handlePalmmicroData(arData):
 	arCNY = {'CNY': 6.7686}
-	arXOP = {'XOP': 141.07}
-	arQuantity162411 = {'SZ162411': 810506}
-	arQuantityXOP = {'XOP':1000}
-	arSPY = {'SPY': 617.34}
-	arES = {'hf_ES': 6252.5}
-	arQuantity161125 = {'SZ161125': 101045}
-	arGLD = {'GLD': 373.92}
-	arGC = {'hf_GC': 4091.51}
-	arSLV = {'SLV': 55.81}
-	arSI = {'hf_SI': 62.22}
-	arQuantity164701 = {'SZ164701': 233041}
-	arQuantitySLV = {'SLV': 100}
-	arUSO = {'USO': 85.75}
-	arCL = {'hf_CL': 56.52}
-	arQuantity160723 = {'SZ160723': 106853}
-	arINDA = {'INDA': 44.72}
-
 	api = PalmmicroAPI(arData)
 	#print(api.get_config())
-    
-	print(round(api.EstNetValue('SZ162411'), 3), '直接算162411官方估值')
-	f162411 = api.EstNetValue('SZ162411', arXOP)
-	fXOP = api.ReverseEst({'SZ162411':f162411})
-	ar162411 = api.CalcQuantity('SZ162411', arQuantity162411 | arQuantityXOP)
-	i162411 = ar162411['SZ162411']
-	iXOP = ar162411['XOP']
-	print(f"直接算162411: {i162411}@{f162411:.3f}, 反向算XOP: {iXOP}@{fXOP:.2f}, 对冲值: {i162411/iXOP:.0f}")
-	ar162411 = api.CalcQuantity('SZ162411', arQuantity162411)
-	print(f"只输入162411数量时建议: {ar162411['SZ162411']}, 对应XOP: {ar162411['XOP']}")
-	ar162411 = api.CalcQuantity('SZ162411', arQuantityXOP)
-	print(f"只输入XOP数量时建议: {ar162411['SZ162411']}, 对应XOP: {ar162411['XOP']}")
-	ar162411 = api.CalcQuantity('SZ162411', arQuantitySLV)
-	print(f"无输入或者错误输入时建议: {ar162411['SZ162411']}, 对应XOP: {ar162411['XOP']}")
-    
-	print(round(api.EstNetValue('SZ159518', arCNY), 3), '直接算159518参考估值')
-	f159518 = api.EstNetValue('SZ159518', arXOP | arCNY)
-	fXOP = api.ReverseEst({'SZ159518':f159518} | arCNY)
-	ar159518 = api.CalcQuantity('SZ159518', {'SZ159518':1415100} | arQuantityXOP)
-	i159518 = ar159518['SZ159518']
-	iXOP = ar159518['XOP']
-	print(f"直接算159518: {i159518}@{f159518:.3f}, 反向算XOP: {iXOP}@{fXOP:.2f}, 对冲值: {i159518/iXOP:.0f}")
-    
-	print(round(api.EstNetValue('SZ161125'), 3), '直接算161125官方估值')
-	f161125 = api.EstNetValue('SZ161125', arSPY)
-	fSPY = api.ReverseEst({'SZ161125':f161125})
-	ar161125 = api.CalcQuantity('SZ161125', arQuantity161125 | {'SPY':100})
-	i161125 = ar161125['SZ161125']
-	iSPY = ar161125['SPY']
-	print(f"把SPY转换成^GSPC后二次计算161125: {i161125}@{f161125:.3f}, 反向算SPY: {iSPY}@{fSPY:.2f}, 对冲值: {i161125/iSPY:.0f}")
-	f161125 = api.EstNetValue('SZ161125', arES)
-	fSPY = api.ReverseEst({'SZ161125':f161125})
-	ar161125 = api.CalcQuantity('SZ161125', arQuantity161125 | {'hf_ES': 1})
-	i161125 = ar161125['SZ161125']
-	iES = ar161125['hf_ES']
-	print(f"把ES转换成^GSPC后二次计算161125: {i161125}@{f161125:.3f}, 反向算SPY: {fSPY:.2f}, 对应ES: {iES}, 对冲值: {i161125/iES/api.get_multiplier('hf_ES'):.0f}")
-    
-	f159612 = api.EstNetValue('SZ159612', arSPY | arCNY)
-	fSPY = api.ReverseEst({'SZ159612':f159612} | arCNY)
-	print(f"把SPY转换成^GSPC后二次计算159612: {f159612:.3f}, 反向算SPY: {fSPY:.2f}")
-	f159612 = api.EstNetValue('SZ159612', arES | arCNY)
-	fSPY = api.ReverseEst({'SZ159612':f159612} | arCNY)
-	print(f"把ES转换成^GSPC后二次计算159612: {f159612:.3f}, 反向算SPY: {fSPY:.2f}")
-	
-	print(round(api.EstNetValue('SZ164701'), 3), '按持仓算164701官方估值')
-	f164701 = api.EstNetValue('SZ164701', arGLD | arSLV)
-	ar164701 = api.CalcQuantity('SZ164701', arQuantity164701 | {'GLD': 100} | arQuantitySLV)
-	i164701 = ar164701['SZ164701']
-	iGLD = ar164701['GLD']
-	print(f"按持仓算164701: {i164701}@{f164701:.3f}, GLD: {iGLD}, SLV: {ar164701['SLV']}, GLD对冲值: {i164701/iGLD:.0f}")
-	f164701 = api.EstNetValue('SZ164701', arGC | arSI)
-	ar164701 = api.CalcQuantity('SZ164701', arQuantity164701 | {'hf_GC': 10} | arQuantitySLV)
-	i164701 = ar164701['SZ164701']
-	iGLD = ar164701['GLD']
-	print(f"把GC和SI转换成GLD和SLV后, 按持仓算164701: {i164701}@{f164701:.3f}, GLD: {iGLD}, SLV: {ar164701['SLV']}, GC: {ar164701['hf_GC']}, GLD对冲值: {i164701/iGLD:.0f}")
-    
-	print(round(api.EstNetValue('SZ160723'), 3), '按持仓算160723官方估值')
-	f160723 = api.EstNetValue('SZ160723', arUSO)
-	ar160723 = api.CalcQuantity('SZ160723', arQuantity160723 | {'USO': 100})
-	i160723 = ar160723['SZ160723']
-	iUSO = ar160723['USO']
-	iUSOEU = ar160723['^USO-EU']
-	print(f"按持仓算160723: {i160723}@{f160723:.3f}, USO: {iUSO}, ^USO-EU: {iUSOEU}, USO对冲值: {i160723/(iUSO + iUSOEU):.0f}")
-	f160723 = api.EstNetValue('SZ160723', arCL)
-	ar160723 = api.CalcQuantity('SZ160723', arQuantity160723 | {'hf_CL': 10})
-	i160723 = ar160723['SZ160723']
-	iUSO = ar160723['USO']
-	iUSOEU = ar160723['^USO-EU']
-	print(f"把CL转换成USO后, 按持仓算160723: {i160723}@{f160723:.3f}, USO: {iUSO}, ^USO-EU: {iUSOEU}, CL: {ar160723['hf_CL']}, USO对冲值: {i160723/(iUSO + iUSOEU):.0f}")
 
-	print(round(api.EstNetValue('SZ164824'), 3), '按持仓算164824官方估值')
-	print(round(api.EstNetValue('SZ164824', arINDA), 3), '按持仓算164824')
+	arQuantity = {'SZ162411': 1085481, 'SZ159518': 1672100}
+	arQuantityUS = {'XOP': 1000, 'GUSH': 10000}
+	arPriceUS = {'XOP': 141.07, 'GUSH': 25.38}
+	for strSymbol, iQuantity in arQuantity.items():
+		for strSymbolUS, iQuantityUS in arQuantityUS.items():
+			__testXOP(api, strSymbol, strSymbolUS, iQuantity, iQuantityUS, arPriceUS[strSymbolUS], arCNY)
+
+	arQuantity = {'SZ161125': 101521, 'SZ159612': 193400}
+	arQuantityUS = {'SPY': 100, 'hf_ES': 2}
+	arPriceUS = {'SPY': 617.34, 'hf_ES': 6253.75}
+	for strSymbol, iQuantity in arQuantity.items():
+		for strSymbolUS, iQuantityUS in arQuantityUS.items():
+			__testSPY(api, strSymbol, strSymbolUS, iQuantity, iQuantityUS, arPriceUS[strSymbolUS], arCNY)
     
-	print(round(api.EstNetValue('SZ161226'), 3), '直接算161226官方估值')
+	f164701 = api.EstNetValue('SZ164701')
+	__printHoldingEst('SZ164701', f164701)
+	f164701 = api.EstNetValue('SZ164701', {'GLD': 365.32, 'SLV': 56.22})
+	ar164701 = api.CalcQuantity('SZ164701', {'SZ164701': 233041, 'GLD': 100, 'SLV': 100})
+	print(f"按持仓算SZ164701: {ar164701['SZ164701']}@{f164701:.3f}, GLD: {ar164701['GLD']}, SLV: {ar164701['SLV']}")
+	__printHedge(api, ar164701, 'SZ164701', 'GLD')
+	f164701 = api.EstNetValue('SZ164701', {'hf_GC': 3997.43, 'hf_SI': 60.42})
+	ar164701 = api.CalcQuantity('SZ164701', {'SZ164701': 233041, 'hf_GC': 10, 'SLV': 100})
+	print(f"把hf_GC和hf_SI转换成GLD和SLV后, 按持仓算SZ164701: {ar164701['SZ164701']}@{f164701:.3f}, GLD: {ar164701['GLD']}, SLV: {ar164701['SLV']}, hf_GC: {ar164701['hf_GC']}")
+	__printHedge(api, ar164701, 'SZ164701', 'GLD')
+    
+	f160723 = api.EstNetValue('SZ160723')
+	__printHoldingEst('SZ160723', f160723)
+	f160723 = api.EstNetValue('SZ160723', {'USO': 90.22})
+	ar160723 = api.CalcQuantity('SZ160723', {'SZ160723': 106853, 'USO': 100})
+	i160723 = ar160723['SZ160723']
+	iUSO = ar160723['USO']
+	iUSOEU = ar160723['^USO-EU']
+	print(f"按持仓算SZ160723: {i160723}@{f160723:.3f}, USO: {iUSO}, ^USO-EU: {iUSOEU}")
+	print(f"USO对冲值: {i160723/(iUSO + iUSOEU):.0f}")
+	f160723 = api.EstNetValue('SZ160723', {'hf_CL': 59.46})
+	ar160723 = api.CalcQuantity('SZ160723', {'SZ160723': 106853, 'hf_CL': 10})
+	i160723 = ar160723['SZ160723']
+	iUSO = ar160723['USO']
+	iUSOEU = ar160723['^USO-EU']
+	print(f"把hf_CL转换成USO后, 按持仓算SZ160723: {i160723}@{f160723:.3f}, USO: {iUSO}, ^USO-EU: {iUSOEU}, hf_CL: {ar160723['hf_CL']}")
+	print(f"USO对冲值: {i160723/(iUSO + iUSOEU):.0f}")
+
+	f164824 = api.EstNetValue('SZ164824')
+	__printHoldingEst('SZ164824', f164824)
+	f164824 = api.EstNetValue('SZ164824', {'INDA': 44.72})
+	__printHoldingEst('SZ164824', f164824, '')
+    
+	f161226 = api.EstNetValue('SZ161226')
+	__printEst('SZ161226', f161226)
 	f161226 = api.EstNetValue('SZ161226', {'nf_AG0':12842.3});
 	fAG0 = api.ReverseEst({'SZ161226':f161226})
 	ar161226 = api.CalcQuantity('SZ161226', {'SZ161226':576813, 'nf_AG0':10})
-	i161226 = ar161226['SZ161226']
-	iAG0 = ar161226['nf_AG0']
-	print(f"直接算161226: {i161226}@{f161226:.3f}, 反向算AG0: {iAG0}@{fAG0:.2f}, 对冲值: {i161226/iAG0/api.get_multiplier('nf_AG0'):.0f}")
+	print(f"直接算161226: {ar161226['SZ161226']}@{f161226:.3f}, 反向算nf_AG0: {ar161226['nf_AG0']}@{fAG0:.2f}")
+	__printHedge(api, ar161226, 'SZ161226', 'nf_AG0')
+
 
 def post_json_array_to_telegram(
 	data_array: Dict[str, Any], 

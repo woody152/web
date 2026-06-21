@@ -1,7 +1,5 @@
 <?php
 
-// ****************************** Internal none-stock link functions *******************************************************
-
 define('PATH_ACCOUNT', '/account/');
 define('PATH_BLOG', '/woody/blog/');
 
@@ -18,7 +16,7 @@ function GetMemberLink($strMemberId, $bChinese = true)
 	    {
 	        $strName = $strEmail;
 	    }
-	    return GetPhpLink(PATH_ACCOUNT.'profile', 'email='.$strEmail, $strName, $bChinese);
+	    return GetPhpLink(PATH_ACCOUNT.'profile', "email=$strEmail", $strName, $bChinese);
 	}
     return '';
 }
@@ -49,31 +47,31 @@ function _getAccountToolArray($bChinese = true)
 {
 	if ($bChinese)
 	{
-		$ar = array('benfordslaw' => ACCOUNT_TOOL_BENFORD_CN,
-					  'chisquaredtest' => ACCOUNT_TOOL_CHI_CN,
-                      'commonphrase' => ACCOUNT_TOOL_PHRASE_CN,
-                      'cramersrule' => ACCOUNT_TOOL_CRAMER_CN,
-                      'dicecaptcha' => ACCOUNT_TOOL_DICE_CN,
-					  'simpletest' => ACCOUNT_TOOL_EDIT_CN,
-                      'ip' => ACCOUNT_TOOL_IP_CN,
-                      'linearregression' => ACCOUNT_TOOL_LINEAR_CN,
-                      'primenumber' => ACCOUNT_TOOL_PRIME_CN,
-                      'sinajs' => ACCOUNT_TOOL_SINAJS_CN,
-                 );
+		$ar = ['benfordslaw' => ACCOUNT_TOOL_BENFORD_CN,
+			   'chisquaredtest' => ACCOUNT_TOOL_CHI_CN,
+               'commonphrase' => ACCOUNT_TOOL_PHRASE_CN,
+               'cramersrule' => ACCOUNT_TOOL_CRAMER_CN,
+               'dicecaptcha' => ACCOUNT_TOOL_DICE_CN,
+			   'simpletest' => ACCOUNT_TOOL_EDIT_CN,
+               'ip' => ACCOUNT_TOOL_IP_CN,
+               'linearregression' => ACCOUNT_TOOL_LINEAR_CN,
+               'primenumber' => ACCOUNT_TOOL_PRIME_CN,
+               'sinajs' => ACCOUNT_TOOL_SINAJS_CN
+		      ];
     }
     else
 	{
-		$ar = array('benfordslaw' => ACCOUNT_TOOL_BENFORD,
-					  'chisquaredtest' => ACCOUNT_TOOL_CHI,
-                      'commonphrase' => ACCOUNT_TOOL_PHRASE,
-                      'cramersrule' => ACCOUNT_TOOL_CRAMER,
-                      'dicecaptcha' => ACCOUNT_TOOL_DICE,
-					  'simpletest' => ACCOUNT_TOOL_EDIT,
-					  'ip' => ACCOUNT_TOOL_IP,
-                      'linearregression' => ACCOUNT_TOOL_LINEAR,
-                      'primenumber' => ACCOUNT_TOOL_PRIME,
-                      'sinajs' => ACCOUNT_TOOL_SINAJS,
-                 );
+		$ar = ['benfordslaw' => ACCOUNT_TOOL_BENFORD,
+			   'chisquaredtest' => ACCOUNT_TOOL_CHI,
+               'commonphrase' => ACCOUNT_TOOL_PHRASE,
+               'cramersrule' => ACCOUNT_TOOL_CRAMER,
+               'dicecaptcha' => ACCOUNT_TOOL_DICE,
+			   'simpletest' => ACCOUNT_TOOL_EDIT,
+			   'ip' => ACCOUNT_TOOL_IP,
+               'linearregression' => ACCOUNT_TOOL_LINEAR,
+               'primenumber' => ACCOUNT_TOOL_PRIME,
+               'sinajs' => ACCOUNT_TOOL_SINAJS
+		  	  ];
     }
 	return $ar;
 }
@@ -93,9 +91,9 @@ function GetAccountToolLink($strPage, $strQuery = false, $strDisplay = false, $b
 {
 	if ($strDisplay === false)
 	{
-		$strDisplay = $strQuery ? $strQuery : GetAccountToolStr($strPage, $bChinese);
+		$strDisplay = $strQuery ?: GetAccountToolStr($strPage, $bChinese);
 	}
-    return GetPhpLink(PATH_ACCOUNT.$strPage, ($strQuery ? $strPage.'='.$strQuery : false), $strDisplay, $bChinese);
+    return GetPhpLink(PATH_ACCOUNT.$strPage, ($strQuery ? "$strPage=$strQuery" : false), $strDisplay, $bChinese);
 }
 
 function GetCommonPhraseLink($bChinese = true)
@@ -110,7 +108,7 @@ function GetSinaDataLink($strSinaSymbols, $strDisplay = false)
 
 function _getIpLink($strPage, $strIp, $bChinese)
 {
-    return GetPageLink(PATH_ACCOUNT, $strPage, 'ip='.$strIp, $strIp, $bChinese);
+    return GetPageLink(PATH_ACCOUNT, $strPage, "ip=$strIp", $strIp, $bChinese);
 }
 
 function GetIpLink($strIp, $bChinese = true)
@@ -135,9 +133,12 @@ function GetTelegramDisplay($bChinese = true)
 
 function GetBotDisplay($strType, $bChinese = true)
 {
-	if ($strType == TABLE_TELEGRAM_BOT)		return GetTelegramDisplay($bChinese);
-	else if ($strType == TABLE_WECHAT_BOT)	return GetWechatDisplay($bChinese);
-	return '';
+	$str = match($strType)
+		   {TABLE_TELEGRAM_BOT => GetTelegramDisplay($bChinese),
+			TABLE_WECHAT_BOT => GetWechatDisplay($bChinese),
+			default => ''
+		   };
+	return $str;
 }
 
 function GetAllVisitorLink($strType = TABLE_VISITOR, $bChinese = true)
@@ -146,7 +147,7 @@ function GetAllVisitorLink($strType = TABLE_VISITOR, $bChinese = true)
 	$strDisplay = '';
 	if ($strType == TABLE_TELEGRAM_BOT || $strType == TABLE_WECHAT_BOT)
 	{
-		$strQuery = 'type='.$strType;
+		$strQuery = "type=$strType";
 		$strDisplay = GetBotDisplay($strType, $bChinese);
 	}
 	return GetPhpLink(PATH_ACCOUNT.TABLE_VISITOR, $strQuery, $strDisplay.($bChinese ? '访问统计' : 'Visitor'), $bChinese);
@@ -156,5 +157,3 @@ function GetAllCommentLink($strQuery, $bChinese = true)
 {
     return GetPhpLink(PATH_ACCOUNT.'comment', $strQuery, ($bChinese ? '全部评论' : 'All Comment'), $bChinese);
 }
-
-?>

@@ -113,8 +113,8 @@ class QdiiGroupAccount extends FundGroupAccount
 
     function GetLeverageSymbols($strEstSymbol)
     {
-   		$pair_sql = GetFundPairSql();
-        return $pair_sql->GetSymbolArray($strEstSymbol);
+		$pair_sql = GetFundPairSql();
+		return $pair_sql->GetSymbolArray($strEstSymbol);
     }
     
     function EchoDebugParagraph()
@@ -138,6 +138,6 @@ function GetMetaDescription()
     if ($est_ref = $fund->GetEstRef())     			$strBase .= '、'.RefGetStockDisplay($est_ref);
 	if ($realtime_ref = $fund->GetRealtimeRef())	$strBase .= '、'.RefGetStockDisplay($realtime_ref);
     
-    $str = '根据'.$strBase.'等其它网站的数据来源估算'.$acct->GetStockDisplay().STOCK_DISP_NETVALUE.'的网页工具。';
+    $str = "根据{$strBase}等其它网站的数据来源估算".$acct->GetStockDisplay().STOCK_DISP_NETVALUE.'的网页工具。';
     return CheckMetaDescription($str);
 }

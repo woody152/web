@@ -11,6 +11,6 @@ def main():
 	print(f"Hello, World! {sys.version}")
 	result = calculate_annualized_return(350, 168, 10)
 	print(f"总结: 无敌哥10年赚168万, 本金350万, 年化收益率为: {result:.2f}%")
-	FetchPalmmicroData("SZ159518, SZ159612, SZ160723, SZ161125, SZ161226, SZ162411, SZ164701, SZ164824")
+	FetchPalmmicroData('SZ159518, SZ159612, SZ160723, SZ161125, SZ161226, SZ162411, SZ164701, SZ164824')
 
 main()

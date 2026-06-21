@@ -19,9 +19,6 @@ def convert_symbol(strSymbol: str) -> str:
 		return strSymbol  # 不符合格式则返回原字符串
 
 class PalmmicroAPI:
-	DEFAULT_KEY_QUANTITY = 1000000
-	DEFAULT_HEDGE_QUANTITY = 10000
-
 	# 定义并初始化字典静态变量 arMultiplier，使用 strSymbol 作为键（整数倍率）
 	arMultiplier: Dict[str, int] = {'hf_CL': 100,	# MCL:100, CL:1000
 									'hf_ES': 5,		# MES
@@ -30,6 +27,8 @@ class PalmmicroAPI:
 									'hf_SI': 5000,	# SI
 									'nf_AG0': 15,
 									'default': 1}	# 默认倍率
+	DEFAULT_KEY_QUANTITY: int = 1000000
+	DEFAULT_HEDGE_QUANTITY: int = 10000
 
 	def __init__(self, config_dict: Dict[str, Any]) -> None:
 		"""
@@ -44,7 +43,11 @@ class PalmmicroAPI:
 		"""返回当前配置字典"""
 		return self.config
 
-	def get_param(self, key, default = None):
+	def set_param(self, key: str, value):
+		"""设置/更新配置参数"""
+		self.config[key] = value
+
+	def get_param(self, key: str, default = None):
 		"""获取指定配置参数的值"""
 		return self.config.get(key, default)
 
@@ -57,15 +60,11 @@ class PalmmicroAPI:
 		return 'calibration' in ar
 
 	@staticmethod
-	def get_next_symbol(ar):
+	def get_next_symbol(ar) -> str:
 		return ar['symbol_hedge']
 
-	def get_next_param(self, ar, default = None):
-		return self.config.get(self.get_next_symbol(ar), default)
-
-	def set_param(self, key, value):
-		"""设置/更新配置参数"""
-		self.config[key] = value
+	def get_next_param(self, ar):
+		return self.get_param(self.get_next_symbol(ar))
 
 	@classmethod
 	def get_multiplier(cls, strSymbol):
@@ -143,12 +142,13 @@ class PalmmicroAPI:
 		return float(ar['netvalue']) * (1.0 + float(ar['position']) * (fTotal * fCny / float(ar['CNYholdings']) - 1.0))
 	
 	def __est_calibration_netvalue(self, ar, arSrc):
-		arHedge = self.get_next_param(ar)
+		strHedgeSymbol = self.get_next_symbol(ar)
+		arHedge = self.get_param(strHedgeSymbol)
 		if arHedge != None:
 			arCopy = None
 			if arSrc != None:	# 需要二次计算
+				arCopy = arSrc.copy()
 				fIndex = None
-				strHedgeSymbol = self.get_next_symbol(ar)
 				if strHedgeSymbol in arSrc:		# strHedgeSymbol in [SPY, QQQ]
 					fIndex = self._reverse_calc_with_calibration(arHedge, strHedgeSymbol, {strHedgeSymbol:arSrc[strHedgeSymbol]})
 					# print(f"{strHedgeSymbol}: {fIndex:.2f}")
@@ -157,12 +157,19 @@ class PalmmicroAPI:
 					if arIndex != None:
 						strFutureSymbol = self.get_next_symbol(arIndex)
 						if strFutureSymbol in arSrc:	# strFutureSymbol in [hf_ES, hf_NQ]
-							fIndex = self._calc_with_calibration(arIndex, {strFutureSymbol:arSrc[strFutureSymbol]})
+							fIndex = self._calc_with_calibration(arIndex, {strFutureSymbol: arSrc[strFutureSymbol]})
 				if fIndex != None:
-					arCopy = arSrc.copy()
 					arCopy[strHedgeSymbol] = fIndex
 		else:
 			arCopy = arSrc
+			if arSrc != None:	# 检查是否有需要二次计算的杠杆ETF输入
+				for strLevSymbol in arSrc:
+					arLev = self.get_param(strLevSymbol)
+					if arLev != None:
+						if strHedgeSymbol == self.get_next_symbol(arLev):
+							arCopy = arSrc.copy()
+							arCopy[strHedgeSymbol] = self._reverse_calc_with_calibration(arLev, strLevSymbol, {strLevSymbol: arSrc[strLevSymbol]})
+							break
 		return self._calc_with_calibration(ar, arCopy)		# 直接算
 	
 	def __est_holdings_netvalue(self, ar, arSrc):
@@ -203,20 +210,31 @@ class PalmmicroAPI:
 
 	def __calc_calibration_quantity(self, strSymbol, ar, arSrc):
 		arDst = {}
-		arHedge = self.get_next_param(ar)
 		strHedgeSymbol = self.get_next_symbol(ar)
 		fHedge = float(ar['hedge']) * float(self.get_multiplier(strHedgeSymbol))
 		iHedgeQuantity = self.DEFAULT_HEDGE_QUANTITY	
 		if strHedgeSymbol in arSrc:
 			iHedgeQuantity = arSrc[strHedgeSymbol]
-		elif arHedge != None:
-			arIndex = self.get_next_param(arHedge)
-			if arIndex != None:
-				strFutureSymbol = self.get_next_symbol(arIndex)
-				if strFutureSymbol in arSrc:
-					fHedge = self._get_hedge(ar) * self.get_multiplier(strFutureSymbol)
-					iHedgeQuantity = arSrc[strFutureSymbol]
-					strHedgeSymbol = strFutureSymbol
+		else:
+			arHedge = self.get_param(strHedgeSymbol)
+			if arHedge != None:
+				arIndex = self.get_next_param(arHedge)
+				if arIndex != None:
+					strFutureSymbol = self.get_next_symbol(arIndex)
+					if strFutureSymbol in arSrc:
+						fHedge = self._get_hedge(ar) * self.get_multiplier(strFutureSymbol)
+						iHedgeQuantity = arSrc[strFutureSymbol]
+						strHedgeSymbol = strFutureSymbol
+			else:
+				for strLevSymbol in arSrc:
+					if strLevSymbol != strSymbol:
+						arLev = self.get_param(strLevSymbol)
+						if arLev != None:
+							if strHedgeSymbol == self.get_next_symbol(arLev):
+								fHedge /= self._get_hedge(arLev) * self.get_multiplier(strLevSymbol)
+								iHedgeQuantity = arSrc[strLevSymbol]
+								strHedgeSymbol = strLevSymbol
+								break
 		if strSymbol in arSrc:
 			fQuantity = _get_floor_quantity(arSrc[strSymbol])
 			iPeerQuantity = int(math.floor(fQuantity / fHedge))

@@ -74,7 +74,7 @@ class MyEWrapper(EWrapper):
         if IsChinaMarketOpen():
             self.arOrder['KWEB'] = GetOrderArray()
             self.arOrder['GLD'] = GetOrderArray()
-            self.arOrder['IEO'] = GetOrderArray()
+            #self.arOrder['IEO'] = GetOrderArray()
             self.arOrder['INDA'] = GetOrderArray()
             self.arOrder['QQQ'] = GetOrderArray()
             self.arOrder['SLV'] = GetOrderArray()
@@ -140,6 +140,11 @@ class MyEWrapper(EWrapper):
             else:
                 if IsMarketOpen():
                     print(arMktData['symbol'], price, tickType)
+                    arMktData['BUY_price'] = price
+                    arMktData['SELL_price'] = price
+                    arMktData['BUY_size'] = 100
+                    arMktData['SELL_size'] = 100
+                    self._CheckPriceAndSize(arMktData)
 
     def tickSize(self, reqId, tickType, size):
         arMktData = self.arMkt[reqId]

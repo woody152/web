@@ -635,7 +635,7 @@ function _getDefaultInput($strPage)
 	$str = match($strPage)
    		   {'benfordslaw' => _getTaobaoDouble11Data(),
    			'chisquaredtest' => '200,200,200,200,200,200; 215,210,185,195,190,205',
-   			'commonphrase' => 'Hello, world!',
+   			'commonphrase' => '{',
     		'cramersrule' => '[0.2506, 2.487, 1099], [2.450, 2.557, 7408]',
     		'dicecaptcha' => '4; 14',
    			'ip' => UrlGetIp(),

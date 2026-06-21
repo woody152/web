@@ -52,6 +52,7 @@ def _get_floor_quantity(fQuantity):
     fQuantity /= 100.0
     return math.floor(fQuantity) * 100.0
 
+"""
 def _get_hedge_quantity(strType, arSymData, fHedge):
     f_quantity = _get_floor_quantity(float(arSymData[strType + '_size']))
     f_floor = math.floor(f_quantity / fHedge)
@@ -74,6 +75,7 @@ def _ref_get_peer_val2(strType, arSymData, arLevSymData, fCNY):
     f_index = _ref_get_peer_val(strType, arSymData, fCNY)
     f_index /= float(arLevSymData['calibration'])
     return fund_adjust_position(float(arLevSymData['position']), f_index, float(arLevSymData['netvalue']))
+"""
 
 def GetSendMsgArray(strKey):
     ar = {'key': strKey,
@@ -232,16 +234,16 @@ class Palmmicro:
             
     def CalcCalibrationArbitrage(self, arMktData, strMktSymbol, strMktType, strSymbol, strType):
         fMktPrice = arMktData[strMktType + '_price']
-        iMktSize = arMktData[strMktType + '_size'] 
+        #iMktSize = arMktData[strMktType + '_size'] 
         #arSymData = self.arSym[strSymbol]
         arSymData = self.api.get_param(strSymbol)
         strSizeIndex = strType + '_size'
         if strSizeIndex in arSymData:
             #fCNY = self._getCNY(arSymData)
             if arSymData[strSizeIndex] > 0 and fMktPrice > 0.001:
-                #if strMktSymbol in self.arSym:
-                    #arLevSymData = self.arSym[strMktSymbol]
                 """
+                if strMktSymbol in self.arSym:
+                    arLevSymData = self.arSym[strMktSymbol]
                 arLevSymData = self.api.get_param(strMktSymbol)
                 if arLevSymData != None:
                     fHedgePos = float(arLevSymData['position'])
@@ -251,25 +253,27 @@ class Palmmicro:
                     if strSymbol == 'SZ161226':
                         fCNY = 1.0
                     fHedgePrice = _ref_get_peer_val(strType, arSymData, fCNY)
-                """
-                arSrc = {strMktSymbol: fMktPrice}
-                if self.api.IsLOF(strSymbol) == False:
-                    arSrc |= {'CNY': self.fUSDCNY}
-                fPrice = self.api.EstNetValue(strSymbol, arSrc)
                 fHedge = float(arSymData['hedge'])
                 iHedgeSize = _get_hedge_quantity(strType, arSymData, fHedge)
-                """
                 fRatio = fHedgePrice / fMktPrice - 1.0
                 if fHedgePos:
                     fRatio /= fHedgePos
                 fRatio *= float(arSymData['position'])
-                """
-                fRatio = fPrice / float(arSymData[strType + '_price']) - 1.0
                 arSymData['discount'] = fRatio
                 iMktSize = min(iMktSize, iHedgeSize)
                 arSymData['quantity'] = iMktSize;
                 iSize = int((float(iMktSize) * fHedge + 50.0) / 100.0) * 100
                 strDebug = self._getSymDebugString(strSymbol, iSize, strType, strMktType)
+                strDebug += get_separate_display(strType) + self._getMktDebugString(strMktSymbol, iMktSize, fMktPrice)
+                """
+                arSrc = {strMktSymbol: fMktPrice}
+                if self.api.IsLOF(strSymbol) == False:
+                    arSrc |= {'CNY': self.fUSDCNY}
+                arSymData['discount'] = float(arSymData[strType + '_price']) / self.api.EstNetValue(strSymbol, arSrc) - 1.0
+                arQuantity = self.api.CalcQuantity(strSymbol, {strSymbol: arSymData[strSizeIndex], strMktSymbol: int(arMktData[strMktType + '_size'])})
+                iMktSize = arQuantity[strMktSymbol]
+                arSymData['quantity'] = iMktSize
+                strDebug = self._getSymDebugString(strSymbol, arQuantity[strSymbol], strType, strMktType)
                 strDebug += get_separate_display(strType) + self._getMktDebugString(strMktSymbol, iMktSize, fMktPrice)
                 return strDebug
         return False
@@ -322,7 +326,6 @@ class Palmmicro:
         fTotal *= fNetValue
         fPrice = float(arSymData[strType + '_price'])
         if (fPrice > 0.001):
-            #arSymData['discount'] = fTotal / fPrice - 1.0
             arSymData['discount'] = fPrice / fTotal - 1.0
             arSymData['quantity'] = iTotalQuantity
             return strDebug

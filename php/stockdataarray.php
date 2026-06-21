@@ -6,8 +6,9 @@ function _addIndexArray(&$ar, $strIndex, $strSymbol, $strDate, $sql, $cal_sql, $
 	if (!isset($ar[$strSymbol]))
 	{
 		$strStockId = $sql->GetId($strSymbol);
-		// $record = $cal_sql->GetRecordFromDate($strStockId, $strDate);
-		$record = $cal_sql->GetRecordNow($strStockId);
+		// 晚上A股基金更新净值期间会出现日期对不齐情况，要等所有基金都更新完净值后才会一致。
+		$record = $cal_sql->GetRecordFromDate($strStockId, $strDate);
+		// $record = $cal_sql->GetRecordNow($strStockId);
 		$strDate = $record['date'];
 
 		$arData = [];
@@ -17,6 +18,7 @@ function _addIndexArray(&$ar, $strIndex, $strSymbol, $strDate, $sql, $cal_sql, $
 		$arData['netvalue'] = rtrim0($net_sql->GetClose($strStockId, $strDate));
 		$arData['symbol_hedge'] = $strIndex;
 		$ar[$strSymbol] = $arData;
+		// DebugString(__FUNCTION__.$strSymbol);
 	}
 }
 
@@ -37,6 +39,7 @@ function _addFundPairArray(&$ar, $strSymbol, $sql, $cal_sql, $net_sql, $last_sql
 			$arData['netvalue'] = ($fVal = $last_sql->ReadVal($strStockId)) ? strval($fVal) : rtrim0($net_sql->GetClose($strStockId, $strDate));
 			$arData['symbol_hedge'] = $sql->GetStockSymbol($strPairId);
 			$ar[$strSymbol] = $arData;
+			// DebugString(__FUNCTION__.$strSymbol);
 		}
 	}
 }
@@ -95,6 +98,14 @@ function GetStockDataArray($strSymbols, $arRange = false)
 								_addFundPairArray($ar, $strIndex, $sql, $cal_sql, $net_sql, $last_sql, $pair_sql, $pos_sql);
 								$strIndex = $strEtf;
 							}
+							else
+							{	// 记住不要把A股QDII基金放到'fundpair'表中，否则还要把它们从这里再删选出来。
+								foreach ($pair_sql->GetSymbolArray($strIndex) as $strEtf)
+								{
+									_addIndexArray($ar, $strIndex, $strEtf, $strDate, $sql, $cal_sql, $net_sql, $pos_sql);
+									// DebugString(__FUNCTION__.$strEtf);
+								}	
+							}	
 						}
 					}
 					else

@@ -120,7 +120,7 @@ function EchoSmaParagraph($ref, $str = false, $cb_ref = false, $callback = false
     	$est_ref = call_user_func($callback, $cb_ref);
     	$str .= _getSmaParagraphWarning($est_ref);
 
-//    	$ar[] = new TableColumnEst(TableColumnGetStock($est_ref));
+		// $ar[] = new TableColumnEst(TableColumnGetStock($est_ref));
     	$ar[] = new TableColumnStock($est_ref, 90);
     	$ar[] = $next_col;
     	if ($bAfterHour)	$ar[] = $afterhour_col;
@@ -203,7 +203,7 @@ function _callbackFutureSma($ref, $strEst = false)
 	{
 		$f = floatval($strEst) * RefGetFuturePremium($ref);
 		$f = round(4.0 * $f) / 4.0;
-//		DebugVal($f, __FUNCTION__, true);
+		// DebugVal($f, __FUNCTION__, true);
 		return strval(round($f, 2));
 	}
 	return $ref;
@@ -216,7 +216,7 @@ function EchoFutureSmaParagraph($ref, $callback2 = false)
 		if ($fPremium = RefGetFuturePremium($realtime_ref))
 		{
 			EchoCalibrationHistoryParagraph($ref->GetEstRef(), 0, 1);
-			$str = '理论溢价：'.number_format($fPremium, 4).' '.GetStockOptionLink(STOCK_OPTION_PREMIUM, $realtime_ref->GetSymbol());
+			$str = '理论溢价：'.strval_round($fPremium, 4).' '.GetStockOptionLink(STOCK_OPTION_PREMIUM, $realtime_ref->GetSymbol());
 			EchoSmaParagraph($ref->GetEstRef(), $str, $realtime_ref, '_callbackFutureSma', $callback2);
 		}
 	}
