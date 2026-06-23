@@ -35,10 +35,9 @@ function EchoAll()
 {
 	global $acct;
 	
-//    if ($ref = $acct->EchoStockGroup())
 	if ($strSymbol = $acct->StockCheckSymbol())
     {
-    	$arSymbol = array($strSymbol);
+    	$arSymbol = [$strSymbol];
     	if ($strCompare = UrlGetQueryValue('compare'))	$arSymbol[] = $strCompare;
     	if ($strForex = UrlGetQueryValue('forex'))		$arSymbol[] = $strForex;
   		StockPrefetchArrayExtendedData($arSymbol);
@@ -51,9 +50,7 @@ function EchoAll()
 
     	$bAdmin = $acct->IsAdmin();
    		$strLinks = _getStockHistoryLinks($ref, $bAdmin);
-   		$csv = new PageCsvFile();
-   		EchoStockHistoryParagraph($ref, $compare_ref, $forex_ref, $strLinks, $csv, $acct->GetStart(), $acct->GetNum(), $bAdmin);
-   		$csv->Close();
+   		EchoStockHistoryParagraph($ref, $compare_ref, $forex_ref, $strLinks, $acct->GetStart(), $acct->GetNum(), $bAdmin);
    		
    		if ($acct->GetLoginId()) 
    		{
@@ -88,4 +85,3 @@ function GetTitle()
     $acct = new SymbolAccount();
 
 require('../../php/ui/_dispcn.php');
-?>

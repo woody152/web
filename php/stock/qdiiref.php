@@ -78,8 +78,6 @@ function QdiiEuGetEstSymbol($strSymbol)
 
 class _QdiiReference extends FundReference
 {
-    var $strOfficialCNY = false;
-    
     public function __construct($strSymbol, $strCny)
     {
         parent::__construct($strSymbol);
@@ -111,14 +109,14 @@ class _QdiiReference extends FundReference
     {
        	$est_ref = $this->GetEstRef();
 		if ($str = $this->_getEstNetValue($est_ref, $strDate))		return $str;
-       	if (method_exists($est_ref, 'GetHoldingsDate'))		return strval($est_ref->_estNetValue($strDate));
+       	if (method_exists($est_ref, 'GetHoldingsDate'))		        return strval($est_ref->_estNetValue($strDate));
         return $this->_getEstPrice($est_ref, $strDate);
     }
 
     function _getFairEstVal($strDate)
     {
        	$est_ref = $this->GetEstRef();
-       	if (method_exists($est_ref, 'GetHoldingsDate'))		return strval($est_ref->_estNetValue());
+       	if (method_exists($est_ref, 'GetHoldingsDate'))		        return strval($est_ref->_estNetValue());
        	if ($str = $this->_getEstNetValue($est_ref, $strDate))		return $str;
         return $this->_getEstPrice($est_ref, $strDate);
     }
@@ -132,9 +130,9 @@ class _QdiiReference extends FundReference
         if ($est_ref == false)    return;
         
         $strDate = $est_ref->GetDate();
-        if ($this->strOfficialCNY = $cny_ref->GetClose($strDate))
+        if ($strOfficialCNY = $cny_ref->GetClose($strDate))
         {
-        	$this->fOfficialNetValue = $this->GetQdiiValue($this->_getOfficialEstVal($strDate), $this->strOfficialCNY);
+        	$this->fOfficialNetValue = $this->GetQdiiValue($this->_getOfficialEstVal($strDate), $strOfficialCNY);
             $this->strOfficialDate = $strDate;
             $this->UpdateEstNetValue();
         }
@@ -144,14 +142,7 @@ class _QdiiReference extends FundReference
             if ($record = $fund_est_sql->GetRecordNow($this->GetStockId()))
             {
                 $this->strOfficialDate = $record['date'];
-                $this->strOfficialCNY = $cny_ref->GetClose($this->strOfficialDate);
                 $this->fOfficialNetValue = floatval($record['close']);
-        	    //$this->fOfficialNetValue = $this->GetQdiiValue($this->_getOfficialEstVal($this->strOfficialDate), $this->strOfficialCNY);
-                //$this->UpdateEstNetValue();
-            }
-            else
-            {
-                $this->strOfficialCNY = $cny_ref->GetPrice();
             }
         }
         
@@ -189,7 +180,6 @@ class _QdiiReference extends FundReference
 	           		if (($strEst = $est_ref->GetClose($strDate)) === false)		return false;
                 }
         
-//                $this->fFactor = floatval($strEst) * floatval($strCNY) / floatval($this->GetPrice());
 				$this->fFactor = QdiiGetCalibration($strEst, $strCNY, $this->GetPrice());
                 $this->InsertFundCalibration();
                 return $this->fFactor;
@@ -208,7 +198,6 @@ class _QdiiReference extends FundReference
     	
     	if ($this->fFactor)
     	{
-//    		$fVal = floatval($strEst) * floatval($strCNY) / $this->fFactor;
 			$fVal = QdiiGetVal(floatval($strEst), floatval($strCNY), $this->fFactor);
     		return $this->AdjustPosition($fVal);
     	}
@@ -295,5 +284,3 @@ class QdiiEuReference extends _QdiiReference
         $this->EstNetValue();
     }
 }
-
-?>

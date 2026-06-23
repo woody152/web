@@ -88,7 +88,7 @@ class MyPairReference extends MyStockReference
     	
     	if ($this->IsSymbolA())	$fVal = QdiiGetVal($fPairVal, $fCny, $this->fFactor);
     	else					$fVal = ($fPairVal / $fCny) / $this->fFactor;
-		return FundAdjustPosition($this->GetPosition(), $fVal, ($this->fLastCalibrationVal ? $this->fLastCalibrationVal : $fVal));
+		return FundAdjustPosition($this->GetPosition(), $fVal, ($this->fLastCalibrationVal ?:$fVal));
     }
     
     function EstToPair($fMyVal = false, $fCny = false)

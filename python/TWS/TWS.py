@@ -10,7 +10,6 @@ from ibapi.order import Order
 from palmmicro import Palmmicro
 from palmmicro import Calibration
 from palmmicro import GetMktDataArray
-from palmmicro import get_display
 
 from nyc_time import GetExchangeTime
 
@@ -62,7 +61,6 @@ class MyEWrapper(EWrapper):
         self.client = client
         self.strCurFuture = '202609'
         self.strNextFuture = '202612'
-        self.arDebug = {}
 
     def nextValidId(self, orderId: int):
         self.arQDII = {'SH501018', 'SZ160719', 'SZ160723', 'SZ161116', 'SZ161125', 'SZ161127', 'SZ161129', 'SZ161130', 'SZ161226', 'SZ162411', 'SZ162415', 'SZ163208', 'SZ164701', 'SZ164824', 'SZ164906', 'SZ165513'}
@@ -85,9 +83,9 @@ class MyEWrapper(EWrapper):
             self.arOrder['XOP'] = GetOrderArray()
         else:
             #self.arOrder['TLT'] = GetOrderArray([80.90, 84.19, 85.21, 86.40, 86.62, 86.72, 87.59, 89.76, 91.88], 100, 1, 8)
-            self.arOrder['SPX'] = GetOrderArray([5191.35, 6197.88, 7021.13, 7274.39, 7417.18, 7479.30, 7484.46, 7694.53, 7844.37])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0095, 3, 6)
-            self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0185, -1, -1)
+            self.arOrder['SPX'] = GetOrderArray([5191.35, 6197.88, 7021.13, 7278.21, 7430.16, 7487.35, 7496.58, 7696.48, 7844.37])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0089, 4, 6)
+            self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0182, -1, -1)
         self.palmmicro = Palmmicro()
         self.client.StartStreaming(orderId)
         self.arMkt = {}
@@ -136,15 +134,9 @@ class MyEWrapper(EWrapper):
                 if IsMarketOpen():
                     arMktData['LAST_price'] = price
                     self.LastPriceTrade(arMktData)
-            #elif tickType == 59: # Avg volume price 21
             else:
                 if IsMarketOpen():
                     print(arMktData['symbol'], price, tickType)
-                    arMktData['BUY_price'] = price
-                    arMktData['SELL_price'] = price
-                    arMktData['BUY_size'] = 100
-                    arMktData['SELL_size'] = 100
-                    self._CheckPriceAndSize(arMktData)
 
     def tickSize(self, reqId, tickType, size):
         arMktData = self.arMkt[reqId]
@@ -294,65 +286,10 @@ class MyEWrapper(EWrapper):
                     self.client.CallPlaceOrder(strSymbol, fPrice, iSize, 'SELL', arOrder['SELL_id'])
                     arOrder['SELL_pos'] = iPos
 
-    def __debugPriceAndSize(self, arSymData, strSymbol, strType, strDebug):
-        iSize = arSymData['quantity']
-        if iSize >= 10:
-            fRatio = arSymData['discount']
-            strDebug = str(round(fRatio * 100.0, 2)) + '% | ' + strDebug
-            strSymbolType = strSymbol + strType
-            if strSymbolType not in self.arDebug or self.arDebug[strSymbolType] != strDebug:
-                self.arDebug[strSymbolType] = strDebug
-                if (fRatio < -0.001 and strType == 'SELL') or (fRatio > 0.001 and strType == 'BUY'):
-                    print(strDebug)
-                    #self.palmmicro.SendSymbolMsg(strDebug, strType, strSymbol)
-                if strSymbol in self.arQDII and iSize >= 100 and ((fRatio < -0.01 and strType == 'SELL') or (fRatio > 0.005 and strType == 'BUY')):
-                    self.palmmicro.SendMsg(strDebug, strType)
-                #elif strType == 'BUY' and fRatio < 0.005:
-                self.palmmicro.SendSymbolMsg(strDebug, strType, strSymbol)
-
-    def _processPriceAndSize(self, arMktData, arSym):
-        strMktSymbol = arMktData['symbol']
-        for strType in ['SELL', 'BUY']:
-            if strType == 'SELL':
-                strMktType = 'BUY'
-            else:
-                strMktType = 'SELL'
-            if all(arMktData[attr] is not None for attr in [strMktType + '_price', strMktType + '_size']):
-                for strSymbol, arSymData in arSym.items():
-                    strDebug = False
-                    if 'calibration' in arSymData:
-                        if arSymData['symbol_hedge'] == strMktSymbol:
-                            strDebug = self.palmmicro.CalcCalibrationArbitrage(arMktData, strMktSymbol, strMktType, strSymbol, strType)
-                    else:
-                        if strMktSymbol in arSymData['symbol_hedge']:
-                            strDebug = self.palmmicro.CalcHoldingsArbitrage(self.arMkt, strMktSymbol, strMktType, arMktData[strMktType + '_size'], strSymbol, strType)
-                    if strDebug:
-                        self.__debugPriceAndSize(arSymData, strSymbol, strType, strDebug)
-            else:
-                for strSymbol, arSymData in arSym.items():
-                    strDebug = strMktSymbol + '无' + get_display(strMktType) + '数据'
-                    if 'calibration' in arSymData:
-                        if arSymData['symbol_hedge'] != strMktSymbol:
-                            strDebug = False
-                    else:
-                        if strMktSymbol not in arSymData['symbol_hedge']:
-                            strDebug = False
-                    if strDebug:
-                        self.palmmicro.SendSymbolMsg(strDebug, strType, strSymbol)
-
     def _CheckPriceAndSize(self, arMktData):
         if IsChinaMarketOpen():
-            arSym = self.palmmicro.FetchData(sorted(self.arQDII | self.arXOPETF | self.arXBIETF))
-            #arSym = self.palmmicro.FetchData(sorted(self.arQDII))
-            self._processPriceAndSize(arMktData, arSym)
-            if self.palmmicro.CheckNewSinaData() == True:
-                for reqId, arOtherMktData in self.arMkt.items():
-                    if arOtherMktData['symbol'] != arMktData['symbol']:
-                        self._processPriceAndSize(arOtherMktData, arSym)
-                self._processPriceAndSize(self.palmmicro.GetAG0(), arSym)
-            #for strHedge in self.arQQQ:
-                #self.palmmicro.SendMsg(strDebug, 'qqq')
-            self.palmmicro.SendOldMsg()
+            self.palmmicro.CheckPriceAndSize(sorted(self.arQDII | self.arXOPETF | self.arXBIETF), arMktData, self.arMkt)
+
 
 def GetContractExchange():
     iTime = GetExchangeTime()

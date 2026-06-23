@@ -411,7 +411,6 @@ function GetStockHedge($strSymbol, $strStockId, $strLev = false)
     		{
 				$strDate = $record['date'];
 				if ($strLevCal = $cal_sql->GetClose($strLevId, $strDate))
-				// if ($strLevCal = $cal_sql->GetCloseNow($strLevId))
 				{
 		    		mysqli_free_result($result);
 					return StockCalcHedge(floatval($record['close']), $fPos) / StockCalcHedge(floatval($strLevCal), $pos_sql->ReadPos($strLevId));

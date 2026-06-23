@@ -117,12 +117,9 @@ class _HoldingsCsvFile extends DebugCsvFile
 		if ($strStockId = SqlGetStockId($strHolding))
 		{
 			$fForex = is_numeric($strHolding) ? $this->fHKDCNY : $this->fUSDCNY;
-			$his_sql = GetStockHistorySql();
-			return $iQuantity * floatval($his_sql->GetAdjClose($strStockId, $this->strDate)) * $fForex;
+			return $iQuantity * floatval(SqlGetAdjCloseByDate($strStockId, $this->strDate)) * $fForex;
 		}
-		DebugString('GetMarketVal failed with '.$strHolding);
+		DebugString("GetMarketVal failed with $strHolding");
 		return 0.0;
     }
 }
-
-?>

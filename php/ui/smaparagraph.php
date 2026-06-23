@@ -89,10 +89,12 @@ function _getSmaParagraphWarning($ref)
 			if (abs($fDiff) > 0.0005)
 			{
 				$strSymbol = $ref->GetSymbol();
-				$str = GetHtmlNewLine().GetFontElement($strSymbol.' '.$record['date'].'收盘价冲突：').$record['adjclose'].' - '.$ref->GetPrevPrice().' = '.number_format($fDiff, 6);
+				$strDiff = strval_round($fDiff, FLOAT_PRECISION);
+				$str = GetHtmlNewLine().GetFontElement("$strSymbol ".$record['date'].'收盘价冲突：').$record['adjclose'].' - '.$ref->GetPrevPrice()." = $strDiff";
 				if (DebugIsAdmin())
 				{
-					$str .= ' '.GetStockOptionLink(STOCK_OPTION_CLOSE, $strSymbol);
+					$str .= ' '.GetStockOptionLink(STOCK_OPTION_DIVIDEND, $strSymbol, false, $strDiff);
+					$str .= ' '.GetStockOptionLink(STOCK_OPTION_CLOSE, $strSymbol, false, $strDiff);
 				}
 				return $str;
 			}

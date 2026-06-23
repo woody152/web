@@ -175,7 +175,7 @@ class HoldingsReference extends MyStockReference
 	    $ar = [];
 		foreach ($this->ar_holdings_ref as $ref)
 	    {
-            if ($fProportion = $his_sql->GetProportion($ref->GetStockId(), $strDate, $strPrevDate))
+            if ($fProportion = $his_sql->GetAdjProportion($ref->GetStockId(), $strDate, $strPrevDate))
 		    {
 				if ($ref->IsSymbolA())
 				{
@@ -266,7 +266,8 @@ class HoldingsReference extends MyStockReference
     		foreach ($this->ar_holdings_ref as $ref)
     		{
     			$strStockId = $ref->GetStockId();
-    			if ($strAdjClose = $his_sql->GetAdjClose($strStockId, $this->strHoldingsDate))	$this->arHoldingsDateHistory[$strStockId] = floatval($strAdjClose);
+				$strAdjClose = $his_sql->GetAdjClose($strStockId, $this->strHoldingsDate);
+    			$this->arHoldingsDateHistory[$strStockId] = floatval($strAdjClose ?: $his_sql->GetAdjClosePrev($strStockId, $this->strHoldingsDate));
     		}
     	}
     	return $this->arHoldingsDateHistory;
@@ -314,10 +315,14 @@ class HoldingsReference extends MyStockReference
 				}
 			}
 */			
-			$strPrice = $ref->GetPrice();
 			if ($strDate)
 			{
-				if ($str = $his_sql->GetAdjClose($strStockId, $strDate))		$strPrice = $str;
+				$str = $his_sql->GetAdjClose($strStockId, $strDate);
+				$strPrice = $str ?: $his_sql->GetAdjClosePrev($strStockId, $strDate);
+			}
+			else
+			{
+				$strPrice = $ref->GetPrice();
 			}
 			$fPrice = floatval($strPrice);
 			if ($bRealtime)
@@ -434,4 +439,3 @@ class HoldingsReference extends MyStockReference
    		return $this->fRealtimeNetValue;
     }
 }
-

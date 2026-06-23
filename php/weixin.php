@@ -2,7 +2,7 @@
 require('_wxprivate.php');
 
 // 微信公众号公共模板, 返回输入信息
-const WX_DEBUG_VER = '版本210';		
+const WX_DEBUG_VER = '版本211';		
 
 const BOT_EOL = "\r\n";
 const MAX_BOT_MSG_LEN = 2048;
@@ -73,7 +73,7 @@ class WeixinCallback
         if (($timestamp = UrlGetQueryValue('timestamp')) == false)	return false;
         if (($nonce = UrlGetQueryValue('nonce')) == false)			return false;
         		
-		$ar = array(WX_TOKEN, $timestamp, $nonce);
+		$ar = [WX_TOKEN, $timestamp, $nonce];
 		sort($ar, SORT_STRING);
 		$str = implode($ar);
 		return (sha1($str) == $signature) ? true : false;
@@ -133,7 +133,7 @@ class WeixinCallback
         return $str.$this->GetVersion();
     }
     
-    function GetVersion()
+    public function GetVersion()
     {
     	return WX_DEBUG_VER;
     }
@@ -175,7 +175,7 @@ class WeixinCallback
     	case 'MASSSENDJOBFINISH':		// Mass send job finish
     		return '收到群发完毕';
     	}
-    	return '未知'.$strContents;
+    	return "未知{$strContents}";
     }
 
     function OnEventMenu($strMenu, $strUserName)
@@ -211,6 +211,6 @@ class WeixinCallback
 
     function OnUnknownType($strType, $strUserName)
     {
-    	return $this->GetUnknownText('未知信息类型'.$strType, $strUserName);
+    	return $this->GetUnknownText("未知信息类型{$strType}", $strUserName);
     }
 }

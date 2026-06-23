@@ -1,7 +1,7 @@
 <?php
 require_once('stocktable.php');
 
-function _echoStockHistoryItem($record, $ref, $compare_ref, $forex_ref, $csv, $his_sql, $strCompareId, $strForexId, $bAdmin)
+function _echoStockHistoryItem($record, $ref, $compare_ref, $forex_ref, $his_sql, $strCompareId, $strForexId, $bAdmin)
 {
 	$ar = [];
 	
@@ -17,7 +17,6 @@ function _echoStockHistoryItem($record, $ref, $compare_ref, $forex_ref, $csv, $h
 	if ($compare_ref)
 	{
 		if ($strCompare = $his_sql->GetAdjClose($strCompareId, $strDate))
-		//if ($strCompare = $his_sql->GetClosePrev($strCompareId, $strDate))
 		{
 			$fCompare = floatval($strCompare);
 			$ar[] = $compare_ref->GetPriceDisplay($fCompare);
@@ -40,7 +39,7 @@ function _echoStockHistoryItem($record, $ref, $compare_ref, $forex_ref, $csv, $h
  	EchoTableColumn($ar);
 }
 
-function _echoStockHistoryData($ref, $compare_ref, $forex_ref, $csv, $his_sql, $strStockId, $iStart, $iNum, $bAdmin)
+function _echoStockHistoryData($ref, $compare_ref, $forex_ref, $his_sql, $strStockId, $iStart, $iNum, $bAdmin)
 {
 	$strCompareId = $compare_ref ? $compare_ref->GetStockId() : false; 
 	$strForexId = $forex_ref ? $forex_ref->GetStockId() : false; 
@@ -48,13 +47,13 @@ function _echoStockHistoryData($ref, $compare_ref, $forex_ref, $csv, $his_sql, $
     {
         while ($record = mysqli_fetch_assoc($result)) 
         {
-            _echoStockHistoryItem($record, $ref, $compare_ref, $forex_ref, $csv, $his_sql, $strCompareId, $strForexId, $bAdmin);
+            _echoStockHistoryItem($record, $ref, $compare_ref, $forex_ref, $his_sql, $strCompareId, $strForexId, $bAdmin);
         }
         mysqli_free_result($result);
     }
 }
 
-function EchoStockHistoryParagraph($ref, $compare_ref = false, $forex_ref = false, $str = false, $csv = false, $iStart = 0, $iNum = TABLE_COMMON_DISPLAY, $bAdmin = false)
+function EchoStockHistoryParagraph($ref, $compare_ref = false, $forex_ref = false, $str = false, $iStart = 0, $iNum = TABLE_COMMON_DISPLAY, $bAdmin = false)
 {
     $strSymbol = $ref->GetSymbol();
     $strStockId = $ref->GetStockId();
@@ -71,9 +70,9 @@ function EchoStockHistoryParagraph($ref, $compare_ref = false, $forex_ref = fals
     	$ar[] = new TableColumnRatio();
     }
 
-	if (EchoTableParagraphBegin($ar, $strSymbol.'stockhistory', $str.GetHtmlNewLine().$strMenuLink))
+	if (EchoTableParagraphBegin($ar, "{$strSymbol}stockhistory", $str.GetHtmlNewLine().$strMenuLink))
 	{
-		_echoStockHistoryData($ref, $compare_ref, $forex_ref, $csv, $his_sql, $strStockId, $iStart, $iNum, $bAdmin);
+		_echoStockHistoryData($ref, $compare_ref, $forex_ref, $his_sql, $strStockId, $iStart, $iNum, $bAdmin);
     	EchoTableParagraphEnd($strMenuLink);
 	}
 }

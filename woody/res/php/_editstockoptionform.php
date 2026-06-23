@@ -247,6 +247,8 @@ function _getStockOptionHoldings($strStockId)
 
 function _getStockOptionVal($strSubmit, $strLoginId, $ref, $strSymbol, $strDate)
 {
+	if ($strVal = UrlGetQueryValue('val'))	return $strVal;
+	
 	$strStockId = $ref->GetStockId();
 	switch ($strSubmit)
 	{

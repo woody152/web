@@ -323,7 +323,7 @@ class TitleAccount extends Account
    		$this->iNum = UrlGetQueryInt('num', DEFAULT_PAGE_NUM);
    		if (($this->iStart != 0) && ($this->iNum != 0))							  			$this->Auth();
    		
-        $this->strQuery = UrlGetQueryValue($strQueryItem ? $strQueryItem : $this->strPage);
+        $this->strQuery = UrlGetQueryValue($strQueryItem ?: $this->strPage);
     }
     
     function GetPage()

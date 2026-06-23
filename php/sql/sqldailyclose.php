@@ -85,11 +85,11 @@ class DailyCloseSql extends KeySql
     	return $this->_getCloseString('GetRecord', $strKeyId, $strDate);
     }
 
-    function GetProportion($strKeyId, $strDate, $strPrevDate)
+    function GetProportion($strKeyId, $strDate, $strPrevDate, $callback = 'GetClose')
     {
-		if ($str = $this->GetClose($strKeyId, $strDate))
+		if ($str = $this->$callback($strKeyId, $strDate))
 		{
-			if ($strPrev = $this->GetClose($strKeyId, $strPrevDate))
+			if ($strPrev = $this->$callback($strKeyId, $strPrevDate))
 			{
                 $fPrev = floatval($strPrev);
                 if ($fPrev > MIN_FLOAT_VAL)

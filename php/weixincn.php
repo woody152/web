@@ -7,9 +7,9 @@ function _wxDebug($strUserName, $strText, $strSubject)
 	$strNewLine = GetHtmlNewLine();
 
 	$str = GetInfoElement('用户：').$strUserName;
-	$str .= $strNewLine.$strText;
+	$str .= "{$strNewLine}$strText";
 	$str .= $strNewLine.GetWeixinLink();
-    trigger_error($strSubject.$strNewLine.$str);
+    trigger_error("$strSubject{$strNewLine}$str");
 }
 
 function _wxEmailInfo()
@@ -24,7 +24,7 @@ class WeixinStock extends WeixinCallback
     	SqlConnectDatabase();
     }
 
-    function GetVersion()
+    public function GetVersion()
     {
     	return WX_DEBUG_VER.' '.GetDevLink('palmmicro/20161014cn.php');
     }

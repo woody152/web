@@ -214,7 +214,7 @@ function _getLinearRegressionStockArrays(&$arX, &$arY, $strInput, $strSeparator,
    	{
    		while ($record = mysqli_fetch_assoc($result)) 
    		{
-   			if ($strY = $his_sql->GetAdjClose($strStockIdY, $record['date'], true))
+   			if ($strY = $his_sql->GetAdjClose($strStockIdY, $record['date']))
    			{
    				$strX = rtrim0($record['adjclose']);
    				if (!IsZeroString($strX) && !IsZeroString($strY))
@@ -240,7 +240,7 @@ function _getLinearRegressionStockArrays(&$arX, &$arY, $strInput, $strSeparator,
 	
   	$str = GetStockHistoryLink($x_ref->GetSymbol(), 'x').' = {';
   	$str .= _getArrayDisplay($arX, $strSeparator, $strNewLine);
-    $str .= '}'.$strNewLine.GetStockHistoryLink($y_ref->GetSymbol(), 'y').' = {';
+    $str .= "}$strNewLine".GetStockHistoryLink($y_ref->GetSymbol(), 'y').' = {';
   	$str .= _getArrayDisplay($arY, $strSeparator, $strNewLine);
    	$str .= '}';
 	return $str;
@@ -289,7 +289,7 @@ function _getLinearRegressionArrays(&$arX, &$arY, $strInput, $strSeparator, $str
     }		
 	
     $str = 'x = ['.implode($strSeparator, $arX).']';
-	$str .= $strNewLine.'y = ['.(empty($strFunction) ? implode($strSeparator, $arY) : strval_round_implode($arY, $strSeparator)).']';
+	$str .= "{$strNewLine}y = [".(empty($strFunction) ? implode($strSeparator, $arY) : strval_round_implode($arY, $strSeparator)).']';
 	return $str;
 }
 
@@ -300,7 +300,7 @@ function _getLinearRegressionString($strInput, $bChinese)
 	
 	if ($strFunction = strstr($strInput, '(', true))
 	{
-		$strInput = ltrim($strInput, $strFunction.'(');
+		$strInput = ltrim($strInput, "$strFunction(");
 		$strInput = rtrim($strInput, ')');
 	}
 
@@ -417,7 +417,7 @@ function _getPrimeNumber($callback, $strNumber)
 {
     $fStart = microtime(true);
     $aiNum = call_user_func($callback, intval($strNumber));
-	$str = $strNumber.'=';
+	$str = "$strNumber=";
 	foreach ($aiNum as $iPrime)
 	{
 		$str .= strval($iPrime).'*';

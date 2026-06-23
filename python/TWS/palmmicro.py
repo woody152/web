@@ -1,7 +1,4 @@
-#import array
-#import json
 import math
-from typing import Self
 import requests
 import time
 
@@ -52,31 +49,6 @@ def _get_floor_quantity(fQuantity):
     fQuantity /= 100.0
     return math.floor(fQuantity) * 100.0
 
-"""
-def _get_hedge_quantity(strType, arSymData, fHedge):
-    f_quantity = _get_floor_quantity(float(arSymData[strType + '_size']))
-    f_floor = math.floor(f_quantity / fHedge)
-    return int(f_floor)
-
-def fund_adjust_position(f_position, f_val, f_old_val):
-    return f_position * f_val + (1.0 - f_position) * f_old_val;
-
-def fund_reverse_adjust_position(f_position, f_val, f_old_val):
-    return f_val / f_position - f_old_val * (1.0 / f_position - 1.0)
-
-def qdii_get_peer_val(f_qdii, f_cny, f_calibration):
-    return f_qdii * f_calibration / f_cny
-
-def _ref_get_peer_val(strType, arSymData, fCNY):
-    f_qdii = fund_reverse_adjust_position(float(arSymData['position']), float(arSymData[strType + '_price']), float(arSymData['netvalue']))
-    return qdii_get_peer_val(f_qdii, fCNY, float(arSymData['calibration']))
-
-def _ref_get_peer_val2(strType, arSymData, arLevSymData, fCNY):
-    f_index = _ref_get_peer_val(strType, arSymData, fCNY)
-    f_index /= float(arLevSymData['calibration'])
-    return fund_adjust_position(float(arLevSymData['position']), f_index, float(arLevSymData['netvalue']))
-"""
-
 def GetSendMsgArray(strKey):
     ar = {'key': strKey,
           'count': 6,
@@ -101,11 +73,11 @@ def GetMktDataArray(strSymbol):
 
 class Palmmicro:
     def __init__(self):
-        #self.arSym = {}
         self.api = None
         self.iTimer = 0
         self.bNewSinaData = False
         self.fUSDCNY = 1.0;
+        self.arDebug = {}
         self.arSendMsg = {}
         self.arSendMsg['telegram'] = GetSendMsgArray(WECHAT_KEY)
         self.arSendMsg['SH501018'] = GetSendMsgArray(WECHAT_SH501018_KEY)
@@ -129,9 +101,6 @@ class Palmmicro:
         self.arSendMsg['SZ165513'] = GetSendMsgArray(WECHAT_SZ165513_KEY)
         self.arAG0 = GetMktDataArray('nf_AG0')
 
-    def GetAG0(self):
-        return self.arAG0
-
     def _fetchSinaData(self, strSymbols):
         strUrl = f'http://hq.sinajs.cn/list=fx_susdcny,nf_AG0,{strSymbols.lower()}'
         try:
@@ -154,8 +123,6 @@ class Palmmicro:
                             self.arAG0['SELL_size'] = int(arItem[12])
                         else:
                             strSymbol = strSymbol.upper()
-                            #if strSymbol in self.arSym:
-                                #arSymData = self.arSym[strSymbol]
                             arSymData = self.api.get_param(strSymbol)
                             if arSymData != None:
                                 arSymData['BUY_price'] = arItem[6]
@@ -188,7 +155,7 @@ class Palmmicro:
                           'date': 0,
                           'text': ''
                          }
-                }
+             }
         arMessage = ar['message']
         arMessage['date'] = int(time.time())
         arMessage['text'] = strSymbols
@@ -198,32 +165,26 @@ class Palmmicro:
             response.raise_for_status()  # Raise an exception for HTTP errors
             if response.status_code == 200:
                 response_data = response.json()  # Parse the JSON response data
-                print('Response data:', response_data)
-                #self.arSym.clear()
-                #self.arSym = response_data['text']
+                #print('Response data:', response_data)
                 self.api = PalmmicroAPI(response_data['text'])
             else:
                 print('Failed to send POST request. Status code:', response.status_code)
         except requests.exceptions.RequestException as e:
             print('_fetchPalmmicroData error:', e)
 
-    def FetchData(self, arSymbol):
+    def _fetchData(self, arSymbol):
         iCur = int(time.time())
         if iCur - self.iTimer >= 19:
             self.iTimer = iCur
             strSymbols = ','.join(arSymbol)
-            #if not self.arSym:
             if self.api is None:
                 self._fetchPalmmicroData(strSymbols)
             self._fetchSinaData(strSymbols)
-        #return self.arSym
-        return self.api.get_config()
-
+        
     def _getMktDebugString(self, strHedgeSymbol, iSize, fPrice):
         return strHedgeSymbol + ' ' + str(iSize) + '@' + str(fPrice)
     
     def _getSymDebugString(self, strSymbol, iSize, strType, strMktType):
-        #arSymData = self.arSym[strSymbol]
         arSymData = self.api.get_param(strSymbol)
         return get_display(strMktType) + ' ' + self._getMktDebugString(strSymbol, iSize, float(arSymData[strType + '_price']))
 
@@ -232,55 +193,130 @@ class Palmmicro:
             return float(arSymData['CNY'])
         return self.fUSDCNY
             
-    def CalcCalibrationArbitrage(self, arMktData, strMktSymbol, strMktType, strSymbol, strType):
-        fMktPrice = arMktData[strMktType + '_price']
-        #iMktSize = arMktData[strMktType + '_size'] 
-        #arSymData = self.arSym[strSymbol]
-        arSymData = self.api.get_param(strSymbol)
-        strSizeIndex = strType + '_size'
-        if strSizeIndex in arSymData:
-            #fCNY = self._getCNY(arSymData)
-            if arSymData[strSizeIndex] > 0 and fMktPrice > 0.001:
-                """
-                if strMktSymbol in self.arSym:
-                    arLevSymData = self.arSym[strMktSymbol]
-                arLevSymData = self.api.get_param(strMktSymbol)
-                if arLevSymData != None:
-                    fHedgePos = float(arLevSymData['position'])
-                    fHedgePrice = _ref_get_peer_val2(strType, arSymData, arLevSymData, fCNY)
-                else:
-                    fHedgePos = False
-                    if strSymbol == 'SZ161226':
-                        fCNY = 1.0
-                    fHedgePrice = _ref_get_peer_val(strType, arSymData, fCNY)
-                fHedge = float(arSymData['hedge'])
-                iHedgeSize = _get_hedge_quantity(strType, arSymData, fHedge)
-                fRatio = fHedgePrice / fMktPrice - 1.0
-                if fHedgePos:
-                    fRatio /= fHedgePos
-                fRatio *= float(arSymData['position'])
-                arSymData['discount'] = fRatio
-                iMktSize = min(iMktSize, iHedgeSize)
-                arSymData['quantity'] = iMktSize;
-                iSize = int((float(iMktSize) * fHedge + 50.0) / 100.0) * 100
-                strDebug = self._getSymDebugString(strSymbol, iSize, strType, strMktType)
-                strDebug += get_separate_display(strType) + self._getMktDebugString(strMktSymbol, iMktSize, fMktPrice)
-                """
-                arSrc = {strMktSymbol: fMktPrice}
-                if self.api.IsLOF(strSymbol) == False:
-                    arSrc |= {'CNY': self.fUSDCNY}
-                arSymData['discount'] = float(arSymData[strType + '_price']) / self.api.EstNetValue(strSymbol, arSrc) - 1.0
-                arQuantity = self.api.CalcQuantity(strSymbol, {strSymbol: arSymData[strSizeIndex], strMktSymbol: int(arMktData[strMktType + '_size'])})
-                iMktSize = arQuantity[strMktSymbol]
-                arSymData['quantity'] = iMktSize
-                strDebug = self._getSymDebugString(strSymbol, arQuantity[strSymbol], strType, strMktType)
-                strDebug += get_separate_display(strType) + self._getMktDebugString(strMktSymbol, iMktSize, fMktPrice)
-                return strDebug
+    def IsFree(self, group):
+        iCur = int(time.time())
+        if iCur - self.arSendMsg[group]['timer'] < self.arSendMsg[group]['count']:
+            return False
+        self.arSendMsg[group]['timer'] = iCur
+        return True
+
+    def SendTelegramMsg(self, strMsg):
+        url = 'https://api.telegram.org/bot' + TG_TOKEN + '/sendMessage?text=' + strMsg + '&chat_id=-1001346320717'
+        try:
+            response = requests.get(url)
+            response.raise_for_status()  # Raise an exception for HTTP errors
+            if response.status_code == 200:
+                data = response.json()  # Assuming the response is in JSON format
+                #print(data)
+            else:
+                print('Failed to retrieve data. Status code:', response.status_code)
+        except requests.exceptions.RequestException as e:
+            print('SendTelegramMsg Error occurred:', e)
+
+    def SendWechatMsg(self, strMsg, group, strType = 'text'):
+        url = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=' + self.arSendMsg[group]['key']
+        arWechatMsg = {'msgtype': strType,  
+                       strType: {'content': ''
+                                }
+                      }
+        arText = arWechatMsg[strType]
+        arText['content'] = strMsg
+        try:
+            response = requests.post(url, json=arWechatMsg, headers={'Content-Type': 'application/json'})
+            response.raise_for_status()  # Raise an exception for HTTP errors
+            if response.status_code == 200:
+                response_data = response.json()  # Parse the JSON response data
+                #print('Response data:', response_data)
+            else:
+                print('Failed to send POST request. Status code:', response.status_code)
+        except requests.exceptions.RequestException as e:
+            print('SendWechatMsg Error occurred:', e)
+
+    def __convert_array_msg(self, group):
+        arMsg = self.arSendMsg[group]['array_msg']
+        if len(arMsg) >= 0:
+            #unique = set(arMsg)
+            #str = '\n\n'.join(unique)
+            str = '\n\n'.join(arMsg)
+            return GetBeijingTimeDisplay() + ' | ' + str
+        return ''
+
+    def __send_msg(self, group):
+        str = self.__convert_array_msg(group)
+        self.SendWechatMsg(str, group)
+        #if group == 'telegram':
+            #self.SendTelegramMsg(str)
+        self.arSendMsg[group]['array_msg'].clear()
+
+    def _sendMsg(self, strMsg, strType, group='telegram'):
+        strMsgType = 'msg_' + strType
+        arSendMsg = self.arSendMsg[group]
+        if arSendMsg[strMsgType] != strMsg:
+            if len(self.__convert_array_msg(group).encode('utf-8')) + len(strMsg.encode('utf-8')) < 2046:
+                arSendMsg[strMsgType] = strMsg
+                arSendMsg['array_msg'].append(strMsg)
+                if self.IsFree(group):
+                    self.__send_msg(group)
+            else:
+                print('too many message in group: ', group)
+
+    def _sendSymbolMsg(self, strMsg, strType, strSymbol):
+        if strSymbol in self.arSendMsg:
+            strMsg = strMsg.replace(' ' + strSymbol.rstrip('ETF'), '')
+            strMsgType = 'msg_' + strType
+            arSendMsg = self.arSendMsg[strSymbol]
+            if arSendMsg[strMsgType] != strMsg:
+                arSendMsg[strMsgType] = strMsg
+                arSendMsg['array_msg'].clear()
+                for strLoop in ['SELL', 'BUY']:
+                    str = arSendMsg['msg_' + strLoop]
+                    if str != '':
+                        if strLoop != strType:
+                            str += ' | 延迟'
+                        arSendMsg['array_msg'].append(str)
+                if self.IsFree(strSymbol):
+                    self.__send_msg(strSymbol)
+
+    def _sendOldMsg(self):
+        for group, value in self.arSendMsg.items():
+            if self.IsFree(group):
+                if len(value['array_msg']) > 0:
+                    self.__send_msg(group)
+
+    def _checkNewSinaData(self):
+        if self.bNewSinaData == True:
+            self.bNewSinaData = False
+            return True
         return False
 
-    def CalcHoldingsArbitrage(self, arMkt, strMktSymbol, strMktType, iMktSize, strSymbol, strType):
-        #arSymData = self.arSym[strSymbol]
-        arSymData = self.api.get_param(strSymbol)
+    def _debugPriceAndSize(self, arSymData, strSymbol, strType, strDebug):
+        iSize = arSymData['quantity']
+        if iSize >= 1:
+            fRatio = arSymData['discount']
+            strDebug = str(round(fRatio * 100.0, 2)) + '% | ' + strDebug
+            strSymbolType = strSymbol + strType
+            if strSymbolType not in self.arDebug or self.arDebug[strSymbolType] != strDebug:
+                self.arDebug[strSymbolType] = strDebug
+                if (fRatio < -0.001 and strType == 'SELL') or (fRatio > 0.001 and strType == 'BUY'):
+                    print(strDebug)
+                if iSize >= 100 and ((fRatio < -0.01 and strType == 'SELL') or (fRatio > 0.005 and strType == 'BUY')):
+                    self._sendMsg(strDebug, strType)
+                self._sendSymbolMsg(strDebug, strType, strSymbol)
+
+    def _calcCalibrationArbitrage(self, arMktData, strMktSymbol, strMktType, arSymData, strSymbol, strType):
+        fMktPrice = arMktData[strMktType + '_price']
+        arSrc = {strMktSymbol: fMktPrice}
+        if self.api.IsLOF(strSymbol) == False:
+            arSrc |= {'CNY': self.fUSDCNY}
+        arSymData['discount'] = float(arSymData[strType + '_price']) / self.api.EstNetValue(strSymbol, arSrc) - 1.0
+        arQuantity = self.api.CalcQuantity(strSymbol, {strSymbol: arSymData[strType + '_size'], strMktSymbol: int(arMktData[strMktType + '_size'])})
+        iMktSize = arQuantity[strMktSymbol]
+        arSymData['quantity'] = iMktSize
+        strDebug = self._getSymDebugString(strSymbol, arQuantity[strSymbol], strType, strMktType)
+        strDebug += get_separate_display(strType) + self._getMktDebugString(strMktSymbol, iMktSize, fMktPrice)
+        return strDebug
+        
+    def _calcHoldingsArbitrage(self, arMkt, strMktSymbol, strMktType, iMktSize, arSymData, strSymbol, strType):
         fQuantity = _get_floor_quantity(float(arSymData[strType + '_size']))
         fNetValue = float(arSymData['netvalue'])
         fCNYholdings = float(arSymData['CNYholdings'])
@@ -330,105 +366,53 @@ class Palmmicro:
             arSymData['quantity'] = iTotalQuantity
             return strDebug
         return False
-    
-    def IsFree(self, group):
-        iCur = int(time.time())
-        if iCur - self.arSendMsg[group]['timer'] < self.arSendMsg[group]['count']:
-            return False
-        self.arSendMsg[group]['timer'] = iCur
-        return True
 
-    def SendTelegramMsg(self, strMsg):
-        url = 'https://api.telegram.org/bot' + TG_TOKEN + '/sendMessage?text=' + strMsg + '&chat_id=-1001346320717'
-        try:
-            response = requests.get(url)
-            response.raise_for_status()  # Raise an exception for HTTP errors
-            if response.status_code == 200:
-                data = response.json()  # Assuming the response is in JSON format
-                #print(data)
+    def _sendMktData(self, strType, strMktSymbol, strMktType, arMktData, arMkt):
+        for strSymbol, arSymData in self.api.get_config().items():
+            strDebug = False
+            if strType + '_size' in arSymData:
+                if self.api.is_single(arSymData):
+                    if self.api.get_next_symbol(arSymData) == strMktSymbol:
+                        strDebug = self._calcCalibrationArbitrage(arMktData, strMktSymbol, strMktType, arSymData, strSymbol, strType)
+                else:
+                    if strMktSymbol in arSymData['symbol_hedge']:
+                        strDebug = self._calcHoldingsArbitrage(arMkt, strMktSymbol, strMktType, arMktData[strMktType + '_size'], arSymData, strSymbol, strType)
+            if strDebug:
+                self._debugPriceAndSize(arSymData, strSymbol, strType, strDebug)
+
+    def _sendNoData(self, strType, strMktSymbol, strMktType):
+        for strSymbol, arSymData in self.api.get_config().items():
+            strDebug = strMktSymbol + '无' + get_display(strMktType) + '数据'
+            if self.api.is_single(arSymData):
+                if self.api.get_next_symbol(arSymData) != strMktSymbol:
+                    strDebug = False
             else:
-                print('Failed to retrieve data. Status code:', response.status_code)
-        except requests.exceptions.RequestException as e:
-            print('SendTelegramMsg Error occurred:', e)
+                if strMktSymbol not in arSymData['symbol_hedge']:
+                    strDebug = False
+            if strDebug:
+                self._sendSymbolMsg(strDebug, strType, strSymbol)
 
-    def SendWechatMsg(self, strMsg, group, strType = 'text'):
-        url = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=' + self.arSendMsg[group]['key']
-        arWechatMsg = {
-            'msgtype': strType,  
-            strType: {
-                'content': ''
-                     }
-                      }
-        arText = arWechatMsg[strType]
-        arText['content'] = strMsg
-        try:
-            response = requests.post(url, json=arWechatMsg, headers={'Content-Type': 'application/json'})
-            response.raise_for_status()  # Raise an exception for HTTP errors
-            if response.status_code == 200:
-                response_data = response.json()  # Parse the JSON response data
-                #print('Response data:', response_data)
+    def _processPriceAndSize(self, arMktData, arMkt):
+        strMktSymbol = arMktData['symbol']
+        for strType in ['SELL', 'BUY']:
+            if strType == 'SELL':
+                strMktType = 'BUY'
             else:
-                print('Failed to send POST request. Status code:', response.status_code)
-        except requests.exceptions.RequestException as e:
-            print('SendWechatMsg Error occurred:', e)
-
-    def __convert_array_msg(self, group):
-        arMsg = self.arSendMsg[group]['array_msg']
-        if len(arMsg) >= 0:
-            #unique = set(arMsg)
-            #str = '\n\n'.join(unique)
-            str = '\n\n'.join(arMsg)
-            return GetBeijingTimeDisplay() + ' | ' + str
-        return ''
-
-    def __send_msg(self, group):
-        str = self.__convert_array_msg(group)
-        self.SendWechatMsg(str, group)
-        #if group == 'telegram':
-            #self.SendTelegramMsg(str)
-        self.arSendMsg[group]['array_msg'].clear()
-
-    def SendMsg(self, strMsg, strType, group='telegram'):
-        strMsgType = 'msg_' + strType
-        arSendMsg = self.arSendMsg[group]
-        if arSendMsg[strMsgType] != strMsg:
-            if len(self.__convert_array_msg(group).encode('utf-8')) + len(strMsg.encode('utf-8')) < 2046:
-                arSendMsg[strMsgType] = strMsg
-                arSendMsg['array_msg'].append(strMsg)
-                if self.IsFree(group):
-                    self.__send_msg(group)
+                strMktType = 'SELL'
+            if all(arMktData[attr] is not None for attr in [strMktType + '_price', strMktType + '_size']):
+                self._sendMktData(strType, strMktSymbol, strMktType, arMktData, arMkt)
             else:
-                print('too many message in group: ', group)
+                self._sendNoData(strType, strMktSymbol, strMktType)
 
-    def SendSymbolMsg(self, strMsg, strType, strSymbol):
-        if strSymbol in self.arSendMsg:
-            strMsg = strMsg.replace(' ' + strSymbol.rstrip('ETF'), '')
-            #self.SendMsg(strMsg, strType, strSymbol)
-            strMsgType = 'msg_' + strType
-            arSendMsg = self.arSendMsg[strSymbol]
-            if arSendMsg[strMsgType] != strMsg:
-                arSendMsg[strMsgType] = strMsg
-                arSendMsg['array_msg'].clear()
-                for strLoop in ['SELL', 'BUY']:
-                    str = arSendMsg['msg_' + strLoop]
-                    if str != '':
-                        if strLoop != strType:
-                            str += ' | 延迟'
-                        arSendMsg['array_msg'].append(str)
-                if self.IsFree(strSymbol):
-                    self.__send_msg(strSymbol)
-
-    def SendOldMsg(self):
-        for group, value in self.arSendMsg.items():
-            if self.IsFree(group):
-                if len(value['array_msg']) > 0:
-                    self.__send_msg(group)
-
-    def CheckNewSinaData(self):
-        if self.bNewSinaData == True:
-            self.bNewSinaData = False
-            return True
-        return False
+    def CheckPriceAndSize(self, arSrc, arMktData, arMkt):
+        self._fetchData(arSrc)
+        self._processPriceAndSize(arMktData, arMkt)
+        if self._checkNewSinaData() == True:
+            for arOtherMktData in arMkt.values():
+                if arOtherMktData['symbol'] != arMktData['symbol']:
+                    self._processPriceAndSize(arOtherMktData, arMkt)
+            self._processPriceAndSize(self.arAG0, arMkt)
+        self._sendOldMsg()
 
 
 class Calibration:

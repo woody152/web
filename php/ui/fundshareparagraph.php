@@ -5,7 +5,7 @@ function _echoFundShareItem($record, $strStockId, $his_sql, $shares_sql)
 {
 	$strDate = $record['date'];
    	$strShare = rtrim0($record['close']);
-   	$ar = array($strDate, $strShare);
+   	$ar = [$strDate, $strShare];
    	
 	if ($strSharePrev = $shares_sql->GetClosePrev($strStockId, $strDate))
 	{
@@ -47,16 +47,16 @@ function EchoFundShareParagraph($ref, $iStart = 0, $iNum = TABLE_COMMON_DISPLAY,
 		$str = GetFundLinks($strSymbol);
 		if ($bAdmin)	$str .= GetHtmlNewLine().StockGetAllLink($strSymbol);
 		$strMenuLink = StockGetMenuLink($strSymbol, $iTotal, $iStart, $iNum);
-		$str .= ' '.$strMenuLink;
+		$str .= " $strMenuLink";
 	}
  	
-	if (EchoTableParagraphBegin(array(new TableColumnDate(),
-									  $share_col,
-									  new TableColumn(STOCK_OPTION_SHARE_DIFF, 110),
-									  $quantity_col,
-									  $turnover_col,
-									  new TableColumnTurnover('新增', 120)
-									 ), 'fundshare', $str))
+	if (EchoTableParagraphBegin([new TableColumnDate(),
+								 $share_col,
+								 new TableColumn(STOCK_OPTION_SHARE_DIFF, 110),
+								 $quantity_col,
+								 $turnover_col,
+								 new TableColumnTurnover('新增', 120)
+								], 'fundshare', $str))
 	{
 		$his_sql = GetStockHistorySql();
     	if ($result = $shares_sql->GetAll($strStockId, $iStart, $iNum)) 
@@ -67,5 +67,3 @@ function EchoFundShareParagraph($ref, $iStart = 0, $iNum = TABLE_COMMON_DISPLAY,
     	EchoTableParagraphEnd($strMenuLink);
 	}
 }
-
-?>

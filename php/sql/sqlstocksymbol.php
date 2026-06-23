@@ -81,15 +81,20 @@ class StockHistorySql extends DailyCloseSql
     	return false;
     }
     
-    function GetAdjClose($strStockId, $strDate, $bStrict = false)
+	function GetAdjClose($strStockId, $strDate)
     {
-    	$str = $this->_getAdjCloseString('GetRecord', $strStockId, $strDate);
-    	if ($bStrict === false)
-    	{
-    		if ($str === false)		$str = $this->_getAdjCloseString('GetRecordPrev', $strStockId, $strDate);	// when hongkong market on holiday
-    	}
-		return $str;
+		return $this->_getAdjCloseString('GetRecord', $strStockId, $strDate);
     }
+
+	function GetAdjClosePrev($strStockId, $strDate)
+    {
+		return $this->_getAdjCloseString('GetRecordPrev', $strStockId, $strDate);
+	}
+
+    function GetAdjProportion($strStockId, $strDate, $strPrevDate)
+    {
+		return $this->GetProportion($strStockId, $strDate, $strPrevDate, 'GetAdjClose');
+	}
 }
 
 class StockSql extends KeyNameSql
@@ -265,7 +270,7 @@ function SqlGetHistoryByDate($strStockId, $strDate)
 function SqlGetAdjCloseByDate($strStockId, $strDate)
 {
 	$his_sql = GetStockHistorySql();
-	return $his_sql->GetAdjClose($strStockId, $strDate, true);
+	return $his_sql->GetAdjClose($strStockId, $strDate);
 }
 
 function GetStockEmaSql($iDays)

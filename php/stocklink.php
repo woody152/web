@@ -115,9 +115,9 @@ function GetOvernightCnhLink($strDisplay = OVERNIGHT_CNH_DISPLAY, $strAmount = '
 
 function GetStockSymbolLink($strPage, $strSymbol, $strDisplay = false, $strExtraQuery = false)
 {
-	$strQuery = 'symbol='.$strSymbol;
-	if ($strExtraQuery)	$strQuery .= '&'.$strExtraQuery;
-	return GetStockPageLink($strPage, ($strDisplay ? $strDisplay : $strSymbol), $strQuery);
+	$strQuery = "symbol=$strSymbol";
+	if ($strExtraQuery)	$strQuery .= "&$strExtraQuery";
+	return GetStockPageLink($strPage, $strDisplay ?: $strSymbol, $strQuery);
 }
 
 define('ALL_STOCK_DISPLAY', '全部股票代码');
@@ -229,7 +229,7 @@ function GetFundAccountLink($strSymbol, $iNum = false)
 const FUND_POSITION_DISPLAY = STOCK_DISP_POSITION.'估算';
 function GetFundPositionLink($strSymbol, $bDisplaySymbol = false)
 {
-    return GetStockSymbolLink('fundposition', $strSymbol, ($bDisplaySymbol ? $strSymbol : FUND_POSITION_DISPLAY));
+    return GetStockSymbolLink('fundposition', $strSymbol, $bDisplaySymbol ? $strSymbol : FUND_POSITION_DISPLAY);
 }
 
 const FUND_SHARE_DISPLAY = '基金场内份额';
@@ -270,11 +270,12 @@ function GetStockOptionArray()
             'editstocksplit' => STOCK_OPTION_SPLIT];
 }
 
-function GetStockOptionLink($strOption, $strSymbol, $strDisplay = false)
+function GetStockOptionLink($strOption, $strSymbol, $strDisplay = false, $strVal = false)
 {
     $ar = GetStockOptionArray();
     $strPage = array_search($strOption, $ar);
-    return GetStockSymbolLink($strPage, $strSymbol, $strDisplay ?: $strOption);
+    $strExtraQuery = $strVal ? "val=$strVal" : false;
+    return GetStockSymbolLink($strPage, $strSymbol, $strDisplay ?: $strOption, $strExtraQuery);
 }
 
 function GetStockEditDeleteLink($strSymbol, $bAdmin)
