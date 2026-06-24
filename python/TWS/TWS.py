@@ -83,7 +83,7 @@ class MyEWrapper(EWrapper):
             self.arOrder['XOP'] = GetOrderArray()
         else:
             #self.arOrder['TLT'] = GetOrderArray([80.90, 84.19, 85.21, 86.40, 86.62, 86.72, 87.59, 89.76, 91.88], 100, 1, 8)
-            self.arOrder['SPX'] = GetOrderArray([5191.35, 6197.88, 7021.13, 7278.21, 7430.16, 7487.35, 7496.58, 7696.48, 7844.37])
+            self.arOrder['SPX'] = GetOrderArray([5191.35, 6193.55, 7051.04, 7278.17, 7437.61, 7476.21, 7487.31, 7696.45, 7908.52])
             self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0089, 4, 6)
             self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0182, -1, -1)
         self.palmmicro = Palmmicro()
@@ -141,9 +141,9 @@ class MyEWrapper(EWrapper):
     def tickSize(self, reqId, tickType, size):
         arMktData = self.arMkt[reqId]
         if tickType == 0:  # Bid size
-            arMktData['BUY_size'] = size
+            arMktData['BUY_size'] = int(size)
         elif tickType == 3:  # Ask size
-            arMktData['SELL_size'] = size
+            arMktData['SELL_size'] = int(size)
         self._CheckPriceAndSize(arMktData)
 
     def tickString(self, reqId, tickType, value):

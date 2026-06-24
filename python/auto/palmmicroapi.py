@@ -7,7 +7,7 @@ def _get_floor_quantity(iQuantity: int) -> float:
     return math.floor(fQuantity) * 100.0
 
 def _round_quantity(fQuantity: float) -> int:
-	return int((fQuantity + 50.0) / 100.0) * 100
+	return int((fQuantity + 49.9) / 100.0) * 100
 
 def convert_symbol(strSymbol: str) -> str:
 	# 匹配 ^XXX-YY 格式，并提取 XXX 部分
@@ -62,6 +62,10 @@ class PalmmicroAPI:
 	@staticmethod
 	def get_next_symbol(ar) -> str:
 		return ar['symbol_hedge']
+	
+	@staticmethod
+	def is_holding_symbol(ar, strSymbol) -> bool:
+		return strSymbol in ar['symbol_hedge']
 
 	def get_next_param(self, ar):
 		return self.get_param(self.get_next_symbol(ar))
@@ -85,7 +89,7 @@ class PalmmicroAPI:
 		return True
 
 	@staticmethod
-	def _get_hedge(ar):
+	def _calc_hedge(ar) -> float:
 		return float(ar['calibration']) / float(ar['position'])
 
 	@staticmethod
@@ -151,7 +155,6 @@ class PalmmicroAPI:
 				fIndex = None
 				if strHedgeSymbol in arSrc:		# strHedgeSymbol in [SPY, QQQ]
 					fIndex = self._reverse_calc_with_calibration(arHedge, strHedgeSymbol, {strHedgeSymbol:arSrc[strHedgeSymbol]})
-					# print(f"{strHedgeSymbol}: {fIndex:.2f}")
 				else:
 					arIndex = self.get_next_param(arHedge)
 					if arIndex != None:
@@ -211,7 +214,7 @@ class PalmmicroAPI:
 	def __calc_calibration_quantity(self, strSymbol, ar, arSrc):
 		arDst = {}
 		strHedgeSymbol = self.get_next_symbol(ar)
-		fHedge = float(ar['hedge']) * float(self.get_multiplier(strHedgeSymbol))
+		fHedge = float(ar['hedge']) * self.get_multiplier(strHedgeSymbol)
 		iHedgeQuantity = self.DEFAULT_HEDGE_QUANTITY	
 		if strHedgeSymbol in arSrc:
 			iHedgeQuantity = arSrc[strHedgeSymbol]
@@ -222,7 +225,7 @@ class PalmmicroAPI:
 				if arIndex != None:
 					strFutureSymbol = self.get_next_symbol(arIndex)
 					if strFutureSymbol in arSrc:
-						fHedge = self._get_hedge(ar) * self.get_multiplier(strFutureSymbol)
+						fHedge = self._calc_hedge(ar) * self.get_multiplier(strFutureSymbol)
 						iHedgeQuantity = arSrc[strFutureSymbol]
 						strHedgeSymbol = strFutureSymbol
 			else:
@@ -231,7 +234,7 @@ class PalmmicroAPI:
 						arLev = self.get_param(strLevSymbol)
 						if arLev != None:
 							if strHedgeSymbol == self.get_next_symbol(arLev):
-								fHedge /= self._get_hedge(arLev) * self.get_multiplier(strLevSymbol)
+								fHedge /= self._calc_hedge(arLev) * self.get_multiplier(strLevSymbol)
 								iHedgeQuantity = arSrc[strLevSymbol]
 								strHedgeSymbol = strLevSymbol
 								break
@@ -267,6 +270,7 @@ class PalmmicroAPI:
 				arReal[strReal] = fQuantity
 		fMax = 0.0
 		strMax = False
+		strFutureSymbol = False
 		for strReal, fQuantity in arReal.items():
 			if strReal in arSrc:
 				fRealQuantity = float(arSrc[strReal])
@@ -279,14 +283,12 @@ class PalmmicroAPI:
 						strFutureSymbol = strNextSymbol
 						iFutureQuantity = arSrc[strFutureSymbol]
 						arDst[strFutureSymbol] = arSrc[strFutureSymbol]
-						fRealQuantity = self._get_hedge(arHolding) * self.get_multiplier(strFutureSymbol) * iFutureQuantity
-						#print(f"RealQuantity {strFutureSymbol}: {fRealQuantity:.2f}")
+						fRealQuantity = self._calc_hedge(arHolding) * self.get_multiplier(strFutureSymbol) * iFutureQuantity
 			fCompare = fQuantity / fRealQuantity
 			if fCompare > fMax:
 				fMax = fCompare
 				strMax = strReal
-		#print(f"Max {strMax}: {fMax:.2f}")
-		if fMax < 1.0 and strMax not in arSrc:
+		if fMax < 1.0 and strFutureSymbol != False and strMax != False and strMax not in arSrc:
 			fMaxTotal = fMax * arDst[strFutureSymbol]
 			if fMaxTotal > 1.0:
 				arDst[strFutureSymbol] = int(math.floor(fMaxTotal))
@@ -300,11 +302,9 @@ class PalmmicroAPI:
 		if fMax > 1.0:
 			for strHolding, fQuantity in arQuantity.items():
 				arQuantity[strHolding] = fQuantity / fMax
-		#print(f"float: {arQuantity}")			
 		for strHolding in ar['symbol_hedge']:
 			arDst[strHolding] = int(math.floor(arQuantity[strHolding]))
 		arDst[strSymbol] = self._recalc_key_quantity(ar, arDst)
-		#print(f"int: {arDst}")			
 		return arDst
 
 	def CalcQuantity(self, strSymbol: str, arSrc: Dict[str, int]) -> Dict[str, int]:

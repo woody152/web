@@ -25,7 +25,9 @@
     <Compile Include="palmmicro.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="palmmicroapi.py" />
+    <Compile Include="..\auto\palmmicroapi.py">
+      <Link>palmmicroapi.py</Link>
+    </Compile>
     <Compile Include="TWS.py" />
     <Compile Include="_tgprivate.py" />
   </ItemGroup>

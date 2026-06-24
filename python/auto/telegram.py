@@ -58,7 +58,7 @@ def __testSPY(api, strSymbol, strSymbolUS, iQuantity, iQuantityUS, fPriceUS, arU
 	__printHedge(api, ar, strSymbol, strSymbolUS)
 
 def _handlePalmmicroData(arData):
-	arCNY = {'CNY': 6.7686}
+	arCNY = {'CNY': 6.79}
 	api = PalmmicroAPI(arData)
 	#print(api.get_config())
 
@@ -71,7 +71,7 @@ def _handlePalmmicroData(arData):
 
 	arQuantity = {'SZ161125': 101521, 'SZ159612': 193400}
 	arQuantityUS = {'SPY': 100, 'hf_ES': 2}
-	arPriceUS = {'SPY': 617.34, 'hf_ES': 6253.75}
+	arPriceUS = {'SPY': 616.93, 'hf_ES': 6248.25}
 	for strSymbol, iQuantity in arQuantity.items():
 		for strSymbolUS, iQuantityUS in arQuantityUS.items():
 			__testSPY(api, strSymbol, strSymbolUS, iQuantity, iQuantityUS, arPriceUS[strSymbolUS], arCNY)
