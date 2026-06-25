@@ -1,7 +1,7 @@
 <?php
 require('php/_entertainment.php');
 
-define('FUND_DEMO_SYMBOL', 'SZ162411');
+const FUND_DEMO_SYMBOL = 'SZ162411';
 
 function GetMetaDescription()
 {
@@ -215,11 +215,11 @@ function _echoPage20190412($strPage)
 	$strPrimeNumber = GetAccountToolLink($strPage);
 	$strImage = ImgAccountTool($strPage);
 
-	$strList = GetListElement(array('68的平方根在8和9之间，从2到8都除一遍就可以。68/2=34；68=2*?。',
-								  	  '因为34还是偶数，继续来除2。34/2=17；68=2*2*?。',
-								  	  '17不是3的整数倍数。',
-								  	  '17不是4的整数倍数。这里可以看到，虽然原来68是4的整数倍数，但是已经在前面处理过了。',
-								  	  '对数字5来说，因为5*5已经比17大，不用继续除下去。最终结果就是68=2*2*17。'));
+	$strList = GetListElement(['68的平方根在8和9之间，从2到8都除一遍就可以。68/2=34；68=2*?。',
+							   '因为34还是偶数，继续来除2。34/2=17；68=2*2*?。',
+							   '17不是3的整数倍数。',
+							   '17不是4的整数倍数。这里可以看到，虽然原来68是4的整数倍数，但是已经在前面处理过了。',
+							   '对数字5来说，因为5*5已经比17大，不用继续除下去。最终结果就是68=2*2*17。']);
 	
 	$strUNICODE = GetNameLink('UNICODE');
 	$strAdrH = GetAdrhCompareLink();
@@ -421,4 +421,3 @@ function EchoAll()
 }
 
 require('../../../php/ui/_dispcn.php');
-?>

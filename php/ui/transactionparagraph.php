@@ -6,7 +6,7 @@ function _echoTransactionTableItem($ref, $record, $bReadOnly, $bAdmin)
 	$strDate = GetSqlTransactionDate($record);
 	$strQuantity = $record['quantity']; 
     
-    $ar = array($strDate, $ref->GetDisplay(), $strQuantity);
+    $ar = [$strDate, $ref->GetDisplay(), $strQuantity];
     $strPrice = $record['price'];
     $ar[] = $ref->GetPriceDisplay(floatval($strPrice), false, ($ref->IsFundA() ? 4 : $ref->GetPrecision()));
     $ar[] = GetNumberDisplay(floatval($record['fees']));
@@ -36,7 +36,7 @@ function _echoTransactionTableItem($ref, $record, $bReadOnly, $bAdmin)
 	$ar[] = $strRemark;
     	
     $strEdit = '';
-   	$strDelete = GetDeleteLink(PATH_STOCK.'submittransaction.php?delete='.$strId, $strDate.' '.$strQuantity.STOCK_TRANSACTION_DISPLAY);
+   	$strDelete = GetDeleteLink(PATH_STOCK.'submittransaction.php?delete='.$strId, "$strDate $strQuantity".STOCK_TRANSACTION_DISPLAY);
     if ($bReadOnly == false)
     {
     	$strEdit = GetEditLink(PATH_STOCK.'editstocktransaction', $strId);
@@ -45,7 +45,7 @@ function _echoTransactionTableItem($ref, $record, $bReadOnly, $bAdmin)
     {
     	$strDelete = '';
     }
-    $ar[] = $strEdit.' '.$strDelete;
+    $ar[] = "$strEdit $strDelete";
 
     EchoTableColumn($ar);
 }
@@ -107,15 +107,16 @@ function EchoTransactionParagraph($acct, $strGroupId, $ref = false, $bAll = true
 	$sql = new StockGroupItemSql($strGroupId);
     if ($bAll)
     {
+		$strQuery = "groupid=$strGroupId";
     	if ($ref)
     	{
             $iTotal = $sql->CountStockTransaction($ref->GetStockId());
-           	$strMenuLink = GetMenuLink('groupid='.$strGroupId.'&symbol='.$ref->GetSymbol(), $iTotal, $iStart, $iNum);
+           	$strMenuLink = GetMenuLink("$strQuery&symbol=".$ref->GetSymbol(), $iTotal, $iStart, $iNum);
     	}
     	else
     	{
             $iTotal = $sql->CountAllStockTransaction();
-           	$strMenuLink = GetMenuLink('groupid='.$strGroupId, $iTotal, $iStart, $iNum);
+           	$strMenuLink = GetMenuLink($strQuery, $iTotal, $iStart, $iNum);
         }
         $str = $strMenuLink;
     }
@@ -125,14 +126,14 @@ function EchoTransactionParagraph($acct, $strGroupId, $ref = false, $bAll = true
         $strMenuLink = '';
     }
 
-	if (EchoTableParagraphBegin(array(new TableColumnDate(),
-									  new TableColumnSymbol(),
-									  new TableColumnQuantity(),
-									  new TableColumnPrice(),
-									  new TableColumn('费用', 60),
-									  new TableColumnRemark(),
-									  new TableColumn('操作')
-									 ), 'transaction', $str))
+	if (EchoTableParagraphBegin([new TableColumnDate(),
+								 new TableColumnSymbol(),
+								 new TableColumnQuantity(),
+								 new TableColumnPrice(),
+								 new TableColumn('费用', 60),
+								 new TableColumnRemark(),
+								 new TableColumn('操作')
+								], 'transaction', $str))
 	{
 	    _echoTransactionTableData($sql, $ref, $iStart, $iNum, $acct->IsGroupReadOnly($strGroupId), $acct->IsAdmin());
     	EchoTableParagraphEnd($strMenuLink);

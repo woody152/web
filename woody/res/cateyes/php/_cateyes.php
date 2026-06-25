@@ -4,7 +4,7 @@ require_once('../../php/_woodymenu.php');
 
 function _menuLoopCateyes($bChinese)
 {
-    $arCateyes = array('alexandrite389', 'baozi', 'emerald594'); 
+    $arCateyes = ['alexandrite389', 'baozi', 'emerald594']; 
     $iLevel = 1;
     
 	MenuBegin();
@@ -36,4 +36,3 @@ function _LayoutBottom($bChinese = true, $bAdsense = true)
 }
 
    	$acct = new Account();
-?>

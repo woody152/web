@@ -155,7 +155,7 @@ function Echo20160126($strHead)
 </p>
 END;
 
-    EchoReferenceParagraph(array(new MyStockReference(FUND_DEMO_SYMBOL)));
+    EchoReferenceParagraph([new MyStockReference(FUND_DEMO_SYMBOL)]);
 }
 
 function _getLofLink()
@@ -167,10 +167,10 @@ function Echo20160127($strHead)
 {
 	$strHead = GetHeadElement($strHead);
 	$strLOF = GetAllLofLink();
-	$strList = GetListElement(array('ETF通常都是100%仓位，而LOF一般不会超过95%的仓位。仓位上的细节会决定'.STOCK_DISP_EST.'的准确度。',
-								  'A股可以从6位数字代码上区分。深市ETF代码从150000到159999，深市LOF代码从160000到169999。沪市ETF代码从510000到569999，沪市LOF代码从500000到509999。SH510900就是一个沪市ETF。',
-								  'A股ETF的申购门槛通常至少都是50万份或者100万份，我这种穷套利者玩不起，所以其实我到现在也没搞清楚具体到底是50万还是100万。在美股市场，ETF的申赎基本上都是由做市商完成的。可以看出，A股从制度上来说其实有利于套利群体。',
-								  'ETF的申赎会比同类型LOF早一个交易日确认。对有钱的套利者来说，就可以少担一个交易日的风险。'));
+	$strList = GetListElement(['ETF通常都是100%仓位，而LOF一般不会超过95%的仓位。仓位上的细节会决定'.STOCK_DISP_EST.'的准确度。',
+							   'A股可以从6位数字代码上区分。深市ETF代码从150000到159999，深市LOF代码从160000到169999。沪市ETF代码从510000到569999，沪市LOF代码从500000到509999。SH510900就是一个沪市ETF。',
+							   'A股ETF的申购门槛通常至少都是50万份或者100万份，我这种穷套利者玩不起，所以其实我到现在也没搞清楚具体到底是50万还是100万。在美股市场，ETF的申赎基本上都是由做市商完成的。可以看出，A股从制度上来说其实有利于套利群体。',
+							   'ETF的申赎会比同类型LOF早一个交易日确认。对有钱的套利者来说，就可以少担一个交易日的风险。']);
 	$strQuote = GetBlockquoteElement('夜深忽梦少年事 梦啼妆泪红阑干');
 
     echo <<<END
@@ -341,14 +341,14 @@ function EchoPage20160818($strPage)
 	$strRealtimeEst = $realtime_col->GetDisplay();
 	$strUSO = GetCalibrationHistoryLink('USO', false);
 	
-	$strEstList = GetListElement(array('要使用^SPSIOP或者XOP的净值，而不是XOP的交易价，两者通常并不一致。',
+	$strEstList = GetListElement(['要使用^SPSIOP或者XOP的净值，而不是XOP的交易价，两者通常并不一致。',
 								  '要使用'.GetNameLink('uscny', '美元人民币中间价').'，而不是新浪的美元汇率实时交易价格，更不是离岸人民币价格。',
-								  _getLofLink().'基金要按95%仓位的处理，而不是ETF基金的100%。'));
+								  _getLofLink().'基金要按95%仓位的处理，而不是ETF基金的100%。']);
 	$strFairEstCode = GetCodeElement('FairEst');
 	$strImage = ImgStockGroup($strPage); 
-	$strUsageList = GetListElement(array('验证'.STOCK_DISP_EST.'算法准确程度和测算申购赎回的成本，看'.$strOfficalEst.'。',
-								  '按溢价折价决定当日是否套利和做跟XOP配对交易的，看'.$strFairEst.'。折价不申购，溢价不赎回。此外A股或者美股休市的日子里也应该看它。',
-								  '做跟美油期货CL配对交易的，看'.$strRealtimeEst.'。'));
+	$strUsageList = GetListElement(['验证'.STOCK_DISP_EST.'算法准确程度和测算申购赎回的成本，看'.$strOfficalEst.'。',
+								    '按溢价折价决定当日是否套利和做跟XOP配对交易的，看'.$strFairEst.'。折价不申购，溢价不赎回。此外A股或者美股休市的日子里也应该看它。',
+								    '做跟美油期货CL配对交易的，看'.$strRealtimeEst.'。']);
 	
     echo <<<END
 	$strHead
@@ -367,12 +367,12 @@ function EchoPage20160818($strPage)
 </p>
 END;
 
-	EchoFundArrayEstParagraph(array(_getDemoFundReference()));
-	if (EchoTableParagraphBegin(array(new TableColumn(STOCK_DISP_EST.'因素', 140), $offical_col, $fair_col, $realtime_col), 'estcompare'))
+	EchoFundArrayEstParagraph([_getDemoFundReference()]);
+	if (EchoTableParagraphBegin([new TableColumn(STOCK_DISP_EST.'因素', 140), $offical_col, $fair_col, $realtime_col], 'estcompare'))
 	{
-		EchoTableColumn(array('T日美股交易',		'XOP净值',	'XOP净值',	'XOP净值'));
-		EchoTableColumn(array('CL期货',			'否',		'否',		'是'));
-		EchoTableColumn(array('美元人民币中间价',	'T日',		'T/T+1日',	'T/T+1日'));
+		EchoTableColumn(['T日美股交易',		'XOP净值',	'XOP净值',	'XOP净值']);
+		EchoTableColumn(['CL期货',			'否',		'否',		'是']);
+		EchoTableColumn(['美元人民币中间价', 'T日',		'T/T+1日',	'T/T+1日']);
 	    EchoTableParagraphEnd();
 	}
 
@@ -493,11 +493,11 @@ function Echo20170128($strHead)
 	$str000001 = GetRemarkElement('000001');
 	$str162411cn = GetRemarkElement('华宝油气');
 	$strSz162411 = GetRemarkElement('sz162411');
-	$strList = GetListElement(array('输入刚好是六位数字并且数值大于等于1000时，直接按照按照A股代码规律扩展后寻找唯一匹配。例如'.$str162411.'匹配SZ162411，'.$str600028.'匹配SH600028。',
-								  '输入刚好是六位数字并且数值小于1000时，寻找可能的沪市指数和深市股票最多两个匹配。例如'.$str000001.'匹配上证指数SH000001和平安银行SZ000001。',
-								  '当输入有非ASCII字符，比如中文'.$str162411cn.'时，不查找代码，而是只在名称字段寻找可能的最多32个匹配。',
-								  '其它情况如'.$strSz162411.'同时在代码和名称字段寻找可能的最多32个匹配。',
-								  ));
+	$strList = GetListElement(['输入刚好是六位数字并且数值大于等于1000时，直接按照按照A股代码规律扩展后寻找唯一匹配。例如'.$str162411.'匹配SZ162411，'.$str600028.'匹配SH600028。',
+							   '输入刚好是六位数字并且数值小于1000时，寻找可能的沪市指数和深市股票最多两个匹配。例如'.$str000001.'匹配上证指数SH000001和平安银行SZ000001。',
+							   '当输入有非ASCII字符，比如中文'.$str162411cn.'时，不查找代码，而是只在名称字段寻找可能的最多32个匹配。',
+							   '其它情况如'.$strSz162411.'同时在代码和名称字段寻找可能的最多32个匹配。'
+							  ]);
 	
 	$strHbyq = GetRemarkElement('hbyq');
 
@@ -521,7 +521,7 @@ function Echo20170128($strHead)
 </p>
 END;
 
-   	EchoAhParagraph(array(new AhPairReference(AH_DEMO_SYMBOL)));
+   	EchoAhParagraph([new AhPairReference(AH_DEMO_SYMBOL)]);
 }
 
 function Echo20171001($strHead)
@@ -628,7 +628,7 @@ function Echo20180404($strHead)
 	$strQuote
 END;
 
-   	EchoAdrhParagraph(array(new AdrPairReference(ADRH_DEMO_SYMBOL)));
+   	EchoAdrhParagraph([new AdrPairReference(ADRH_DEMO_SYMBOL)]);
 }
 
 function Echo20180405($strHead)
@@ -651,7 +651,7 @@ function Echo20180405($strHead)
 </p>
 END;
 
-   	EchoAbParagraph(array(new AbPairReference(AB_DEMO_SYMBOL)));
+   	EchoAbParagraph([new AbPairReference(AB_DEMO_SYMBOL)]);
 }
 
 function Echo20180413($strHead)
@@ -696,7 +696,7 @@ function Echo20180620($strPage)
 </p>
 END;
 
-	EchoFundListParagraph(array(new FundPairReference(A_DEMO_SYMBOL)));
+	EchoFundListParagraph([new FundPairReference(A_DEMO_SYMBOL)]);
 }
 
 function Echo20191025($strHead)
@@ -1003,5 +1003,3 @@ function Echo20240606($strHead)
 </p>
 END;
 }
-
-?>

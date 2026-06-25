@@ -36,10 +36,11 @@ function _LayoutBottom($bChinese = true, $bAdsense = true)
 function GetTitle($bChinese = true)
 {
 	global $acct;
+	/** @var ImageAccount $acct */
 	
 	$strYear = $acct->GetPageYear();
 	if ($bChinese)	$strYear .= '年网络日志图片';
-	else				$strYear .= ' Blog Pictures';
+	else			$strYear .= ' Blog Pictures';
 
 	return $strYear;
 }
@@ -52,4 +53,3 @@ function GetMetaDescription($bChinese)
 }
 
    	$acct = new ImageAccount();
-?>

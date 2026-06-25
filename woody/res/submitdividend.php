@@ -107,7 +107,7 @@ https://www.proshares.com/api/distributionsummary?fund=TQQQ&year=2024
 
 function _updateProsharesEtfDividend($strStockId, $strSymbol, $strPathName, $sql)
 {
-	$strUrl = GetProsharesUrl().'api/distributionsummary?fund='.$strSymbol.'&year=2025';
+	$strUrl = GetProsharesUrl().'api/distributionsummary?fund='.$strSymbol.'&year=2026';
    	if ($ar = StockDebugJson($strPathName, $strUrl))
    	{
 //   		$sql->DeleteAll($strStockId);
@@ -146,4 +146,3 @@ class _AdminDividendAccount extends SymbolAccount
 
    	$acct = new _AdminDividendAccount();
 	$acct->AdminRun();
-?>

@@ -3,7 +3,7 @@ require_once('_woody.php');
 
 function GetBlogYearTags()
 {
-	$ar = array();
+	$ar = [];
 	foreach (GetBlogPhotoYears() as $iYear)
 	{
 		$ar[$iYear] = GetHtmlNewLine().GetRemarkElement(GetNameTag(strval($iYear)));
@@ -20,5 +20,3 @@ function GetBlogYearLinks()
 	}
 	return $str;
 }
-
-?>

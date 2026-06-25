@@ -4,7 +4,7 @@ require_once('../php/_woodymenu.php');
 
 function _menuLoopCompany($bChinese)
 {
-    $arCompany = array('btbond', 'cateyes'); 
+    $arCompany = ['btbond', 'cateyes']; 
     $iLevel = 1;
     
 	MenuBegin();
@@ -27,4 +27,3 @@ function _LayoutBottom($bChinese = true, $bAdsense = true)
 }
 
    	$acct = new Account();
-?>

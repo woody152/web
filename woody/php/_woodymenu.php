@@ -2,25 +2,22 @@
 
 function GetMyPhotoYears()
 {
-	return array(2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2019, 2020, 2021, 2023);
+	return [2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2019, 2020, 2021, 2023];
 }
 
 function GetMiaPhotoYears()
 {
-	return array(2014, 2015, 2016, 2018, 2022, 2023, 2024);
+	return [2014, 2015, 2016, 2018, 2022, 2023, 2024];
 }
 
 function GetBlogPhotoYears()
 {
-/*	$ar = array();
-	for ($i = 2006; $i <= 2016; $i ++)	$ar[] = $i;
-	return $ar;*/
-	return array(2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2020, 2023, 2025);
+	return [2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2020, 2023, 2025];
 }
 
 function GetPhotoPageArray($arYears)
 {
-	$arPhoto = array();
+	$arPhoto = [];
 	foreach ($arYears as $iYear)
 	{
 		$arPhoto[] = 'photo'.strval($iYear);
@@ -30,11 +27,11 @@ function GetPhotoPageArray($arYears)
 
 function GetPhotoMenuArray($arYears)
 {
-	$arPhoto = array();
+	$arPhoto = [];
 	foreach ($arYears as $iYear)
 	{
 		$strYear = strval($iYear);
-		$arPhoto['photo'.$strYear] = $strYear;	// substr($strYear, -2, 2);
+		$arPhoto["photo{$strYear}"] = $strYear;	// substr($strYear, -2, 2);
 	}
 	return $arPhoto;
 }
@@ -59,7 +56,7 @@ function GetMia30DaysDisplay($bChinese = true)
 	return $bChinese ? '满月' : '30 Days';
 }
 
-define('PATH_MIA_30DAYS', '/woody/mia/30days/');
+const PATH_MIA_30DAYS = '/woody/mia/30days/';
 function GetMia30DaysLink($bChinese = true)
 {
 	return GetPageLink(PATH_MIA_30DAYS, 'index', false, GetMia30DaysDisplay($bChinese), $bChinese);
@@ -67,9 +64,8 @@ function GetMia30DaysLink($bChinese = true)
 
 function GetBlogMenuArray($bChinese)
 {
-    if ($bChinese)  $arName = array('ar1688' => 'AR1688', 'entertainment' => '娱乐',          'pa1688' => 'PA1688', 'pa3288' => 'PA3288', 'pa6488' => 'PA6488', 'palmmicro' => 'Palmmicro');
-    else              $arName = array('ar1688' => 'AR1688', 'entertainment' => 'Entertainment', 'pa1688' => 'PA1688', 'pa3288' => 'PA3288', 'pa6488' => 'PA6488', 'palmmicro' => 'Palmmicro');
-    return $arName;
+    if ($bChinese)  return ['ar1688' => 'AR1688', 'entertainment' => '娱乐', 'pa1688' => 'PA1688', 'pa3288' => 'PA3288', 'pa6488' => 'PA6488', 'palmmicro' => 'Palmmicro'];
+    return ['ar1688' => 'AR1688', 'entertainment' => 'Entertainment', 'pa1688' => 'PA1688', 'pa3288' => 'PA3288', 'pa6488' => 'PA6488', 'palmmicro' => 'Palmmicro'];
 }
 
 function GetBlogMenuLinks($bChinese = true)
@@ -102,25 +98,6 @@ function LayoutMiaPhotoArray($bChinese)
 	LayoutWoodyMenuArray($bChinese);
 }
 
-/*
-function UrlGetHtml($bChinese = true)
-{
-    return $bChinese ? 'cn.html' : '.html';
-}
-
-function HtmlMenuItem($arName, $iLevel, $strItem, $bChinese)
-{
-    foreach ($arName as $strKey => $strDisplay)
-    {
-        if ($strItem == $strKey)
-        {
-          	MenuWriteItemLink($iLevel, $strItem, UrlGetHtml($bChinese), $strDisplay);
-        	break;
-        }
-    }
-}
-*/
-
 function PhpMenuItem($arName, $iLevel, $strItem, $bChinese)
 {
     foreach ($arName as $strKey => $strDisplay)
@@ -135,15 +112,11 @@ function PhpMenuItem($arName, $iLevel, $strItem, $bChinese)
 
 function GetWoodyMenuArray($bChinese)
 {
-    if ($bChinese)  $arName = array('index' => '资源共享', 'image' => '相片',  'blog' => '网络日志'); 
-    else              $arName = array('index' => 'Resource', 'image' => 'Image', 'blog' => 'Blog');
-    return $arName;
+    if ($bChinese)	return ['index' => '资源共享', 'image' => '相片',  'blog' => '网络日志']; 
+    return ['index' => 'Resource', 'image' => 'Image', 'blog' => 'Blog'];
 }
 
 function WoodyMenuItem($iLevel, $strItem, $bChinese = true)
 {
-//    HtmlMenuItem(GetWoodyMenuArray($bChinese), $iLevel, $strItem, $bChinese);
     PhpMenuItem(GetWoodyMenuArray($bChinese), $iLevel, $strItem, $bChinese);
 }
-
-?>

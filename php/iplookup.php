@@ -7,7 +7,6 @@ require_once('ui/commentparagraph.php');
 
 function _getIpInfoIpLookUpUrl($strIp)
 {
-	// return GetIpInfoUrl().$strIp.'/json';
 	return GetIpInfoUrl().'json/'.$strIp.'?fields=status,country,regionName,city,org,reverse';
 }
 
@@ -44,24 +43,15 @@ class IpLookupAccount extends CommentAccount
     	{
     		DebugString("$strUrl: $str");
     		$ar = json_decode($str, true);
-	   		// if (isset($ar['hostname']))
 			if (isset($ar['reverse']))
     		{
-    			// $strHostName = $ar['hostname'];
     			$strHostName = $ar['reverse'];
-    			switch ($strHostName)
+    			if ($strHostName != '')
 				{
-				// case 'No Hostname':
-				case '':
-					// unset($ar['hostname']);
-					break;
-
-				default:
     				if (strstr_array($strHostName, ['bot', 'crawl', 'proxy', 'spider']))
     				{
     					if ($this->SetCrawler($strIp))	DebugString("自动标注爬虫: $strHostName");
     				}
-					break;
     			}
     		}
 			// DebugPrint($ar);
@@ -114,12 +104,6 @@ class IpLookupAccount extends CommentAccount
     	$str .= $strNewLine.GetExternalLink(_getIpInfoIpLookUpUrl($strIp), '详情').': ';
     	if ($arInfo = $this->_ipInfoLookUp($strIp))
     	{
-    		/*if (isset($arInfo['error']) == false)
-    		{
-    			$str .= $arInfo['country'].' '.$arInfo['region'].' '.$arInfo['city'].' ['.$arInfo['loc'].'] '.$arInfo['org'];
-    			if (isset($arInfo['postal']))	$str .= ' '.$arInfo['postal'];
-    			if (isset($arInfo['hostname']))	$str .= ' '.$arInfo['hostname'];
-    		}*/
     		if (isset($arInfo['status']))
     		{
 				$strStatus = $arInfo['status'];
@@ -127,7 +111,7 @@ class IpLookupAccount extends CommentAccount
 				{
 				case 'success':
 					unset($arInfo['status']);
-					$str .= implode(', ', $arInfo);
+					$str .= implode('/', $arInfo);
 					break;
 
 				default:

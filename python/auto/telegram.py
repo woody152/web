@@ -89,20 +89,22 @@ def _handlePalmmicroData(arData):
     
 	f160723 = api.EstNetValue('SZ160723')
 	__printHoldingEst('SZ160723', f160723)
-	f160723 = api.EstNetValue('SZ160723', {'USO': 90.22})
+	f160723 = api.EstNetValue('SZ160723', {'USO': 90.26})
 	ar160723 = api.CalcQuantity('SZ160723', {'SZ160723': 106853, 'USO': 100})
 	i160723 = ar160723['SZ160723']
 	iUSO = ar160723['USO']
 	iUSOEU = ar160723['^USO-EU']
-	print(f"按持仓算SZ160723: {i160723}@{f160723:.3f}, USO: {iUSO}, ^USO-EU: {iUSOEU}")
-	print(f"USO对冲值: {i160723/(iUSO + iUSOEU):.0f}")
+	iUSOJP = ar160723['^USO-JP']
+	print(f"按持仓算SZ160723: {i160723}@{f160723:.3f}, USO: {iUSO}, ^USO-EU: {iUSOEU}, ^USO-JP: {iUSOJP}")
+	print(f"USO对冲值: {i160723/(iUSO + iUSOEU + iUSOJP):.0f}")
 	f160723 = api.EstNetValue('SZ160723', {'hf_CL': 59.46})
 	ar160723 = api.CalcQuantity('SZ160723', {'SZ160723': 106853, 'hf_CL': 10})
 	i160723 = ar160723['SZ160723']
 	iUSO = ar160723['USO']
 	iUSOEU = ar160723['^USO-EU']
-	print(f"把hf_CL转换成USO后, 按持仓算SZ160723: {i160723}@{f160723:.3f}, USO: {iUSO}, ^USO-EU: {iUSOEU}, hf_CL: {ar160723['hf_CL']}")
-	print(f"USO对冲值: {i160723/(iUSO + iUSOEU):.0f}")
+	iUSOJP = ar160723['^USO-JP']
+	print(f"把hf_CL转换成USO后, 按持仓算SZ160723: {i160723}@{f160723:.3f}, USO: {iUSO}, ^USO-EU: {iUSOEU}, ^USO-JP: {iUSOJP}, hf_CL: {ar160723['hf_CL']}")
+	print(f"USO对冲值: {i160723/(iUSO + iUSOEU + iUSOJP):.0f}")
 
 	f164824 = api.EstNetValue('SZ164824')
 	__printHoldingEst('SZ164824', f164824)

@@ -30,12 +30,10 @@ function _LayoutBottom($bChinese = true, $bAdsense = true)
 function GetTitle($bChinese = true)
 {
 	global $acct;
+	/** @var ImageAccount $acct */
 	
 	$strYear = $acct->GetPageYear();
-	if ($bChinese)	$str = '林近岚'.$strYear.'年相片';
-	else				$str = 'Mia '.$strYear.' Photos';
-
-	return $str;
+	return $bChinese ? "林近岚{$strYear}年相片" : "Mia $strYear Photos";
 }
 
 function GetMetaDescription($bChinese)
@@ -46,4 +44,3 @@ function GetMetaDescription($bChinese)
 }
 
    	$acct = new ImageAccount();
-?>

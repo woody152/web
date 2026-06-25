@@ -35,20 +35,6 @@ def get_display(strType):
         return '买入'
     return ''
 
-def get_separate_display(strType):
-    return ' | ' + get_display(strType) + ' '
-"""
-def convert_fake_symbol(symbol):
-    if symbol.startswith('^'):
-        symbol = symbol[1:]
-        if '-' in symbol:
-            symbol = symbol.split('-')[0]
-    return symbol
-
-def _get_floor_quantity(fQuantity):
-    fQuantity /= 100.0
-    return math.floor(fQuantity) * 100.0
-"""
 def GetSendMsgArray(strKey):
     ar = {'key': strKey,
           'count': 6,
@@ -186,13 +172,8 @@ class Palmmicro:
     
     def _getSymDebugString(self, strSymbol, iSize, strType, strMktType):
         arSymData = self.api.get_param(strSymbol)
-        return get_display(strMktType) + ' ' + self._getMktDebugString(strSymbol, iSize, float(arSymData[strType + '_price']))
-    """
-    def _getCNY(self, arSymData):
-        if 'CNY' in arSymData:
-            return float(arSymData['CNY'])
-        return self.fUSDCNY
-    """        
+        return get_display(strMktType) + ' ' + self._getMktDebugString(strSymbol, iSize, float(arSymData[strType + '_price'])) + ' | ' + get_display(strType) + ' '
+
     def IsFree(self, group):
         ar = self.arSendMsg[group]
         iCur = int(time.time())
@@ -234,14 +215,12 @@ class Palmmicro:
             print('SendWechatMsg Error occurred:', e)
 
     def __convert_array_msg(self, group):
+        str = GetBeijingTimeDisplay() + ' | '
         arMsg = self.arSendMsg[group]['array_msg']
-        if len(arMsg) >= 0:
-            #unique = set(arMsg)
-            #str = '\n\n'.join(unique)
-            str = '\n\n'.join(arMsg)
-            return GetBeijingTimeDisplay() + ' | ' + str
-        return ''
-
+        if len(arMsg) > 0:
+            str += '\n\n'.join(arMsg)
+        return str
+        
     def __send_msg(self, group):
         str = self.__convert_array_msg(group)
         self.SendWechatMsg(str, group)
@@ -249,19 +228,23 @@ class Palmmicro:
             #self.SendTelegramMsg(str)
         self.arSendMsg[group]['array_msg'].clear()
 
-    def _sendMsg(self, strMsg, strType, group='telegram'):
-        if len(self.__convert_array_msg(group).encode('utf-8')) + len(strMsg.encode('utf-8')) < 2046:
-            self.arSendMsg[group]['array_msg'].append(strMsg)
-            if self.IsFree(group):
-                self.__send_msg(group)
+    def _sendMsg(self, strMsg, group='telegram'):
+        arMsg = self.arSendMsg[group]['array_msg']
+        if strMsg in arMsg:
+            print('duplicated message in group: ', group)
         else:
-            print('too many message in group: ', group)
+            if len(self.__convert_array_msg(group).encode('utf-8')) + len(strMsg.encode('utf-8')) < 2046:
+                arMsg.append(strMsg)
+                if self.IsFree(group):
+                    self.__send_msg(group)
+            else:
+                print('too many message in group: ', group)
 
     def _sendSymbolMsg(self, strMsg, strType, strSymbol):
         if strSymbol in self.arSendMsg:
             ar = self.arSendMsg[strSymbol]
             ar['array_msg'].clear()
-            ar['msg_' + strType] = strMsg.replace(' ' + strSymbol.rstrip('ETF'), '')
+            ar['msg_' + strType] = strMsg.replace(' ' + strSymbol, '')
             for strLoop in ['SELL', 'BUY']:
                 str = ar['msg_' + strLoop]
                 if str != '':
@@ -283,88 +266,31 @@ class Palmmicro:
             return True
         return False
 
-    def _debugPriceAndSize(self, arSymData, strSymbol, strType, strDebug):
-        iSize = arSymData['quantity']
-        if iSize >= 1:
-            fRatio = arSymData['discount']
+    def _debugPriceAndSize(self, strSymbol, strType, strDebug, iSize, iMktSize, fRatio):
+        fRatio -= 1.0
+        if iMktSize > 0:
             strDebug = str(round(fRatio * 100.0, 2)) + '% | ' + strDebug
             strSymbolType = strSymbol + strType
             if strSymbolType not in self.arDebug or self.arDebug[strSymbolType] != strDebug:
                 self.arDebug[strSymbolType] = strDebug
                 if (fRatio < -0.001 and strType == 'SELL') or (fRatio > 0.001 and strType == 'BUY'):
-                    print(strDebug)
-                if iSize >= 100 and ((fRatio < -0.01 and strType == 'SELL') or (fRatio > 0.005 and strType == 'BUY')):
-                    self._sendMsg(strDebug, strType)
+                    print(f"{strDebug} | 对冲值:{iSize / iMktSize:.0f}")
+                if iMktSize >= 100 and ((fRatio < -0.01 and strType == 'SELL') or (fRatio > 0.005 and strType == 'BUY')):
+                    self._sendMsg(strDebug)
                 self._sendSymbolMsg(strDebug, strType, strSymbol)
 
     def _calcCalibrationArbitrage(self, arMktData, strMktSymbol, strMktType, arSymData, strSymbol, strType):
-        fMktPrice = arMktData[strMktType + '_price']
-        arSrc = {strMktSymbol: fMktPrice}
-        if self.api.IsLOF(strSymbol) == False:
-            arSrc |= {'CNY': self.fUSDCNY}
         arQuantity = self.api.CalcQuantity(strSymbol, {strSymbol: arSymData[strType + '_size'], strMktSymbol: arMktData[strMktType + '_size']})
         iSize = arQuantity[strSymbol]
         if iSize > 0:
-            arSymData['discount'] = float(arSymData[strType + '_price']) / self.api.EstNetValue(strSymbol, arSrc) - 1.0
             iMktSize = arQuantity[strMktSymbol]
-            arSymData['quantity'] = iMktSize
-            strDebug = self._getSymDebugString(strSymbol, iSize, strType, strMktType)
-            strDebug += get_separate_display(strType) + self._getMktDebugString(strMktSymbol, iMktSize, fMktPrice)
-            return strDebug
-        return False
-    """    
-    def _calcHoldingsArbitrage(self, arMkt, strMktSymbol, strMktType, iMktSize, arSymData, strSymbol, strType):
-        fQuantity = _get_floor_quantity(float(arSymData[strType + '_size']))
-        fNetValue = float(arSymData['netvalue'])
-        fCNYholdings = float(arSymData['CNYholdings'])
-        fPosition = float(arSymData['position'])
-        fAmount = fQuantity * fNetValue / fCNYholdings
-        if strSymbol != 'SZ164701':
-            fMktAmount = float(arSymData['symbol_hedge'][strMktSymbol]['price']) * float(iMktSize)
-            if fMktAmount < fAmount:
-                fAmount = fMktAmount
-                fQuantity = fAmount * fCNYholdings / fNetValue
-                fQuantity = _get_floor_quantity(fQuantity)
-                fAmount = fQuantity * fNetValue / fCNYholdings
-        strDebug = get_separate_display(strType)
-        iTotalQuantity = 0
-        bDisplayTotalQuantity = False
-        strAnd = ' 和 '
-        fTotal = 0.0
-        for strHoldingSymbol, arHoldingData in arSymData['symbol_hedge'].items():
-            strRealSymbol = convert_fake_symbol(strHoldingSymbol)
-            if strRealSymbol != strHoldingSymbol:
-                bDisplayTotalQuantity = True
-            for reqId, arMktData in arMkt.items():
-                if arMktData['symbol'] == strRealSymbol:
-                    fCurPrice = arMktData[strMktType + '_price']
-                    if fCurPrice != None:
-                        fRatio = float(arHoldingData['ratio']) / 100.0
-                        fPrice = float(arHoldingData['price'])
-                        iHoldingQuantity = int(round(fAmount * fRatio / fPrice))
-                        iTotalQuantity += iHoldingQuantity
-                        fTotal += fRatio * (fCurPrice / fPrice)
-                        strDebug += self._getMktDebugString(strHoldingSymbol, iHoldingQuantity, fCurPrice) + strAnd
-                    else:
-                        return False
-                    break
-        strDebug = strDebug.rstrip(strAnd)
-        if bDisplayTotalQuantity == True:
-            strDebug += ' 共' + str(iTotalQuantity)
-        strDebug = self._getSymDebugString(strSymbol, int(fQuantity), strType, strMktType) + strDebug
-        fTotal *= self._getCNY(arSymData) / fCNYholdings
-        fTotal -= 1.0
-        fTotal *= fPosition
-        fTotal += 1.0
-        fTotal *= fNetValue
-        fPrice = float(arSymData[strType + '_price'])
-        if (fPrice > 0.001):
-            arSymData['discount'] = fPrice / fTotal - 1.0
-            arSymData['quantity'] = iTotalQuantity
-            return strDebug
-        return False
-    """
-
+            fMktPrice = arMktData[strMktType + '_price']
+            strDebug = self._getSymDebugString(strSymbol, iSize, strType, strMktType) + self._getMktDebugString(strMktSymbol, iMktSize, fMktPrice)
+            arSrc = {strMktSymbol: fMktPrice}
+            if self.api.IsLOF(strSymbol) == False:
+                arSrc |= {'CNY': self.fUSDCNY}
+            self._debugPriceAndSize(strSymbol, strType, strDebug, iSize, iMktSize, arSymData[strType + '_price'] / self.api.EstNetValue(strSymbol, arSrc))
+    
     def _calcHoldingArbitrage(self, arMkt, arMktData, strMktSymbol, strMktType, arSymData, strSymbol, strType):
         strMktPriceType = strMktType + '_price'
         strMktSizeType = strMktType + '_size'
@@ -379,11 +305,10 @@ class Palmmicro:
         arQuantity = self.api.CalcQuantity(strSymbol, {strSymbol: arSymData[strType + '_size']} | arSrcQuantity)
         iSize = arQuantity[strSymbol]
         if iSize > 0:
-            arSymData['discount'] = float(arSymData[strType + '_price']) / self.api.EstNetValue(strSymbol, arSrcPrice) - 1.0
-            strDebug = get_separate_display(strType)
             iTotalSize = 0
             bDisplayTotalQuantity = False
             strAnd = ' 和 '
+            strDebug = self._getSymDebugString(strSymbol, iSize, strType, strMktType)
             for strHoldingSymbol in arSymData['symbol_hedge']:
                 strRealSymbol = convert_symbol(strHoldingSymbol)
                 if strRealSymbol != strHoldingSymbol:
@@ -397,23 +322,17 @@ class Palmmicro:
             strDebug = strDebug.rstrip(strAnd)
             if bDisplayTotalQuantity == True:
                 strDebug += ' 共' + str(iTotalSize)
-            arSymData['quantity'] = iTotalSize
-            return self._getSymDebugString(strSymbol, iSize, strType, strMktType) + strDebug
-        return False
+            self._debugPriceAndSize(strSymbol, strType, strDebug, iSize, iTotalSize, arSymData[strType + '_price'] / self.api.EstNetValue(strSymbol, arSrcPrice))
 
     def _sendMktData(self, strType, strMktSymbol, strMktType, arMktData, arMkt):
         for strSymbol, arSymData in self.api.get_config().items():
-            strDebug = False
             if strType + '_size' in arSymData:
                 if self.api.is_single(arSymData):
                     if self.api.get_next_symbol(arSymData) == strMktSymbol:
-                        strDebug = self._calcCalibrationArbitrage(arMktData, strMktSymbol, strMktType, arSymData, strSymbol, strType)
+                        self._calcCalibrationArbitrage(arMktData, strMktSymbol, strMktType, arSymData, strSymbol, strType)
                 else:
                     if self.api.is_holding_symbol(arSymData, strMktSymbol):
-                        #strDebug = self._calcHoldingsArbitrage(arMkt, strMktSymbol, strMktType, arMktData[strMktType + '_size'], arSymData, strSymbol, strType)
-                        strDebug = self._calcHoldingArbitrage(arMkt, arMktData, strMktSymbol, strMktType, arSymData, strSymbol, strType)
-            if strDebug:
-                self._debugPriceAndSize(arSymData, strSymbol, strType, strDebug)
+                        self._calcHoldingArbitrage(arMkt, arMktData, strMktSymbol, strMktType, arSymData, strSymbol, strType)
 
     def _processPriceAndSize(self, arMktData, arMkt):
         strMktSymbol = arMktData['symbol']

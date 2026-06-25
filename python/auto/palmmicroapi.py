@@ -17,7 +17,14 @@ def convert_symbol(strSymbol: str) -> str:
 		return match.group(1)  # 返回符号主体部分
 	else:
 		return strSymbol  # 不符合格式则返回原字符串
-
+	"""
+	if symbol.startswith('^'):
+		symbol = symbol[1:]
+		if '-' in symbol:
+			symbol = symbol.split('-')[0]
+	return symbol
+	"""
+	
 class PalmmicroAPI:
 	# 定义并初始化字典静态变量 arMultiplier，使用 strSymbol 作为键（整数倍率）
 	arMultiplier: Dict[str, int] = {'hf_CL': 100,	# MCL:100, CL:1000
@@ -284,10 +291,11 @@ class PalmmicroAPI:
 						iFutureQuantity = arSrc[strFutureSymbol]
 						arDst[strFutureSymbol] = arSrc[strFutureSymbol]
 						fRealQuantity = self._calc_hedge(arHolding) * self.get_multiplier(strFutureSymbol) * iFutureQuantity
-			fCompare = fQuantity / fRealQuantity
-			if fCompare > fMax:
-				fMax = fCompare
-				strMax = strReal
+			if fRealQuantity > 0.000001:
+				fCompare = fQuantity / fRealQuantity
+				if fCompare > fMax:
+					fMax = fCompare
+					strMax = strReal
 		if fMax < 1.0 and strFutureSymbol != False and strMax != False and strMax not in arSrc:
 			fMaxTotal = fMax * arDst[strFutureSymbol]
 			if fMaxTotal > 1.0:
@@ -303,7 +311,10 @@ class PalmmicroAPI:
 			for strHolding, fQuantity in arQuantity.items():
 				arQuantity[strHolding] = fQuantity / fMax
 		for strHolding in ar['symbol_hedge']:
-			arDst[strHolding] = int(math.floor(arQuantity[strHolding]))
+			if arQuantity[strHolding] < 0.0:
+				arDst[strHolding] = 0
+			else:
+				arDst[strHolding] = int(math.floor(arQuantity[strHolding]))
 		arDst[strSymbol] = self._recalc_key_quantity(ar, arDst)
 		return arDst
 

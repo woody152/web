@@ -64,7 +64,7 @@ function RefEchoTableColumn($ref, $ar, $bWide = false)
 
 function GetArbitrageQuantity($strSymbol, $strStockId, $fQuantity)
 {
-	return number_format($fQuantity / GetStockHedge($strSymbol, $strStockId));
+	return GetNumberDisplay($fQuantity / GetStockHedge($strSymbol, $strStockId), 0);
 }
 
 function GetTurnoverDisplay($fVolume, $fShare, $iPrecision = 2)

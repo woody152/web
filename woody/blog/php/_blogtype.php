@@ -37,10 +37,9 @@ function GetTitle($bChinese = true)
 	$ar = GetBlogMenuArray($bChinese);
 	$str = $ar[$strPage];
 	if ($bChinese)	$str .= '日志';
-	else				$str .= ' Blogs';
+	else			$str .= ' Blogs';
 
 	return $str;
 }
 
    	$acct = new TitleAccount();
-?>

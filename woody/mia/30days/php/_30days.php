@@ -7,15 +7,14 @@ require_once('_photo.php');
 
 function Get30DaysMenuArray($bChinese)
 {
-    if ($bChinese)  $arName = array('blue' => '蓝色', 'hat' => '圣诞小红帽',    'crown' => '王冠',   'yellow' => '黄色',   'leopard' => '豹纹');
-    else              $arName = array('blue' => 'Blue', 'hat' => 'Christmas Hat', 'crown' => 'Crown', 'yellow' => 'Yellow', 'leopard' => 'Leopard');
-    return $arName;
+    if ($bChinese)  return ['blue' => '蓝色', 'hat' => '圣诞小红帽',    'crown' => '王冠',   'yellow' => '黄色',   'leopard' => '豹纹'];
+    return ['blue' => 'Blue', 'hat' => 'Christmas Hat', 'crown' => 'Crown', 'yellow' => 'Yellow', 'leopard' => 'Leopard'];
 }
 
 function _menuLoop30Days($bChinese)
 {
 	$strDisplay = GetMia30DaysDisplay($bChinese);
-	$ar30Days = array_keys(Get30DaysMenuArray($bChinese));		// array('blue', 'hat', 'crown', 'yellow', 'leopard'); 
+	$ar30Days = array_keys(Get30DaysMenuArray($bChinese));
     $iLevel = 1;
     
 	MenuBegin();
@@ -58,7 +57,7 @@ function GetTitle($bChinese)
 	$str = $bChinese ? '林近岚' : 'Mia ';
 	$str .= GetMia30DaysDisplay($bChinese);
 	$str .= $bChinese ? '艺术照' : ' Photos';
-	if ($strSeries = Get30DaysDisplay($acct->GetPage(), $bChinese))		$str .= ' - '.$strSeries;
+	if ($strSeries = Get30DaysDisplay($acct->GetPage(), $bChinese))		$str .= " - $strSeries";
 	return $str;
 }
 
@@ -70,4 +69,3 @@ function GetMetaDescription($bChinese)
 }
 
    	$acct = new TitleAccount();
-?>

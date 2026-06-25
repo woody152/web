@@ -5,8 +5,7 @@
     <ProjectGuid>7cf3b798-611f-49f2-a2af-d6c18577fb46</ProjectGuid>
     <ProjectHome>.</ProjectHome>
     <StartupFile>TWS.py</StartupFile>
-    <SearchPath>
-    </SearchPath>
+    <SearchPath>..\auto</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>TWS</Name>
@@ -24,9 +23,6 @@
     <Compile Include="nyc_time.py" />
     <Compile Include="palmmicro.py">
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="..\auto\palmmicroapi.py">
-      <Link>palmmicroapi.py</Link>
     </Compile>
     <Compile Include="TWS.py" />
     <Compile Include="_tgprivate.py" />

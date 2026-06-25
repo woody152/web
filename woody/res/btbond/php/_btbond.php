@@ -4,7 +4,7 @@ require_once('../../php/_woodymenu.php');
 
 function _menuLoopBtbond($bChinese)
 {
-    $arBtbonds = array('coinwifi'); 
+    $arBtbonds = ['coinwifi']; 
     $iLevel = 1;
     
 	MenuBegin();
@@ -36,4 +36,3 @@ function _LayoutBottom($bChinese = true, $bAdsense = true)
 }
 
    	$acct = new Account();
-?>

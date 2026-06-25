@@ -49,4 +49,3 @@ function EchoBlogDate($bChinese = true)
 }
 
    	$acct = new EditCommentAccount();
-?>
