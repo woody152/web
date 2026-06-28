@@ -34,7 +34,6 @@ class _UploadFileAccount extends SymbolAccount
 	function _updateStockHistory($ref, $strFileName)
 	{
 		$strStockId = $ref->GetStockId();
-//		SqlDeleteStockHistory($strStockId);
 		$csv = new _YahooHistoryCsvFile($strFileName, $strStockId);
 		$csv->Read();
 
@@ -69,5 +68,3 @@ class _UploadFileAccount extends SymbolAccount
 	    }
 	}
 }
-
-?>

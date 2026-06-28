@@ -1,6 +1,7 @@
 import math
-import re
 from typing import Any, Dict, Optional
+
+from palmmicrostock import PalmmicroStock
 
 def _get_floor_quantity(iQuantity: int) -> float:
     fQuantity = iQuantity / 100.0
@@ -9,22 +10,6 @@ def _get_floor_quantity(iQuantity: int) -> float:
 def _round_quantity(fQuantity: float) -> int:
 	return int((fQuantity + 49.9) / 100.0) * 100
 
-def convert_symbol(strSymbol: str) -> str:
-	# 匹配 ^XXX-YY 格式，并提取 XXX 部分
-	pattern = r'^\^([A-Z]+)-[A-Z]{2}$'
-	match = re.match(pattern, strSymbol)
-	if match:
-		return match.group(1)  # 返回符号主体部分
-	else:
-		return strSymbol  # 不符合格式则返回原字符串
-	"""
-	if symbol.startswith('^'):
-		symbol = symbol[1:]
-		if '-' in symbol:
-			symbol = symbol.split('-')[0]
-	return symbol
-	"""
-	
 class PalmmicroAPI:
 	# 定义并初始化字典静态变量 arMultiplier，使用 strSymbol 作为键（整数倍率）
 	arMultiplier: Dict[str, int] = {'hf_CL': 100,	# MCL:100, CL:1000
@@ -58,10 +43,6 @@ class PalmmicroAPI:
 		"""获取指定配置参数的值"""
 		return self.config.get(key, default)
 
-	@staticmethod
-	def IsLOF(strSymbol: str) -> bool:
-		return strSymbol.startswith(("SZ16", "SH50"))
-	
 	@staticmethod
 	def is_single(ar) -> bool:
 		return 'calibration' in ar
@@ -141,7 +122,7 @@ class PalmmicroAPI:
 		fTotal = 0.0
 		for strHolding, arHolding in ar['symbol_hedge'].items():
 			if arSrc != None:
-				strReal = convert_symbol(strHolding)
+				strReal = PalmmicroStock.ConvertSymbol(strHolding)
 				if strReal in arSrc:
 					fPrice = arSrc[strReal]
 				else:
@@ -270,7 +251,7 @@ class PalmmicroAPI:
 		for strHolding, arHolding in ar['symbol_hedge'].items():
 			fQuantity = fAmount * (float(arHolding['ratio']) / 100.0) / float(arHolding['price'])
 			arQuantity[strHolding] = fQuantity
-			strReal = convert_symbol(strHolding)
+			strReal = PalmmicroStock.ConvertSymbol(strHolding)
 			if strReal in arReal:
 				arReal[strReal] += fQuantity
 			else:

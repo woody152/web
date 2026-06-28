@@ -145,5 +145,3 @@ if (!$resJson_decode->quoteResponse->result) {
     
 }
 */
-
-?>

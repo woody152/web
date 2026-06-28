@@ -25,7 +25,7 @@ function _updateStockHistoryAdjCloseBySplit($ref, $strSymbol, $strStockId, $his_
     unlinkConfigFile($strSymbol);
 }
 
-function _updateStockHistoryAdjCloseByDividend($ref, $strSymbol, $strStockId, $his_sql, $strYMD, $strDividend)
+function _updateStockHistoryAdjCloseByDividend($strSymbol, $strStockId, $his_sql, $strYMD, $fDividend)
 {
     $ar = [];
     if ($result = $his_sql->GetFromDate($strStockId, $strYMD)) 
@@ -37,7 +37,6 @@ function _updateStockHistoryAdjCloseByDividend($ref, $strSymbol, $strStockId, $h
         mysqli_free_result($result);
     }
 
-	$fDividend = floatval($strDividend);
     foreach ($ar as $strId => $fAdjClose)
     {
         $fAdjClose -= $fDividend;
@@ -290,15 +289,16 @@ function _updateStockOptionDividend($ref, $strSymbol, $strStockId, $his_sql, $st
 	$sql = new StockDividendSql();
 	if (_updateOptionDailySql($sql, $strStockId, $strDate, $strVal))
 	{
+		$fDividend = floatval($strVal);
 		DebugString('Dividend updated');
        	$cal_sql = GetCalibrationSql();
 		$net_sql = GetNetValueHistorySql();
   		if ($strClosePrev = $cal_sql->GetClosePrev($strStockId, $strDate))
   		{	// SPY, TQQQ
   			$strDatePrev = $cal_sql->GetDatePrev($strStockId, $strDate);
-  			DebugString($strSymbol.' Change calibaration on '.$strDatePrev);
+  			DebugString("$strSymbol Change calibaration on $strDatePrev");
   			$fNetValue = floatval($net_sql->GetClose($strStockId, $strDatePrev));
-  			$fNewNetValue = $fNetValue - floatval($strVal); 
+  			$fNewNetValue = $fNetValue - $fDividend; 
   			$fFactor = floatval($strClosePrev) * $fNetValue / $fNewNetValue;
   			$cal_sql->WriteDaily($strStockId, $strDatePrev, strval($fFactor));
   		}
@@ -311,22 +311,22 @@ function _updateStockOptionDividend($ref, $strSymbol, $strStockId, $his_sql, $st
 				if ($strClosePrev = $cal_sql->GetClosePrev($strQdiiId, $strDate))
 				{
 					$strDatePrev = $cal_sql->GetDatePrev($strQdiiId, $strDate);
-					DebugString(__FUNCTION__.' '.$strQdii.' Change calibaration on '.$strDatePrev);
+					DebugString(__FUNCTION__." $strQdii Change calibaration on $strDatePrev");
 					$fNetValue = floatval($net_sql->GetClose($strStockId, $strDatePrev));
-					$fNewNetValue = $fNetValue - floatval($strVal); 
+					$fNewNetValue = $fNetValue - $fDividend; 
 					$fFactor = floatval($strClosePrev) * $fNewNetValue / $fNetValue;
 					$cal_sql->WriteDaily($strQdiiId, $strDatePrev, strval($fFactor));
 				}
   			}
   		}
- 		if ($strClosePrev)	$net_sql->WriteDaily($strStockId, $strDatePrev, strval($fNewNetValue));
-		_updateStockHistoryAdjCloseByDividend($ref, $strSymbol, $strStockId, $his_sql, $strDate, $strVal);
+ 		// if ($strClosePrev)	$net_sql->WriteDaily($strStockId, $strDatePrev, strval($fNewNetValue));
+		_updateStockHistoryAdjCloseByDividend($strSymbol, $strStockId, $his_sql, $strDate, $fDividend);
 	}
 }
 
 function _updateStockOptionCalibration($strSymbol, $strStockId, $strDate, $strVal)
 {
-	DebugString($strSymbol.' '.$strDate.' '.$strVal);
+	DebugString("$strSymbol $strDate $strVal");
 	if (empty($strVal))
 	{
 		$last_sql = new LastCalibrationSql();
@@ -388,7 +388,6 @@ class _SubmitOptionsAccount extends Account
 
 		$strVal = $_POST['val'];
 		if ($bAdmin === false)		$strVal = SqlCleanString($strVal);
-		// DebugString(__CLASS__.'->'.__FUNCTION__.' '.$strVal);
 		
     	StockPrefetchExtendedData($strSymbol);
         $ref = StockGetReference($strSymbol);
@@ -481,4 +480,3 @@ class _SubmitOptionsAccount extends Account
 		unset($_POST['submit']);
 	}
 }
-

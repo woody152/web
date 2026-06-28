@@ -19,5 +19,3 @@ class _AdminHistoryAccount extends SymbolAccount
 	    }
 	}
 }
-
-?>

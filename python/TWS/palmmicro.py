@@ -1,33 +1,15 @@
 import requests
 import time
 
-from palmmicroapi import convert_symbol
 from palmmicroapi import PalmmicroAPI
+from palmmicrostock import PalmmicroStock, SinaStock
 
 from nyc_time import GetBeijingTimeDisplay
 
 from _tgprivate import TG_TOKEN
 from _tgprivate import WECHAT_KEY
-from _tgprivate import WECHAT_SH501018_KEY
-from _tgprivate import WECHAT_SH513350_KEY
-from _tgprivate import WECHAT_SZ159502_KEY
-from _tgprivate import WECHAT_SZ159518_KEY
-from _tgprivate import WECHAT_SZ160719_KEY
-from _tgprivate import WECHAT_SZ160723_KEY
-from _tgprivate import WECHAT_SZ161116_KEY
-from _tgprivate import WECHAT_SZ161125_KEY
-from _tgprivate import WECHAT_SZ161127_KEY
-from _tgprivate import WECHAT_SZ161129_KEY
-from _tgprivate import WECHAT_SZ161130_KEY
-from _tgprivate import WECHAT_SZ161226_KEY
-from _tgprivate import WECHAT_SZ162411_KEY
-from _tgprivate import WECHAT_SZ162415_KEY
-from _tgprivate import WECHAT_SZ163208_KEY
-from _tgprivate import WECHAT_SZ164701_KEY
-from _tgprivate import WECHAT_SZ164824_KEY
-from _tgprivate import WECHAT_SZ164906_KEY
-from _tgprivate import WECHAT_SZ165513_KEY
-
+from _tgprivate import arSymbolKey  # QQQ = ['SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941']
+        
 def get_display(strType):
     if strType == 'SELL':
         return '卖出'
@@ -66,25 +48,8 @@ class Palmmicro:
         self.arDebug = {}
         self.arSendMsg = {}
         self.arSendMsg['telegram'] = GetSendMsgArray(WECHAT_KEY)
-        self.arSendMsg['SH501018'] = GetSendMsgArray(WECHAT_SH501018_KEY)
-        self.arSendMsg['SH513350'] = GetSendMsgArray(WECHAT_SH513350_KEY)
-        self.arSendMsg['SZ159502'] = GetSendMsgArray(WECHAT_SZ159502_KEY)
-        self.arSendMsg['SZ159518'] = GetSendMsgArray(WECHAT_SZ159518_KEY)
-        self.arSendMsg['SZ160719'] = GetSendMsgArray(WECHAT_SZ160719_KEY)
-        self.arSendMsg['SZ160723'] = GetSendMsgArray(WECHAT_SZ160723_KEY)
-        self.arSendMsg['SZ161116'] = GetSendMsgArray(WECHAT_SZ161116_KEY)
-        self.arSendMsg['SZ161125'] = GetSendMsgArray(WECHAT_SZ161125_KEY)
-        self.arSendMsg['SZ161127'] = GetSendMsgArray(WECHAT_SZ161127_KEY)
-        self.arSendMsg['SZ161129'] = GetSendMsgArray(WECHAT_SZ161129_KEY)
-        self.arSendMsg['SZ161130'] = GetSendMsgArray(WECHAT_SZ161130_KEY)
-        self.arSendMsg['SZ161226'] = GetSendMsgArray(WECHAT_SZ161226_KEY)
-        self.arSendMsg['SZ162411'] = GetSendMsgArray(WECHAT_SZ162411_KEY)
-        self.arSendMsg['SZ162415'] = GetSendMsgArray(WECHAT_SZ162415_KEY)
-        self.arSendMsg['SZ163208'] = GetSendMsgArray(WECHAT_SZ163208_KEY)
-        self.arSendMsg['SZ164701'] = GetSendMsgArray(WECHAT_SZ164701_KEY)
-        self.arSendMsg['SZ164824'] = GetSendMsgArray(WECHAT_SZ164824_KEY)
-        self.arSendMsg['SZ164906'] = GetSendMsgArray(WECHAT_SZ164906_KEY)
-        self.arSendMsg['SZ165513'] = GetSendMsgArray(WECHAT_SZ165513_KEY)
+        for strSymbol, strKey in arSymbolKey.items():
+            self.arSendMsg[strSymbol] = GetSendMsgArray(strKey)
         self.arAG0 = GetMktDataArray('nf_AG0')
 
     def _fetchSinaData(self, strSymbols):
@@ -158,11 +123,11 @@ class Palmmicro:
         except requests.exceptions.RequestException as e:
             print('_fetchPalmmicroData error:', e)
 
-    def _fetchData(self, arSymbol):
+    def _fetchData(self):
         iCur = int(time.time())
         if iCur - self.iTimer >= 19:
             self.iTimer = iCur
-            strSymbols = ','.join(arSymbol)
+            strSymbols = ','.join(arSymbolKey.keys())
             if self.api is None:
                 self._fetchPalmmicroData(strSymbols)
             self._fetchSinaData(strSymbols)
@@ -287,7 +252,7 @@ class Palmmicro:
             fMktPrice = arMktData[strMktType + '_price']
             strDebug = self._getSymDebugString(strSymbol, iSize, strType, strMktType) + self._getMktDebugString(strMktSymbol, iMktSize, fMktPrice)
             arSrc = {strMktSymbol: fMktPrice}
-            if self.api.IsLOF(strSymbol) == False:
+            if PalmmicroStock.IsLOF(strSymbol) == False:
                 arSrc |= {'CNY': self.fUSDCNY}
             self._debugPriceAndSize(strSymbol, strType, strDebug, iSize, iMktSize, arSymData[strType + '_price'] / self.api.EstNetValue(strSymbol, arSrc))
     
@@ -310,7 +275,7 @@ class Palmmicro:
             strAnd = ' 和 '
             strDebug = self._getSymDebugString(strSymbol, iSize, strType, strMktType)
             for strHoldingSymbol in arSymData['symbol_hedge']:
-                strRealSymbol = convert_symbol(strHoldingSymbol)
+                strRealSymbol = PalmmicroStock.ConvertSymbol(strHoldingSymbol)
                 if strRealSymbol != strHoldingSymbol:
                     bDisplayTotalQuantity = True
                 for arAllMktData in arMkt.values():
@@ -346,8 +311,8 @@ class Palmmicro:
             else:
                 print(strMktSymbol + '无' + get_display(strMktType) + '数据')
                 
-    def CheckPriceAndSize(self, arSrc, arMktData, arMkt):
-        self._fetchData(arSrc)
+    def CheckPriceAndSize(self, arMktData, arMkt):
+        self._fetchData()
         self._processPriceAndSize(arMktData, arMkt)
         if self._checkNewSinaData() == True:
             for arOtherMktData in arMkt.values():

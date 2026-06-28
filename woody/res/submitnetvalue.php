@@ -19,4 +19,3 @@ class _AdminNetValueAccount extends SymbolAccount
 
    	$acct = new _AdminNetValueAccount();
 	$acct->AdminRun();
-?>

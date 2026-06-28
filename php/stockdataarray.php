@@ -139,7 +139,8 @@ function GetStockDataArray($strSymbols, $arRange = false)
 						$arHolding = [];
 						$arHolding['ratio'] = $strRatio;
 						$arHolding['price'] = rtrim0($his_sql->GetClose($strHoldingId, $strDate));
-						if ($strOfficial = $his_sql->GetAdjClose($strHoldingId, $strOfficialDate))	$arHolding['est_price'] = rtrim0($strOfficial);
+						$strOfficial = ($strOfficial = $his_sql->GetAdjClose($strHoldingId, $strOfficialDate)) ?: $his_sql->GetAdjClosePrev($strHoldingId, $strOfficialDate);
+						$arHolding['est_price'] = rtrim0($strOfficial);
 						$strHoldingSymbol = $sql->GetStockSymbol($strHoldingId);
 						$arSymbolHedge[$strHoldingSymbol] = $arHolding;
 						if (str_starts_with($strHoldingSymbol, YAHOO_INDEX_CHAR) === false)

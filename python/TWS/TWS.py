@@ -19,8 +19,8 @@ def IsChinaMarketOpen():
         return True
     elif iTime >= 1300 and iTime < 1500:
         return True
-    #return False
-    return True
+    return False
+    #return True
 
 def IsMarketOpen():
     iTime = GetExchangeTime()
@@ -63,10 +63,6 @@ class MyEWrapper(EWrapper):
         self.strNextFuture = '202612'
 
     def nextValidId(self, orderId: int):
-        self.arQDII = {'SH501018', 'SZ160719', 'SZ160723', 'SZ161116', 'SZ161125', 'SZ161127', 'SZ161129', 'SZ161130', 'SZ161226', 'SZ162411', 'SZ162415', 'SZ163208', 'SZ164701', 'SZ164824', 'SZ164906', 'SZ165513'}
-        #self.arQQQ = {'SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941'}
-        self.arXOPETF = {'SH513350', 'SZ159518'}
-        self.arXBIETF = {'SZ159502'}
         self.arOrder = {}
         self.arOrder['SPY'] = GetOrderArray()
         if IsChinaMarketOpen():
@@ -83,7 +79,7 @@ class MyEWrapper(EWrapper):
             self.arOrder['XOP'] = GetOrderArray()
         else:
             #self.arOrder['TLT'] = GetOrderArray([80.90, 84.19, 85.21, 86.40, 86.62, 86.72, 87.59, 89.76, 91.88], 100, 1, 8)
-            self.arOrder['SPX'] = GetOrderArray([5191.35, 6193.55, 7051.04, 7261.79, 7435.26, 7439.73, 7479.22, 7696.65, 7908.52])
+            self.arOrder['SPX'] = GetOrderArray([5191.35, 6193.55, 7051.04, 7233.86, 7388.49, 7441.30, 7459.84, 7685.82, 7908.52])
             self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0089, 4, 7)
             self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0182, -1, -1)
         self.palmmicro = Palmmicro()
@@ -288,7 +284,7 @@ class MyEWrapper(EWrapper):
 
     def _CheckPriceAndSize(self, arMktData):
         if IsChinaMarketOpen():
-            self.palmmicro.CheckPriceAndSize(sorted(self.arQDII | self.arXOPETF | self.arXBIETF), arMktData, self.arMkt)
+            self.palmmicro.CheckPriceAndSize(arMktData, self.arMkt)
 
 
 def GetContractExchange():

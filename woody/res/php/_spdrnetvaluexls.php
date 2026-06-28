@@ -3,7 +3,6 @@ require_once('../../php/class/PHPExcel/IOFactory.php');
 
 function _readXlsFile($bIshares, $strPathName, $net_sql, $shares_sql, $strStockId)
 {
-//	date_default_timezone_set('America/New_York');
 	try 
 	{	// 读取excel文件
 		$inputFileType = PHPExcel_IOFactory::identify($strPathName);
@@ -34,18 +33,18 @@ function _readXlsFile($bIshares, $strPathName, $net_sql, $shares_sql, $strStockI
 	$highestColumn = $sheet->getHighestColumn();
 
 	$oldest_ymd = new OldestYMD();
-   	$cal_sql = GetCalibrationSql();
+	// $cal_sql = GetCalibrationSql();
 	
 	// 获取一行的数据
 	$iCount = 0;
 	$iSharesCount = 0;
+	$iTotal = 0;
 	for ($row = 1; $row <= $highestRow; $row++)
 	{
 		// Read a row of data into an array
 		$rowData = $sheet->rangeToArray('A'.$row.':'.$highestColumn.$row, null, true, false);
 		//这里得到的rowData都是一行的数据，得到数据后自行处理，我们这里只打出来看看效果
 		$ar = $rowData[0];
-//		DebugPrint($ar);
 		if ($iTick = strtotime($ar[0]))
 		{
     		$ymd = new TickYMD($iTick);
@@ -53,14 +52,16 @@ function _readXlsFile($bIshares, $strPathName, $net_sql, $shares_sql, $strStockI
 			if ($oldest_ymd->IsTooOld($strDate))	break;
    			if ($oldest_ymd->IsInvalid($strDate) === false)
    			{
+				$iTotal ++;
   				if ($net_sql->WriteDaily($strStockId, $strDate, $ar[$iNetValueIndex]))
   				{
   					$iCount ++;
+					/*
   					if ($cal_sql->GetClose($strStockId, $strDate))
   					{
-  						DebugString('Delete calibaration on '.$strDate);
+  						DebugString("Delete calibaration on $strDate");
   						$cal_sql->DeleteByDate($strStockId, $strDate);
-  					}
+  					}*/
   				}
   				if ($shares_sql->WriteDaily($strStockId, $strDate, strval(floatval($ar[$iSharesIndex]) / 10000.0)))
   				{
@@ -69,7 +70,7 @@ function _readXlsFile($bIshares, $strPathName, $net_sql, $shares_sql, $strStockI
    			}
 		}
 	}
-	return '更新'.strval($iCount).'条'.STOCK_DISP_NETVALUE.'和'.strval($iSharesCount).'条流通股数';
+	return '共'.strval($iTotal).', 更新'.strval($iCount).'条'.STOCK_DISP_NETVALUE.'和'.strval($iSharesCount).'条流通股数';
 }
 
 function GetNetValueXlsStr($sym, $bAutoCheck = false)
@@ -84,7 +85,7 @@ function GetNetValueXlsStr($sym, $bAutoCheck = false)
 		}
 
 		$strPathName = DebugGetPathName('netvalue_'.$strSymbol.'.xls');
-		if ($str = StockSaveDebugFile($strPathName, $strUrl))
+		if (StockSaveDebugFile($strPathName, $strUrl))
 		{
 			$sym->SetTimeZone();
 			$strStockId = SqlGetStockId($strSymbol);
@@ -105,5 +106,3 @@ function DebugNetValueXlsStr($sym, $bAutoCheck = false)
 	$str = GetNetValueXlsStr($sym, $bAutoCheck);
     DebugString($str);
 }
-
-?>

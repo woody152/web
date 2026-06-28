@@ -15,7 +15,6 @@ function _transSortBySymbol($arTrans)
         else					        $ar[$strSymbol] = [$trans];
     }
     ksort($ar);
-    
     $arSort = [];
     foreach ($ar as $arTrans)	array_push($arSort, ...$arTrans);
     return $arSort;
@@ -25,7 +24,6 @@ function _transEchoReferenceParagraph($arTrans, $bAdmin)
 {
 	$arRef = [];
 	$arSymbol = [];
-	
 	foreach ($arTrans as $trans)
 	{
 		$ref = $trans->GetRef();
@@ -36,8 +34,6 @@ function _transEchoReferenceParagraph($arTrans, $bAdmin)
        		$arSymbol[] = $strSymbol;
        	}
 	}
-	
-	foreach ($arRef as $ref)		$his = new StockHistory($ref);		// Stock history update
     EchoReferenceParagraph($arRef, $bAdmin);
 }
 
@@ -46,23 +42,24 @@ function _echoMergeParagraph($arMerge)
 	if (EchoTableParagraphBegin([new TableColumnSymbol(),
 								 new TableColumnQuantity(),
 								 new TableColumnTest()
-								], 'merge', '合并'.TableColumnGetQuantity()))
+								], 'merge', '合并'.TableColumnGetQuantity()
+							   ))
 	{
 		foreach ($arMerge as $strSymbol => $trans)
 		{
 			$iTotal = $trans->GetTotalShares();
 			if ($iTotal != 0)
 			{
-				$ar = [];
-		
 				$ref = $trans->GetRef();
+				$ar = [];
 				$ar[] = RefGetMyStockLink($ref);
 				$ar[] = strval($iTotal);
 				$ar[] = strval($iTotal + match($strSymbol)
-										 {'KWEB' => - 200 + 1100,
+										 {'KWEB' => - 200 + 1200,
 										  'XOP' => - 00 - 00,
 										  default => 0
-							   });
+							   			 }
+							  );
 				RefEchoTableColumn($ref, $ar);
 			}
 		}
@@ -72,11 +69,10 @@ function _echoMergeParagraph($arMerge)
 
 function _transEchoMergeParagraph($arTrans)
 {
-	$arMerge = [];
-	$arSymbol = [];
 	$prev_trans = false;
 	$cur_trans = false;
-	
+	$arMerge = [];
+	$arSymbol = [];
 	foreach ($arTrans as $trans)
 	{
 		$strSymbol = $trans->GetSymbol();
@@ -101,9 +97,8 @@ function _transEchoMergeParagraph($arTrans)
        		$prev_trans = $trans;
        	}
 	}
-
-	if ($cur_trans)	$arMerge[$strSymbol] = $cur_trans;
-	if (count($arMerge) > 0)		_echoMergeParagraph($arMerge);
+	if ($cur_trans)				$arMerge[$strSymbol] = $cur_trans;
+	if (count($arMerge) > 0)	_echoMergeParagraph($arMerge);
 }
 
 function _echoPortfolio($portfolio, $sql, $strMemberId, $bAdmin)
@@ -112,7 +107,6 @@ function _echoPortfolio($portfolio, $sql, $strMemberId, $bAdmin)
 	$arTransH = [];
 	$arTransUS = [];
 	$arStockGroup = [];
-	
 	if ($result = $sql->GetAll($strMemberId)) 
 	{
 		while ($record = mysqli_fetch_assoc($result)) 
@@ -136,7 +130,6 @@ function _echoPortfolio($portfolio, $sql, $strMemberId, $bAdmin)
 		}
 		mysqli_free_result($result);
 	}
-
 	$arTrans = [..._transSortBySymbol($arTransA), ..._transSortBySymbol($arTransH), ..._transSortBySymbol($arTransUS)];
     _transEchoReferenceParagraph($arTrans, $bAdmin);
 	EchoPortfolioParagraph($arTrans);
@@ -161,7 +154,6 @@ function _onPrefetch($sql, $strMemberId)
 function EchoAll()
 {
 	global $acct;
-	
 	$strMemberId = $acct->GetMemberId();
 	$sql = $acct->GetGroupSql();
     _onPrefetch($sql, $strMemberId);
@@ -170,7 +162,6 @@ function EchoAll()
     $arStockGroup = _echoPortfolio($portfolio, $sql, $strMemberId, $acct->IsAdmin());
     $arStockGroup[] = $portfolio; 
 	$acct->EchoMoneyParagraphs($arStockGroup, new CnyReference('USCNY'), new CnyReference('HKCNY'));
-    
     $acct->EchoLinks();
 }
 
@@ -183,7 +174,6 @@ function GetTitle()
 function GetMetaDescription()
 {
 	global $acct;
-	
     $str = $acct->GetWhoseDisplay().MY_PORTFOLIO_DISPLAY.'页面。根据用户输入的交易详情汇总证券投资组合信息，显示包括单个股票的盈亏情况，分组投资盈亏情况以及总体盈亏情况等内容。用来跟踪和记录长期投资表现。';
     return CheckMetaDescription($str);
 }

@@ -1,5 +1,5 @@
-import requests
 import json
+import requests
 import time
 from typing import Union, List, Dict, Any
 
@@ -7,6 +7,7 @@ from _mytoken import BOT_TOKEN
 #from _mytoken import ROT_TOKEN
 
 from palmmicroapi import PalmmicroAPI
+from palmmicrostock import PalmmicroStock, SinaStock
 
 def __printHedge(api, ar: Dict[str, int], strSymbol, strSymbolUS):
 	if ar[strSymbolUS] != 0:
@@ -21,7 +22,7 @@ def __printHoldingEst(strSymbol, fNetValue, strType = '官方'):
 def __testXOP(api, strSymbol, strSymbolUS, iQuantity, iQuantityUS, fPriceUS, arUSDCNY):
 	fNetValue = api.EstNetValue(strSymbol)
 	__printEst(strSymbol, fNetValue)
-	if api.IsLOF(strSymbol):
+	if PalmmicroStock.IsLOF(strSymbol):
 		fNetValue = api.EstNetValue(strSymbol, {strSymbolUS: fPriceUS})
 		fPriceUS = api.ReverseEst({strSymbol: fNetValue})
 	else:
@@ -45,7 +46,7 @@ def __testXOP(api, strSymbol, strSymbolUS, iQuantity, iQuantityUS, fPriceUS, arU
 def __testSPY(api, strSymbol, strSymbolUS, iQuantity, iQuantityUS, fPriceUS, arUSDCNY):
 	fNetValue = api.EstNetValue(strSymbol)
 	__printEst(strSymbol, fNetValue)
-	if api.IsLOF(strSymbol):
+	if PalmmicroStock.IsLOF(strSymbol):
 		fNetValue = api.EstNetValue(strSymbol, {strSymbolUS: fPriceUS})
 		fPriceUS = api.ReverseEst({strSymbol: fNetValue})
 	else:
@@ -57,48 +58,69 @@ def __testSPY(api, strSymbol, strSymbolUS, iQuantity, iQuantityUS, fPriceUS, arU
 	print(f"把{strSymbolUS}转换成^GSPC后二次计算{strSymbol}: {ar[strSymbol]}@{fNetValue:.3f}, 对应{strSymbolUS}: {ar[strSymbolUS]}, 反向算SPY@{fPriceUS:.2f}")
 	__printHedge(api, ar, strSymbol, strSymbolUS)
 
-def _handlePalmmicroData(arData):
-	arCNY = {'CNY': 6.79}
-	api = PalmmicroAPI(arData)
-	#print(api.get_config())
+def __getSize(arStock, arSymbol, strType = 'SELL'):
+	arQuantity = {}
+	for strSymbol in arSymbol:
+		arQuantity |= arStock[strSymbol].GetSize(strType)
+	return arQuantity
 
-	arQuantity = {'SZ162411': 1085481, 'SZ159518': 1672100}
+def _handlePalmmicroData(arData, strSymbols):
+	arLine = SinaStock.FetchData('fx_susdcny,nf_AG0,' + strSymbols.lower())
+	if arLine == False:
+		print('无法获得新浪数据')
+		return
+	
+	usdcny_stock = SinaStock(arLine[0])
+	ag0_stock = SinaStock(arLine[1])
+	arSymbol = strSymbols.split(',')
+	iIndex = 2
+	arStock = {}
+	for strSymbol in arSymbol:
+		arStock[strSymbol] = SinaStock(arLine[iIndex])
+		iIndex += 1
+
+	arCNY = usdcny_stock.GetPrice()
+	api = PalmmicroAPI(arData)
+	
+	arQuantity = __getSize(arStock, {'SZ162411', 'SZ159518'})
 	arQuantityUS = {'XOP': 1000, 'GUSH': 10000}
-	arPriceUS = {'XOP': 141.07, 'GUSH': 25.38}
+	arPriceUS = {'XOP': 144.29, 'GUSH': 26.77}
 	for strSymbol, iQuantity in arQuantity.items():
 		for strSymbolUS, iQuantityUS in arQuantityUS.items():
 			__testXOP(api, strSymbol, strSymbolUS, iQuantity, iQuantityUS, arPriceUS[strSymbolUS], arCNY)
 
-	arQuantity = {'SZ161125': 101521, 'SZ159612': 193400}
+	arQuantity = __getSize(arStock, {'SZ161125', 'SZ159612'})
 	arQuantityUS = {'SPY': 100, 'hf_ES': 2}
-	arPriceUS = {'SPY': 616.93, 'hf_ES': 6248.25}
+	arPriceUS = {'SPY': 619.19, 'hf_ES': 6267.25}
 	for strSymbol, iQuantity in arQuantity.items():
 		for strSymbolUS, iQuantityUS in arQuantityUS.items():
 			__testSPY(api, strSymbol, strSymbolUS, iQuantity, iQuantityUS, arPriceUS[strSymbolUS], arCNY)
     
+	arQuantity = arStock['SZ164701'].GetSize('SELL')
 	f164701 = api.EstNetValue('SZ164701')
 	__printHoldingEst('SZ164701', f164701)
-	f164701 = api.EstNetValue('SZ164701', {'GLD': 365.32, 'SLV': 56.22})
-	ar164701 = api.CalcQuantity('SZ164701', {'SZ164701': 233041, 'GLD': 100, 'SLV': 100})
+	f164701 = api.EstNetValue('SZ164701', {'GLD': 357.37, 'SLV': 56.22})
+	ar164701 = api.CalcQuantity('SZ164701', arQuantity | {'GLD': 100, 'SLV': 100})
 	print(f"按持仓算SZ164701: {ar164701['SZ164701']}@{f164701:.3f}, GLD: {ar164701['GLD']}, SLV: {ar164701['SLV']}")
 	__printHedge(api, ar164701, 'SZ164701', 'GLD')
-	f164701 = api.EstNetValue('SZ164701', {'hf_GC': 3997.43, 'hf_SI': 60.42})
-	ar164701 = api.CalcQuantity('SZ164701', {'SZ164701': 233041, 'hf_GC': 10, 'SLV': 100})
+	f164701 = api.EstNetValue('SZ164701', {'hf_GC': 3909.92, 'hf_SI': 60.42})
+	ar164701 = api.CalcQuantity('SZ164701', arQuantity | {'hf_GC': 1, 'SLV': 100})
 	print(f"把hf_GC和hf_SI转换成GLD和SLV后, 按持仓算SZ164701: {ar164701['SZ164701']}@{f164701:.3f}, GLD: {ar164701['GLD']}, SLV: {ar164701['SLV']}, hf_GC: {ar164701['hf_GC']}")
 	__printHedge(api, ar164701, 'SZ164701', 'GLD')
     
+	arQuantity = arStock['SZ160723'].GetSize('SELL')
 	f160723 = api.EstNetValue('SZ160723')
 	__printHoldingEst('SZ160723', f160723)
-	f160723 = api.EstNetValue('SZ160723', {'USO': 90.26})
-	ar160723 = api.CalcQuantity('SZ160723', {'SZ160723': 106853, 'USO': 100})
+	f160723 = api.EstNetValue('SZ160723', {'USO': 93.47})
+	ar160723 = api.CalcQuantity('SZ160723', arQuantity | {'USO': 100})
 	i160723 = ar160723['SZ160723']
 	iUSO = ar160723['USO']
 	iUSOEU = ar160723['^USO-EU']
 	iUSOJP = ar160723['^USO-JP']
 	print(f"按持仓算SZ160723: {i160723}@{f160723:.3f}, USO: {iUSO}, ^USO-EU: {iUSOEU}, ^USO-JP: {iUSOJP}")
 	print(f"USO对冲值: {i160723/(iUSO + iUSOEU + iUSOJP):.0f}")
-	f160723 = api.EstNetValue('SZ160723', {'hf_CL': 59.46})
-	ar160723 = api.CalcQuantity('SZ160723', {'SZ160723': 106853, 'hf_CL': 10})
+	f160723 = api.EstNetValue('SZ160723', {'hf_CL': 61.53})
+	ar160723 = api.CalcQuantity('SZ160723', arQuantity | {'hf_CL': 10})
 	i160723 = ar160723['SZ160723']
 	iUSO = ar160723['USO']
 	iUSOEU = ar160723['^USO-EU']
@@ -113,7 +135,8 @@ def _handlePalmmicroData(arData):
     
 	f161226 = api.EstNetValue('SZ161226')
 	__printEst('SZ161226', f161226)
-	f161226 = api.EstNetValue('SZ161226', {'nf_AG0':12842.3});
+	#f161226 = api.EstNetValue('SZ161226', {'nf_AG0':12842.3});
+	f161226 = api.EstNetValue('SZ161226', ag0_stock.GetPrice());
 	fAG0 = api.ReverseEst({'SZ161226':f161226})
 	ar161226 = api.CalcQuantity('SZ161226', {'SZ161226':576813, 'nf_AG0':10})
 	print(f"直接算161226: {ar161226['SZ161226']}@{f161226:.3f}, 反向算nf_AG0: {ar161226['nf_AG0']}@{fAG0:.2f}")
@@ -224,6 +247,6 @@ def FetchPalmmicroData(strSymbols):
 	if result is not None:
 		# 可以进一步处理result
 		if isinstance(result, dict):
-			_handlePalmmicroData(result['text'])
+			_handlePalmmicroData(result['text'], strSymbols)
 	else:
 		print("函数执行失败, 请检查上面的错误信息。")
