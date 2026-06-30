@@ -9,9 +9,11 @@ from _mytoken import BOT_TOKEN
 from palmmicroapi import PalmmicroAPI
 from palmmicrostock import PalmmicroStock, SinaStock
 
-def __printHedge(api, ar: Dict[str, int], strSymbol, strSymbolUS):
-	if ar[strSymbolUS] != 0:
-		print(f"{strSymbolUS}对冲值: {ar[strSymbol]/ar[strSymbolUS]/api.get_multiplier(strSymbolUS):.0f}")
+def __printHedge(api, ar: Dict[str, int], strSymbol: str, strSymbolUS: str, iSizeUS = None):
+	if iSizeUS == None:
+		iSizeUS = ar[strSymbolUS]
+	if iSizeUS != 0:
+		print(f"{strSymbolUS}对冲值: {ar[strSymbol]/iSizeUS/api.get_multiplier(strSymbolUS):.0f}")
 
 def __printEst(strSymbol, fNetValue, strType = '官方', strMethod = '直接'):
 	print(f"{strMethod}算{strSymbol}{strType}估值: {fNetValue:.3f}")
@@ -96,7 +98,7 @@ def _handlePalmmicroData(arData, strSymbols):
 		for strSymbolUS, iQuantityUS in arQuantityUS.items():
 			__testSPY(api, strSymbol, strSymbolUS, iQuantity, iQuantityUS, arPriceUS[strSymbolUS], arCNY)
     
-	arQuantity = arStock['SZ164701'].GetSize('SELL')
+	arQuantity = arStock['SZ164701'].GetSize('BUY')
 	f164701 = api.EstNetValue('SZ164701')
 	__printHoldingEst('SZ164701', f164701)
 	f164701 = api.EstNetValue('SZ164701', {'GLD': 357.37, 'SLV': 56.22})
@@ -108,25 +110,30 @@ def _handlePalmmicroData(arData, strSymbols):
 	print(f"把hf_GC和hf_SI转换成GLD和SLV后, 按持仓算SZ164701: {ar164701['SZ164701']}@{f164701:.3f}, GLD: {ar164701['GLD']}, SLV: {ar164701['SLV']}, hf_GC: {ar164701['hf_GC']}")
 	__printHedge(api, ar164701, 'SZ164701', 'GLD')
     
-	arQuantity = arStock['SZ160723'].GetSize('SELL')
+	arQuantity = arStock['SZ160723'].GetSize('BUY')
+	arHolding = api.GetHoldingSymbols('SZ160723')
 	f160723 = api.EstNetValue('SZ160723')
 	__printHoldingEst('SZ160723', f160723)
 	f160723 = api.EstNetValue('SZ160723', {'USO': 93.47})
 	ar160723 = api.CalcQuantity('SZ160723', arQuantity | {'USO': 100})
-	i160723 = ar160723['SZ160723']
-	iUSO = ar160723['USO']
-	iUSOEU = ar160723['^USO-EU']
-	iUSOJP = ar160723['^USO-JP']
-	print(f"按持仓算SZ160723: {i160723}@{f160723:.3f}, USO: {iUSO}, ^USO-EU: {iUSOEU}, ^USO-JP: {iUSOJP}")
-	print(f"USO对冲值: {i160723/(iUSO + iUSOEU + iUSOJP):.0f}")
+	str = ''
+	iSum = 0
+	for strHolding in arHolding:
+		iSize = ar160723[strHolding]
+		str += f", {strHolding}: {iSize}"
+		iSum += iSize
+	print(f"按持仓算SZ160723: {ar160723['SZ160723']}@{f160723:.3f}{str}")
+	__printHedge(api, ar160723, 'SZ160723', 'USO', iSum)
 	f160723 = api.EstNetValue('SZ160723', {'hf_CL': 61.53})
 	ar160723 = api.CalcQuantity('SZ160723', arQuantity | {'hf_CL': 10})
-	i160723 = ar160723['SZ160723']
-	iUSO = ar160723['USO']
-	iUSOEU = ar160723['^USO-EU']
-	iUSOJP = ar160723['^USO-JP']
-	print(f"把hf_CL转换成USO后, 按持仓算SZ160723: {i160723}@{f160723:.3f}, USO: {iUSO}, ^USO-EU: {iUSOEU}, ^USO-JP: {iUSOJP}, hf_CL: {ar160723['hf_CL']}")
-	print(f"USO对冲值: {i160723/(iUSO + iUSOEU + iUSOJP):.0f}")
+	str = ''
+	iSum = 0
+	for strHolding in arHolding:
+		iSize = ar160723[strHolding]
+		str += f", {strHolding}: {iSize}"
+		iSum += iSize
+	print(f"把hf_CL转换成USO后, 按持仓算SZ160723: {ar160723['SZ160723']}@{f160723:.3f}{str}, hf_CL: {ar160723['hf_CL']}")
+	__printHedge(api, ar160723, 'SZ160723', 'USO', iSum)
 
 	f164824 = api.EstNetValue('SZ164824')
 	__printHoldingEst('SZ164824', f164824)

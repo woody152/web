@@ -23,12 +23,7 @@ class PalmmicroAPI:
 	DEFAULT_HEDGE_QUANTITY: int = 10000
 
 	def __init__(self, config_dict: Dict[str, Any]) -> None:
-		"""
-		使用字典初始化API
-
-		参数:
-			config_dict: 包含配置参数的字典
-		"""
+		"""使用字典初始化API"""
 		self.config = config_dict
 
 	def get_config(self):
@@ -39,9 +34,9 @@ class PalmmicroAPI:
 		"""设置/更新配置参数"""
 		self.config[key] = value
 
-	def get_param(self, key: str, default = None):
+	def get_param(self, key: str):
 		"""获取指定配置参数的值"""
-		return self.config.get(key, default)
+		return self.config.get(key)
 
 	@staticmethod
 	def is_single(ar) -> bool:
@@ -54,6 +49,10 @@ class PalmmicroAPI:
 	@staticmethod
 	def is_holding_symbol(ar, strSymbol) -> bool:
 		return strSymbol in ar['symbol_hedge']
+
+	@staticmethod
+	def get_holding_symbols(ar):
+		return ar['symbol_hedge'].keys()
 
 	def get_next_param(self, ar):
 		return self.get_param(self.get_next_symbol(ar))
@@ -168,7 +167,8 @@ class PalmmicroAPI:
 		if arSrc != None:
 			arCopy = arSrc.copy()
 			for strSrc in arSrc:
-				for strHolding in ar['symbol_hedge']:
+				#for strHolding in ar['symbol_hedge']:
+				for strHolding in self.get_holding_symbols(ar):
 					arHolding = self.get_param(strHolding)
 					if arHolding != None:
 						if self.get_next_symbol(arHolding) == strSrc:
@@ -291,7 +291,8 @@ class PalmmicroAPI:
 		if fMax > 1.0:
 			for strHolding, fQuantity in arQuantity.items():
 				arQuantity[strHolding] = fQuantity / fMax
-		for strHolding in ar['symbol_hedge']:
+		#for strHolding in ar['symbol_hedge']:
+		for strHolding in self.get_holding_symbols(ar):
 			if arQuantity[strHolding] < 0.0:
 				arDst[strHolding] = 0
 			else:
@@ -307,3 +308,17 @@ class PalmmicroAPI:
 			else:
 				return self.__calc_holdings_quantity(strSymbol, ar, arSrc)
 		return {}
+
+	def GetNextSymbol(self, strSymbol: str):
+		ar = self.get_param(strSymbol)
+		if self.is_single(ar):
+			return self.get_next_symbol(ar)
+		return False
+		
+	def GetHoldingSymbols(self, strSymbol: str):
+		ar = self.get_param(strSymbol)
+		return self.get_holding_symbols(ar)
+
+	def IsHoldingSymbol(self, strSymbol: str, strUnknown: str):
+		ar = self.get_param(strSymbol)
+		return self.is_holding_symbol(ar, strUnknown)

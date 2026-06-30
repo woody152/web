@@ -17,8 +17,7 @@ const CONTACT_EMAIL = ', 请联系: '.ADMIN_EMAIL;
 
 function _inBlackList($strIp)
 {
-	$ar = ['14.120.49.81',
-		   '36.143.159.189',
+	$ar = ['36.143.159.189',
 		   '66.90.98.35',
 		   '203.10.99.42'];
 	foreach ($ar as $str)
