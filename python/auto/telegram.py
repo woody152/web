@@ -1,7 +1,7 @@
 import json
 import requests
 import time
-from typing import Union, List, Dict, Any
+from typing import Any, Dict, List, Union
 
 from _mytoken import BOT_TOKEN
 #from _mytoken import ROT_TOKEN
@@ -118,20 +118,22 @@ def _handlePalmmicroData(arData, strSymbols):
 	ar160723 = api.CalcQuantity('SZ160723', arQuantity | {'USO': 100})
 	str = ''
 	iSum = 0
-	for strHolding in arHolding:
-		iSize = ar160723[strHolding]
-		str += f", {strHolding}: {iSize}"
-		iSum += iSize
+	if arHolding:
+		for strHolding in arHolding:
+			iSize = ar160723[strHolding]
+			str += f", {strHolding}: {iSize}"
+			iSum += iSize
 	print(f"按持仓算SZ160723: {ar160723['SZ160723']}@{f160723:.3f}{str}")
 	__printHedge(api, ar160723, 'SZ160723', 'USO', iSum)
 	f160723 = api.EstNetValue('SZ160723', {'hf_CL': 61.53})
 	ar160723 = api.CalcQuantity('SZ160723', arQuantity | {'hf_CL': 10})
 	str = ''
 	iSum = 0
-	for strHolding in arHolding:
-		iSize = ar160723[strHolding]
-		str += f", {strHolding}: {iSize}"
-		iSum += iSize
+	if arHolding:
+		for strHolding in arHolding:
+			iSize = ar160723[strHolding]
+			str += f", {strHolding}: {iSize}"
+			iSum += iSize
 	print(f"把hf_CL转换成USO后, 按持仓算SZ160723: {ar160723['SZ160723']}@{f160723:.3f}{str}, hf_CL: {ar160723['hf_CL']}")
 	__printHedge(api, ar160723, 'SZ160723', 'USO', iSum)
 

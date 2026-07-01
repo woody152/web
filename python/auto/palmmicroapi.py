@@ -291,7 +291,6 @@ class PalmmicroAPI:
 		if fMax > 1.0:
 			for strHolding, fQuantity in arQuantity.items():
 				arQuantity[strHolding] = fQuantity / fMax
-		#for strHolding in ar['symbol_hedge']:
 		for strHolding in self.get_holding_symbols(ar):
 			if arQuantity[strHolding] < 0.0:
 				arDst[strHolding] = 0
@@ -311,14 +310,19 @@ class PalmmicroAPI:
 
 	def GetNextSymbol(self, strSymbol: str):
 		ar = self.get_param(strSymbol)
-		if self.is_single(ar):
+		if ar != None and self.is_single(ar):
 			return self.get_next_symbol(ar)
 		return False
 		
 	def GetHoldingSymbols(self, strSymbol: str):
 		ar = self.get_param(strSymbol)
-		return self.get_holding_symbols(ar)
+		if ar != None:
+			return self.get_holding_symbols(ar)
+		return False
 
-	def IsHoldingSymbol(self, strSymbol: str, strUnknown: str):
+	def IsHoldingSymbol(self, strSymbol: str, strUnknown: str) -> bool:
 		ar = self.get_param(strSymbol)
-		return self.is_holding_symbol(ar, strUnknown)
+		if ar != None:
+			return self.is_holding_symbol(ar, strUnknown)
+		return False
+	

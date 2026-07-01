@@ -3,21 +3,22 @@ require_once('php/_stock.php');
 require_once('php/_emptygroup.php');
 require_once('../../php/ui/editinputform.php');
 
-function _echoRotationTradingItem($rotation_ref, $fEstQuantity, $bRotationSell)
+function _echoRotationTradingItem($rotation_ref, $fEstQuantity, $strHedgeSymbol, $bRotationSell)
 {
 	$ar = [];
     $stock_ref = GetStockRef($rotation_ref);
 	
 	$strSymbol = $stock_ref->GetSymbol();
-	$ar[] = CopyPhpLink('symbol='.$strSymbol, $strSymbol);
+	$ar[] = CopyPhpLink("symbol=$strSymbol", $strSymbol);
    	if ($strQuantity = $stock_ref->GetAvailableQuantity($bRotationSell))
    	{
    		$strPrice = $stock_ref->GetAvailablePrice($bRotationSell);
 		$fPrice = floatval($strPrice);
    		$ar[] = $stock_ref->GetPriceDisplay($fPrice);
    		$ar[] = $strQuantity;
-		
-		$fHedge = GetStockHedge($strSymbol, $stock_ref->GetStockId());
+
+		$est_ref = $rotation_ref->GetEstRef();
+		$fHedge = GetStockHedge($strSymbol, $stock_ref->GetStockId(), ($est_ref->GetSymbol() == $strHedgeSymbol) ? false : $strHedgeSymbol);
 		$fHintQuantity = abs(round($fHedge * $fEstQuantity / 100.0) * 100.0);
 		$strHintQuantity = strval($fHintQuantity);
 		if ($fHintQuantity > floatval($strQuantity))	$strHintQuantity = GetFontElement($strHintQuantity);
@@ -46,9 +47,9 @@ function _echoRotationTradingParagraph($strPage, $arRotationRef, $fEstQuantity, 
 		   new TableColumnQuantity($strHedgeSymbol),
 		   new TableColumnPremium()];
 	
-	if (EchoTableParagraphBegin($ar, $strPage))
+	if (EchoTableParagraphBegin($ar, "$strPage{$strHedgeSymbol}"))
 	{
-		foreach ($arRotationRef as $rotation_ref)	_echoRotationTradingItem($rotation_ref, $fEstQuantity, $bRotationSell);
+		foreach ($arRotationRef as $rotation_ref)	_echoRotationTradingItem($rotation_ref, $fEstQuantity, $strHedgeSymbol, $bRotationSell);
 		EchoTableParagraphEnd();
 	}
 }
@@ -78,20 +79,26 @@ function EchoAll()
     		}
 
     		$fund_ref = StockGetFundReference($strSymbol);
+			$est_ref = $fund_ref->GetEstRef();
     		$ref = GetStockRef($fund_ref);
    			$acct->SetRef($ref);
    			$acct->EchoStockGroup();
 
-   			if ($strInput = GetEditInput())		$fInput = floatval($strInput);
-   			else								$fInput = -1000000.0;
+   			$fInput = ($strInput = GetEditInput()) ? floatval($strInput) : -1000000.0;
    			$bSell = ($fInput < 0.0) ? true : false;
-			$fEstQuantity = $fInput / GetStockHedge($strSymbol, $ref->GetStockId());
 
+			$arHedgeSymbol = [];
 			$strHedgeSymbol = GetLeverageHedgeSymbol($strSymbol);
-			if ($strHedgeSymbol === false)
+			if ($strHedgeSymbol)
 			{
-				$est_ref = $fund_ref->GetEstRef();
+				$arHedgeSymbol[] = $strHedgeSymbol;
+			}
+			else
+			{
 				$strHedgeSymbol = $est_ref->GetSymbol();
+				$arHedgeSymbol[] = $strHedgeSymbol;
+				$pair_sql = GetFundPairSql();
+				foreach ($pair_sql->GetSymbolArray($strHedgeSymbol) as $strEtf)		$arHedgeSymbol[] = $strEtf;
 			}
 			
    			if ($strQuantity = $ref->GetAvailableQuantity($bSell))
@@ -111,15 +118,19 @@ function EchoAll()
 				else if ($ref->IsShenZhenEtf())	$str = GetShenZhenEtfListLink($ref, false);
 				else							$str = GetXueqiuLink($ref);
 
-				$str .= '目前可'.$strOp.'价格'.$strPrice;
+				$str .= "目前可{$strOp}价格{$strPrice}";
 				if ($fEst = $fund_ref->GetEstNetValue())
 				{
-					$str .= TableColumnGetPremium();
+					$str .= '、'.TableColumnGetPremium();
 					$str .= $ref->GetPercentageDisplay($fEst, floatval($strPrice));
 				}
-				$str .= '、可'.$strOp.'数量'.$strQuantity.'，轮动数量：';
+				$str .= "、可{$strOp}数量{$strQuantity}，轮动数量：";
    				EchoEditInputForm($str, strval($fInput));
-   				_echoRotationTradingParagraph($acct->GetPage(), $arRotationRef, $fEstQuantity, $strHedgeSymbol, $bSell);
+				foreach ($arHedgeSymbol as $strHedgeSymbol)
+				{
+					$fEstQuantity = $fInput / GetStockHedge($strSymbol, $ref->GetStockId(), ($est_ref->GetSymbol() == $strHedgeSymbol) ? false : $strHedgeSymbol);
+	   				_echoRotationTradingParagraph($acct->GetPage(), $arRotationRef, $fEstQuantity, $strHedgeSymbol, $bSell);
+				}
    			}
    		}
     }
@@ -144,4 +155,3 @@ function GetTitle()
     $acct = new SymbolAccount();
 
 require('../../php/ui/_dispcn.php');
-?>
