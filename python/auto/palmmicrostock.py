@@ -41,21 +41,24 @@ class PalmmicroStock:
 			return strSymbol
 		return 'errorsymbol'
 
-	def GetPrice(self, strType: str = 'LAST') -> Dict[str, float]:
+	def GetSymbolPrice(self, strType: str = 'BUY') -> Dict[str, float]:
 		strSymbol = self.GetSymbol()
 		fPrice = self.get_value(strType + '_price')
 		if isinstance(fPrice, float):
 			return {strSymbol: fPrice}
 		return {strSymbol: 0.0}
 	
-	def GetSize(self, strType: str = 'BUY') -> Dict[str, int]:
+	def GetSymbolSize(self, strType: str = 'BUY') -> Dict[str, int]:
 		strSymbol = self.GetSymbol()
 		iSize = self.get_value(strType + '_size')
 		if isinstance(iSize, int):
 			return {strSymbol: iSize}
 		return {strSymbol: 0}
+	
+	def HasData(self, strType: str = 'BUY') -> bool:
+		return self.get_value(strType + '_price') != None and self.get_value(strType + '_size') != None
 
-	def SetPrice(self, fPrice: float, strType: str = 'LAST') -> None:
+	def SetPrice(self, fPrice: float, strType: str = 'BUY') -> None:
 		self.set_value(strType + '_price', fPrice)
 			
 	def SetSize(self, iSize: int, strType: str = 'BUY') -> None:
@@ -66,7 +69,7 @@ class PalmmicroStock:
 		return strSymbol.startswith(("SZ16", "SH50"))
 
 	@staticmethod
-	def ConvertSymbol(strSymbol: str) -> str:
+	def ConvertYahooNetValueSymbol(strSymbol: str) -> str:
 		# 匹配 ^XXX-YY 格式，并提取 XXX 部分
 		pattern = r'^\^([A-Z]+)-[A-Z]{2}$'
 		match = re.match(pattern, strSymbol)
@@ -123,11 +126,11 @@ class SinaStock(PalmmicroStock):
 				# 分割数据
 				parts = data_content.split(',')
 				if self.strSinaSymbol.startswith('fx_'):
-					self.SetPrice(float(parts[8]))
+					self.SetPrice(float(parts[8]), 'LAST')
 				elif self.strSinaSymbol.startswith('nf_'):
 					self.SetPrice(float(parts[6]), 'BUY')
 					self.SetPrice(float(parts[7]), 'SELL')
-					self.SetPrice(float(parts[8]))
+					self.SetPrice(float(parts[8]), 'LAST')
 					self.SetSize(int(parts[11]), 'BUY')
 					self.SetSize(int(parts[12]), 'SELL')
 				elif self.strSinaSymbol.startswith('gb_'):
@@ -151,3 +154,19 @@ class SinaStock(PalmmicroStock):
 		except requests.exceptions.RequestException as e:
 			print('FetchSinaData error:', e)
 		return False
+
+
+class IbkrStock(PalmmicroStock):
+	def __init__(self, strName):
+		self.strName = strName
+		if strName.startswith('MES'):
+			strSymbol = 'hf_ES'
+		elif strName.startswith('MNQ'):
+			strSymbol = 'hf_NQ'
+		else:
+			strSymbol = strName
+		super().__init__(strSymbol)
+
+	def GetNamePrice(self, strType: str = 'BUY') -> Dict[str, float]:
+		(strSymbol, fPrice), = self.GetSymbolPrice(strType).items()
+		return {self.strName: fPrice}

@@ -4,7 +4,7 @@ require_once('stocktable.php');
 function _getPortfolioTestVal($iShares, $strSymbol)
 {
 	$iQuantity = match($strSymbol)
-    			 {'KWEB' => 700,
+    			 {'KWEB' => 200,
 				  'SH600104' => 12000,
 				  'TLT' => 500,
 				  default => 0
@@ -35,7 +35,7 @@ function _getArbitrageTestStr($iShares, $strGroupId, $strStockId, $strSymbol)
     if ($record)
     {
     	$iQuantity = _getPortfolioTestVal($iShares, $strSymbol); 
-    	return number_format($iArbitrageQuantity + $iQuantity * GetStockHedge(SqlGetStockSymbol($record['stock_id']), $record['stock_id']));
+    	return GetNumberDisplay($iArbitrageQuantity + $iQuantity * GetStockHedge(SqlGetStockSymbol($record['stock_id']), $record['stock_id']), 0);
     }
     return '';
 }

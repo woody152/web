@@ -9,8 +9,8 @@ from ibapi.order import Order
 
 from palmmicro import Palmmicro
 from palmmicro import Calibration
-#from palmmicro import GetMktDataArray
-from palmmicrostock import PalmmicroStock
+from palmmicroapi import PalmmicroAPI
+from palmmicrostock import IbkrStock
 
 from nyc_time import GetExchangeTime
 
@@ -20,8 +20,8 @@ def IsChinaMarketOpen():
         return True
     elif iTime >= 1300 and iTime < 1500:
         return True
-    #return False
-    return True
+    return False
+    #return True
 
 def IsMarketOpen():
     iTime = GetExchangeTime()
@@ -62,6 +62,8 @@ class MyEWrapper(EWrapper):
         self.client = client
         self.strCurFuture = '202609'
         self.strNextFuture = '202612'
+        #PalmmicroAPI.set_multiplier('hf_ES', 1)
+        #PalmmicroAPI.set_multiplier('hf_NQ', 1)
 
     def nextValidId(self, orderId: int):
         self.arOrder = {}
@@ -79,10 +81,12 @@ class MyEWrapper(EWrapper):
             self.arOrder['XLE'] = GetOrderArray()
             self.arOrder['XLY'] = GetOrderArray()
             self.arOrder['XOP'] = GetOrderArray()
+            self.arOrder['MES' + self.strCurFuture] = GetOrderArray()
+            self.arOrder['MNQ' + self.strCurFuture] = GetOrderArray()
         else:
             #self.arOrder['TLT'] = GetOrderArray([80.90, 84.19, 85.21, 86.40, 86.62, 86.72, 87.59, 89.76, 91.88], 100, 1, 8)
-            self.arOrder['SPX'] = GetOrderArray([5191.35, 6215.66, 7078.29, 7233.27, 7377.54, 7420.05, 7439.55, 7645.83, 7940.92])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0081, 4, 6)
+            self.arOrder['SPX'] = GetOrderArray([5177.26, 6215.66, 7078.29, 7251.65, 7425.73, 7430.03, 7444.26, 7608.40, 7940.92])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0071, 5, 7)
             self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0182, -1, -1)
         self.palmmicro = Palmmicro()
         self.client.StartStreaming(orderId)
@@ -92,12 +96,13 @@ class MyEWrapper(EWrapper):
             if strSymbol.startswith('MES'):
                 self.spx_cal[strSymbol] = Calibration(strSymbol)
                 iRequestId = self.client.FutureReqMktData('MES', strSymbol[3:])
+            elif strSymbol.startswith('MNQ'):
+                iRequestId = self.client.FutureReqMktData('MNQ', strSymbol[3:])
             elif strSymbol == 'SPX':
                 iRequestId = self.client.IndexReqMktData(strSymbol)
             else:
                 iRequestId = self.client.StockReqMktData(strSymbol)
-            #self.arMkt[iRequestId] = GetMktDataArray(strSymbol)
-            self.arMkt[iRequestId] = PalmmicroStock(strSymbol)
+            self.arMkt[iRequestId] = IbkrStock(strSymbol)
 
     def __get_buy_symbol(self, strSymbol):
         if strSymbol.startswith('MES'):
@@ -120,66 +125,43 @@ class MyEWrapper(EWrapper):
 
     def tickPrice(self, reqId, tickType, price, attrib):
         if price > 0.0:
-            #arMktData = self.arMkt[reqId]
             mkt_stock = self.arMkt[reqId]
             if tickType == 1:  # Bid price
-                """
-                arMktData['BUY_price'] = price
-                self.BidPriceTrade(arMktData)
-                self._CheckPriceAndSize(arMktData)
-                """
                 mkt_stock.SetPrice(price, 'BUY')
                 self.BidPriceTrade(mkt_stock)
                 self._CheckPriceAndSize(mkt_stock)
             elif tickType == 2:  # Ask price
-                """
-                arMktData['SELL_price'] = price
-                self.AskPriceTrade(arMktData)
-                self._CheckPriceAndSize(arMktData)
-                """
                 mkt_stock.SetPrice(price, 'SELL')
                 self.AskPriceTrade(mkt_stock)
                 self._CheckPriceAndSize(mkt_stock)
             elif tickType == 4: # Last price
                 if IsMarketOpen():
-                    """
-                    arMktData['LAST_price'] = price
-                    self.LastPriceTrade(arMktData)
-                    """
                     mkt_stock.SetPrice(price, 'LAST')
                     self.LastPriceTrade(mkt_stock)
             else:
                 if IsMarketOpen():
-                    #print(arMktData['symbol'], price, tickType)
                     print(mkt_stock.GetSymbol(), price, tickType)
 
     def tickSize(self, reqId, tickType, size):
-        #arMktData = self.arMkt[reqId]
         mkt_stock = self.arMkt[reqId]
+        iSize = int(size)
         if tickType == 0:  # Bid size
-            #arMktData['BUY_size'] = int(size)
-            mkt_stock.SetSize(int(size), 'BUY')
+            mkt_stock.SetSize(iSize, 'BUY')
         elif tickType == 3:  # Ask size
-            #arMktData['SELL_size'] = int(size)
-            mkt_stock.SetSize(int(size), 'SELL')
-        #self._CheckPriceAndSize(arMktData)
+            mkt_stock.SetSize(iSize, 'SELL')
         self._CheckPriceAndSize(mkt_stock)
 
     def tickString(self, reqId, tickType, value):
-        #arMktData = self.arMkt[reqId]
         mkt_stock = self.arMkt[reqId]
         if tickType == 48:  # RT_VOLUME
             arParts = value.split(';')
             if len(arParts) >= 6 and arParts[4] != '': 
                 fPrice = float(arParts[4])
-                strSymbol = mkt_stock.GetSymbol()
+                (strSymbol, fOld), = mkt_stock.GetNamePrice('VWAP').items()
                 if strSymbol.startswith('MES'):
                     fPrice = round(4.0 * fPrice) / 4.0
                 fPrice = round(fPrice, 2)
-                #if arMktData['VWAP_price'] == None or abs(fPrice - arMktData['VWAP_price']) > 0.005:
-                fOld = mkt_stock.get_value('VWAP_price')
                 if fOld == None or abs(fPrice - fOld) > 0.005:
-                    #arMktData['VWAP_price'] = fPrice
                     mkt_stock.SetPrice(fPrice, 'VWAP')
                     print(strSymbol, 'VWAP', fPrice)
                     arOrder = self.arOrder[strSymbol]
@@ -245,13 +227,10 @@ class MyEWrapper(EWrapper):
         if arOrder['SELL_pos'] >= iLen:
             arOrder['SELL_pos'] = -1
 
-    #def LastPriceTrade(self, arMktData):
     def LastPriceTrade(self, mkt_stock):
-        #strSymbol = arMktData['symbol']
-        strSymbol = mkt_stock.GetSymbol()
+        (strSymbol, fLast), = mkt_stock.GetNamePrice('LAST').items()
         if strSymbol.startswith('MES'):
-            #fAdjust = self.spx_cal[strSymbol].Calc(arMktData['LAST_price'])
-            fAdjust = self.spx_cal[strSymbol].Calc(mkt_stock.get_value('LAST_price'))
+            fAdjust = self.spx_cal[strSymbol].Calc(fLast)
             if fAdjust > 1.0:
                 arOrder = self.arOrder[strSymbol]
                 arNew = AdjustPriceArray(self.arOrder['SPX']['price'], fAdjust)
@@ -268,13 +247,10 @@ class MyEWrapper(EWrapper):
                 print(arOrder)
         elif strSymbol == 'SPX':
             for key in self.spx_cal:
-                #self.spx_cal[key].SetPrice(arMktData['LAST_price'])
-                self.spx_cal[key].SetPrice(mkt_stock.get_value('LAST_price'))
+                self.spx_cal[key].SetPrice(fLast)
     
-    #def AskPriceTrade(self, arMktData):
     def AskPriceTrade(self, mkt_stock):
-        #strSymbol = arMktData['symbol']
-        strSymbol = mkt_stock.GetSymbol()
+        (strSymbol, fSell), = mkt_stock.GetNamePrice('SELL').items()
         arOrder = self.arOrder[strSymbol]
         iPos = arOrder['BUY_org_pos']
         if iPos != -1:
@@ -282,25 +258,20 @@ class MyEWrapper(EWrapper):
             arPrice = arOrder['price']
             fPrice = arPrice[iPos]
             if arOrder['BUY_id'] == -1:
-                #if arMktData['SELL_price'] > fPrice:
-                if mkt_stock.get_value('SELL_price') > fPrice:
+                if fSell > fPrice:
                     arOrder['BUY_id'] = self.client.CallPlaceOrder(strSymbol, fPrice, iSize, 'BUY')
                 elif iPos >= 1:
                     iActPos = iPos - 1
-                    #if arMktData['SELL_price'] > arPrice[iActPos]:
-                    if mkt_stock.get_value('SELL_price') > arPrice[iActPos]:
+                    if fSell > arPrice[iActPos]:
                         arOrder['BUY_id'] = self.client.CallPlaceOrder(strSymbol, arPrice[iActPos], iSize, 'BUY')
                         arOrder['BUY_pos'] = iActPos
             elif iPos != arOrder['BUY_pos']:
-                #if arMktData['SELL_price'] > fPrice:
-                if mkt_stock.get_value('SELL_price') > fPrice:
+                if fSell > fPrice:
                     self.client.CallPlaceOrder(strSymbol, fPrice, iSize, 'BUY', arOrder['BUY_id'])
                     arOrder['BUY_pos'] = iPos
 
-    #def BidPriceTrade(self, arMktData):
     def BidPriceTrade(self, mkt_stock):
-        #strSymbol = arMktData['symbol']
-        strSymbol = mkt_stock.GetSymbol()
+        (strSymbol, fBuy), = mkt_stock.GetNamePrice('BUY').items()
         arOrder = self.arOrder[strSymbol]
         iPos = arOrder['SELL_org_pos']
         if iPos != -1:
@@ -308,25 +279,20 @@ class MyEWrapper(EWrapper):
             arPrice = arOrder['price']
             fPrice = arPrice[iPos]
             if arOrder['SELL_id'] == -1:
-                #if arMktData['BUY_price'] < fPrice:
-                if mkt_stock.get_value('BUY_price') < fPrice:
+                if fBuy < fPrice:
                     arOrder['SELL_id'] = self.client.CallPlaceOrder(strSymbol, fPrice, iSize, 'SELL')
                 elif iPos < len(arPrice) - 1 :
                     iActPos = iPos + 1
-                    #if arMktData['BUY_price'] < arPrice[iActPos]:
-                    if mkt_stock.get_value('BUY_price') < arPrice[iActPos]:
+                    if fBuy < arPrice[iActPos]:
                         arOrder['SELL_id'] = self.client.CallPlaceOrder(strSymbol, arPrice[iActPos], iSize, 'SELL')
                         arOrder['SELL_pos'] = iActPos
             elif iPos != arOrder['SELL_pos']:
-                #if arMktData['BUY_price'] < fPrice:
-                if mkt_stock.get_value('BUY_price') < fPrice:
+                if fBuy < fPrice:
                     self.client.CallPlaceOrder(strSymbol, fPrice, iSize, 'SELL', arOrder['SELL_id'])
                     arOrder['SELL_pos'] = iPos
 
-    #def _CheckPriceAndSize(self, arMktData):
     def _CheckPriceAndSize(self, mkt_stock):
         if IsChinaMarketOpen():
-            #self.palmmicro.CheckPriceAndSize(arMktData, self.arMkt)
             self.palmmicro.CheckPriceAndSize(mkt_stock, self.arMkt)
 
 
@@ -386,6 +352,7 @@ class MyEClient(EClient):
                 order.outsideRth = True
         else:
             if IsMarketOpen() == False:
+                #pass
                 return -1
         if iOrderId == -1:
             iOrderId = self.iOrderId

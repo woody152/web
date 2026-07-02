@@ -121,7 +121,7 @@ class PalmmicroAPI:
 		fTotal = 0.0
 		for strHolding, arHolding in ar['symbol_hedge'].items():
 			if arSrc != None:
-				strReal = PalmmicroStock.ConvertSymbol(strHolding)
+				strReal = PalmmicroStock.ConvertYahooNetValueSymbol(strHolding)
 				if strReal in arSrc:
 					fPrice = arSrc[strReal]
 				else:
@@ -251,7 +251,7 @@ class PalmmicroAPI:
 		for strHolding, arHolding in ar['symbol_hedge'].items():
 			fQuantity = fAmount * (float(arHolding['ratio']) / 100.0) / float(arHolding['price'])
 			arQuantity[strHolding] = fQuantity
-			strReal = PalmmicroStock.ConvertSymbol(strHolding)
+			strReal = PalmmicroStock.ConvertYahooNetValueSymbol(strHolding)
 			if strReal in arReal:
 				arReal[strReal] += fQuantity
 			else:

@@ -6,8 +6,8 @@ from typing import Any, Dict, List, Union
 from _mytoken import BOT_TOKEN
 #from _mytoken import ROT_TOKEN
 
-from palmmicroapi import PalmmicroAPI
 from palmmicrostock import PalmmicroStock, SinaStock
+from palmmicroapi import PalmmicroAPI
 
 def __printHedge(api, ar: Dict[str, int], strSymbol: str, strSymbolUS: str, iSizeUS = None):
 	if iSizeUS == None:
@@ -33,17 +33,17 @@ def __testXOP(api, strSymbol, strSymbolUS, iQuantity, iQuantityUS, fPriceUS, arU
 		fNetValue = api.EstNetValue(strSymbol, {strSymbolUS: fPriceUS} | arUSDCNY)
 		fPriceUS = api.ReverseEst({strSymbol: fNetValue} | arUSDCNY)
 	ar = api.CalcQuantity(strSymbol, {strSymbol: iQuantity, strSymbolUS: iQuantityUS})
+	__printHedge(api, ar, strSymbol, strSymbolUS)
 	print(f"直接算{strSymbol}: {ar[strSymbol]}@{fNetValue:.3f}, 对应{strSymbolUS}: {ar[strSymbolUS]}, 反向算XOP@{fPriceUS:.2f}")
-	__printHedge(api, ar, strSymbol, strSymbolUS)
 	ar = api.CalcQuantity(strSymbol, {strSymbolUS: iQuantityUS})
-	print(f"只输入{strSymbolUS}数量时建议: {ar[strSymbol]}, 对应{strSymbolUS}: {ar[strSymbolUS]}")
 	__printHedge(api, ar, strSymbol, strSymbolUS)
+	print(f"只输入{strSymbolUS}数量时建议: {ar[strSymbol]}, 对应{strSymbolUS}: {ar[strSymbolUS]}")
 	ar = api.CalcQuantity(strSymbol, {strSymbol: iQuantity})
+	__printHedge(api, ar, strSymbol, 'XOP')
 	print(f"只输入{strSymbol}数量时建议: {ar[strSymbol]}, 对应XOP: {ar['XOP']}")
-	__printHedge(api, ar, strSymbol, 'XOP')
 	ar = api.CalcQuantity(strSymbol, {})
-	print(f"无输入数量或者出错时建议: {ar[strSymbol]}, 对应XOP: {ar['XOP']}")
 	__printHedge(api, ar, strSymbol, 'XOP')
+	print(f"无输入数量或者出错时建议: {ar[strSymbol]}, 对应XOP: {ar['XOP']}")
 
 def __testSPY(api, strSymbol, strSymbolUS, iQuantity, iQuantityUS, fPriceUS, arUSDCNY):
 	fNetValue = api.EstNetValue(strSymbol)
@@ -57,13 +57,25 @@ def __testSPY(api, strSymbol, strSymbolUS, iQuantity, iQuantityUS, fPriceUS, arU
 		fNetValue = api.EstNetValue(strSymbol, {strSymbolUS: fPriceUS} | arUSDCNY)
 		fPriceUS = api.ReverseEst({strSymbol: fNetValue} | arUSDCNY)
 	ar = api.CalcQuantity(strSymbol, {strSymbol: iQuantity, strSymbolUS: iQuantityUS})
-	print(f"把{strSymbolUS}转换成^GSPC后二次计算{strSymbol}: {ar[strSymbol]}@{fNetValue:.3f}, 对应{strSymbolUS}: {ar[strSymbolUS]}, 反向算SPY@{fPriceUS:.2f}")
 	__printHedge(api, ar, strSymbol, strSymbolUS)
+	print(f"把{strSymbolUS}转换成^GSPC后二次计算{strSymbol}: {ar[strSymbol]}@{fNetValue:.3f}, 对应{strSymbolUS}: {ar[strSymbolUS]}, 反向算SPY@{fPriceUS:.2f}")
+
+def __debugUSO(api, strSymbol, arQuantity):
+	strDebug = ''
+	iSum = 0
+	arHolding = api.GetHoldingSymbols(strSymbol)
+	if arHolding:
+		for strHolding in arHolding:
+			iSize = arQuantity[strHolding]
+			strDebug += f", {strHolding}: {iSize}"
+			iSum += iSize
+		__printHedge(api, arQuantity, strSymbol, 'USO', iSum)
+	return strDebug
 
 def __getSize(arStock, arSymbol, strType = 'SELL'):
 	arQuantity = {}
 	for strSymbol in arSymbol:
-		arQuantity |= arStock[strSymbol].GetSize(strType)
+		arQuantity |= arStock[strSymbol].GetSymbolSize(strType)
 	return arQuantity
 
 def _handlePalmmicroData(arData, strSymbols):
@@ -81,8 +93,8 @@ def _handlePalmmicroData(arData, strSymbols):
 		arStock[strSymbol] = SinaStock(arLine[iIndex])
 		iIndex += 1
 
-	arCNY = usdcny_stock.GetPrice()
 	api = PalmmicroAPI(arData)
+	arCNY = usdcny_stock.GetSymbolPrice('LAST')
 	
 	arQuantity = __getSize(arStock, {'SZ162411', 'SZ159518'})
 	arQuantityUS = {'XOP': 1000, 'GUSH': 10000}
@@ -98,44 +110,29 @@ def _handlePalmmicroData(arData, strSymbols):
 		for strSymbolUS, iQuantityUS in arQuantityUS.items():
 			__testSPY(api, strSymbol, strSymbolUS, iQuantity, iQuantityUS, arPriceUS[strSymbolUS], arCNY)
     
-	arQuantity = arStock['SZ164701'].GetSize('BUY')
+	arQuantity = arStock['SZ164701'].GetSymbolSize('BUY')
 	f164701 = api.EstNetValue('SZ164701')
 	__printHoldingEst('SZ164701', f164701)
 	f164701 = api.EstNetValue('SZ164701', {'GLD': 357.37, 'SLV': 56.22})
 	ar164701 = api.CalcQuantity('SZ164701', arQuantity | {'GLD': 100, 'SLV': 100})
-	print(f"按持仓算SZ164701: {ar164701['SZ164701']}@{f164701:.3f}, GLD: {ar164701['GLD']}, SLV: {ar164701['SLV']}")
 	__printHedge(api, ar164701, 'SZ164701', 'GLD')
+	print(f"按持仓算SZ164701: {ar164701['SZ164701']}@{f164701:.3f}, GLD: {ar164701['GLD']}, SLV: {ar164701['SLV']}")
 	f164701 = api.EstNetValue('SZ164701', {'hf_GC': 3909.92, 'hf_SI': 60.42})
 	ar164701 = api.CalcQuantity('SZ164701', arQuantity | {'hf_GC': 1, 'SLV': 100})
-	print(f"把hf_GC和hf_SI转换成GLD和SLV后, 按持仓算SZ164701: {ar164701['SZ164701']}@{f164701:.3f}, GLD: {ar164701['GLD']}, SLV: {ar164701['SLV']}, hf_GC: {ar164701['hf_GC']}")
 	__printHedge(api, ar164701, 'SZ164701', 'GLD')
+	print(f"把hf_GC和hf_SI转换成GLD和SLV后, 按持仓算SZ164701: {ar164701['SZ164701']}@{f164701:.3f}, GLD: {ar164701['GLD']}, SLV: {ar164701['SLV']}, hf_GC: {ar164701['hf_GC']}")
     
-	arQuantity = arStock['SZ160723'].GetSize('BUY')
-	arHolding = api.GetHoldingSymbols('SZ160723')
+	arQuantity = arStock['SZ160723'].GetSymbolSize('BUY')
 	f160723 = api.EstNetValue('SZ160723')
 	__printHoldingEst('SZ160723', f160723)
 	f160723 = api.EstNetValue('SZ160723', {'USO': 93.47})
 	ar160723 = api.CalcQuantity('SZ160723', arQuantity | {'USO': 100})
-	str = ''
-	iSum = 0
-	if arHolding:
-		for strHolding in arHolding:
-			iSize = ar160723[strHolding]
-			str += f", {strHolding}: {iSize}"
-			iSum += iSize
+	str = __debugUSO(api, 'SZ160723', ar160723)
 	print(f"按持仓算SZ160723: {ar160723['SZ160723']}@{f160723:.3f}{str}")
-	__printHedge(api, ar160723, 'SZ160723', 'USO', iSum)
 	f160723 = api.EstNetValue('SZ160723', {'hf_CL': 61.53})
 	ar160723 = api.CalcQuantity('SZ160723', arQuantity | {'hf_CL': 10})
-	str = ''
-	iSum = 0
-	if arHolding:
-		for strHolding in arHolding:
-			iSize = ar160723[strHolding]
-			str += f", {strHolding}: {iSize}"
-			iSum += iSize
+	str = __debugUSO(api, 'SZ160723', ar160723)
 	print(f"把hf_CL转换成USO后, 按持仓算SZ160723: {ar160723['SZ160723']}@{f160723:.3f}{str}, hf_CL: {ar160723['hf_CL']}")
-	__printHedge(api, ar160723, 'SZ160723', 'USO', iSum)
 
 	f164824 = api.EstNetValue('SZ164824')
 	__printHoldingEst('SZ164824', f164824)
@@ -144,12 +141,11 @@ def _handlePalmmicroData(arData, strSymbols):
     
 	f161226 = api.EstNetValue('SZ161226')
 	__printEst('SZ161226', f161226)
-	#f161226 = api.EstNetValue('SZ161226', {'nf_AG0':12842.3});
-	f161226 = api.EstNetValue('SZ161226', ag0_stock.GetPrice());
+	f161226 = api.EstNetValue('SZ161226', ag0_stock.GetSymbolPrice('LAST'));
 	fAG0 = api.ReverseEst({'SZ161226':f161226})
 	ar161226 = api.CalcQuantity('SZ161226', {'SZ161226':576813, 'nf_AG0':10})
-	print(f"直接算161226: {ar161226['SZ161226']}@{f161226:.3f}, 反向算nf_AG0: {ar161226['nf_AG0']}@{fAG0:.2f}")
 	__printHedge(api, ar161226, 'SZ161226', 'nf_AG0')
+	print(f"直接算161226: {ar161226['SZ161226']}@{f161226:.3f}, 反向算nf_AG0: {ar161226['nf_AG0']}@{fAG0:.2f}")
 
 
 def post_json_array_to_telegram(
