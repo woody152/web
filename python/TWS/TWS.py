@@ -83,6 +83,9 @@ class MyEWrapper(EWrapper):
             self.arOrder['XOP'] = GetOrderArray()
             self.arOrder['MES' + self.strCurFuture] = GetOrderArray()
             self.arOrder['MNQ' + self.strCurFuture] = GetOrderArray()
+            self.arOrder['MCL202608'] = GetOrderArray()
+            self.arOrder['MGC202608'] = GetOrderArray()
+        
         else:
             #self.arOrder['TLT'] = GetOrderArray([80.90, 84.19, 85.21, 86.40, 86.62, 86.72, 87.59, 89.76, 91.88], 100, 1, 8)
             self.arOrder['SPX'] = GetOrderArray([5177.26, 6215.66, 7078.29, 7251.65, 7425.73, 7430.03, 7444.26, 7608.40, 7940.92])
@@ -97,7 +100,11 @@ class MyEWrapper(EWrapper):
                 self.spx_cal[strSymbol] = Calibration(strSymbol)
                 iRequestId = self.client.FutureReqMktData('MES', strSymbol[3:])
             elif strSymbol.startswith('MNQ'):
-                iRequestId = self.client.FutureReqMktData('MNQ', strSymbol[3:])
+                iRequestId = self.client.FutureReqMktData(strSymbol[:3], strSymbol[3:])
+            elif strSymbol.startswith('MGC'):
+                iRequestId = self.client.FutureReqMktData(strSymbol[:3], strSymbol[3:], 'COMEX')
+            elif strSymbol.startswith('MCL'):
+                iRequestId = self.client.FutureReqMktData(strSymbol[:3], strSymbol[3:], 'NYMEX')
             elif strSymbol == 'SPX':
                 iRequestId = self.client.IndexReqMktData(strSymbol)
             else:
@@ -321,10 +328,10 @@ class MyEClient(EClient):
         self.reqMktData(self.iRequestId, contract, '233', False, False, [])
         return self.iRequestId
 
-    def FutureReqMktData(self, strSymbol, strYearMonth):
+    def FutureReqMktData(self, strSymbol, strYearMonth, strExchange = 'CME'):
         contract = Contract()
         contract.secType = 'FUT'
-        contract.exchange = 'CME'
+        contract.exchange = strExchange
         contract.lastTradeDateOrContractMonth = strYearMonth
         return self.callReqMktData(strSymbol, contract, strYearMonth)
 

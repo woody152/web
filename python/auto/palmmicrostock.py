@@ -159,8 +159,12 @@ class SinaStock(PalmmicroStock):
 class IbkrStock(PalmmicroStock):
 	def __init__(self, strName):
 		self.strName = strName
-		if strName.startswith('MES'):
+		if strName.startswith('MCL'):
+			strSymbol = 'hf_CL'
+		elif strName.startswith('MES'):
 			strSymbol = 'hf_ES'
+		elif strName.startswith('MGC'):
+			strSymbol = 'hf_GC'
 		elif strName.startswith('MNQ'):
 			strSymbol = 'hf_NQ'
 		else:
@@ -168,5 +172,6 @@ class IbkrStock(PalmmicroStock):
 		super().__init__(strSymbol)
 
 	def GetNamePrice(self, strType: str = 'BUY') -> Dict[str, float]:
-		(strSymbol, fPrice), = self.GetSymbolPrice(strType).items()
+		#(strSymbol, fPrice), = self.GetSymbolPrice(strType).items()
+		fPrice = next(iter(self.GetSymbolPrice(strType).values()))
 		return {self.strName: fPrice}

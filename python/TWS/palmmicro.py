@@ -1,3 +1,5 @@
+from tkinter import FALSE
+
 import requests
 import time
 
@@ -261,6 +263,46 @@ class Palmmicro:
                     strDebug += ' 共' + str(iTotalSize)
                 self._debugPriceAndSize(strMktSymbol, stock, strType, strDebug, iSize, iTotalSize, self.api.EstNetValue(strSymbol, arSrcPrice))
 
+    def _calcFutureHoldingArbitrage(self, arMkt, mkt_stock, strMktSymbol, strMktType, strMktHoldingSymbol, stock, strSymbol, strType):
+        arSrcPrice = mkt_stock.GetSymbolPrice(strMktType)
+        arSrcQuantity = mkt_stock.GetSymbolSize(strMktType)
+        for other_stock in arMkt.values():
+            strOtherSymbol = other_stock.GetSymbol()
+            if strOtherSymbol != strMktSymbol and strOtherSymbol != strMktHoldingSymbol and self.api.IsHoldingSymbol(strSymbol, strOtherSymbol):   # 不同
+                if other_stock.HasData(strMktType):
+                    arSrcPrice |= other_stock.GetSymbolPrice(strMktType)
+                    arSrcQuantity |= other_stock.GetSymbolSize(strMktType)
+        arQuantity = self.api.CalcQuantity(strSymbol, stock.GetSymbolSize(strType) | arSrcQuantity)
+        iSize = arQuantity[strSymbol]
+        if iSize > 0:
+            iTotalSize = 0
+            bDisplayTotalQuantity = False
+            strAnd = ' 和 '
+            strDebug = self._getSymDebugString(stock, iSize, strType, strMktType)
+            for strHoldingSymbol in self.api.GetHoldingSymbols(strSymbol):
+                strRealSymbol = PalmmicroStock.ConvertYahooNetValueSymbol(strHoldingSymbol)
+                if strRealSymbol != strHoldingSymbol:
+                    bDisplayTotalQuantity = True
+                for all_stock in arMkt.values():
+                    if all_stock.GetSymbol() == strRealSymbol:
+                        iHoldingSize = arQuantity[strHoldingSymbol]
+                        if iHoldingSize > 0:
+                            iTotalSize += iHoldingSize
+                            strDebug += self._getMktDebugString(strHoldingSymbol, all_stock, iHoldingSize, strMktType) + strAnd
+                        break
+            strDebug = strDebug.rstrip(strAnd)
+            if bDisplayTotalQuantity == True:
+                strDebug += ' 共' + str(iTotalSize)
+            if strMktHoldingSymbol != False:
+                strDebug += ' 实际期货' + self._getMktDebugString(strMktSymbol, mkt_stock, arQuantity[strMktSymbol], strMktType)    # 不同
+            self._debugPriceAndSize(strMktSymbol, stock, strType, strDebug, iSize, iTotalSize, self.api.EstNetValue(strSymbol, arSrcPrice))
+
+    def _isFutureOfHoldingSymbol(self, strSymbol, strMktSymbol):
+        for strHoldingSymbol in self.api.GetHoldingSymbols(strSymbol):
+            if strMktSymbol == self.api.GetNextSymbol(strHoldingSymbol):
+                return strHoldingSymbol
+        return False
+
     def _sendMktData(self, strType, strMktSymbol, strMktType, mkt_stock, arMkt):
         for strSymbol in self.api.get_config().keys():
             stock = self.arStock.get(strSymbol)
@@ -272,6 +314,11 @@ class Palmmicro:
                 else:
                     if self.api.IsHoldingSymbol(strSymbol, strMktSymbol):
                         self._calcHoldingArbitrage(arMkt, mkt_stock, strMktSymbol, strMktType, strSymbol, strType)
+                    else:
+                        strMktHoldingSymbol = self._isFutureOfHoldingSymbol(strSymbol, strMktSymbol)
+                        if strMktHoldingSymbol != False:
+                            self._calcFutureHoldingArbitrage(arMkt, mkt_stock, strMktSymbol, strMktType, strMktHoldingSymbol, stock, strSymbol, strType)
+
                         
     def _processPriceAndSize(self, mkt_stock, arMkt):
         strMktSymbol = mkt_stock.GetSymbol()

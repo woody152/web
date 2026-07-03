@@ -11,8 +11,9 @@ function _getEditStockOptionSubmit($strPage)
 function EchoAll()
 {
 	global $acct;
+    /** @var SymbolEditAccount $acct */
 	
-    if ($ref = $acct->EchoStockGroup())
+    if ($acct->EchoStockGroup())
     {
       	$strPage = UrlGetPage();
        	$acct->StockOptionEditForm(_getEditStockOptionSubmit($strPage));
@@ -36,4 +37,3 @@ function GetTitle()
 }
 
     $acct = new SymbolEditAccount();
-?>

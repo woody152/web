@@ -167,7 +167,6 @@ class PalmmicroAPI:
 		if arSrc != None:
 			arCopy = arSrc.copy()
 			for strSrc in arSrc:
-				#for strHolding in ar['symbol_hedge']:
 				for strHolding in self.get_holding_symbols(ar):
 					arHolding = self.get_param(strHolding)
 					if arHolding != None:

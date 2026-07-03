@@ -119,7 +119,7 @@ function _getStockOptionNetValue($ref, $strSymbol, $strStockId, $strDate)
 function _getStockOptionPremium($strStockId, $strDate)
 {
 	$premium_sql = new FuturePremiumSql();
-	if ($strClose = $premium_sql->GetClose($strStockId, $strDate))		return $strClose;
+	if ($strClose = $premium_sql->GetClose($strStockId, $strDate))		return rtrim0($strClose);
 	return '4.5';
 }
 
@@ -165,7 +165,7 @@ function _getStockOptionEma($strStockId, $strDate)
 	$str50 = _getStockOptionEmaDays($strStockId, $strDate, 50);
 	if ($str200 && $str50)
 	{
-		return $str200.'/'.$str50;
+		return "$str200/$str50";
 	}
 	return 'EMA200/50';
 }
