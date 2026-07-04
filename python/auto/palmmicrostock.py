@@ -1,6 +1,14 @@
+import json
 import re
 import requests
-from typing import Dict
+import sys
+import time
+from typing import Dict, List
+
+#import pandas as pd
+
+sys.path.append('C:/new_tdx64/PYPlugins/user')
+from tqcenter import tq
 
 class PalmmicroStock:
 	def __init__(self, strSymbol: str):
@@ -85,6 +93,27 @@ class PalmmicroStock:
 		return symbol
 		"""
 
+class IbkrStock(PalmmicroStock):
+	def __init__(self, strName):
+		self.strName = strName
+		if strName.startswith('MCL'):
+			strSymbol = 'hf_CL'
+		elif strName.startswith('MES'):
+			strSymbol = 'hf_ES'
+		elif strName.startswith('MGC'):
+			strSymbol = 'hf_GC'
+		elif strName.startswith('MNQ'):
+			strSymbol = 'hf_NQ'
+		else:
+			strSymbol = strName
+		super().__init__(strSymbol)
+
+	def GetNamePrice(self, strType: str = 'BUY') -> Dict[str, float]:
+		#(strSymbol, fPrice), = self.GetSymbolPrice(strType).items()
+		fPrice = next(iter(self.GetSymbolPrice(strType).values()))
+		return {self.strName: fPrice}
+
+
 class SinaStock(PalmmicroStock):
 	#新浪股票类，继承自 PalmmicroStock, 使用新浪接口返回的原始数据字符串进行初始化, 格式如: 'var hq_str_sh600036="招商银行,36.50,36.48,...";'
 	def __init__(self, data_str):
@@ -155,23 +184,74 @@ class SinaStock(PalmmicroStock):
 			print('FetchSinaData error:', e)
 		return False
 
+def _tdx_callback_func(data_str):
+	#print('callback data ', data_str, int(time.time()))
+	code_json = json.loads(data_str)
+	TdxStock.GetData(code_json.get('Code'))
 
-class IbkrStock(PalmmicroStock):
-	def __init__(self, strName):
-		self.strName = strName
-		if strName.startswith('MCL'):
-			strSymbol = 'hf_CL'
-		elif strName.startswith('MES'):
-			strSymbol = 'hf_ES'
-		elif strName.startswith('MGC'):
-			strSymbol = 'hf_GC'
-		elif strName.startswith('MNQ'):
-			strSymbol = 'hf_NQ'
-		else:
-			strSymbol = strName
+class TdxStock(PalmmicroStock):
+	iTimer = 0
+	ar_stock = {}
+
+	def __init__(self, strSymbol):
 		super().__init__(strSymbol)
+		self.strName = self.ConvertToTdxSymbol(strSymbol)
 
-	def GetNamePrice(self, strType: str = 'BUY') -> Dict[str, float]:
-		#(strSymbol, fPrice), = self.GetSymbolPrice(strType).items()
-		fPrice = next(iter(self.GetSymbolPrice(strType).values()))
-		return {self.strName: fPrice}
+	def GetName(self) -> str:
+		return self.strName
+
+	def Update(self) -> None:
+		self.Refresh()
+		data_dict = tq.get_market_snapshot(self.strName, ['Now', 'Buyp', 'Buyv', 'Sellp', 'Sellv'])
+		self.SetPrice(float(data_dict['Buyp'][0]), 'BUY')
+		self.SetPrice(float(data_dict['Sellp'][0]), 'SELL')
+		self.SetPrice(float(data_dict['Now']), 'LAST')
+		self.SetSize(int(data_dict['Buyv'][0]) * 100 - 1, 'BUY')
+		self.SetSize(int(data_dict['Sellv'][0]) * 100 - 1, 'SELL')
+		#print(data_dict)
+		
+	@staticmethod
+	def ConvertTdxSymbol(strSymbol: str) -> str:
+		strSymbol = strSymbol.strip()				# 去除前后空格
+		if '.' in strSymbol:						# 如果包含 '.' 则分割
+			parts = strSymbol.split('.')
+			if len(parts) == 2:
+				symbol = parts[0]					# 股票代码部分
+				market = parts[1].upper()			# 市场部分，转为大写
+				if market in ['SH', 'SZ', 'BJ']:	# 如果市场代码是 SH 或 SZ，返回市场+代码格式
+					return f"{market}{symbol}"
+		return strSymbol							# 无法识别格式，返回原字符串
+
+	@staticmethod
+	def ConvertToTdxSymbol(strSymbol: str) -> str:
+		strSymbol = strSymbol.strip().upper()		# 去除前后空格
+		if strSymbol[:2] in ['SH', 'SZ', 'BJ']:		# 如果以 SH、SZ、BJ 开头
+			market = strSymbol[:2]
+			symbol = strSymbol[2:]
+			return f"{symbol}.{market}"
+		return strSymbol							# 无法识别格式，返回原字符串
+
+	@classmethod
+	def Init(cls, arSymbol: List):
+		tq.initialize(__file__)
+		ar = []
+		for strSymbol in arSymbol:
+			stock = TdxStock(strSymbol)
+			cls.ar_stock[strSymbol] = stock
+			ar.append(stock.GetName())
+		sub_hq = tq.subscribe_hq(ar, _tdx_callback_func)
+		print(sub_hq)
+		return cls.ar_stock
+
+	@classmethod
+	def GetData(cls, strName):
+		strSymbol = cls.ConvertTdxSymbol(strName)
+		cls.ar_stock[strSymbol].Update()
+
+	@classmethod
+	def Refresh(cls):
+		iCur = int(time.time())
+		if iCur - cls.iTimer >= 6:
+			cls.iTimer = iCur
+			cache = tq.refresh_cache('AG', True)
+			print(cache)

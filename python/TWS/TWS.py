@@ -1,3 +1,4 @@
+from ast import Pass
 import time
 
 # python -m pip install setuptools
@@ -20,13 +21,14 @@ def IsChinaMarketOpen():
         return True
     elif iTime >= 1300 and iTime < 1500:
         return True
-    return False
-    #return True
+    #return False
+    return True
 
 def IsMarketOpen():
     iTime = GetExchangeTime()
     if iTime >= 930 and iTime < 1600:
-        return True
+        pass
+        #return True
     return False
 
 def GetOrderArray(arPrice = [], iSize = 1, iBuyPos = -1, iSellPos = -1, iAvgPos = -1):

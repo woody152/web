@@ -294,7 +294,10 @@ class PalmmicroAPI:
 			if arQuantity[strHolding] < 0.0:
 				arDst[strHolding] = 0
 			else:
-				arDst[strHolding] = int(math.floor(arQuantity[strHolding]))
+				if strFutureSymbol != False:
+					arDst[strHolding] = round(arQuantity[strHolding])
+				else:
+					arDst[strHolding] = int(math.floor(arQuantity[strHolding]))
 		arDst[strSymbol] = self._recalc_key_quantity(ar, arDst)
 		return arDst
 

@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Union
 from _mytoken import BOT_TOKEN
 #from _mytoken import ROT_TOKEN
 
-from palmmicrostock import PalmmicroStock, SinaStock
+from palmmicrostock import PalmmicroStock, SinaStock, TdxStock
 from palmmicroapi import PalmmicroAPI
 
 def __printHedge(api, ar: Dict[str, int], strSymbol: str, strSymbolUS: str, iSizeUS = None):
@@ -79,6 +79,7 @@ def __getSize(arStock, arSymbol, strType = 'SELL'):
 	return arQuantity
 
 def _handlePalmmicroData(arData, strSymbols):
+	api = PalmmicroAPI(arData)
 	arLine = SinaStock.FetchData('fx_susdcny,nf_AG0,' + strSymbols.lower())
 	if arLine == False:
 		print('无法获得新浪数据')
@@ -87,15 +88,30 @@ def _handlePalmmicroData(arData, strSymbols):
 	usdcny_stock = SinaStock(arLine[0])
 	ag0_stock = SinaStock(arLine[1])
 	arSymbol = strSymbols.split(',')
+	
+	"""
 	iIndex = 2
 	arStock = {}
 	for strSymbol in arSymbol:
 		arStock[strSymbol] = SinaStock(arLine[iIndex])
 		iIndex += 1
-
-	api = PalmmicroAPI(arData)
-	arCNY = usdcny_stock.GetSymbolPrice('LAST')
+	"""
+	arStock = TdxStock.Init(arSymbol)
+	while True:
+		time.sleep(1)
+		bHasData = True
+		for stock in arStock.values():
+			bHasData = stock.HasData()
+			if bHasData == False:
+				print(stock.GetSymbol(), ' has no data')
+				break
+		if bHasData:
+			break
 	
+
+
+	arCNY = usdcny_stock.GetSymbolPrice('LAST')
+
 	arQuantity = __getSize(arStock, {'SZ162411', 'SZ159518'})
 	arQuantityUS = {'XOP': 1000, 'GUSH': 10000}
 	arPriceUS = {'XOP': 144.29, 'GUSH': 26.77}
@@ -143,10 +159,10 @@ def _handlePalmmicroData(arData, strSymbols):
 	__printEst('SZ161226', f161226)
 	f161226 = api.EstNetValue('SZ161226', ag0_stock.GetSymbolPrice('LAST'));
 	fAG0 = api.ReverseEst({'SZ161226':f161226})
-	ar161226 = api.CalcQuantity('SZ161226', {'SZ161226':576813, 'nf_AG0':10})
+	ar161226 = api.CalcQuantity('SZ161226', arStock['SZ161226'].GetSymbolSize('SELL') | {'nf_AG0':10})
 	__printHedge(api, ar161226, 'SZ161226', 'nf_AG0')
 	print(f"直接算161226: {ar161226['SZ161226']}@{f161226:.3f}, 反向算nf_AG0: {ar161226['nf_AG0']}@{fAG0:.2f}")
-
+	
 
 def post_json_array_to_telegram(
 	data_array: Dict[str, Any], 
