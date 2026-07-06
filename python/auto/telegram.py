@@ -96,21 +96,23 @@ def _handlePalmmicroData(arData, strSymbols):
 		arStock[strSymbol] = SinaStock(arLine[iIndex])
 		iIndex += 1
 	"""
+	#arSymbol.append('CNY')
+	#arSymbol.append('nf_AG0')
 	arStock = TdxStock.Init(arSymbol)
+	#ag0_stock = arStock['nf_AG0']
 	while True:
 		time.sleep(1)
 		bHasData = True
 		for stock in arStock.values():
-			bHasData = stock.HasData()
-			if bHasData == False:
+			if (stock.HasData('BUY') and stock.HasData('SELL')) == False:
 				print(stock.GetSymbol(), ' has no data')
+				bHasData = False
 				break
 		if bHasData:
 			break
 	
-
-
-	arCNY = usdcny_stock.GetSymbolPrice('LAST')
+	arCNY = usdcny_stock.GetSymbolPrice()
+	#print(arCNY)
 
 	arQuantity = __getSize(arStock, {'SZ162411', 'SZ159518'})
 	arQuantityUS = {'XOP': 1000, 'GUSH': 10000}
@@ -157,9 +159,9 @@ def _handlePalmmicroData(arData, strSymbols):
     
 	f161226 = api.EstNetValue('SZ161226')
 	__printEst('SZ161226', f161226)
-	f161226 = api.EstNetValue('SZ161226', ag0_stock.GetSymbolPrice('LAST'));
+	f161226 = api.EstNetValue('SZ161226', ag0_stock.GetSymbolPrice());
 	fAG0 = api.ReverseEst({'SZ161226':f161226})
-	ar161226 = api.CalcQuantity('SZ161226', arStock['SZ161226'].GetSymbolSize('SELL') | {'nf_AG0':10})
+	ar161226 = api.CalcQuantity('SZ161226', arStock['SZ161226'].GetSymbolSize('SELL') | ag0_stock.GetSymbolSize('SELL'))
 	__printHedge(api, ar161226, 'SZ161226', 'nf_AG0')
 	print(f"直接算161226: {ar161226['SZ161226']}@{f161226:.3f}, 反向算nf_AG0: {ar161226['nf_AG0']}@{fAG0:.2f}")
 	

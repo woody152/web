@@ -1,5 +1,5 @@
 import math
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 
 from palmmicrostock import PalmmicroStock
 
@@ -328,3 +328,10 @@ class PalmmicroAPI:
 			return self.is_holding_symbol(ar, strUnknown)
 		return False
 	
+	def IsFutureOfHoldingSymbol(self, strSymbol: str, strUnknown: str) -> Union[str, bool]:
+		ar = self.get_param(strSymbol)
+		if ar != None:
+			for strHoldingSymbol in self.get_holding_symbols(ar):
+				if strUnknown == self.GetNextSymbol(strHoldingSymbol):
+					return strHoldingSymbol
+		return False

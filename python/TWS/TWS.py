@@ -1,4 +1,3 @@
-from ast import Pass
 import time
 
 # python -m pip install setuptools
@@ -10,7 +9,6 @@ from ibapi.order import Order
 
 from palmmicro import Palmmicro
 from palmmicro import Calibration
-from palmmicroapi import PalmmicroAPI
 from palmmicrostock import IbkrStock
 
 from nyc_time import GetExchangeTime
@@ -21,14 +19,14 @@ def IsChinaMarketOpen():
         return True
     elif iTime >= 1300 and iTime < 1500:
         return True
-    #return False
-    return True
+    return False
+    #return True
 
 def IsMarketOpen():
     iTime = GetExchangeTime()
     if iTime >= 930 and iTime < 1600:
-        pass
-        #return True
+        #pass
+        return True
     return False
 
 def GetOrderArray(arPrice = [], iSize = 1, iBuyPos = -1, iSellPos = -1, iAvgPos = -1):
@@ -64,8 +62,6 @@ class MyEWrapper(EWrapper):
         self.client = client
         self.strCurFuture = '202609'
         self.strNextFuture = '202612'
-        #PalmmicroAPI.set_multiplier('hf_ES', 1)
-        #PalmmicroAPI.set_multiplier('hf_NQ', 1)
 
     def nextValidId(self, orderId: int):
         self.arOrder = {}
@@ -87,7 +83,6 @@ class MyEWrapper(EWrapper):
             self.arOrder['MNQ' + self.strCurFuture] = GetOrderArray()
             self.arOrder['MCL202608'] = GetOrderArray()
             self.arOrder['MGC202608'] = GetOrderArray()
-        
         else:
             #self.arOrder['TLT'] = GetOrderArray([80.90, 84.19, 85.21, 86.40, 86.62, 86.72, 87.59, 89.76, 91.88], 100, 1, 8)
             self.arOrder['SPX'] = GetOrderArray([5177.26, 6215.66, 7078.29, 7251.65, 7425.73, 7430.03, 7444.26, 7608.40, 7940.92])
@@ -138,11 +133,11 @@ class MyEWrapper(EWrapper):
             if tickType == 1:  # Bid price
                 mkt_stock.SetPrice(price, 'BUY')
                 self.BidPriceTrade(mkt_stock)
-                self._CheckPriceAndSize(mkt_stock)
+                self._CheckPriceAndSize(mkt_stock, 'BUY')
             elif tickType == 2:  # Ask price
                 mkt_stock.SetPrice(price, 'SELL')
                 self.AskPriceTrade(mkt_stock)
-                self._CheckPriceAndSize(mkt_stock)
+                self._CheckPriceAndSize(mkt_stock, 'SELL')
             elif tickType == 4: # Last price
                 if IsMarketOpen():
                     mkt_stock.SetPrice(price, 'LAST')
@@ -156,10 +151,11 @@ class MyEWrapper(EWrapper):
         iSize = int(size)
         if tickType == 0:  # Bid size
             mkt_stock.SetSize(iSize, 'BUY')
+            self._CheckPriceAndSize(mkt_stock, 'BUY')
         elif tickType == 3:  # Ask size
             mkt_stock.SetSize(iSize, 'SELL')
-        self._CheckPriceAndSize(mkt_stock)
-
+            self._CheckPriceAndSize(mkt_stock, 'SELL')
+        
     def tickString(self, reqId, tickType, value):
         mkt_stock = self.arMkt[reqId]
         if tickType == 48:  # RT_VOLUME
@@ -300,9 +296,9 @@ class MyEWrapper(EWrapper):
                     self.client.CallPlaceOrder(strSymbol, fPrice, iSize, 'SELL', arOrder['SELL_id'])
                     arOrder['SELL_pos'] = iPos
 
-    def _CheckPriceAndSize(self, mkt_stock):
+    def _CheckPriceAndSize(self, mkt_stock, strMktType):
         if IsChinaMarketOpen():
-            self.palmmicro.CheckPriceAndSize(mkt_stock, self.arMkt)
+            self.palmmicro.CheckPriceAndSize(self.arMkt, mkt_stock, strMktType)
 
 
 def GetContractExchange():

@@ -49,32 +49,39 @@ class PalmmicroStock:
 			return strSymbol
 		return 'errorsymbol'
 
-	def GetSymbolPrice(self, strType: str = 'BUY') -> Dict[str, float]:
+	def GetSymbolPrice(self, strType: str = 'LAST') -> Dict[str, float]:
 		strSymbol = self.GetSymbol()
 		fPrice = self.get_value(strType + '_price')
 		if isinstance(fPrice, float):
 			return {strSymbol: fPrice}
 		return {strSymbol: 0.0}
 	
-	def GetSymbolSize(self, strType: str = 'BUY') -> Dict[str, int]:
+	def GetSymbolSize(self, strType: str) -> Dict[str, int]:
 		strSymbol = self.GetSymbol()
 		iSize = self.get_value(strType + '_size')
 		if isinstance(iSize, int):
 			return {strSymbol: iSize}
 		return {strSymbol: 0}
 	
-	def HasData(self, strType: str = 'BUY') -> bool:
+	def HasData(self, strType: str) -> bool:
 		return self.get_value(strType + '_price') != None and self.get_value(strType + '_size') != None
 
-	def SetPrice(self, fPrice: float, strType: str = 'BUY') -> None:
+	def SetPrice(self, fPrice: float, strType: str = 'LAST') -> None:
 		self.set_value(strType + '_price', fPrice)
 			
-	def SetSize(self, iSize: int, strType: str = 'BUY') -> None:
+	def SetSize(self, iSize: int, strType: str) -> None:
 		self.set_value(strType + '_size', iSize)
 			
 	@staticmethod
 	def IsLOF(strSymbol: str) -> bool:
 		return strSymbol.startswith(("SZ16", "SH50"))
+	
+	@staticmethod
+	def IsSymbolA(strSymbol: str) -> bool:
+		pattern = r'^(SH|SZ|BJ)\d{6}$'
+		if re.match(pattern, strSymbol):
+			return True
+		return False
 
 	@staticmethod
 	def ConvertYahooNetValueSymbol(strSymbol: str) -> str:
@@ -108,7 +115,7 @@ class IbkrStock(PalmmicroStock):
 			strSymbol = strName
 		super().__init__(strSymbol)
 
-	def GetNamePrice(self, strType: str = 'BUY') -> Dict[str, float]:
+	def GetNamePrice(self, strType: str = 'LAST') -> Dict[str, float]:
 		#(strSymbol, fPrice), = self.GetSymbolPrice(strType).items()
 		fPrice = next(iter(self.GetSymbolPrice(strType).values()))
 		return {self.strName: fPrice}
@@ -155,11 +162,11 @@ class SinaStock(PalmmicroStock):
 				# 分割数据
 				parts = data_content.split(',')
 				if self.strSinaSymbol.startswith('fx_'):
-					self.SetPrice(float(parts[8]), 'LAST')
+					self.SetPrice(float(parts[8]))
 				elif self.strSinaSymbol.startswith('nf_'):
 					self.SetPrice(float(parts[6]), 'BUY')
 					self.SetPrice(float(parts[7]), 'SELL')
-					self.SetPrice(float(parts[8]), 'LAST')
+					self.SetPrice(float(parts[8]))
 					self.SetSize(int(parts[11]), 'BUY')
 					self.SetSize(int(parts[12]), 'SELL')
 				elif self.strSinaSymbol.startswith('gb_'):
@@ -197,18 +204,28 @@ class TdxStock(PalmmicroStock):
 		super().__init__(strSymbol)
 		self.strName = self.ConvertToTdxSymbol(strSymbol)
 
+	def __del__(self):
+		#un_sub_ptr = tq.unsubscribe_hq([self.strName])
+		#print(un_sub_ptr)
+		self.OnDel(self.GetSymbol())
+
 	def GetName(self) -> str:
 		return self.strName
 
 	def Update(self) -> None:
-		self.Refresh()
-		data_dict = tq.get_market_snapshot(self.strName, ['Now', 'Buyp', 'Buyv', 'Sellp', 'Sellv'])
-		self.SetPrice(float(data_dict['Buyp'][0]), 'BUY')
-		self.SetPrice(float(data_dict['Sellp'][0]), 'SELL')
-		self.SetPrice(float(data_dict['Now']), 'LAST')
-		self.SetSize(int(data_dict['Buyv'][0]) * 100 - 1, 'BUY')
-		self.SetSize(int(data_dict['Sellv'][0]) * 100 - 1, 'SELL')
-		#print(data_dict)
+		if tq._initialized:
+			data_dict = tq.get_market_snapshot(self.strName, ['Now', 'Buyp', 'Buyv', 'Sellp', 'Sellv'])
+			#print(data_dict)
+			self.SetPrice(float(data_dict['Buyp'][0]), 'BUY')
+			self.SetPrice(float(data_dict['Sellp'][0]), 'SELL')
+			self.SetPrice(float(data_dict['Now']))
+			iBuy = int(data_dict['Buyv'][0])
+			iSell = int(data_dict['Sellv'][0])
+			if self.IsSymbolA(self.GetSymbol()):
+				iBuy *= 99
+				iSell *= 99
+			self.SetSize(iBuy, 'BUY')
+			self.SetSize(iSell, 'SELL')
 		
 	@staticmethod
 	def ConvertTdxSymbol(strSymbol: str) -> str:
@@ -220,20 +237,31 @@ class TdxStock(PalmmicroStock):
 				market = parts[1].upper()			# 市场部分，转为大写
 				if market in ['SH', 'SZ', 'BJ']:	# 如果市场代码是 SH 或 SZ，返回市场+代码格式
 					return f"{market}{symbol}"
+				elif strSymbol == 'AGL8.SHF':
+					return 'nf_AG0'
+				elif strSymbol == 'USDCNY.OT':
+					return 'CNY'
 		return strSymbol							# 无法识别格式，返回原字符串
 
 	@staticmethod
 	def ConvertToTdxSymbol(strSymbol: str) -> str:
-		strSymbol = strSymbol.strip().upper()		# 去除前后空格
-		if strSymbol[:2] in ['SH', 'SZ', 'BJ']:		# 如果以 SH、SZ、BJ 开头
+		#strSymbol = strSymbol.strip().upper()		# 去除前后空格
+		#if strSymbol[:2] in ['SH', 'SZ', 'BJ']:		# 如果以 SH、SZ、BJ 开头
+		if PalmmicroStock.IsSymbolA(strSymbol):
 			market = strSymbol[:2]
 			symbol = strSymbol[2:]
 			return f"{symbol}.{market}"
+		elif strSymbol == 'CNY':
+			return 'USDCNY.OT'
+		elif strSymbol == 'nf_AG0':
+			return 'AGL8.SHF'
 		return strSymbol							# 无法识别格式，返回原字符串
 
 	@classmethod
 	def Init(cls, arSymbol: List):
 		tq.initialize(__file__)
+		#match_stkinfo = tq.get_match_stkinfo('USDCNY')
+		#print(match_stkinfo)
 		ar = []
 		for strSymbol in arSymbol:
 			stock = TdxStock(strSymbol)
@@ -244,14 +272,39 @@ class TdxStock(PalmmicroStock):
 		return cls.ar_stock
 
 	@classmethod
+	def OnDel(cls, strSymbol: str):
+		del cls.ar_stock[strSymbol]
+		if len(cls.ar_stock) == 0:
+			print('closing...')
+			#tq.close()
+
+	@classmethod
+	def TqDebug(cls, strDebug: str) -> None:
+		try:
+			tq.send_message(str)
+		except Exception as e:
+			print(f"TqDebug异常: {e}")
+
+	@classmethod
+	def _refresh_cache(cls, strMarket):
+		try:
+			cache = tq.refresh_cache(strMarket, True)
+		except Exception as e:
+			print(f"_refresh_cache异常: {e}")
+			return
+		cache_json = json.loads(cache)
+		if cache_json['ErrorId'] != '0':
+			print(strMarket, cache_json['Error'])
+		else:
+			pass
+			#cls.TqDebug(f'{strMarket} refresh cache')
+
+	@classmethod
 	def GetData(cls, strName):
 		strSymbol = cls.ConvertTdxSymbol(strName)
 		cls.ar_stock[strSymbol].Update()
-
-	@classmethod
-	def Refresh(cls):
 		iCur = int(time.time())
 		if iCur - cls.iTimer >= 6:
 			cls.iTimer = iCur
-			cache = tq.refresh_cache('AG', True)
-			print(cache)
+			#cls._refresh_cache('AG')
+			#cls._refresh_cache('QH')
