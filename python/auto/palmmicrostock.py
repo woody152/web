@@ -18,7 +18,9 @@ class PalmmicroStock:
 					  'BUY_price': None,
 					  'SELL_price': None,
 					  'BUY_size': None,
-					  'SELL_size': None
+					  'SELL_size': None,
+					  'BUY_updated': False,
+					  'SELL_updated': False
 					 }
 	
 	def set_value(self, key, value):
@@ -66,11 +68,24 @@ class PalmmicroStock:
 	def HasData(self, strType: str) -> bool:
 		return self.get_value(strType + '_price') != None and self.get_value(strType + '_size') != None
 
+	def IsUpdated(self, strType: str):
+		return self.get_value(strType + '_updated')
+
+	def SetUpdated(self, strType: str, bStatus: bool = True):
+		if strType in ['BUY', 'SELL']:
+			self.set_value(strType + '_updated', bStatus)
+		
 	def SetPrice(self, fPrice: float, strType: str = 'LAST') -> None:
-		self.set_value(strType + '_price', fPrice)
+		fOld = self.get_value(strType + '_price')
+		if fOld == None or abs(fOld - fPrice) > 0.0001:
+			self.set_value(strType + '_price', fPrice)
+			self.SetUpdated(strType)
 			
 	def SetSize(self, iSize: int, strType: str) -> None:
-		self.set_value(strType + '_size', iSize)
+		iOld = self.get_value(strType + '_size')
+		if iOld == None or iOld != iSize:
+			self.set_value(strType + '_size', iSize)
+			self.SetUpdated(strType)
 			
 	@staticmethod
 	def IsLOF(strSymbol: str) -> bool:
@@ -99,27 +114,6 @@ class PalmmicroStock:
 				symbol = symbol.split('-')[0]
 		return symbol
 		"""
-
-class IbkrStock(PalmmicroStock):
-	def __init__(self, strName):
-		self.strName = strName
-		if strName.startswith('MCL'):
-			strSymbol = 'hf_CL'
-		elif strName.startswith('MES'):
-			strSymbol = 'hf_ES'
-		elif strName.startswith('MGC'):
-			strSymbol = 'hf_GC'
-		elif strName.startswith('MNQ'):
-			strSymbol = 'hf_NQ'
-		else:
-			strSymbol = strName
-		super().__init__(strSymbol)
-
-	def GetNamePrice(self, strType: str = 'LAST') -> Dict[str, float]:
-		#(strSymbol, fPrice), = self.GetSymbolPrice(strType).items()
-		fPrice = next(iter(self.GetSymbolPrice(strType).values()))
-		return {self.strName: fPrice}
-
 
 class SinaStock(PalmmicroStock):
 	#新浪股票类，继承自 PalmmicroStock, 使用新浪接口返回的原始数据字符串进行初始化, 格式如: 'var hq_str_sh600036="招商银行,36.50,36.48,...";'
@@ -191,6 +185,35 @@ class SinaStock(PalmmicroStock):
 			print('FetchSinaData error:', e)
 		return False
 
+	@classmethod
+	def UpdateStock(cls, stock, strLine):
+		if stock != None:
+			stock.Update(strLine)
+		else:
+			stock = SinaStock(strLine)
+		return stock
+
+
+class IbkrStock(PalmmicroStock):
+	def __init__(self, strName):
+		self.strName = strName
+		if strName.startswith('MCL'):
+			strSymbol = 'hf_CL'
+		elif strName.startswith('MES'):
+			strSymbol = 'hf_ES'
+		elif strName.startswith('MGC'):
+			strSymbol = 'hf_GC'
+		elif strName.startswith('MNQ'):
+			strSymbol = 'hf_NQ'
+		else:
+			strSymbol = strName
+		super().__init__(strSymbol)
+
+	def GetNamePrice(self, strType: str = 'LAST') -> Dict[str, float]:
+		fPrice = next(iter(self.GetSymbolPrice(strType).values()))
+		return {self.strName: fPrice}
+
+
 def _tdx_callback_func(data_str):
 	#print('callback data ', data_str, int(time.time()))
 	code_json = json.loads(data_str)
@@ -200,9 +223,9 @@ class TdxStock(PalmmicroStock):
 	iTimer = 0
 	ar_stock = {}
 
-	def __init__(self, strSymbol):
-		super().__init__(strSymbol)
-		self.strName = self.ConvertToTdxSymbol(strSymbol)
+	def __init__(self, strName):
+		self.strName = strName
+		super().__init__(self.ConvertTdxSymbol(strName))
 
 	def __del__(self):
 		#un_sub_ptr = tq.unsubscribe_hq([self.strName])
@@ -213,9 +236,13 @@ class TdxStock(PalmmicroStock):
 		return self.strName
 
 	def Update(self) -> None:
-		if tq._initialized:
-			data_dict = tq.get_market_snapshot(self.strName, ['Now', 'Buyp', 'Buyv', 'Sellp', 'Sellv'])
-			#print(data_dict)
+		try:
+			data_dict = tq.get_market_snapshot(self.strName, ['ErrorId', 'Now', 'Buyp', 'Buyv', 'Sellp', 'Sellv'])
+		except Exception as e:
+			print(f"tq.get_market_snapshot异常: {e}")
+			return
+		#print(data_dict)
+		if data_dict['ErrorId'] == '0':	
 			self.SetPrice(float(data_dict['Buyp'][0]), 'BUY')
 			self.SetPrice(float(data_dict['Sellp'][0]), 'SELL')
 			self.SetPrice(float(data_dict['Now']))
@@ -258,25 +285,33 @@ class TdxStock(PalmmicroStock):
 		return strSymbol							# 无法识别格式，返回原字符串
 
 	@classmethod
-	def Init(cls, arSymbol: List):
+	def Init(cls):
 		tq.initialize(__file__)
+
 		#match_stkinfo = tq.get_match_stkinfo('USDCNY')
 		#print(match_stkinfo)
+		block_stocks = tq.get_stock_list_in_sector('PLMM', 1)
+		print(block_stocks)
+
 		ar = []
-		for strSymbol in arSymbol:
-			stock = TdxStock(strSymbol)
+		for strName in block_stocks:
+			stock = TdxStock(strName)
+			strSymbol = stock.GetSymbol()
 			cls.ar_stock[strSymbol] = stock
-			ar.append(stock.GetName())
+			ar.append(strName)
 		sub_hq = tq.subscribe_hq(ar, _tdx_callback_func)
 		print(sub_hq)
 		return cls.ar_stock
 
 	@classmethod
 	def OnDel(cls, strSymbol: str):
+		pass
+		"""
 		del cls.ar_stock[strSymbol]
 		if len(cls.ar_stock) == 0:
 			print('closing...')
 			#tq.close()
+		"""
 
 	@classmethod
 	def TqDebug(cls, strDebug: str) -> None:

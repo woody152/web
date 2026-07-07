@@ -1,3 +1,4 @@
+import threading
 import time
 
 # python -m pip install setuptools
@@ -8,7 +9,6 @@ from ibapi.contract import Contract
 from ibapi.order import Order
 
 from palmmicro import Palmmicro
-from palmmicro import Calibration
 from palmmicrostock import IbkrStock
 
 from nyc_time import GetExchangeTime
@@ -62,8 +62,6 @@ class MyEWrapper(EWrapper):
         self.client = client
         self.strCurFuture = '202609'
         self.strNextFuture = '202612'
-
-    def nextValidId(self, orderId: int):
         self.arOrder = {}
         self.arOrder['SPY'] = GetOrderArray()
         if IsChinaMarketOpen():
@@ -83,12 +81,15 @@ class MyEWrapper(EWrapper):
             self.arOrder['MNQ' + self.strCurFuture] = GetOrderArray()
             self.arOrder['MCL202608'] = GetOrderArray()
             self.arOrder['MGC202608'] = GetOrderArray()
+            self.palmmicro = Palmmicro()
         else:
             #self.arOrder['TLT'] = GetOrderArray([80.90, 84.19, 85.21, 86.40, 86.62, 86.72, 87.59, 89.76, 91.88], 100, 1, 8)
-            self.arOrder['SPX'] = GetOrderArray([5177.26, 6215.66, 7078.29, 7251.65, 7425.73, 7430.03, 7444.26, 7608.40, 7940.92])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0071, 5, 7)
+            self.arOrder['SPX'] = GetOrderArray([5177.26, 6226.84, 7108.49, 7263.90, 7430.99, 7432.80, 7500.82, 7601.69, 7990.13])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0067, 5, 7)
             self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0182, -1, -1)
-        self.palmmicro = Palmmicro()
+            self.palmmicro = None
+
+    def nextValidId(self, orderId: int):
         self.client.StartStreaming(orderId)
         self.arMkt = {}
         self.spx_cal = {}
@@ -122,10 +123,15 @@ class MyEWrapper(EWrapper):
         else:
             return strSymbol
 
+    #def error(self, reqId, errorCode, errorString, advancedOrderRejectJson=""):
     def error(self, reqId, errorCode, errorString, *args):
+        #print(f"IB Error {errorCode}: {errorString}")
         print('Error:', reqId, errorCode, errorString)
         if args:
             print(args[0])
+
+    def connectionClosed(self):
+        print("IB连接已关闭")
 
     def tickPrice(self, reqId, tickType, price, attrib):
         if price > 0.0:
@@ -140,7 +146,7 @@ class MyEWrapper(EWrapper):
                 self._CheckPriceAndSize(mkt_stock, 'SELL')
             elif tickType == 4: # Last price
                 if IsMarketOpen():
-                    mkt_stock.SetPrice(price, 'LAST')
+                    mkt_stock.SetPrice(price)
                     self.LastPriceTrade(mkt_stock)
             else:
                 if IsMarketOpen():
@@ -163,7 +169,7 @@ class MyEWrapper(EWrapper):
             if len(arParts) >= 6 and arParts[4] != '': 
                 fPrice = float(arParts[4])
                 (strSymbol, fOld), = mkt_stock.GetNamePrice('VWAP').items()
-                if strSymbol.startswith('MES'):
+                if strSymbol.startswith('MES') or strSymbol.startswith('MNQ'):
                     fPrice = round(4.0 * fPrice) / 4.0
                 fPrice = round(fPrice, 2)
                 if fOld == None or abs(fPrice - fOld) > 0.005:
@@ -233,7 +239,7 @@ class MyEWrapper(EWrapper):
             arOrder['SELL_pos'] = -1
 
     def LastPriceTrade(self, mkt_stock):
-        (strSymbol, fLast), = mkt_stock.GetNamePrice('LAST').items()
+        (strSymbol, fLast), = mkt_stock.GetNamePrice().items()
         if strSymbol.startswith('MES'):
             fAdjust = self.spx_cal[strSymbol].Calc(fLast)
             if fAdjust > 1.0:
@@ -297,7 +303,7 @@ class MyEWrapper(EWrapper):
                     arOrder['SELL_pos'] = iPos
 
     def _CheckPriceAndSize(self, mkt_stock, strMktType):
-        if IsChinaMarketOpen():
+        if self.palmmicro != None:
             self.palmmicro.CheckPriceAndSize(self.arMkt, mkt_stock, strMktType)
 
 
@@ -306,6 +312,7 @@ def GetContractExchange():
     if iTime >= 350 and iTime < 2000:
         return 'SMART'
     return 'OVERNIGHT'
+
 
 
 class MyEClient(EClient):
@@ -367,8 +374,93 @@ class MyEClient(EClient):
         return iOrderId
 
 
+class Calibration:
+    def __init__(self, strDisplay):
+        self.strDisplay = strDisplay
+        self.fPrice = None
+        self.Reset()
+
+    def Reset(self):
+        self.fTotal = 0.0
+        self.iCount = 0
+
+    def SetPrice(self, fPrice):
+        self.fPrice = fPrice
+
+    def Calc(self, fPeerPrice):
+        if self.fPrice != None:
+            fRatio = fPeerPrice/self.fPrice
+            self.fTotal += fRatio
+            self.iCount += 1
+            if self.iCount > 100:
+                fAvg = round(self.fTotal/self.iCount, 4)
+                print(self.strDisplay, 'last', round(fRatio, 4), 'avg', fAvg)
+                self.Reset()
+                return fAvg
+        return 0.0
+
+"""
 app = MyEClient(MyEWrapper(None))
 app.wrapper = MyEWrapper(app)
 app.connect('127.0.0.1', 7497, clientId=0)
 time.sleep(1)
 app.run()
+"""
+
+# 2. 假设这是检测TQ断开的函数
+def is_tq_disconnected():
+    # 实际实现：尝试调用一个tq接口函数，捕获异常则返回True
+    # 例如:
+    # try:
+    #     tq.get_market_data(...)
+    #     return False
+    # except Exception:
+    #     return True
+    return False # 占位
+
+# 3. 监控线程函数
+def monitor_tq_and_disconnect_ib(app):
+    while not app.isConnected():
+        time.sleep(1)  # 等待IB连接建立
+
+    print("开始监控TQ连接状态...")
+    while app.isConnected():
+        if is_tq_disconnected():  # 检查TQ连接
+            print("检测到TQ断开！正在结束IB连接...")
+            app.disconnect()  # 断开IB，使app.run()循环退出
+            break
+        time.sleep(2)  # 每2秒检查一次
+
+# 4. 主程序
+def main():
+    app = MyEClient(MyEWrapper(None))
+    app.wrapper = MyEWrapper(app)
+
+    # 启动IB连接
+    app.connect('127.0.0.1', 7497, clientId=0)
+
+    # 将app.run()放入后台线程
+    ib_thread = threading.Thread(target=app.run, daemon=True)
+    ib_thread.start()
+    print("IB API 运行线程已启动。")
+
+    # 启动监控线程，监控TQ状态并控制app
+    monitor_thread = threading.Thread(target=monitor_tq_and_disconnect_ib, args=(app,), daemon=True)
+    monitor_thread.start()
+
+    # 主线程可以继续执行其他任务，或者等待监控线程结束
+    try:
+        # 等待监控线程结束，它会在TQ断开并调用app.disconnect()后退出
+        monitor_thread.join()
+        print("监控线程已退出。")
+    except KeyboardInterrupt:
+        print("用户中断。")
+        app.disconnect()
+    finally:
+        # 可选：确保app.run()线程结束
+        if ib_thread.is_alive():
+            ib_thread.join(timeout=5)
+            print("IB线程已结束。")
+
+if __name__ == "__main__":
+    main()

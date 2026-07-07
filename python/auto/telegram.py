@@ -87,7 +87,7 @@ def _handlePalmmicroData(arData, strSymbols):
 	
 	usdcny_stock = SinaStock(arLine[0])
 	ag0_stock = SinaStock(arLine[1])
-	arSymbol = strSymbols.split(',')
+	#arSymbol = strSymbols.split(',')
 	
 	"""
 	iIndex = 2
@@ -98,7 +98,7 @@ def _handlePalmmicroData(arData, strSymbols):
 	"""
 	#arSymbol.append('CNY')
 	#arSymbol.append('nf_AG0')
-	arStock = TdxStock.Init(arSymbol)
+	arStock = TdxStock.Init()
 	#ag0_stock = arStock['nf_AG0']
 	while True:
 		time.sleep(1)

@@ -1,10 +1,8 @@
-from tkinter import FALSE
-
 import requests
 import time
 
 from palmmicroapi import PalmmicroAPI
-from palmmicrostock import PalmmicroStock, SinaStock
+from palmmicrostock import PalmmicroStock, SinaStock, TdxStock
 
 from nyc_time import GetBeijingTimeDisplay
 
@@ -21,7 +19,7 @@ def get_display(strType):
 
 def GetSendMsgArray(strKey):
     ar = {'key': strKey,
-          'count': 6,
+          'count': 4,
           'timer': 0,
           'msg': {}
          }
@@ -32,36 +30,15 @@ class Palmmicro:
     def __init__(self):
         self.api = None
         self.iTimer = 0
-        self.bNewSinaData = False
         self.usdcny_stock = None
         self.ag0_stock = None
-        self.arStock = {}
         self.arDebug = {}
         self.arSendMsg = {}
         self.arSendMsg['telegram'] = GetSendMsgArray(WECHAT_KEY)
         for strSymbol, strKey in arSymbolKey.items():
             self.arSendMsg[strSymbol] = GetSendMsgArray(strKey)
+        self.arStock = TdxStock.Init()
 
-    @staticmethod
-    def __updateSina(stock, strLine):
-        if stock != None:
-            stock.Update(strLine)
-        else:
-            stock = SinaStock(strLine)
-        return stock
-
-    def _fetchSinaData(self, strSymbols):
-        arLine = SinaStock.FetchData('fx_susdcny,nf_AG0,' + strSymbols.lower())
-        if arLine:
-            self.bNewSinaData = True
-            self.usdcny_stock = self.__updateSina(self.usdcny_stock, arLine[0])
-            self.ag0_stock = self.__updateSina(self.ag0_stock, arLine[1])
-            arSymbol = strSymbols.split(',')
-            iIndex = 2
-            for strSymbol in arSymbol:
-                self.arStock[strSymbol] = self.__updateSina(self.arStock.get(strSymbol), arLine[iIndex])
-                iIndex += 1
-                        
     def _getTelegramChatId(self):
         return 992671436
 
@@ -95,7 +72,6 @@ class Palmmicro:
                 response_data = response.json()  # Parse the JSON response data
                 #print('Response data:', response_data)
                 self.api = PalmmicroAPI(response_data['text'])
-                #PalmmicroAPI.set_multiplier('hf_ES', 1)
                 #PalmmicroAPI.set_multiplier('hf_NQ', 1)
             else:
                 print('Failed to send POST request. Status code:', response.status_code)
@@ -106,10 +82,12 @@ class Palmmicro:
         iCur = int(time.time())
         if iCur - self.iTimer >= 19:
             self.iTimer = iCur
-            strSymbols = ','.join(arSymbolKey.keys())
             if self.api is None:
-                self._fetchPalmmicroData(strSymbols)
-            self._fetchSinaData(strSymbols)
+                self._fetchPalmmicroData(','.join(arSymbolKey.keys()))
+            arLine = SinaStock.FetchData('fx_susdcny,nf_AG0')
+            if arLine:
+                self.usdcny_stock = SinaStock.UpdateStock(self.usdcny_stock, arLine[0])
+                self.ag0_stock = SinaStock.UpdateStock(self.ag0_stock, arLine[1])
         
     def _getMktDebugString(self, strSymbol, stock, iSize, strType):
         (strRealSymbol, fPrice), = stock.GetSymbolPrice(strType).items()
@@ -197,12 +175,6 @@ class Palmmicro:
                 if len(value['msg']) > 0:
                     self.__send_msg(group)
 
-    def _checkNewSinaData(self):
-        if self.bNewSinaData == True:
-            self.bNewSinaData = False
-            return True
-        return False
-
     def _debugPriceAndSize(self, strMktSymbol, iMktSize, stock, strType, iSize, strDebug, fEst):
         (strSymbol, fPrice), = stock.GetSymbolPrice(strType).items()
         fRatio = fPrice / fEst - 1.0
@@ -213,6 +185,7 @@ class Palmmicro:
                 self.arDebug[strMsgType] = strDebug
                 if (fRatio < -0.001 and strType == 'SELL') or (fRatio > 0.001 and strType == 'BUY'):
                     print(f"{strDebug} | 对冲值:{iSize / iMktSize:.0f}")
+                    #TdxStock.TqDebug(strDebug)
                 if iMktSize >= 100 and ((fRatio < -0.01 and strType == 'SELL') or (fRatio > 0.005 and strType == 'BUY')):
                     self._sendMsg(strDebug, strMsgType)
                 self._sendMsg(strDebug, strMsgType, strSymbol)
@@ -226,50 +199,15 @@ class Palmmicro:
             arSrc = mkt_stock.GetSymbolPrice(strMktType)
             if PalmmicroStock.IsLOF(strSymbol) == False:
                 if self.usdcny_stock:
-                    arSrc |= self.usdcny_stock.GetSymbolPrice('LAST')
+                    arSrc |= self.usdcny_stock.GetSymbolPrice()
             self._debugPriceAndSize(strMktSymbol, iMktSize, stock, strType, iSize, strDebug, self.api.EstNetValue(strSymbol, arSrc))
-    """    
-    def _calcHoldingArbitrage(self, arMkt, mkt_stock, strMktSymbol, strMktType, strSymbol, strType):
-        stock = self.arStock.get(strSymbol)
-        if stock:
-            arSrcPrice = mkt_stock.GetSymbolPrice(strMktType)
-            arSrcQuantity = mkt_stock.GetSymbolSize(strMktType)
-            for other_stock in arMkt.values():
-                strOtherSymbol = other_stock.GetSymbol()
-                if strOtherSymbol != strMktSymbol and self.api.IsHoldingSymbol(strSymbol, strOtherSymbol):
-                    if other_stock.HasData(strMktType):
-                        arSrcPrice |= other_stock.GetSymbolPrice(strMktType)
-                        arSrcQuantity |= other_stock.GetSymbolSize(strMktType)
-            arQuantity = self.api.CalcQuantity(strSymbol, stock.GetSymbolSize(strType) | arSrcQuantity)
-            iSize = arQuantity[strSymbol]
-            if iSize > 0:
-                iTotalSize = 0
-                bDisplayTotalQuantity = False
-                strAnd = ' 和 '
-                strDebug = self._getSymDebugString(stock, iSize, strType, strMktType)
-                for strHoldingSymbol in self.api.GetHoldingSymbols(strSymbol):
-                    strRealSymbol = PalmmicroStock.ConvertYahooNetValueSymbol(strHoldingSymbol)
-                    if strRealSymbol != strHoldingSymbol:
-                        bDisplayTotalQuantity = True
-                    for all_stock in arMkt.values():
-                        if all_stock.GetSymbol() == strRealSymbol:
-                            iHoldingSize = arQuantity[strHoldingSymbol]
-                            if iHoldingSize > 0:
-                                iTotalSize += iHoldingSize
-                                strDebug += self._getMktDebugString(strHoldingSymbol, all_stock, iHoldingSize, strMktType) + strAnd
-                            break
-                strDebug = strDebug.rstrip(strAnd)
-                if bDisplayTotalQuantity == True:
-                    strDebug += ' 共' + str(iTotalSize)
-                self._debugPriceAndSize(strMktSymbol, stock, strType, strDebug, iSize, iTotalSize, self.api.EstNetValue(strSymbol, arSrcPrice))
-    """
 
     def _calcHoldingArbitrage(self, arMkt, mkt_stock, strMktType, strMktSymbol, strMktHoldingSymbol, stock, strType, strSymbol):
         arSrcPrice = mkt_stock.GetSymbolPrice(strMktType)
         arSrcQuantity = mkt_stock.GetSymbolSize(strMktType)
         for other_stock in arMkt.values():
             strOtherSymbol = other_stock.GetSymbol()
-            if strOtherSymbol != strMktSymbol and strOtherSymbol != strMktHoldingSymbol and self.api.IsHoldingSymbol(strSymbol, strOtherSymbol):   # 不同
+            if strOtherSymbol != strMktSymbol and strOtherSymbol != strMktHoldingSymbol and self.api.IsHoldingSymbol(strSymbol, strOtherSymbol):
                 if other_stock.HasData(strMktType):
                     arSrcPrice |= other_stock.GetSymbolPrice(strMktType)
                     arSrcQuantity |= other_stock.GetSymbolSize(strMktType)
@@ -293,20 +231,27 @@ class Palmmicro:
                         break
             strDebug = strDebug.rstrip(strAnd)
             if strMktHoldingSymbol != False:
-                strDebug += ' 实际期货' + self._getMktDebugString(strMktSymbol, mkt_stock, arQuantity[strMktSymbol], strMktType)    # 不同
+                strDebug += ' 实际期货' + self._getMktDebugString(strMktSymbol, mkt_stock, arQuantity[strMktSymbol], strMktType)
             elif bDisplayTotalQuantity == True:
                 strDebug += ' 共' + str(iTotalSize)
             self._debugPriceAndSize(strMktSymbol, iTotalSize, stock, strType, iSize, strDebug, self.api.EstNetValue(strSymbol, arSrcPrice))
 
-    """
-    def _isFutureOfHoldingSymbol(self, strSymbol, strMktSymbol):
-        for strHoldingSymbol in self.api.GetHoldingSymbols(strSymbol):
-            if strMktSymbol == self.api.GetNextSymbol(strHoldingSymbol):
-                return strHoldingSymbol
-        return False
-    """
-
-    def _sendMktData(self, arMkt, mkt_stock, strMktType, strMktSymbol):
+    def _processPriceAndSize(self, arMkt, mkt_stock, strMktType, stock, strType, strSymbol):
+        strMktSymbol = mkt_stock.GetSymbol()
+        if mkt_stock.HasData(strMktType):
+            strNextSymbol = self.api.GetNextSymbol(strSymbol)
+            if strNextSymbol != False:
+                if strNextSymbol == strMktSymbol or strNextSymbol == self.api.GetNextSymbol(strMktSymbol) or strMktSymbol == self.api.GetNextSymbol(self.api.GetNextSymbol(strNextSymbol)):
+                    self._calcCalibrationArbitrage(mkt_stock, strMktType, strMktSymbol, stock, strType, strSymbol)
+            else:
+                strMktHoldingSymbol = self.api.IsFutureOfHoldingSymbol(strSymbol, strMktSymbol)
+                if self.api.IsHoldingSymbol(strSymbol, strMktSymbol) or strMktHoldingSymbol != False:
+                    self._calcHoldingArbitrage(arMkt, mkt_stock, strMktType, strMktSymbol, strMktHoldingSymbol, stock, strType, strSymbol)
+        else:
+            print(strMktSymbol + '无' + get_display(strMktType) + '数据')
+                
+    def CheckPriceAndSize(self, arMkt, mkt_stock, strMktType):
+        self._fetchData()
         if strMktType == 'SELL':
             strType = 'BUY'
         else:
@@ -314,63 +259,13 @@ class Palmmicro:
         for strSymbol in self.api.get_config().keys():
             stock = self.arStock.get(strSymbol)
             if stock and stock.HasData(strType):
-                strNextSymbol = self.api.GetNextSymbol(strSymbol)
-                if strNextSymbol != False:
-                    if strNextSymbol == strMktSymbol or strNextSymbol == self.api.GetNextSymbol(strMktSymbol) or strMktSymbol == self.api.GetNextSymbol(self.api.GetNextSymbol(strNextSymbol)):
-                        self._calcCalibrationArbitrage(mkt_stock, strMktType, strMktSymbol, stock, strType, strSymbol)
-                else:
-                    """
-                    if self.api.IsHoldingSymbol(strSymbol, strMktSymbol):
-                        self._calcHoldingArbitrage(arMkt, mkt_stock, strMktSymbol, strMktType, strSymbol, strType)
-                    else:
-                        strMktHoldingSymbol = self._isFutureOfHoldingSymbol(strSymbol, strMktSymbol)
-                        if strMktHoldingSymbol != False:
-                            self._calcFutureHoldingArbitrage(arMkt, mkt_stock, strMktSymbol, strMktType, strMktHoldingSymbol, stock, strSymbol, strType)
-                    """
-                    #strMktHoldingSymbol = self._isFutureOfHoldingSymbol(strSymbol, strMktSymbol)
-                    strMktHoldingSymbol = self.api.IsFutureOfHoldingSymbol(strSymbol, strMktSymbol)
-                    if self.api.IsHoldingSymbol(strSymbol, strMktSymbol) or strMktHoldingSymbol != False:
-                        self._calcHoldingArbitrage(arMkt, mkt_stock, strMktType, strMktSymbol, strMktHoldingSymbol, stock, strType, strSymbol)
-                        
-    def _processPriceAndSize(self, arMkt, mkt_stock, strMktType):
-        strMktSymbol = mkt_stock.GetSymbol()
-        if mkt_stock.HasData(strMktType):
-            self._sendMktData(arMkt, mkt_stock, strMktType, strMktSymbol)
-        else:
-            print(strMktSymbol + '无' + get_display(strMktType) + '数据')
-                
-    def CheckPriceAndSize(self, arMkt, mkt_stock, strMktType):
-        self._fetchData()
-        self._processPriceAndSize(arMkt, mkt_stock, strMktType)
-        if self._checkNewSinaData() == True:
-            for other_stock in arMkt.values():
-                if other_stock.GetSymbol() != mkt_stock.GetSymbol():
-                    self._processPriceAndSize(arMkt, other_stock, strMktType)
-            self._processPriceAndSize(arMkt, self.ag0_stock, strMktType)
+                self._processPriceAndSize(arMkt, mkt_stock, strMktType, stock, strType, strSymbol)
+                if stock.IsUpdated(strType):
+                    for other_stock in arMkt.values():
+                        if other_stock.GetSymbol() != mkt_stock.GetSymbol():
+                            self._processPriceAndSize(arMkt, other_stock, strMktType, stock, strType, strSymbol)
+                    if self.ag0_stock.IsUpdated(strMktType):
+                        self._processPriceAndSize(arMkt, self.ag0_stock, strMktType, stock, strType, strSymbol)
+                        self.ag0_stock.SetUpdated(strMktType, False)
+                stock.SetUpdated(strType, False)
         self._sendOldMsg()
-
-
-class Calibration:
-    def __init__(self, strDisplay):
-        self.strDisplay = strDisplay
-        self.fPrice = None
-        self.Reset()
-
-    def Reset(self):
-        self.fTotal = 0.0
-        self.iCount = 0
-
-    def SetPrice(self, fPrice):
-        self.fPrice = fPrice
-
-    def Calc(self, fPeerPrice):
-        if self.fPrice != None:
-            fRatio = fPeerPrice/self.fPrice
-            self.fTotal += fRatio
-            self.iCount += 1
-            if self.iCount > 100:
-                fAvg = round(self.fTotal/self.iCount, 4)
-                print(self.strDisplay, 'last', round(fRatio, 4), 'avg', fAvg)
-                self.Reset()
-                return fAvg
-        return 0.0
