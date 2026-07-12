@@ -119,7 +119,11 @@ function _echoOverNightCnhItem($strSymbol, $strInput, $bSell)
 				}
 			}
 			$strMemo = rtrim($strMemo, '、');
-			if ($strSymbol != 'SZ160216' && $strSymbol != 'SZ161815' && $strSymbol != 'SZ163208' && $strSymbol != 'SZ164701')	$strMemo .= '，共'.strval(round($fTotalQuantity)).'股。';
+			if ($strSymbol != 'SZ160216' && $strSymbol != 'SZ161815' && $strSymbol != 'SZ163208' && $strSymbol != 'SZ164701')
+			{
+				$strMemo .= '，共'.strval(round($fTotalQuantity)).'股。';
+				$strHedge = GetNumberDisplay($fHintQuantity / $fTotalQuantity, 0);
+			}
    		}
 		$fHintQuantity = round($fHintQuantity / 100.0) * 100.0;
 		$strHintQuantity = strval($fHintQuantity);
@@ -153,7 +157,7 @@ function _echoOverNightCnhParagraph($strPage, $arSymbol, $strInput)
 
 function _copyFutureLink($strQuery, $strFuture)
 {
-	return ' '.CopyPhpLink($strQuery.'1'.$strFuture, $strFuture.'对冲');
+	return ' '.CopyPhpLink("{$strQuery}1{$strFuture}", "{$strFuture}对冲");
 }
 
 function EchoAll()
@@ -183,7 +187,7 @@ function EchoAll()
 
 function GetMetaDescription()
 {
-    $str = GetTitle().'。自动计算为了平衡对冲汇率策略下，义工群覆盖的当前各个QDII基金应该买入或者卖出的数量。同时顺便显示对冲值等信息。';
+    $str = GetTitle().'。自动计算为了平衡对冲汇率策略下, 义工群覆盖的当前各个QDII基金应该买入或者卖出的数量。同时顺便显示对冲值等信息。';
     return CheckMetaDescription($str);
 }
 

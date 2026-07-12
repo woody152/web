@@ -19,8 +19,8 @@ def IsChinaMarketOpen():
         return True
     elif iTime >= 1300 and iTime < 1500:
         return True
-    return False
-    #return True
+    #return False
+    return True
 
 def IsMarketOpen():
     iTime = GetExchangeTime()
@@ -60,6 +60,7 @@ def AdjustOrderArray(arOrder, fAdjust, iBuyPos = -1, iSellPos = -1):
 class MyEWrapper(EWrapper):
     def __init__(self, client):
         self.client = client
+        self.palmmicro = None
         self.strCurFuture = '202609'
         self.strNextFuture = '202612'
         self.arOrder = {}
@@ -81,14 +82,12 @@ class MyEWrapper(EWrapper):
             self.arOrder['MNQ' + self.strCurFuture] = GetOrderArray()
             self.arOrder['MCL202608'] = GetOrderArray()
             self.arOrder['MGC202608'] = GetOrderArray()
-            self.palmmicro = Palmmicro()
         else:
             #self.arOrder['TLT'] = GetOrderArray([80.90, 84.19, 85.21, 86.40, 86.62, 86.72, 87.59, 89.76, 91.88], 100, 1, 8)
-            self.arOrder['SPX'] = GetOrderArray([5177.26, 6226.84, 7108.49, 7263.90, 7430.99, 7432.80, 7500.82, 7601.69, 7990.13])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0067, 5, 7)
+            self.arOrder['SPX'] = GetOrderArray([5177.26, 6226.84, 7108.49, 7308.26, 7457.58, 7480.88, 7516.91, 7606.89, 7990.13])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0061, 5, 7)
             self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0182, -1, -1)
-            self.palmmicro = None
-
+            
     def nextValidId(self, orderId: int):
         self.client.StartStreaming(orderId)
         self.arMkt = {}
@@ -150,7 +149,7 @@ class MyEWrapper(EWrapper):
                     self.LastPriceTrade(mkt_stock)
             else:
                 if IsMarketOpen():
-                    print(mkt_stock.GetSymbol(), price, tickType)
+                    print(mkt_stock.GetName(), price, tickType)
 
     def tickSize(self, reqId, tickType, size):
         mkt_stock = self.arMkt[reqId]
@@ -172,7 +171,7 @@ class MyEWrapper(EWrapper):
                 if strSymbol.startswith('MES') or strSymbol.startswith('MNQ'):
                     fPrice = round(4.0 * fPrice) / 4.0
                 fPrice = round(fPrice, 2)
-                if fOld == None or abs(fPrice - fOld) > 0.005:
+                if fOld is None or abs(fPrice - fOld) > 0.005:
                     mkt_stock.SetPrice(fPrice, 'VWAP')
                     print(strSymbol, 'VWAP', fPrice)
                     arOrder = self.arOrder[strSymbol]
@@ -303,7 +302,9 @@ class MyEWrapper(EWrapper):
                     arOrder['SELL_pos'] = iPos
 
     def _CheckPriceAndSize(self, mkt_stock, strMktType):
-        if self.palmmicro != None:
+        if IsChinaMarketOpen():
+            if self.palmmicro is None:
+                self.palmmicro = Palmmicro()
             self.palmmicro.CheckPriceAndSize(self.arMkt, mkt_stock, strMktType)
 
 
@@ -312,7 +313,6 @@ def GetContractExchange():
     if iTime >= 350 and iTime < 2000:
         return 'SMART'
     return 'OVERNIGHT'
-
 
 
 class MyEClient(EClient):
@@ -388,7 +388,7 @@ class Calibration:
         self.fPrice = fPrice
 
     def Calc(self, fPeerPrice):
-        if self.fPrice != None:
+        if self.fPrice is not None:
             fRatio = fPeerPrice/self.fPrice
             self.fTotal += fRatio
             self.iCount += 1
@@ -399,13 +399,6 @@ class Calibration:
                 return fAvg
         return 0.0
 
-"""
-app = MyEClient(MyEWrapper(None))
-app.wrapper = MyEWrapper(app)
-app.connect('127.0.0.1', 7497, clientId=0)
-time.sleep(1)
-app.run()
-"""
 
 # 2. 假设这是检测TQ断开的函数
 def is_tq_disconnected():
@@ -438,6 +431,7 @@ def main():
 
     # 启动IB连接
     app.connect('127.0.0.1', 7497, clientId=0)
+    #app.run()
 
     # 将app.run()放入后台线程
     ib_thread = threading.Thread(target=app.run, daemon=True)

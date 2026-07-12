@@ -151,6 +151,10 @@ function GetXueqiuLink($sym, $strDisplay = false)
 			$strXueqiu = 'HKHSCEI';
 			break;
 			
+		case '^HSSI':
+			$strXueqiu = 'HKHSSI';
+			break;
+
 		case '^HSTECH':
 			$strXueqiu = 'HKHSTECH';
 			break;
@@ -229,6 +233,7 @@ function GetSinaUsStockLink($sym)
     return GetExternalLink($strHttp, $strSymbol);
 }
 
+// https://stock.finance.sina.com.cn/hkstock/quotes/HSSI.html
 function GetSinaHkStockLink($sym)
 {
     $strSymbol = $sym->GetSymbol();

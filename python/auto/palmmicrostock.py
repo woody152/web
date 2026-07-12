@@ -66,7 +66,7 @@ class PalmmicroStock:
 		return {strSymbol: 0}
 	
 	def HasData(self, strType: str) -> bool:
-		return self.get_value(strType + '_price') != None and self.get_value(strType + '_size') != None
+		return self.get_value(strType + '_price') is not None and self.get_value(strType + '_size') is not None
 
 	def IsUpdated(self, strType: str):
 		return self.get_value(strType + '_updated')
@@ -77,16 +77,26 @@ class PalmmicroStock:
 		
 	def SetPrice(self, fPrice: float, strType: str = 'LAST') -> None:
 		fOld = self.get_value(strType + '_price')
-		if fOld == None or abs(fOld - fPrice) > 0.0001:
+		if fOld is None or abs(fOld - fPrice) > 0.0001:
 			self.set_value(strType + '_price', fPrice)
 			self.SetUpdated(strType)
 			
 	def SetSize(self, iSize: int, strType: str) -> None:
 		iOld = self.get_value(strType + '_size')
-		if iOld == None or iOld != iSize:
+		if iOld is None or iOld != iSize:
 			self.set_value(strType + '_size', iSize)
 			self.SetUpdated(strType)
-			
+
+	@staticmethod
+	def GetTypeList() -> List[str]:
+		return ['BUY', 'SELL']
+
+	@staticmethod
+	def GetPeerType(strType: str) -> str:
+		if strType == 'SELL':
+			return 'BUY'
+		return 'SELL'
+
 	@staticmethod
 	def IsLOF(strSymbol: str) -> bool:
 		return strSymbol.startswith(("SZ16", "SH50"))
@@ -187,10 +197,10 @@ class SinaStock(PalmmicroStock):
 
 	@classmethod
 	def UpdateStock(cls, stock, strLine):
-		if stock != None:
-			stock.Update(strLine)
-		else:
+		if stock is None:
 			stock = SinaStock(strLine)
+		else:
+			stock.Update(strLine)
 		return stock
 
 
@@ -209,8 +219,12 @@ class IbkrStock(PalmmicroStock):
 			strSymbol = strName
 		super().__init__(strSymbol)
 
+	def GetName(self) -> str:
+		return self.strName
+
 	def GetNamePrice(self, strType: str = 'LAST') -> Dict[str, float]:
-		fPrice = next(iter(self.GetSymbolPrice(strType).values()))
+		(_, fPrice), = self.GetSymbolPrice(strType).items()
+		#fPrice = next(iter(self.GetSymbolPrice(strType).values()))
 		return {self.strName: fPrice}
 
 
@@ -249,8 +263,10 @@ class TdxStock(PalmmicroStock):
 			iBuy = int(data_dict['Buyv'][0])
 			iSell = int(data_dict['Sellv'][0])
 			if self.IsSymbolA(self.GetSymbol()):
-				iBuy *= 99
-				iSell *= 99
+				iBuy *= 100
+				iSell *= 100
+				iBuy -= 50
+				iSell -= 50
 			self.SetSize(iBuy, 'BUY')
 			self.SetSize(iSell, 'SELL')
 		

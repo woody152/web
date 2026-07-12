@@ -332,9 +332,12 @@ class HoldingsReference extends MyStockReference
 			
 			if (isset($arHoldingsDateHistory[$strStockId]))
 			{
-				$fChange = $fRatio * ($fPrice / $arHoldingsDateHistory[$strStockId]);
-				$fChange /= RefAdjustForex($ref, $fAdjustHKD, $fAdjustUSD);
-				$fTotalChange += $fChange;
+				if ($arHoldingsDateHistory[$strStockId] > MIN_FLOAT_VAL)
+				{
+					$fChange = $fRatio * ($fPrice / $arHoldingsDateHistory[$strStockId]);
+					$fChange /= RefAdjustForex($ref, $fAdjustHKD, $fAdjustUSD);
+					$fTotalChange += $fChange;
+				}	
 			}
 		}
 		

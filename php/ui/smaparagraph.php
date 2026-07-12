@@ -70,7 +70,7 @@ function _getSmaParagraphMemo($his)
 	$sym = $his->GetRef();
 	$strSymbol = $sym->GetSymbol();
 	$bAdmin = DebugIsAdmin();
-	$str = $bAdmin ? GetStockChartsLink($strSymbol) : GetYahooStockLink($sym);
+	$str = $sym->IsSymbolUS() ? ($bAdmin ? GetStockChartsLink($strSymbol) : GetYahooStockLink($sym)) : GetXueqiuLink($sym);
 	$str .= ' '.$his->GetStartDate().'数据';
 	if ($strBullBear = $his->GetBullBear())		$str .= ' '.GetBoldElement($strBullBear);
     $str .= ' '.GetStockHistoryLink($strSymbol);

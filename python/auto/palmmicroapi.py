@@ -1,5 +1,6 @@
 import math
-from typing import Any, Dict, Optional, Union
+import pandas as pd
+from typing import Any, Dict, List, Optional, Union
 
 from palmmicrostock import PalmmicroStock
 
@@ -82,14 +83,14 @@ class PalmmicroAPI:
 	@staticmethod
 	def _get_CNY(ar, arSrc):
 		fCny = 1.0
-		if arSrc != None:
+		if arSrc is None:
+			if 'CNYest' in ar:
+				fCny = float(ar['CNYest'])
+		else:
 			if 'CNY' in arSrc:
 				fCny = arSrc['CNY']
 			elif 'CNY' in ar:
 				fCny = float(ar['CNY'])
-		else:
-			if 'CNYest' in ar:
-				fCny = float(ar['CNYest'])
 		return fCny
 
 	@staticmethod
@@ -102,16 +103,16 @@ class PalmmicroAPI:
 	def _calc_with_calibration(ar, arSrc):
 		fCny = PalmmicroAPI._get_CNY(ar, arSrc)
 		fEst = 0.0
-		if arSrc != None:
+		if arSrc is None:
+			if 'est_netvalue' in ar:
+				fEst = float(ar['est_netvalue'])
+		else:
 			strHedgeSymbol = PalmmicroAPI.get_next_symbol(ar)
 			if strHedgeSymbol in arSrc:
 				fEst = arSrc[strHedgeSymbol]
 			else:
 				if 'est_netvalue' in ar:
 					fEst = float(ar['est_netvalue'])
-		else:
-			if 'est_netvalue' in ar:
-				fEst = float(ar['est_netvalue'])
 		fPos = float(ar['position'])
 		return (1.0 - fPos) * float(ar['netvalue']) + fPos * fEst * fCny  / float(ar['calibration'])
 
@@ -120,14 +121,14 @@ class PalmmicroAPI:
 		fCny = PalmmicroAPI._get_CNY(ar, arSrc)
 		fTotal = 0.0
 		for strHolding, arHolding in ar['symbol_hedge'].items():
-			if arSrc != None:
+			if arSrc is None:
+				fPrice = float(arHolding['est_price'])
+			else:
 				strReal = PalmmicroStock.ConvertYahooNetValueSymbol(strHolding)
 				if strReal in arSrc:
 					fPrice = arSrc[strReal]
 				else:
 					fPrice = float(arHolding['est_price'])
-			else:
-				fPrice = float(arHolding['est_price'])
 			fTotal += float(arHolding['ratio']) * fPrice / float(arHolding['price'])
 		fTotal /= 100.0
 		return float(ar['netvalue']) * (1.0 + float(ar['position']) * (fTotal * fCny / float(ar['CNYholdings']) - 1.0))
@@ -135,41 +136,41 @@ class PalmmicroAPI:
 	def __est_calibration_netvalue(self, ar, arSrc):
 		strHedgeSymbol = self.get_next_symbol(ar)
 		arHedge = self.get_param(strHedgeSymbol)
-		if arHedge != None:
+		if arHedge is None:
+			arCopy = arSrc
+			if arSrc is not None:	# 检查是否有需要二次计算的杠杆ETF输入
+				for strLevSymbol in arSrc:
+					arLev = self.get_param(strLevSymbol)
+					if arLev is not None:
+						if strHedgeSymbol == self.get_next_symbol(arLev):
+							arCopy = arSrc.copy()
+							arCopy[strHedgeSymbol] = self._reverse_calc_with_calibration(arLev, strLevSymbol, {strLevSymbol: arSrc[strLevSymbol]})
+							break
+		else:
 			arCopy = None
-			if arSrc != None:	# 需要二次计算
+			if arSrc is not None:	# 需要二次计算
 				arCopy = arSrc.copy()
 				fIndex = None
 				if strHedgeSymbol in arSrc:		# strHedgeSymbol in [SPY, QQQ]
 					fIndex = self._reverse_calc_with_calibration(arHedge, strHedgeSymbol, {strHedgeSymbol:arSrc[strHedgeSymbol]})
 				else:
 					arIndex = self.get_next_param(arHedge)
-					if arIndex != None:
+					if arIndex is not None:
 						strFutureSymbol = self.get_next_symbol(arIndex)
 						if strFutureSymbol in arSrc:	# strFutureSymbol in [hf_ES, hf_NQ]
 							fIndex = self._calc_with_calibration(arIndex, {strFutureSymbol: arSrc[strFutureSymbol]})
-				if fIndex != None:
+				if fIndex is not None:
 					arCopy[strHedgeSymbol] = fIndex
-		else:
-			arCopy = arSrc
-			if arSrc != None:	# 检查是否有需要二次计算的杠杆ETF输入
-				for strLevSymbol in arSrc:
-					arLev = self.get_param(strLevSymbol)
-					if arLev != None:
-						if strHedgeSymbol == self.get_next_symbol(arLev):
-							arCopy = arSrc.copy()
-							arCopy[strHedgeSymbol] = self._reverse_calc_with_calibration(arLev, strLevSymbol, {strLevSymbol: arSrc[strLevSymbol]})
-							break
 		return self._calc_with_calibration(ar, arCopy)		# 直接算
 	
 	def __est_holdings_netvalue(self, ar, arSrc):
 		arCopy = None
-		if arSrc != None:
+		if arSrc is not None:
 			arCopy = arSrc.copy()
 			for strSrc in arSrc:
 				for strHolding in self.get_holding_symbols(ar):
 					arHolding = self.get_param(strHolding)
-					if arHolding != None:
+					if arHolding is not None:
 						if self.get_next_symbol(arHolding) == strSrc:
 							arCopy[strHolding] = self._calc_with_calibration(arHolding, arSrc)
 		return self._calc_with_holdings(ar, arCopy)		# 需要按持仓计算
@@ -177,7 +178,7 @@ class PalmmicroAPI:
 	def EstNetValue(self, strSymbol: str, arSrc: Optional[Dict[str, float]] = None) -> float:
 		fEst = 0.0
 		ar = self.get_param(strSymbol)
-		if ar != None:
+		if ar is not None:
 			if self.is_single(ar):
 				fEst = self.__est_calibration_netvalue(ar, arSrc)
 			else:
@@ -190,11 +191,11 @@ class PalmmicroAPI:
 				break
 		fEst = 0.0
 		ar = self.get_param(strSymbol)
-		if ar != None:
+		if ar is not None:
 			if self.is_single(ar):
 				fEst = self._reverse_calc_with_calibration(ar, strSymbol, arSrc)
 				arHedge = self.get_next_param(ar)
-				if arHedge != None:
+				if arHedge is not None:
 					fEst = self._calc_with_calibration(arHedge, {self.get_next_symbol(arHedge):fEst})
 		return fEst
 
@@ -207,24 +208,24 @@ class PalmmicroAPI:
 			iHedgeQuantity = arSrc[strHedgeSymbol]
 		else:
 			arHedge = self.get_param(strHedgeSymbol)
-			if arHedge != None:
-				arIndex = self.get_next_param(arHedge)
-				if arIndex != None:
-					strFutureSymbol = self.get_next_symbol(arIndex)
-					if strFutureSymbol in arSrc:
-						fHedge = self._calc_hedge(ar) * self.get_multiplier(strFutureSymbol)
-						iHedgeQuantity = arSrc[strFutureSymbol]
-						strHedgeSymbol = strFutureSymbol
-			else:
+			if arHedge is None:
 				for strLevSymbol in arSrc:
 					if strLevSymbol != strSymbol:
 						arLev = self.get_param(strLevSymbol)
-						if arLev != None:
+						if arLev is not None:
 							if strHedgeSymbol == self.get_next_symbol(arLev):
 								fHedge /= self._calc_hedge(arLev) * self.get_multiplier(strLevSymbol)
 								iHedgeQuantity = arSrc[strLevSymbol]
 								strHedgeSymbol = strLevSymbol
 								break
+			else:
+				arIndex = self.get_next_param(arHedge)
+				if arIndex is not None:
+					strFutureSymbol = self.get_next_symbol(arIndex)
+					if strFutureSymbol in arSrc:
+						fHedge = self._calc_hedge(ar) * self.get_multiplier(strFutureSymbol)
+						iHedgeQuantity = arSrc[strFutureSymbol]
+						strHedgeSymbol = strFutureSymbol
 		if strSymbol in arSrc:
 			fQuantity = _get_floor_quantity(arSrc[strSymbol])
 			iPeerQuantity = int(math.floor(fQuantity / fHedge))
@@ -256,15 +257,15 @@ class PalmmicroAPI:
 			else:
 				arReal[strReal] = fQuantity
 		fMax = 0.0
-		strMax = False
-		strFutureSymbol = False
+		strMax = None
+		strFutureSymbol = None
 		for strReal, fQuantity in arReal.items():
 			if strReal in arSrc:
 				fRealQuantity = float(arSrc[strReal])
 			else:
 				fRealQuantity = self.DEFAULT_HEDGE_QUANTITY
 				arHolding = self.get_param(strReal)
-				if arHolding != None:
+				if arHolding is not None:
 					strNextSymbol = self.get_next_symbol(arHolding) 
 					if strNextSymbol in arSrc:
 						strFutureSymbol = strNextSymbol
@@ -273,10 +274,14 @@ class PalmmicroAPI:
 						fRealQuantity = self._calc_hedge(arHolding) * self.get_multiplier(strFutureSymbol) * iFutureQuantity
 			if fRealQuantity > 0.000001:
 				fCompare = fQuantity / fRealQuantity
+				if strFutureSymbol is not None:
+					fMax = fCompare
+					strMax = strReal
+					break					
 				if fCompare > fMax:
 					fMax = fCompare
 					strMax = strReal
-		if fMax < 1.0 and strFutureSymbol != False and strMax != False and strMax not in arSrc:
+		if fMax < 1.0 and strFutureSymbol is not None and strMax is not None and strMax not in arSrc:
 			fMaxTotal = fMax * arDst[strFutureSymbol]
 			if fMaxTotal > 1.0:
 				arDst[strFutureSymbol] = int(math.floor(fMaxTotal))
@@ -294,44 +299,224 @@ class PalmmicroAPI:
 			if arQuantity[strHolding] < 0.0:
 				arDst[strHolding] = 0
 			else:
-				if strFutureSymbol != False:
-					arDst[strHolding] = round(arQuantity[strHolding])
-				else:
+				if strFutureSymbol is None:
 					arDst[strHolding] = int(math.floor(arQuantity[strHolding]))
+				else:
+					arDst[strHolding] = round(arQuantity[strHolding])
 		arDst[strSymbol] = self._recalc_key_quantity(ar, arDst)
 		return arDst
 
 	def CalcQuantity(self, strSymbol: str, arSrc: Dict[str, int]) -> Dict[str, int]:
 		ar = self.get_param(strSymbol)
-		if ar != None:
+		if ar is not None:
 			if self.is_single(ar):
 				return self.__calc_calibration_quantity(strSymbol, ar, arSrc)
 			else:
 				return self.__calc_holdings_quantity(strSymbol, ar, arSrc)
 		return {}
 
-	def GetNextSymbol(self, strSymbol: str):
+	def GetNextSymbol(self, strSymbol: str) -> Union[str, None]:
 		ar = self.get_param(strSymbol)
-		if ar != None and self.is_single(ar):
+		if ar is not None and self.is_single(ar):
 			return self.get_next_symbol(ar)
-		return False
+		return None
+	
+	def GetHedgeSymbol(self, strSymbol: str, strUnknown: str) -> Union[str, None]:
+		strNextSymbol = self.GetNextSymbol(strSymbol)
+		if strNextSymbol is not None:
+			if strNextSymbol == strUnknown:							# in [SPY, QQQ, XOP]
+				return strUnknown
+			elif strNextSymbol == self.GetNextSymbol(strUnknown):	# in [GUSH]
+				return strUnknown
+			else:
+				strIndex = self.GetNextSymbol(strNextSymbol)
+				if strIndex is not None:
+					if strUnknown == self.GetNextSymbol(strIndex):	# in [hf_ES, hf_NQ]
+						return strUnknown
+		return strNextSymbol
 		
 	def GetHoldingSymbols(self, strSymbol: str):
 		ar = self.get_param(strSymbol)
-		if ar != None:
+		if ar is not None:
 			return self.get_holding_symbols(ar)
-		return False
+		return None
 
 	def IsHoldingSymbol(self, strSymbol: str, strUnknown: str) -> bool:
 		ar = self.get_param(strSymbol)
-		if ar != None:
+		if ar is not None:
 			return self.is_holding_symbol(ar, strUnknown)
 		return False
 	
 	def IsFutureOfHoldingSymbol(self, strSymbol: str, strUnknown: str) -> Union[str, bool]:
 		ar = self.get_param(strSymbol)
-		if ar != None:
+		if ar is not None:
 			for strHoldingSymbol in self.get_holding_symbols(ar):
-				if strUnknown == self.GetNextSymbol(strHoldingSymbol):
+				if strUnknown == self.GetNextSymbol(strHoldingSymbol):	# in [hf_CL, hf_GC]
 					return strHoldingSymbol
+		return False
+
+	def GetMapping(self) -> Dict[str, List[str]]:
+		arMapping = {}
+		for strSymbol in self.config.keys():
+			if PalmmicroStock.IsSymbolA(strSymbol):
+				arList = []
+				strNextSymbol = self.GetNextSymbol(strSymbol)
+				if strNextSymbol is None:
+					arHolding = self.GetHoldingSymbols(strSymbol)
+					if arHolding is not None:
+						for strHoldingSymbol in arHolding:
+							strRealSymbol = PalmmicroStock.ConvertYahooNetValueSymbol(strHoldingSymbol)
+							if strRealSymbol not in arList:
+								arList.append(strRealSymbol)			# in [GLD, SLV, USO]
+							strFutureSymbol = self.GetNextSymbol(strHoldingSymbol)
+							if strFutureSymbol is not None and strFutureSymbol not in arList:
+								if strFutureSymbol != 'hf_SI' and strFutureSymbol != 'znb_SENSEX':
+									arList.append(strFutureSymbol)		# in [hf_GC, hf_CL]
+				else:
+					arList.append(strNextSymbol)						# in [SPY, QQQ, XOP]
+					strIndexSymbol = self.GetNextSymbol(strNextSymbol)
+					if strIndexSymbol is not None:
+						strFutureSymbol = self.GetNextSymbol(strIndexSymbol)
+						if strFutureSymbol is not None:
+							arList.append(strFutureSymbol)				# in [hf_ES, hf_NQ]
+					for strOtherSymbol in self.config.keys():
+						if strSymbol != strOtherSymbol and PalmmicroStock.IsSymbolA(strOtherSymbol) == False:
+							if strNextSymbol == self.GetNextSymbol(strOtherSymbol):
+								if strOtherSymbol != 'DRIP':
+									arList.append(strOtherSymbol)		# in [GUSH]
+				arMapping[strSymbol] = arList
+		return arMapping
+
+
+class PalmmicroDataFrame:
+	def __init__(self, api):
+		self.api = api
+		self.index_names = ['Symbol', 'Hedge', 'Type']
+		rows = []
+		for symbol, hedges in api.GetMapping().items():
+			for hedge in hedges:
+				for side in PalmmicroStock.GetTypeList():
+					row = {'Symbol': symbol,
+						   'Hedge': hedge,
+						   'Type': side}
+					rows.append(row | self._build_row())
+		df_flat = pd.DataFrame(data=rows)
+		self.df = df_flat.set_index(self.index_names)
+
+	@staticmethod
+	def _combine_size_and_price(iSize, fPrice, iDigit = 2):
+		strOutput = str(iSize)
+		if fPrice is not None:
+			strOutput += '@' + str(round(fPrice, iDigit))
+		return strOutput
+
+	@staticmethod
+	def _build_row(time = '', estprice = None, symbolqty = 0, symbolprice = 0.0, hedgeqty = 0, hedgeprice = 0.0, note = ''):
+		if estprice is None:
+			fPercent = 0.0
+		else:
+			fPercent = symbolprice / estprice - 1.0
+		return {'Time': time,
+				'Percent': fPercent,
+				'SymbolSize': symbolqty,
+				'SymbolPrice': symbolprice,
+				'HedgeSize': hedgeqty,
+				'HedgePrice': hedgeprice,
+				'Note': note
+			   }
+	
+	def GetData(self, symbol: str, hedge: str, side: str) -> pd.Series:
+		return self.df.loc[(symbol, hedge, side)]  # type: ignore
+	
+	def UpdateData(self, strSymbol: str, strHedge: str, strType: str, arNewData: Dict[str, Any]):
+		bChanged = False
+		self.df.loc[(strSymbol, strHedge, strType), 'Time'] = arNewData.pop('Time', None)
+		arOldData = self.GetData(strSymbol, strHedge, strType)
+		for key, value in arNewData.items():
+			if value is not None:
+				if key in self.df.columns and arOldData[key] != value:
+					self.df.loc[(strSymbol, strHedge, strType), key] = value
+					bChanged = True
+		return bChanged
+
+	def GetDataFrame(self):
+		return self.df
+	
+	def _calcCalibrationArbitrage(self, mkt_stock, strMktType, strMktSymbol, stock, strType, usdcny_stock, strTime):
+		(strSymbol, fPrice), = stock.GetSymbolPrice(strType).items()
+		arQuantity = self.api.CalcQuantity(strSymbol, stock.GetSymbolSize(strType) | mkt_stock.GetSymbolSize(strMktType))
+		iSize = arQuantity[strSymbol]
+		if iSize > 0:
+			#iMktSize = arQuantity[strMktSymbol]
+			#strDebug = self._getSymDebugString(stock, iSize, strType, strMktType) + self._getMktDebugString(strMktSymbol, mkt_stock, iMktSize, strMktType)
+			arSrc = mkt_stock.GetSymbolPrice(strMktType)
+			if PalmmicroStock.IsLOF(strSymbol) == False:
+				if usdcny_stock:
+					arSrc |= usdcny_stock.GetSymbolPrice()
+			fEst = self.api.EstNetValue(strSymbol, arSrc)
+			#self._debugPriceAndSize(strMktSymbol, iMktSize, stock, strType, iSize, strDebug, self.api.EstNetValue(strSymbol, arSrc))
+			row = self._build_row(strTime, fEst, iSize, fPrice, arQuantity[strMktSymbol], arSrc[strMktSymbol])
+			return self.UpdateData(strSymbol, strMktSymbol, strType, row)
+		return False
+	
+	def _calcHoldingArbitrage(self, arMkt, mkt_stock, strMktType, strMktSymbol, strMktHoldingSymbol, stock, strType, strTime):
+		(strSymbol, fPrice), = stock.GetSymbolPrice(strType).items()
+		arSrcPrice = mkt_stock.GetSymbolPrice(strMktType)
+		arSrcQuantity = mkt_stock.GetSymbolSize(strMktType)
+		for other_stock in arMkt.values():
+			strOtherSymbol = other_stock.GetSymbol()
+			if strOtherSymbol != strMktSymbol and strOtherSymbol != strMktHoldingSymbol and self.api.IsHoldingSymbol(strSymbol, strOtherSymbol):
+				if other_stock.HasData(strMktType):
+					arSrcPrice |= other_stock.GetSymbolPrice(strMktType)
+					arSrcQuantity |= other_stock.GetSymbolSize(strMktType)
+				else:
+					return False
+		arQuantity = self.api.CalcQuantity(strSymbol, stock.GetSymbolSize(strType) | arSrcQuantity)
+		iSize = arQuantity[strSymbol]
+		if iSize > 0:
+			iTotalSize = 0
+			bDisplayTotalQuantity = False
+			strAnd = '+'
+			strDebug = ''
+			#strAnd = ' 和 '
+			#strDebug = self._getSymDebugString(stock, iSize, strType, strMktType)
+			for strHoldingSymbol in self.api.GetHoldingSymbols(strSymbol):
+				strRealSymbol = PalmmicroStock.ConvertYahooNetValueSymbol(strHoldingSymbol)
+				if strRealSymbol != strHoldingSymbol:
+					bDisplayTotalQuantity = True
+				for all_stock in arMkt.values():
+					if all_stock.GetSymbol() == strRealSymbol:
+						iHoldingSize = arQuantity[strHoldingSymbol]
+						if iHoldingSize > 0:
+							iTotalSize += iHoldingSize
+							#strDebug += self._getMktDebugString(strHoldingSymbol, all_stock, iHoldingSize, strMktType) + strAnd
+							strDebug += str(iHoldingSize)
+							if strRealSymbol == strHoldingSymbol:
+								strDebug += strHoldingSymbol
+							else:
+								strDebug += strHoldingSymbol[-2:]
+							strDebug += strAnd
+						break
+			strDebug = strDebug.rstrip(strAnd)
+			if strMktHoldingSymbol != False:
+				pass
+				#strDebug += ' 实际期货' + self._getMktDebugString(strMktSymbol, mkt_stock, arQuantity[strMktSymbol], strMktType)
+			elif bDisplayTotalQuantity == True:
+				#strDebug += ' 共' + str(iTotalSize)
+				strDebug += '=' + str(iTotalSize)
+			#self._debugPriceAndSize(strMktSymbol, iTotalSize, stock, strType, iSize, strDebug, self.api.EstNetValue(strSymbol, arSrcPrice))
+			fEst = self.api.EstNetValue(strSymbol, arSrcPrice)
+			row = self._build_row(strTime, fEst, iSize, fPrice, arQuantity[strMktSymbol], arSrcPrice[strMktSymbol], strDebug)
+			return self.UpdateData(strSymbol, strMktSymbol, strType, row)
+		return False
+	
+	def ProcessPriceAndSize(self, arMkt, mkt_stock, strMktType, strMktSymbol, stock, strType, strSymbol, usdcny_stock, strTime):
+		strHedgeSymbol = self.api.GetHedgeSymbol(strSymbol, strMktSymbol)
+		if strHedgeSymbol is None:
+			strMktHoldingSymbol = self.api.IsFutureOfHoldingSymbol(strSymbol, strMktSymbol)
+			if self.api.IsHoldingSymbol(strSymbol, strMktSymbol) or strMktHoldingSymbol != False:
+				return self._calcHoldingArbitrage(arMkt, mkt_stock, strMktType, strMktSymbol, strMktHoldingSymbol, stock, strType, strTime)
+		else:
+			if strHedgeSymbol == strMktSymbol:
+				return self._calcCalibrationArbitrage(mkt_stock, strMktType, strMktSymbol, stock, strType, usdcny_stock, strTime)
 		return False

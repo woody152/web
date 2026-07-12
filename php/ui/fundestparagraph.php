@@ -163,7 +163,7 @@ function EchoFundEstParagraph($ref)
    	EchoCalibrationHistoryParagraph($ref, 0, 1);
 }
 
-function EchoHoldingsEstParagraph($ref)
+function EchoHoldingsEstParagraph($ref, $bAdmin = false)
 {
 	$arRef = [$ref];
 	$arColumn = _getFundEstTableColumn($arRef, $bFair);
@@ -172,6 +172,7 @@ function EchoHoldingsEstParagraph($ref)
 	$strSymbol = $ref->GetSymbol();
 	$str .= GetHoldingsLink($strSymbol).'更新于'.$ref->GetHoldingsDate().'。';
 	if ($ref->CountHoldings() <= 4)	$str .= GetExhaustiveHoldingsLink($strSymbol);
+	if ($bAdmin)					$str .= ' '.GetStockOptionHoldingsLink($strSymbol);
 
 	_echoFundEstParagraph($arColumn, $bFair, $arRef, $str);
    	EchoNetValueHistoryParagraph($ref, false, 0, 1);

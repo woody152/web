@@ -127,8 +127,9 @@ function EchoAll()
     	$arForex[] = $inr_ref;
 	}	
     
-	EchoHoldingsEstParagraph($ref);
-    EchoReferenceParagraph([...$acct->GetStockRefArray(), ...$arForex], $acct->IsAdmin());
+	$bAdmin = $acct->IsAdmin();
+	EchoHoldingsEstParagraph($ref, $bAdmin);
+    EchoReferenceParagraph([...$acct->GetStockRefArray(), ...$arForex], $bAdmin);
 	EchoFundTradingParagraph($ref);
     if ($ref->UseRealtimeEst())		EchoFundListParagraph($ref->GetRealtimeRefArray());
 

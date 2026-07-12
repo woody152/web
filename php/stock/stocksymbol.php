@@ -41,14 +41,14 @@ T+0 QDII 亚洲,160322,港股精选LOF,95%,恒生综指,HSCI,1.00%,开放申购,
 T+0 QDII 亚洲,501310,价值基金LOF,95%,标普中国价值,spchval,1.00%,开放申购,1.50%,
 T+0 QDII 亚洲,501305,港股高股息LOF,95%,港股通高股息,930914.CSI,1.50%,开放申购,1.50%,
 T+0 QDII 亚洲,501303,恒生中型股LOF,95%,恒生综合中型股,HSMI,1.00%,开放申购,1.50%,
-T+0 QDII 亚洲,501302,恒生指数基金LOF,95%,恒生指数,HSI,1.00%,开放申购,1.50%,
 T+0 QDII 亚洲,501021,香港中小LOF,95%,香港中小,HSMCI,1.00%,开放申购,1.50%,
 T+0 QDII 亚洲,501306,港股高股息LOFC,95%,港股通高股息,930914.CSI,1.20%,开放申购,1.50%,
 T+0 QDII 亚洲,501307,银华高股息LOF,95%,SHS高股息,930917.CSI,1.00%,开放申购,1.50%,
 T+0 QDII 亚洲,501301,香港大盘LOF,95%,恒生中国30,HSCCI,1.00%,开放申购,1.50%,
 T+0 QDII 亚洲,501311,新经济港股通LOF,95%,恒生港股通新经济,HSSCNE,1.00%,开放申购,1.50%,
 T+0 QDII 亚洲,501025,香港银行LOF,95%,HK银行,000869,1.00%,开放申购,1.50%,
-T+0 QDII 亚洲,161124,港股小盘LOF,95%,恒生小型股,HSSI,1.20%,开放申购,1.50%,
+T+0 QDII 亚洲,161124,港股小盘LOF,95%,恒生小型股,HSSI,1.20%,开放申购,1.50%, hkHSSI,hkHSSI_i,rt_hkHSSI_preipo
+https://quotes.sina.cn/hk/company/quotes/view/hssi
 */
 
 define('SINA_FOREX_PREFIX', 'fx_s');
@@ -243,7 +243,7 @@ function in_arrayHangSengQdiiHk($strSymbol)
 
 function QdiiHkGetIndexSymbolArray()
 {
-    return ['^HSI', '^HSCE', '^HSTECH'];
+    return ['^HSI', '^HSCE', '^HSSI', '^HSTECH'];
 }
  
 function QdiiHkGetSymbolArray()
@@ -839,20 +839,13 @@ class StockSymbol
     {
     	if ($this->strSinaIndexH == false)
     	{
-    		switch ($this->strSymbol)
-    		{
-    		case '^HSI':
-    			$this->strSinaIndexH = 'HSI';
-    			break;
-    			
-    		case '^HSCE':
-    			$this->strSinaIndexH = 'HSCEI';
-    			break;
-    			
-    		case '^HSTECH':
-    			$this->strSinaIndexH = 'HSTECH';
-    			break;
-    		}
+            $this->strSinaIndexH = match($this->strSymbol)
+                                   {'^HSI' => 'HSI',
+                                    '^HSCE' => 'HSCEI',
+                                    '^HSSI' => 'HSSI',
+                                    '^HSTECH' => 'HSTECH',
+                                    default => false
+                                   };
     	}
     	return $this->strSinaIndexH;
     }
