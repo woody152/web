@@ -72,7 +72,7 @@ class PalmmicroStock:
 		return self.get_value(strType + '_updated')
 
 	def SetUpdated(self, strType: str, bStatus: bool = True):
-		if strType in ['BUY', 'SELL']:
+		if strType in self.GetTypeList():
 			self.set_value(strType + '_updated', bStatus)
 		
 	def SetPrice(self, fPrice: float, strType: str = 'LAST') -> None:

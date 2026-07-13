@@ -1,3 +1,4 @@
+import dtale
 import requests
 import time
 
@@ -27,9 +28,11 @@ def GetSendMsgArray(strKey):
 
 
 class Palmmicro:
+    d_column_formats = {'Percent': {'fmt': '0.00%'}, 'SymbolPrice': {'fmt': '0.000'}}
+
     def __init__(self):
         self.api = None
-        self.df = None
+        self.pdf = None
         self.iTimer = 0
         self.usdcny_stock = None
         self.ag0_stock = None
@@ -39,6 +42,9 @@ class Palmmicro:
         for strSymbol, strKey in arSymbolKey.items():
             self.arSendMsg[strSymbol] = GetSendMsgArray(strKey)
         self.arStock = TdxStock.Init()
+        self._fetchPalmmicroData(','.join(arSymbolKey.keys()))
+        self.d = dtale.show(self.pdf.GetDataFrame(), host = '127.0.0.1', port = 40005, column_formats = self.d_column_formats)
+        self.d.open_browser()
 
     def _getTelegramChatId(self):
         return 992671436
@@ -73,7 +79,7 @@ class Palmmicro:
                 response_data = response.json()  # Parse the JSON response data
                 #print('Response data:', response_data)
                 self.api = PalmmicroAPI(response_data['text'])
-                self.df = PalmmicroDataFrame(self.api)
+                self.pdf = PalmmicroDataFrame(self.api)
                 #self.api.set_multiplier('hf_ES', 1)
             else:
                 print('Failed to send POST request. Status code:', response.status_code)
@@ -84,23 +90,11 @@ class Palmmicro:
         iCur = int(time.time())
         if iCur - self.iTimer >= 19:
             self.iTimer = iCur
-            if self.api is None:
-                self._fetchPalmmicroData(','.join(arSymbolKey.keys()))
             arLine = SinaStock.FetchData('fx_susdcny,nf_AG0')
             if arLine:
                 self.usdcny_stock = SinaStock.UpdateStock(self.usdcny_stock, arLine[0])
                 self.ag0_stock = SinaStock.UpdateStock(self.ag0_stock, arLine[1])
         
-    def _getMktDebugString(self, strSymbol, stock, iSize, strType):
-        (strRealSymbol, fPrice), = stock.GetSymbolPrice(strType).items()
-        strDebug = strSymbol + ' ' + str(iSize)
-        if strRealSymbol == strSymbol:
-            strDebug += '@' + str(fPrice)
-        return strDebug
-    
-    def _getSymDebugString(self, stock, iSize, strType, strMktType):
-        return get_display(strMktType) + ' ' + self._getMktDebugString(stock.GetSymbol(), stock, iSize, strType) + ' | ' + get_display(strType) + ' '
-
     def IsFree(self, group):
         ar = self.arSendMsg[group]
         iCur = int(time.time())
@@ -178,115 +172,72 @@ class Palmmicro:
                 if len(value['msg']) > 0:
                     self.__send_msg(group)
 
-    def _debugPriceAndSize(self, strMktSymbol, iMktSize, stock, strType, iSize, strDebug, fEst):
-        (strSymbol, fPrice), = stock.GetSymbolPrice(strType).items()
-        fRatio = fPrice / fEst - 1.0
-        if iMktSize > 0:
-            strDebug = str(round(fRatio * 100.0, 2)) + '% | ' + strDebug
-            strMsgType = strSymbol + strMktSymbol + strType
-            if strMsgType not in self.arDebug or self.arDebug[strMsgType] != strDebug:
-                self.arDebug[strMsgType] = strDebug
-                if (fRatio < -0.001 and strType == 'SELL') or (fRatio > 0.001 and strType == 'BUY'):
-                    print(f"{strDebug} | 对冲值:{iSize / iMktSize:.0f}")
-                    #TdxStock.TqDebug(strDebug)
-                if iMktSize >= 100 and ((fRatio < -0.01 and strType == 'SELL') or (fRatio > 0.005 and strType == 'BUY')):
-                    self._sendMsg(strDebug, strMsgType)
-                self._sendMsg(strDebug, strMsgType, strSymbol)
-
-    """
-    def _calcCalibrationArbitrage(self, mkt_stock, strMktType, strMktSymbol, stock, strType, strSymbol):
-        arQuantity = self.api.CalcQuantity(strSymbol, stock.GetSymbolSize(strType) | mkt_stock.GetSymbolSize(strMktType))
-        iSize = arQuantity[strSymbol]
-        if iSize > 0:
-            iMktSize = arQuantity[strMktSymbol]
-            strDebug = self._getSymDebugString(stock, iSize, strType, strMktType) + self._getMktDebugString(strMktSymbol, mkt_stock, iMktSize, strMktType)
-            arSrc = mkt_stock.GetSymbolPrice(strMktType)
-            if PalmmicroStock.IsLOF(strSymbol) == False:
-                if self.usdcny_stock:
-                    arSrc |= self.usdcny_stock.GetSymbolPrice()
-            self._debugPriceAndSize(strMktSymbol, iMktSize, stock, strType, iSize, strDebug, self.api.EstNetValue(strSymbol, arSrc))
-
-    def _calcHoldingArbitrage(self, arMkt, mkt_stock, strMktType, strMktSymbol, strMktHoldingSymbol, stock, strType, strSymbol):
-        arSrcPrice = mkt_stock.GetSymbolPrice(strMktType)
-        arSrcQuantity = mkt_stock.GetSymbolSize(strMktType)
-        for other_stock in arMkt.values():
-            strOtherSymbol = other_stock.GetSymbol()
-            if strOtherSymbol != strMktSymbol and strOtherSymbol != strMktHoldingSymbol and self.api.IsHoldingSymbol(strSymbol, strOtherSymbol):
-                if other_stock.HasData(strMktType):
-                    arSrcPrice |= other_stock.GetSymbolPrice(strMktType)
-                    arSrcQuantity |= other_stock.GetSymbolSize(strMktType)
-                else:
-                    return
-        arQuantity = self.api.CalcQuantity(strSymbol, stock.GetSymbolSize(strType) | arSrcQuantity)
-        iSize = arQuantity[strSymbol]
-        if iSize > 0:
-            iTotalSize = 0
-            bDisplayTotalQuantity = False
-            strAnd = ' 和 '
-            strDebug = self._getSymDebugString(stock, iSize, strType, strMktType)
-            for strHoldingSymbol in self.api.GetHoldingSymbols(strSymbol):
-                strRealSymbol = PalmmicroStock.ConvertYahooNetValueSymbol(strHoldingSymbol)
-                if strRealSymbol != strHoldingSymbol:
-                    bDisplayTotalQuantity = True
-                for all_stock in arMkt.values():
-                    if all_stock.GetSymbol() == strRealSymbol:
-                        iHoldingSize = arQuantity[strHoldingSymbol]
-                        if iHoldingSize > 0:
-                            iTotalSize += iHoldingSize
-                            strDebug += self._getMktDebugString(strHoldingSymbol, all_stock, iHoldingSize, strMktType) + strAnd
-                        break
-            strDebug = strDebug.rstrip(strAnd)
-            if strMktHoldingSymbol != False:
-                strDebug += ' 实际期货' + self._getMktDebugString(strMktSymbol, mkt_stock, arQuantity[strMktSymbol], strMktType)
-            elif bDisplayTotalQuantity == True:
-                strDebug += ' 共' + str(iTotalSize)
-            self._debugPriceAndSize(strMktSymbol, iTotalSize, stock, strType, iSize, strDebug, self.api.EstNetValue(strSymbol, arSrcPrice))
-        """
-
     def _processPriceAndSize(self, arMkt, mkt_stock, strMktType, stock, strType, strSymbol):
         strMktSymbol = mkt_stock.GetSymbol()
         if mkt_stock.HasData(strMktType):
-            if self.df.ProcessPriceAndSize(arMkt, mkt_stock, strMktType, strMktSymbol, stock, strType, strSymbol, self.usdcny_stock, GetBeijingTimeDisplay()):
-                strMsgType = strSymbol + strMktSymbol + strType
-                ar = self.df.GetData(strSymbol, strMktSymbol, strType)
-                strDebug = ar['Percent'] + ' | ' + get_display(strMktType) + ' ' + strSymbol + ' ' +  ar['SymbolSizePrice'] + ' | ' + get_display(strType) + ' ' + strMktSymbol + ar['HedgeSizePrice']
-                if ar['Note'] is not None:
-                    strDebug += ' ' + ar['Note']
-                fRatio = float(ar['Percent'].rstrip('%')) / 100.0
-                iSize = int(ar['SymbolSizePrice'].split('@')[0])
-                iMktSize = int(ar['HedgeSizePrice'].split('@')[0])
-                if (fRatio < -0.001 and strType == 'SELL') or (fRatio > 0.001 and strType == 'BUY'):
-                    print(f"{strDebug} | 对冲值:{iSize / iMktSize:.0f}")
-                if iMktSize >= 100 and ((fRatio < -0.01 and strType == 'SELL') or (fRatio > 0.005 and strType == 'BUY')):
+            if stock.IsUpdated(strType) or mkt_stock.IsUpdated(strType):
+                if self.pdf.ProcessPriceAndSize(arMkt, mkt_stock, strMktType, strMktSymbol, stock, strType, strSymbol, self.usdcny_stock, GetBeijingTimeDisplay()):
+                    strMsgType = strSymbol + strMktSymbol + strType
+                    ar = self.pdf.GetData(strSymbol, strMktSymbol, strType)
+                    fRatio = ar['Percent']
+                    strDebug = strDebug = str(round(fRatio * 100.0, 2)) + '% | '
+                    iSize = ar['SymbolSize']
+                    strDebug += get_display(strMktType) + ' ' + self.pdf.CombineSizeAndPrice(strSymbol, stock, iSize, strType) + ' '
+                    iMktSize = ar['HedgeSize']
+                    strDebug += get_display(strType) + ' ' + self.pdf.CombineSizeAndPrice(strMktSymbol, mkt_stock, iMktSize, strMktType)
+                    if ar['Note'] != '':
+                        strDebug += ' # ' + ar['Note']
+                    #if (fRatio < -0.001 and strType == 'SELL') or (fRatio > 0.001 and strType == 'BUY'):
+                        #print(f"{strDebug} | 对冲值:{iSize / iMktSize:.0f}")
+                    if iMktSize >= 100 and ((fRatio < -0.01 and strType == 'SELL') or (fRatio > 0.005 and strType == 'BUY')):
                         self._sendMsg(strDebug, strMsgType)
-                self._sendMsg(strDebug, strMsgType, strSymbol)
-	
-            """
-            strHedgeSymbol = self.api.GetHedgeSymbol(strSymbol, strMktSymbol)
-            if strHedgeSymbol is None:
-                strMktHoldingSymbol = self.api.IsFutureOfHoldingSymbol(strSymbol, strMktSymbol)
-                if self.api.IsHoldingSymbol(strSymbol, strMktSymbol) or strMktHoldingSymbol != False:
-                    self._calcHoldingArbitrage(arMkt, mkt_stock, strMktType, strMktSymbol, strMktHoldingSymbol, stock, strType, strSymbol)
-            else:
-                if strHedgeSymbol == strMktSymbol:
-                    self._calcCalibrationArbitrage(mkt_stock, strMktType, strMktSymbol, stock, strType, strSymbol)
-            """
+                    self._sendMsg(strDebug, strMsgType, strSymbol)
+                    return True
         else:
             print(strMktSymbol + '无' + get_display(strMktType) + '数据')
+        return False
        
+    """
     def CheckPriceAndSize(self, arMkt, mkt_stock, strMktType):
         self._fetchData()
+        bChanged = False
         strType = mkt_stock.GetPeerType(strMktType)
         for strSymbol in self.api.get_config().keys():
             stock = self.arStock.get(strSymbol)
             if stock and stock.HasData(strType):
-                self._processPriceAndSize(arMkt, mkt_stock, strMktType, stock, strType, strSymbol)
+                bChanged |= self._processPriceAndSize(arMkt, mkt_stock, strMktType, stock, strType, strSymbol)
                 if stock.IsUpdated(strType):
                     for other_stock in arMkt.values():
                         if other_stock.GetSymbol() != mkt_stock.GetSymbol():
-                            self._processPriceAndSize(arMkt, other_stock, strMktType, stock, strType, strSymbol)
+                            bChanged |= self._processPriceAndSize(arMkt, other_stock, strMktType, stock, strType, strSymbol)
                 if stock.IsUpdated(strType) or self.ag0_stock.IsUpdated(strMktType):
-                    self._processPriceAndSize(arMkt, self.ag0_stock, strMktType, stock, strType, strSymbol)
+                    bChanged |= self._processPriceAndSize(arMkt, self.ag0_stock, strMktType, stock, strType, strSymbol)
                     self.ag0_stock.SetUpdated(strMktType, False)
                 stock.SetUpdated(strType, False)
+        if bChanged:
+            self.d.data = self.pdf.GetDataFrame()
+            self.d.update_settings(column_formats = self.d_column_formats)
+        self._sendOldMsg()
+    """
+
+    def HandleData(self, arMkt):
+        self._fetchData()
+        bChanged = False
+        for strSymbol in self.api.get_config().keys():
+            stock = self.arStock.get(strSymbol)
+            if stock:
+                for strType in stock.GetTypeList():
+                    if stock.HasData(strType):
+                        strMktType = stock.GetPeerType(strType)
+                        for mkt_stock in arMkt.values():
+                            bChanged |= self._processPriceAndSize(arMkt, mkt_stock, strMktType, stock, strType, strSymbol)
+                        bChanged |= self._processPriceAndSize(arMkt, self.ag0_stock, strMktType, stock, strType, strSymbol)
+                        stock.SetUpdated(strType, False)
+        for strMktType in PalmmicroStock.GetTypeList():
+            for mkt_stock in arMkt.values():
+                mkt_stock.SetUpdated(strMktType, False)
+            self.ag0_stock.SetUpdated(strMktType, False)
+        if bChanged:
+            self.d.data = self.pdf.GetDataFrame()
+            self.d.update_settings(column_formats = self.d_column_formats)
         self._sendOldMsg()

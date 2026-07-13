@@ -61,6 +61,7 @@ class MyEWrapper(EWrapper):
     def __init__(self, client):
         self.client = client
         self.palmmicro = None
+        self.arMkt = {}
         self.strCurFuture = '202609'
         self.strNextFuture = '202612'
         self.arOrder = {}
@@ -90,7 +91,6 @@ class MyEWrapper(EWrapper):
             
     def nextValidId(self, orderId: int):
         self.client.StartStreaming(orderId)
-        self.arMkt = {}
         self.spx_cal = {}
         for strSymbol in self.arOrder.keys():
             if strSymbol.startswith('MES'):
@@ -302,11 +302,17 @@ class MyEWrapper(EWrapper):
                     arOrder['SELL_pos'] = iPos
 
     def _CheckPriceAndSize(self, mkt_stock, strMktType):
-        if IsChinaMarketOpen():
-            if self.palmmicro is None:
-                self.palmmicro = Palmmicro()
+        ...
+        """
+        if IsChinaMarketOpen() and self.palmmicro is not None:
             self.palmmicro.CheckPriceAndSize(self.arMkt, mkt_stock, strMktType)
+        """
 
+    def PalmmicroInit(self):
+        self.palmmicro = Palmmicro()
+
+    def PalmmicroRun(self):
+        self.palmmicro.HandleData(self.arMkt)
 
 def GetContractExchange():
     iTime = GetExchangeTime()
@@ -424,10 +430,12 @@ def monitor_tq_and_disconnect_ib(app):
             break
         time.sleep(2)  # 每2秒检查一次
 
-# 4. 主程序
 def main():
     app = MyEClient(MyEWrapper(None))
     app.wrapper = MyEWrapper(app)
+
+    if IsChinaMarketOpen():
+        app.wrapper.PalmmicroInit()
 
     # 启动IB连接
     app.connect('127.0.0.1', 7497, clientId=0)
@@ -442,16 +450,20 @@ def main():
     monitor_thread = threading.Thread(target=monitor_tq_and_disconnect_ib, args=(app,), daemon=True)
     monitor_thread.start()
 
-    # 主线程可以继续执行其他任务，或者等待监控线程结束
+    # === 主线程改为事件循环 ===
     try:
-        # 等待监控线程结束，它会在TQ断开并调用app.disconnect()后退出
-        monitor_thread.join()
-        print("监控线程已退出。")
+        # 监控线程是否还在运行，以及IB线程是否存活
+        while monitor_thread.is_alive() and ib_thread.is_alive():
+            time.sleep(1)  # 休眠让出CPU
+            app.wrapper.PalmmicroRun()
+            # 可选：检查是否有用户中断
+            # 使用全局标志或信号处理来实现
+        print("监控线程或IB线程已结束，退出主循环。")
     except KeyboardInterrupt:
         print("用户中断。")
-        app.disconnect()
     finally:
-        # 可选：确保app.run()线程结束
+        # 清理资源
+        app.disconnect()
         if ib_thread.is_alive():
             ib_thread.join(timeout=5)
             print("IB线程已结束。")
