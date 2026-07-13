@@ -85,7 +85,7 @@ class MyEWrapper(EWrapper):
             self.arOrder['MGC202608'] = GetOrderArray()
         else:
             #self.arOrder['TLT'] = GetOrderArray([80.90, 84.19, 85.21, 86.40, 86.62, 86.72, 87.59, 89.76, 91.88], 100, 1, 8)
-            self.arOrder['SPX'] = GetOrderArray([5177.26, 6226.84, 7108.49, 7308.26, 7457.58, 7480.88, 7516.91, 7606.89, 7990.13])
+            self.arOrder['SPX'] = GetOrderArray([5177.26, 6241.53, 7145.15, 7310.32, 7467.11, 7505.48, 7526.40, 7623.90, 8048.76])
             self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0061, 5, 7)
             self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0182, -1, -1)
             
@@ -138,11 +138,9 @@ class MyEWrapper(EWrapper):
             if tickType == 1:  # Bid price
                 mkt_stock.SetPrice(price, 'BUY')
                 self.BidPriceTrade(mkt_stock)
-                self._CheckPriceAndSize(mkt_stock, 'BUY')
             elif tickType == 2:  # Ask price
                 mkt_stock.SetPrice(price, 'SELL')
                 self.AskPriceTrade(mkt_stock)
-                self._CheckPriceAndSize(mkt_stock, 'SELL')
             elif tickType == 4: # Last price
                 if IsMarketOpen():
                     mkt_stock.SetPrice(price)
@@ -156,10 +154,8 @@ class MyEWrapper(EWrapper):
         iSize = int(size)
         if tickType == 0:  # Bid size
             mkt_stock.SetSize(iSize, 'BUY')
-            self._CheckPriceAndSize(mkt_stock, 'BUY')
         elif tickType == 3:  # Ask size
             mkt_stock.SetSize(iSize, 'SELL')
-            self._CheckPriceAndSize(mkt_stock, 'SELL')
         
     def tickString(self, reqId, tickType, value):
         mkt_stock = self.arMkt[reqId]
@@ -301,18 +297,12 @@ class MyEWrapper(EWrapper):
                     self.client.CallPlaceOrder(strSymbol, fPrice, iSize, 'SELL', arOrder['SELL_id'])
                     arOrder['SELL_pos'] = iPos
 
-    def _CheckPriceAndSize(self, mkt_stock, strMktType):
-        ...
-        """
-        if IsChinaMarketOpen() and self.palmmicro is not None:
-            self.palmmicro.CheckPriceAndSize(self.arMkt, mkt_stock, strMktType)
-        """
-
     def PalmmicroInit(self):
         self.palmmicro = Palmmicro()
 
     def PalmmicroRun(self):
-        self.palmmicro.HandleData(self.arMkt)
+        if self.palmmicro is not None:
+            self.palmmicro.HandleData(self.arMkt)
 
 def GetContractExchange():
     iTime = GetExchangeTime()

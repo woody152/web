@@ -1,5 +1,7 @@
 import math
 import pandas as pd
+import requests
+import time
 from typing import Any, Dict, List, Optional, Union
 
 from palmmicrostock import PalmmicroStock
@@ -11,7 +13,56 @@ def _get_floor_quantity(iQuantity: int) -> float:
 def _round_quantity(fQuantity: float) -> int:
 	return int((fQuantity + 49.9) / 100.0) * 100
 
-class PalmmicroAPI:
+class TelegramAPI:
+	@staticmethod
+	def FetchData(strSymbols, strToken, strUrl = 'https://palmmicro.com/php/telegram.php', iChatId = 992671436, strFirstName = 'woody', strUserName = 'palmmicro'):
+		ar = {'update_id': 886050244,
+			  'message': {'message_id': 6620,
+						  'from': {'id': iChatId,
+								   'is_bot': False,
+								   'first_name': strFirstName,
+								   'username': strUserName,
+								   'language_code': 'zh-Hans'
+								  },
+						  'chat': {'id': iChatId,
+								   'first_name': strFirstName,
+								   'username': strUserName,
+								   'type': 'private'
+								  },
+						  'date': int(time.time()),
+						  'text': strSymbols
+						 }
+			 }
+		strUrl += '?token=' + strToken
+		try:
+			response = requests.post(strUrl, json = ar, headers = {'Content-Type': 'application/json'})
+			response.raise_for_status()  # Raise an exception for HTTP errors
+			if response.status_code == 200:
+				response_data = response.json()  # Parse the JSON response data
+                #print('Response data:', response_data)
+				return response_data['text']
+			else:
+				print('Failed to send POST request. Status code:', response.status_code)
+		except requests.exceptions.RequestException as e:
+			print('FetchData error:', e)
+		return None
+
+	@staticmethod
+	def SendMsg(strMsg, strToken, strUrl = 'https://api.telegram.org/', iChatId = -1001346320717):
+		url = strUrl + 'bot' + strToken + '/sendMessage?text=' + strMsg + '&chat_id=' + str(iChatId)
+		try:
+			response = requests.get(url)
+			response.raise_for_status()  # Raise an exception for HTTP errors
+			if response.status_code == 200:
+				...
+				#data = response.json()  # Assuming the response is in JSON format
+			else:
+				print('Failed to retrieve data. Status code:', response.status_code)
+		except requests.exceptions.RequestException as e:
+			print('SendMsg Error occurred:', e)
+
+
+class PalmmicroAPI(TelegramAPI):
 	# 定义并初始化字典静态变量 arMultiplier，使用 strSymbol 作为键（整数倍率）
 	arMultiplier: Dict[str, int] = {'hf_CL': 100,	# MCL:100, CL:1000
 									'hf_ES': 5,		# MES
@@ -23,7 +74,7 @@ class PalmmicroAPI:
 	DEFAULT_KEY_QUANTITY: int = 1000000
 	DEFAULT_HEDGE_QUANTITY: int = 10000
 
-	def __init__(self, config_dict: Dict[str, Any]) -> None:
+	def __init__(self, config_dict):
 		"""使用字典初始化API"""
 		self.config = config_dict
 
@@ -407,7 +458,7 @@ class PalmmicroDataFrame:
 		return self.df
 	
 	@staticmethod
-	def _build_row(time = '', estprice = None, symbolqty = 0, symbolprice = 0.0, hedgeqty = 0, hedgeprice = 0.0, note = ''):
+	def _build_row(time = '00:00:00', estprice = None, symbolqty = 0, symbolprice = 0.0, hedgeqty = 0, hedgeprice = 0.0, note = ''):
 		if estprice is None:
 			fPercent = 0.0
 		else:
@@ -498,7 +549,10 @@ class PalmmicroDataFrame:
 				return self.UpdateData(strSymbol, strMktSymbol, strType, row)
 		return False
 	
-	def ProcessPriceAndSize(self, arMkt, mkt_stock, strMktType, strMktSymbol, stock, strType, strSymbol, usdcny_stock, strTime):
+	def ProcessPriceAndSize(self, arMkt, mkt_stock, stock, strType, usdcny_stock, strTime = '00:00:00'):
+		strSymbol = stock.GetSymbol()
+		strMktType = stock.GetPeerType(strType)
+		strMktSymbol = mkt_stock.GetSymbol()
 		strHedgeSymbol = self.api.GetHedgeSymbol(strSymbol, strMktSymbol)
 		if strHedgeSymbol is None:
 			strMktHoldingSymbol = self.api.IsFutureOfHoldingSymbol(strSymbol, strMktSymbol)
