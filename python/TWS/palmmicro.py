@@ -1,9 +1,9 @@
-import aiohttp
-import asyncio
+#import aiohttp
+#import asyncio
 import dtale
-import json
+#import json
 import requests
-#import threading
+import threading
 import time
 
 from palmmicroapi import PalmmicroAPI, PalmmicroDataFrame
@@ -30,7 +30,6 @@ def GetSendMsgArray(strKey):
          }
     return ar
 
-
 class Palmmicro:
     d_column_formats = {'Percent': {'fmt': '0.00%'}, 'SymbolPrice': {'fmt': '0.000'}}
 
@@ -56,25 +55,17 @@ class Palmmicro:
             if arLine:
                 self.usdcny_stock = SinaStock.UpdateStock(self.usdcny_stock, arLine[0])
                 self.ag0_stock = SinaStock.UpdateStock(self.ag0_stock, arLine[1])
-    
+    """
     async def SendWechatMsgAsync(self, strMsg, group, strType='text'):
-        #异步版本的发送微信消息
         url = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=' + self.arSendMsg[group]['key']
-        arWechatMsg = {
-            'msgtype': strType,
-            strType: {'content': strMsg}
-        }
-        
+        arWechatMsg = {'msgtype': strType,
+                       strType: {'content': strMsg}
+                      }
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.post(
-                    url, 
-                    json=arWechatMsg, 
-                    headers={'Content-Type': 'application/json'}
-                ) as response:
+                async with session.post(url, json = arWechatMsg, headers = {'Content-Type': 'application/json'}) as response:
                     if response.status == 200:
                         response_data = await response.json()
-                        # print('Response data:', response_data)
                         return response_data
                     else:
                         print(f'Failed to send POST request. Status code: {response.status}')
@@ -84,19 +75,14 @@ class Palmmicro:
             return None
     
     async def _sendMsgAsync(self):
-        #异步版本的_sendMsg，并发发送所有消息
         tasks = []
         for group, value in self.arSendMsg.items():
             if self.__isFree(group):
                 if len(value['msg']) > 0:
                     strMsg = self.__convert_array_msg(group)
-                    # 创建异步任务，不等待立即返回
-                    task = asyncio.create_task(
-                        self.SendWechatMsgAsync(strMsg, group)
-                    )
+                    task = asyncio.create_task(self.SendWechatMsgAsync(strMsg, group))
                     tasks.append(task)
                     self.arSendMsg[group]['msg'].clear()
-        
         if tasks:
             # 等待所有发送任务完成（可选）
             results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -122,7 +108,6 @@ class Palmmicro:
             loop.close()
 
     """    
-
     def SendWechatMsg(self, strMsg, group, strType = 'text'):
         url = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=' + self.arSendMsg[group]['key']
         arWechatMsg = {'msgtype': strType,  
@@ -156,7 +141,7 @@ class Palmmicro:
                     # 直接开线程发送，不等待
                     t = threading.Thread(target=self.__send_msg, args=(group,), daemon=True)
                     t.start()
-    """
+    
 
     def __isFree(self, group):
         ar = self.arSendMsg[group]
@@ -188,12 +173,12 @@ class Palmmicro:
         elif group in self.arSendMsg:
             ar[strType] = strMsg.replace(' ' + group, '')
 
-    def _processPriceAndSize(self, arMkt, mkt_stock, stock, strType, strSymbol):
+    def _processPriceAndSize(self, arMktList, mkt_stock, stock, strType, strSymbol):
         strMktSymbol = mkt_stock.GetSymbol()
         strMktType = stock.GetPeerType(strType)
         if mkt_stock.HasData(strMktType):
             if stock.IsUpdated(strType) or mkt_stock.IsUpdated(strMktType):
-                if self.pdf.ProcessPriceAndSize(arMkt, mkt_stock, stock, strType, self.usdcny_stock, GetBeijingTimeDisplay()):
+                if self.pdf.ProcessPriceAndSize(arMktList, mkt_stock, stock, strType, self.usdcny_stock, GetBeijingTimeDisplay()):
                     strMsgType = strSymbol + strMktSymbol + strType
                     ar = self.pdf.GetData(strSymbol, strMktSymbol, strType)
                     fRatio = ar['Percent']
@@ -204,8 +189,8 @@ class Palmmicro:
                     strDebug += get_display(strType) + ' ' + self.pdf.CombineSizeAndPrice(strMktSymbol, mkt_stock, iMktSize, strMktType)
                     if ar['Note'] != '':
                         strDebug += ' # ' + ar['Note']
-                    #if (fRatio < -0.001 and strType == 'SELL') or (fRatio > 0.001 and strType == 'BUY'):
-                        #print(f"{strDebug} | 对冲值:{iSize / iMktSize:.0f}")
+                    if (fRatio < -0.001 and strType == 'SELL') or (fRatio > 0.001 and strType == 'BUY'):
+                        print(f"{strDebug} | 对冲值:{iSize / iMktSize:.0f}")
                     if iMktSize >= 100 and ((fRatio < -0.01 and strType == 'SELL') or (fRatio > 0.005 and strType == 'BUY')):
                         self._postMsg(strDebug, strMsgType)
                     self._postMsg(strDebug, strMsgType, strSymbol)
@@ -217,14 +202,15 @@ class Palmmicro:
     def HandleData(self, arMkt):
         self._fetchData()
         bChanged = False
+        arMktList = list(arMkt.values())
         for strSymbol in self.api.get_config().keys():
             stock = self.arStock.get(strSymbol)
             if stock:
                 for strType in stock.GetTypeList():
                     if stock.HasData(strType):
                         for mkt_stock in arMkt.values():
-                            bChanged |= self._processPriceAndSize(arMkt, mkt_stock, stock, strType, strSymbol)
-                        bChanged |= self._processPriceAndSize(arMkt, self.ag0_stock, stock, strType, strSymbol)
+                            bChanged |= self._processPriceAndSize(arMktList, mkt_stock, stock, strType, strSymbol)
+                        bChanged |= self._processPriceAndSize(arMktList, self.ag0_stock, stock, strType, strSymbol)
                         stock.SetUpdated(strType, False)
         for strMktType in PalmmicroStock.GetTypeList():
             for mkt_stock in arMkt.values():

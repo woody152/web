@@ -88,13 +88,15 @@ def FetchPalmmicroData(strSymbols):
 				   )
 	d.open_browser()
 	
-	arLine = SinaStock.FetchData('fx_susdcny,nf_AG0')
+	arLine = SinaStock.FetchData('fx_susdcny,hf_GC,hf_CL,nf_AG0')
 	if arLine == False:
 		print('无法获得新浪数据')
 		return
 	
 	usdcny_stock = SinaStock(arLine[0])
-	ag0_stock = SinaStock(arLine[1])
+	gc_stock = SinaStock(arLine[1])
+	cl_stock = SinaStock(arLine[2])
+	ag0_stock = SinaStock(arLine[3])
 	arStock = TdxStock.Init()
 	while True:
 		time.sleep(1)
@@ -159,8 +161,12 @@ def FetchPalmmicroData(strSymbols):
 	__printHedge(api, ar161226, 'SZ161226', 'nf_AG0')
 	print(f"直接算161226: {ar161226['SZ161226']}@{f161226:.3f}, 反向算nf_AG0: {ar161226['nf_AG0']}@{fAG0:.2f}")
 
-	row = pdf._build_row('11:19:21', f161226, ar161226['SZ161226'], arStock['SZ161226'].GetSymbolPrice('BUY')['SZ161226'], ar161226['nf_AG0'], ag0_stock.GetSymbolPrice()['nf_AG0'])
-	if pdf.UpdateData('SZ161226', 'nf_AG0', 'SELL', row):
+	arMktList = [ag0_stock, cl_stock, gc_stock]
+	bChanged = False
+	for strType in PalmmicroStock.GetTypeList():
+		bChanged |= pdf.ProcessPriceAndSize(arMktList, cl_stock, arStock['SZ160723'], strType)
+		bChanged |= pdf.ProcessPriceAndSize([], ag0_stock, arStock['SZ161226'], strType, usdcny_stock, strTime = '11:19:22')
+	if bChanged:
 		d.data = pdf.GetDataFrame()
 		d.update_settings(column_formats = d_column_formats)
 		print(d.data)

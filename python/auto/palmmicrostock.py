@@ -147,14 +147,25 @@ class SinaStock(PalmmicroStock):
 			if code_part:
 				if code_part.startswith('fx_'):
 					strSymbol = code_part[-3:].upper()	# 'CNY'
-				elif code_part.startswith('nf_'):
-					strSymbol = code_part				# 'nf_AG0'
+				elif code_part.startswith('hf_') or code_part.startswith('nf_'):
+					strSymbol = code_part				# 'hf_CL, nf_AG0'
 				elif code_part.startswith('gb_'):
 					strSymbol = code_part[3:].upper()	# 'XOP'
 				else:
 					strSymbol = code_part.upper()		# 'SZ162411'
 				self.strSinaSymbol = code_part
 		return strSymbol
+
+	def __set_price_and_size(self, parts, last, buyp = None, sellp = None, buyv = None, sellv = None):
+		self.SetPrice(float(parts[last]))
+		if buyp is not None:
+			self.SetPrice(float(parts[buyp]), 'BUY')
+		if sellp is not None:
+			self.SetPrice(float(parts[sellp]), 'SELL')
+		if buyv is not None:
+			self.SetSize(int(parts[buyv]), 'BUY')
+		if sellv is not None:
+			self.SetSize(int(parts[sellv]), 'SELL')
 
 	def _update_data(self, data_str):
 		# 提取引号内的数据
@@ -166,21 +177,30 @@ class SinaStock(PalmmicroStock):
 				# 分割数据
 				parts = data_content.split(',')
 				if self.strSinaSymbol.startswith('fx_'):
-					self.SetPrice(float(parts[8]))
+					self.__set_price_and_size(parts, 8)
+					#self.SetPrice(float(parts[8]))
+				elif self.strSinaSymbol.startswith('hf_'):
+					self.__set_price_and_size(parts, 0, 2, 3, 10, 11)
 				elif self.strSinaSymbol.startswith('nf_'):
+					self.__set_price_and_size(parts, 8, 6, 7, 11, 12)
+					"""
 					self.SetPrice(float(parts[6]), 'BUY')
 					self.SetPrice(float(parts[7]), 'SELL')
 					self.SetPrice(float(parts[8]))
 					self.SetSize(int(parts[11]), 'BUY')
 					self.SetSize(int(parts[12]), 'SELL')
+					"""
 				elif self.strSinaSymbol.startswith('gb_'):
-					pass
+					self.__set_price_and_size(parts, 1)
 				else:
 					if len(parts) >= 32:
+						self.__set_price_and_size(parts, 3, 6, 7, 10, 20)
+						"""
 						self.SetPrice(float(parts[6]), 'BUY')
 						self.SetPrice(float(parts[7]), 'SELL')
 						self.SetSize(int(parts[10]), 'BUY')
 						self.SetSize(int(parts[20]), 'SELL')
+						"""
 	
 	@staticmethod
 	def FetchData(strSymbols: str):

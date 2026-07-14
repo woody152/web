@@ -493,7 +493,7 @@ class PalmmicroDataFrame:
 		if iSize > 0:
 			arSrcPrice = mkt_stock.GetSymbolPrice(strMktType)
 			if PalmmicroStock.IsLOF(strSymbol) == False:
-				if usdcny_stock:
+				if usdcny_stock is not None:
 					arSrcPrice |= usdcny_stock.GetSymbolPrice()
 			fEst = self.api.EstNetValue(strSymbol, arSrcPrice)
 			row = self._build_row(strTime, fEst, iSize, fPrice, arQuantity[strMktSymbol], arSrcPrice[strMktSymbol])
@@ -508,11 +508,11 @@ class PalmmicroDataFrame:
 			strDebug += '@' + str(fPrice)
 		return strDebug
 
-	def _calcHoldingArbitrage(self, arMkt, mkt_stock, strMktType, strMktSymbol, strMktHoldingSymbol, stock, strType, strTime):
+	def _calcHoldingArbitrage(self, arMktList, mkt_stock, strMktType, strMktSymbol, strMktHoldingSymbol, stock, strType, strTime):
 		(strSymbol, fPrice), = stock.GetSymbolPrice(strType).items()
 		arSrcPrice = mkt_stock.GetSymbolPrice(strMktType)
 		arSrcQuantity = mkt_stock.GetSymbolSize(strMktType)
-		for other_stock in arMkt.values():
+		for other_stock in arMktList:
 			strOtherSymbol = other_stock.GetSymbol()
 			if strOtherSymbol != strMktSymbol and strOtherSymbol != strMktHoldingSymbol and self.api.IsHoldingSymbol(strSymbol, strOtherSymbol):
 				if other_stock.HasData(strMktType):
@@ -528,7 +528,7 @@ class PalmmicroDataFrame:
 			strDebug = ''
 			for strHoldingSymbol in self.api.GetHoldingSymbols(strSymbol):
 				strRealSymbol = PalmmicroStock.ConvertYahooNetValueSymbol(strHoldingSymbol)
-				for all_stock in arMkt.values():
+				for all_stock in arMktList:
 					if all_stock.GetSymbol() == strRealSymbol:
 						iHoldingSize = arQuantity[strHoldingSymbol]
 						if iHoldingSize > 0 and strHoldingSymbol != strMktSymbol:
@@ -549,7 +549,7 @@ class PalmmicroDataFrame:
 				return self.UpdateData(strSymbol, strMktSymbol, strType, row)
 		return False
 	
-	def ProcessPriceAndSize(self, arMkt, mkt_stock, stock, strType, usdcny_stock, strTime = '00:00:00'):
+	def ProcessPriceAndSize(self, arMktList, mkt_stock, stock, strType, usdcny_stock = None, strTime = '00:00:00'):
 		strSymbol = stock.GetSymbol()
 		strMktType = stock.GetPeerType(strType)
 		strMktSymbol = mkt_stock.GetSymbol()
@@ -557,7 +557,7 @@ class PalmmicroDataFrame:
 		if strHedgeSymbol is None:
 			strMktHoldingSymbol = self.api.IsFutureOfHoldingSymbol(strSymbol, strMktSymbol)
 			if self.api.IsHoldingSymbol(strSymbol, strMktSymbol) or strMktHoldingSymbol != False:
-				return self._calcHoldingArbitrage(arMkt, mkt_stock, strMktType, strMktSymbol, strMktHoldingSymbol, stock, strType, strTime)
+				return self._calcHoldingArbitrage(arMktList, mkt_stock, strMktType, strMktSymbol, strMktHoldingSymbol, stock, strType, strTime)
 		else:
 			if strHedgeSymbol == strMktSymbol:
 				return self._calcCalibrationArbitrage(mkt_stock, strMktType, strMktSymbol, stock, strType, usdcny_stock, strTime)
