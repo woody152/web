@@ -154,7 +154,7 @@ define('STOCK_HISTORY_UPDATE', '更新'.STOCK_HISTORY_DISPLAY);
 function GetUpdateStockHistoryLink($sym, $strDisplay = false)
 {
 	$strSymbol = $sym->GetSymbol();
-	return GetOnClickLink(PATH_STOCK.'submithistory.php?symbol='.$strSymbol, '确认'.$strSymbol.STOCK_HISTORY_UPDATE.'？', ($strDisplay ? $strDisplay : $strSymbol));
+	return GetOnClickLink(PATH_STOCK.'submithistory.php?symbol='.$strSymbol, "确认{$strSymbol}".STOCK_HISTORY_UPDATE.'?', $strDisplay ?: $strSymbol);
 }
 
 define('FUND_HISTORY_DISPLAY', '基金溢价记录');

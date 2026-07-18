@@ -439,12 +439,9 @@ class _SubmitOptionsAccount extends Account
 		case STOCK_OPTION_HOLDINGS:
 			if ($bAdmin)
 			{
-	    		if ($ref->IsShangHaiEtf())			ReadSseHoldingsFile($strSymbol, $strStockId);
-    			else if ($ref->IsShenZhenEtf())		ReadSzseHoldingsFile($strSymbol, $strStockId, $strDate);
-				else
-				{
-					UpdateStockOptionHoldings($strStockId, $strDate, $strVal);
-				}
+	    		if ($ref->IsShangHaiEtf() && $strSymbol != 'SH513310')	ReadSseHoldingsFile($strSymbol, $strStockId);
+    			else if ($ref->IsShenZhenEtf())							ReadSzseHoldingsFile($strSymbol, $strStockId, $strDate);
+				else													UpdateStockOptionHoldings($strStockId, $strDate, $strVal);
 			}
 			break;
 

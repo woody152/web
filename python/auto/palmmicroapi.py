@@ -452,7 +452,7 @@ class PalmmicroDataFrame:
 						   'Type': side}
 					rows.append(row | self._build_row())
 		df_flat = pd.DataFrame(data=rows)
-		self.df = df_flat.set_index(self.index_names)
+		self.df = df_flat.set_index(self.index_names).sort_index()
 
 	def GetDataFrame(self):
 		return self.df

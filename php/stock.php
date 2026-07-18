@@ -22,6 +22,9 @@ require_once('stock/qdiiref.php');
 
 require_once('stock/fundpairref.php');
 
+// max 20 months history used
+const MAX_QUOTES_DAYS = 500;
+
 function StockGetSymbol($str)
 {
 	$str = trim($str);
@@ -427,4 +430,45 @@ function GetStockHedge($strSymbol, $strStockId, $strLev = false)
    		}
 	}
    	return 1.0;
+}
+
+function StockSaveDebugFile($strPathName, $strUrl, $iInterval = SECONDS_IN_MIN, $arExtraHeaders = false, $strFileName = false)
+{
+	if (StockNeedFile($strPathName, $iInterval) == false)	return false; 	// do not update too often
+	
+	$strShortName = UrlGetPathName($strPathName);
+	if ($str = url_get_contents($strUrl, $arExtraHeaders, $strFileName))
+	{
+		file_put_contents($strPathName, $str);
+		DebugString("$strUrl saved to $strShortName");
+		return $str;
+	}
+
+	DebugString("mark failed $strShortName");
+	file_put_contents($strPathName, 'failed');
+	return false;
+}
+
+function StockDebugJson($strPathName, $strUrl, $iInterval = SECONDS_IN_MIN, $arExtraHeaders = false, $strFileName = false)
+{
+	if ($str = StockSaveDebugFile($strPathName, $strUrl, $iInterval, $arExtraHeaders, $strFileName))
+	{
+		return json_decode($str, true);
+	}
+	return false;
+}
+
+function StockDebugXml($strPathName, $strUrl, $iInterval = SECONDS_IN_MIN, $arExtraHeaders = false, $strFileName = false)
+{
+	if ($str = StockSaveDebugFile($strPathName, $strUrl, $iInterval, $arExtraHeaders, $strFileName))
+	{
+		return simplexml_load_string($str);
+	}
+	return false;
+}
+
+function StockSaveDebugCsv($strFileName, $strUrl, $arExtraHeaders = false)
+{
+   	$csv = new DebugCsvFile($strFileName);
+	return StockSaveDebugFile($csv->GetPathName(), $strUrl, 5 * SECONDS_IN_MIN, $arExtraHeaders);
 }

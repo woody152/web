@@ -1,7 +1,7 @@
 <?php 
-require('php/_qdiijp.php');
+require('php/_chinaindex.php');
 
-function GetQdiiJpRelated($strDigitA)
+function GetChinaIndexRelated($strDigitA)
 {
 	$str = GetHtmlNewLine();
 	$str .= GetIcbcUbsSoftwareLinks($strDigitA);

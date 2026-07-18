@@ -1,8 +1,6 @@
 <?php
 require_once('class/ini_file.php');
 
-// max 20 months history used
-define('MAX_QUOTES_DAYS', 620);
 define('BOLL_DAYS', 20);
 
 define('SMA_SECTION', 'SMA');
@@ -259,9 +257,12 @@ class StockHistory
     {
     	$strName = 'EMA'.strval($iDays);
 		$sql = GetStockEmaSql($iDays);
-    	$this->arSMA[$strName] = $sql->GetClose($this->GetStockId(), $this->strStartDate);
-       	$this->arNext[$strName] = false;
-       	$this->arAfterHour[$strName] = false;
+        if ($strClose = $sql->GetClose($this->GetStockId(), $this->strStartDate))
+        {
+	    	$this->arSMA[$strName] = $strClose;
+    	   	$this->arNext[$strName] = false;
+       		$this->arAfterHour[$strName] = false;
+		}    
     }
     
     function _cfg_set_SMAs($cfg, $strPrefix, $afClose)
@@ -509,7 +510,7 @@ class StockHistory
     public function __construct($ref, $bAfterHour = false) 
     {
         $this->stock_ref = $ref;
-        $this->aiNum = array(5, 10, 20);
+        $this->aiNum = [5, 10, 20];
                                                               
 		$ref->SetTimeZone();
 		$this->strStartDate = $this->_calcStartDate();

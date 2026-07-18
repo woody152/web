@@ -80,7 +80,7 @@ function GetProsharesOfficialLink($strSymbol)
 
 function GetKraneOfficialLink($strSymbol)
 {
-	$str = GetKraneUrl().strtolower($strSymbol).'/';
+	$str = GetKraneUrl().'etf/'.strtolower($strSymbol).'/';
 	return GetOfficialLink($str, $strSymbol);
 }
 

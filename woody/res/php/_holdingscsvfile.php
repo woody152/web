@@ -21,7 +21,7 @@ class _HoldingsCsvFile extends DebugCsvFile
     
     function InsertHolding($strSymbol, $strName, $strRatio)
     {
-    //    $strSymbol = str_replace('/', '.', $strSymbol);	// BRK/B -> BRK.B
+    	// $strSymbol = str_replace('/', '.', $strSymbol);	// BRK/B -> BRK.B
         $sql = GetStockSql();
 		$sql->InsertSymbol($strSymbol, $strName);
     	if ($strStockId = $sql->GetId($strSymbol))
@@ -30,7 +30,6 @@ class _HoldingsCsvFile extends DebugCsvFile
     		if ($his_sql->GetRecord($strStockId, $this->strDate) == false)
     		{
     			$this->DebugReport(GetMyStockLink($strSymbol).' missing data on '.$this->strDate);
-//    			UpdateYahooHistoryChart(new MyStockReference($strSymbol));
     		}
         
     		$holdings_sql = GetHoldingsSql();

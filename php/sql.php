@@ -42,7 +42,7 @@ function SqlDieByQuery($strQry, $strDie)
 {
 	global $g_link;
 	
-	if ($result = mysqli_query($g_link, $strQry)) 
+	if (mysqli_query($g_link, $strQry)) 
 	{
 		return true;
 	}
@@ -57,7 +57,7 @@ function SqlGetTableData($strTableName, $strWhere = false, $strOrder = false, $s
 {
 	global $g_link;
 	
-	$strQry = 'SELECT * FROM '.$strTableName._SqlAddWhere($strWhere)._SqlAddOrder($strOrder)._SqlAddLimit($strLimit);
+	$strQry = "SELECT * FROM $strTableName"._SqlAddWhere($strWhere)._SqlAddOrder($strOrder)._SqlAddLimit($strLimit);
 	if ($result = mysqli_query($g_link, $strQry))
 	{
 	    if (mysqli_num_rows($result) > 0) 
@@ -67,7 +67,7 @@ function SqlGetTableData($strTableName, $strWhere = false, $strOrder = false, $s
 	}
 	else
 	{
-	    die_mysql_error($strTableName.' query data by '.$strQry.' failed');
+	    die_mysql_error("$strTableName query data by $strQry failed");
 	}
 	return false;
 }
@@ -76,7 +76,7 @@ function SqlGetSingleTableData($strTableName, $strWhere = false, $strOrder = fal
 {
 	global $g_link;
 	
-	$strQry = 'SELECT * FROM '.$strTableName._SqlAddWhere($strWhere)._SqlAddOrder($strOrder)._SqlAddLimit('1');
+	$strQry = "SELECT * FROM $strTableName"._SqlAddWhere($strWhere)._SqlAddOrder($strOrder)._SqlAddLimit('1');
 	if ($result = mysqli_query($g_link, $strQry)) 
 	{
 	    if (mysqli_num_rows($result) == 1) 
@@ -88,7 +88,7 @@ function SqlGetSingleTableData($strTableName, $strWhere = false, $strOrder = fal
 	}
 	else
 	{
-	    die_mysql_error($strTableName.' query single data by '.$strQry.' failed');
+	    die_mysql_error("$strTableName query single data by $strQry failed");
 	}
 	return false;
 }
@@ -106,8 +106,8 @@ function SqlDeleteTableData($strTableName, $strWhere, $strLimit = false)
 {
     if ($strWhere)
     {
-        $strQry = 'DELETE FROM '.$strTableName._SqlAddWhere($strWhere)._SqlAddLimit($strLimit);
-        return SqlDieByQuery($strQry, $strTableName.' delete table data by '.$strQry.' failed');
+        $strQry = "DELETE FROM $strTableName"._SqlAddWhere($strWhere)._SqlAddLimit($strLimit);
+        return SqlDieByQuery($strQry, "$strTableName delete table data by $strQry failed");
     }
     return false;
 }
@@ -181,7 +181,7 @@ function _errorHandler($errno, $errstr, $errfile, $errline)
 
 		$strIp = UrlGetIp();
 		$str .= $strNewLine.GetVisitorLink($strIp);
-   		if (EmailHtml(ADMIN_EMAIL, $strSubject.' '.$strIp, $str) == false)	$strDebug .= ' mail failed too';
+   		if (EmailHtml(ADMIN_EMAIL, "$strSubject $strIp", $str) == false)	$strDebug .= ' mail failed too';
    		DebugString(str_replace($strNewLine, PHP_EOL, $strDebug));
    	}
 }

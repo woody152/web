@@ -92,6 +92,16 @@ function in_arrayAshrSymbol($strSymbol)
     return in_array($strSymbol, ChinaIndexGetAshrArray());
 }
 
+function ChinaIndexGetKstrArray()
+{
+    return ['SH588000', 'SH588050', 'SH588080', 'SH588090'];
+}
+
+function in_arrayKstrSymbol($strSymbol)
+{
+    return in_array($strSymbol, ChinaIndexGetKstrArray());
+}
+
 function ChinaIndexGetSz100Array()
 {
     return ['SZ161227', 'SZ161812'];
@@ -105,6 +115,7 @@ function ChinaIndexGetCoalArray()
 function ChinaIndexGetSymbolArray()
 {
     return [...ChinaIndexGetAshrArray(),
+            ...ChinaIndexGetKstrArray(),
             ...ChinaIndexGetSz100Array(),
             ...ChinaIndexGetCoalArray(),
             'SH502000', 'SZ160225',
@@ -423,7 +434,7 @@ function _isDigitShangHaiIndex($iDigit)
 
 function _isDigitShangHaiEtf($iDigit)
 {
-    return ($iDigit >= 510000 && $iDigit <= 569999) ? true : false;	// 518999
+    return ($iDigit >= 510000 && $iDigit <= 599999) ? true : false;
 }
 
 function _isDigitShangHaiLof($iDigit)
@@ -462,7 +473,7 @@ function BuildChinaFundSymbol($strDigit)
         $iDigit = intval($strDigit);
         if (_isDigitShangHaiFund($iDigit))		$strPrefix = SH_PREFIX;
         else if (_isDigitShenZhenFund($iDigit))	$strPrefix = SZ_PREFIX;
-        else										return false;		// $strPrefix = SINA_FUND_PREFIX;
+        else									return false;		// $strPrefix = SINA_FUND_PREFIX;
         return $strPrefix.$strDigit;
     }
     return false;
@@ -1123,7 +1134,7 @@ class StockSymbol
 			}
 		}
         else if ($this->IsSymbolA() || $this->IsSymbolH())	{}
-        else													return $strEDT;
+        else												return $strEDT;
         return 'Asia/Shanghai';
     }
 

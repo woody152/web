@@ -177,7 +177,7 @@ function GetDaChengSoftwareLinks($strDigitA)
 // https://www.efunds.com.cn/fund/510900.shtml
 function GetEFundSoftwareLinks($strDigitA)
 {
-    $ar = ['SH510310', 'SH510900', 'SH513000', 'SH513010', 'SH513050', 'SH513090', 'SH513210', 'SH513850', 'SZ159696', 'SZ159934', 'SZ161116', 'SZ161124', 'SZ161125', 'SZ161126', 'SZ161127', 'SZ161128', 'SZ161129', 'SZ161130'];
+    $ar = ['SH510310', 'SH510900', 'SH513000', 'SH513010', 'SH513050', 'SH513090', 'SH513210', 'SH513850', 'SH588080', 'SZ159696', 'SZ159934', 'SZ161116', 'SZ161124', 'SZ161125', 'SZ161126', 'SZ161127', 'SZ161128', 'SZ161129', 'SZ161130'];
 	$strUrl = 'https://www.efunds.com.cn';
     return ' '.GetOfficialLink($strUrl.'/fund/'.$strDigitA.'.shtml', $strDigitA)._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '易方达基金'));
 }
@@ -233,36 +233,27 @@ function GetHuaBaoSoftwareLinks($strDigitA)
 
 function GetHuaTaiSoftwareLinks($strDigitA)
 {
-    $ar = ['SH510300', 'SH513110', 'SH513130'];
+    $ar = ['SH510300', 'SH513110', 'SH513130', 'SH588090'];
 	$strUrl = 'http://www.huatai-pb.com';
-    return ' '.GetOfficialLink($strUrl.'/products/zhishu/'.$strDigitA.'/index.html', $strDigitA)._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '华泰柏瑞'));
+    return ' '.GetOfficialLink("$strUrl/products/zhishu/$strDigitA/index.html", $strDigitA)._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '华泰柏瑞'));
 }
 
 // https://www.chinaamc.com/fund/159985/index.shtml
 function GetHuaXiaSoftwareLinks($strDigitA)
 {
-    $ar = ['SH510330', 'SH513180', 'SH513230', 'SH513300', 'SH513520', 'SH513660', 'SZ159655', 'SZ159850', 'SZ159920', 'SZ159985'];
+    $ar = ['SH510330', 'SH513180', 'SH513230', 'SH513300', 'SH513520', 'SH513660', 'SH588000', 'SZ159655', 'SZ159850', 'SZ159920', 'SZ159985'];
 	$strUrl = 'https://www.chinaamc.com';
-    return ' '.GetOfficialLink($strUrl.'/fund/'.$strDigitA.'/index.shtml', $strDigitA)._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '华夏基金'));
+    return ' '.GetOfficialLink("$strUrl/fund/$strDigitA/index.shtml", $strDigitA)._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '华夏基金'));
 }
 
-// https://www.icbccs.com.cn/gyrx/jjcp/etf/gyrjETF/index.html
-// https://www.icbccs.com.cn/gyrx/jjcp/qdi/gyydjjrmbfof/index.html
-function GetIcbcCsSoftwareLinks($strDigitA)
+// https://www.icbcubs.com.cn/jj/jjxq/164824.html
+// https://www.icbcubs.com.cn/jj/jjxq/159866.html
+// https://www.icbcubs.com.cn/jj/jjxq/588050.html
+function GetIcbcUbsSoftwareLinks($strDigitA)
 {
-    $ar = ['SZ159866', 'SZ164824'];
-	$strUrl = 'https://www.icbccs.com.cn';
-	switch ($strDigitA)
-	{
-	case '159866':
-		$str = '/gyrx/jjcp/etf/gyrjETF/index.html';
-		break;
-		
-	case '164824':
-		$str = '/gyrx/jjcp/qdi/gyydjjrmbfof/index.html';
-		break;
-	}
-    return ' '.GetOfficialLink($strUrl.$str, $strDigitA)._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '工银瑞信'));
+    $ar = ['SH588050', 'SZ159866', 'SZ164824'];
+	$strUrl = 'https://www.icbcubs.com.cn';
+    return ' '.GetOfficialLink("$strUrl/jj/jjxq/{$strDigitA}.html", $strDigitA)._getCategorySoftwareLinks($ar, GetExternalLink($strUrl, '工银瑞信'));
 }
 /*
 function GetJianXinSoftwareLinks($strDigitA)

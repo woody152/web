@@ -84,5 +84,3 @@ function UpdateInvescoNetValue($strSymbol)
 		$net_sql->WriteDaily(SqlGetStockId($strSymbol), $ar['effectiveDate'], $ar['nav']);
    	}
 }
-
-?>

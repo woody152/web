@@ -109,7 +109,7 @@ function _getStockOptionHa($strSymbol)
 
 function _getStockOptionNetValue($ref, $strSymbol, $strStockId, $strDate)
 {
-	if ($strSymbol == 'KWEB')
+	if ($strSymbol == 'KWEB' || $strSymbol == 'KSTR')
 	{
 		if ($strNetValue = GetKraneNetValue($ref, $strDate))		return $strNetValue;
 	}

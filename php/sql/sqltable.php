@@ -249,24 +249,4 @@ class TableSql
 	{
 		return false;
 	}
-
-    function DeleteInvalid($callback)
-    {
-    	$ar = [];
-    	if ($result = $this->GetAll())
-    	{
-    		while ($record = mysqli_fetch_assoc($result)) 
-    		{
-    			if ($this->$callback($record))		$ar[] = $record['id'];
-    		}
-    		mysqli_free_result($result);
-    	}
-
-    	$iCount = count($ar);
-    	if ($iCount > 0)
-    	{
-    		foreach ($ar as $strId)		$this->DeleteById($strId);
-    	}
-    	return $iCount;
-    }
 }

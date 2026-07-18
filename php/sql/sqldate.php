@@ -34,6 +34,14 @@ class StockHistoryDateSql extends DateSql
     }
 }
 
+class NetValueHistoryDateSql extends DateSql
+{
+    public function __construct()
+    {
+        parent::__construct('netvaluehistorydate');
+    }
+}
+
 class HoldingsDateSql extends DateSql
 {
     public function __construct()
@@ -42,4 +50,3 @@ class HoldingsDateSql extends DateSql
     }
 }
 
-?>

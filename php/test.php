@@ -5,7 +5,7 @@ require_once('stock.php');
 
 //require_once('sql/sqlkeystring.php');
 
-define('DEBUG_UTF8_BOM', "\xef\xbb\xbf");
+const DEBUG_UTF8_BOM = "\xef\xbb\xbf";
 
 // http://www.todayir.com/en/index.php HSFML25
 
@@ -83,7 +83,7 @@ function DebugClearPath($strSection)
     {
     	if ($strFileName != '.' && $strFileName != '..')
     	{
-    		$strPathName = $strPath.'/'.$strFileName;
+    		$strPathName = "$strPath/$strFileName";
     		if (!is_dir($strPathName)) 
     		{
     			unlink($strPathName);
@@ -115,9 +115,6 @@ function DebugClearPath($strSection)
     $iCount = $his_sql->DeleteClose();
 	if ($iCount > 0)	DebugVal($iCount, 'Zero close data');
 
-//    $iCount = $his_sql->DeleteInvalidDate();		// this can be very slow!
-//	if ($iCount > 0)	DebugVal($iCount, 'Invalid or older date'); 
-	
 //	TestModifyTransactions('1376', 'UWT', 'USO');
 //	TestModifyTransactions('1831', 'CHU', '00762', 10);
 //	TestModifyTransactions('160', 'SNP', '00386', 100);

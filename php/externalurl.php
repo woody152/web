@@ -71,7 +71,7 @@ function GetSinaUsStockListUrl()
 
 function GetEastMoneyFundUrl()
 {
-	return 'http://fund.eastmoney.com/';
+	return 'https://fund.eastmoney.com/';
 }
 
 function GetAastocksUrl()

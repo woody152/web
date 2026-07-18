@@ -4,7 +4,7 @@ require('php/_chinaindex.php');
 function GetChinaIndexRelated($strDigitA)
 {
 	$str = GetHtmlNewLine();
-	$str .= GetHuaTaiSoftwareLinks($strDigitA);
+	$str .= GetEFundSoftwareLinks($strDigitA);
 	return $str;
 }
 

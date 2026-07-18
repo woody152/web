@@ -76,8 +76,9 @@ def __getSize(arStock, arSymbol, strType = 'SELL'):
 		arQuantity |= arStock[strSymbol].GetSymbolSize(strType)
 	return arQuantity
 
-def FetchPalmmicroData(strSymbols):
-	api = PalmmicroAPI(PalmmicroAPI.FetchData(strSymbols, BOT_TOKEN))
+def FetchPalmmicroData():
+	arStock = TdxStock.Init()
+	api = PalmmicroAPI(PalmmicroAPI.FetchData(PalmmicroStock.JoinSymbols(arStock), BOT_TOKEN))
 	pdf = PalmmicroDataFrame(api)
 
 	d_column_formats = {'Percent': {'fmt': '0.00%'}, 'SymbolPrice': {'fmt': '0.000'}}
@@ -92,12 +93,11 @@ def FetchPalmmicroData(strSymbols):
 	if arLine == False:
 		print('无法获得新浪数据')
 		return
-	
 	usdcny_stock = SinaStock(arLine[0])
 	gc_stock = SinaStock(arLine[1])
 	cl_stock = SinaStock(arLine[2])
 	ag0_stock = SinaStock(arLine[3])
-	arStock = TdxStock.Init()
+
 	while True:
 		time.sleep(1)
 		bHasData = True
@@ -169,7 +169,7 @@ def FetchPalmmicroData(strSymbols):
 	if bChanged:
 		d.data = pdf.GetDataFrame()
 		d.update_settings(column_formats = d_column_formats)
-		print(d.data)
+		#print(d.data)
 		
 	print("按 Ctrl+C 退出...")
 	try:
@@ -189,6 +189,6 @@ def main():
 	print(f"Hello, World! {sys.version}")
 	result = calculate_annualized_return(350, 168, 10)
 	print(f"总结: 无敌哥10年赚168万, 本金350万, 年化收益率为: {result:.2f}%")
-	FetchPalmmicroData('SZ159518,SZ159612,SZ160723,SZ161125,SZ161226,SZ162411,SZ164701,SZ164824')
+	FetchPalmmicroData()
 
 main()

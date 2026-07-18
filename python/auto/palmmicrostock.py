@@ -125,6 +125,11 @@ class PalmmicroStock:
 		return symbol
 		"""
 
+	@staticmethod
+	def JoinSymbols(arStock):
+		return ','.join(arStock.keys())
+	
+		
 class SinaStock(PalmmicroStock):
 	#新浪股票类，继承自 PalmmicroStock, 使用新浪接口返回的原始数据字符串进行初始化, 格式如: 'var hq_str_sh600036="招商银行,36.50,36.48,...";'
 	def __init__(self, data_str):
@@ -255,7 +260,7 @@ def _tdx_callback_func(data_str):
 
 class TdxStock(PalmmicroStock):
 	iTimer = 0
-	ar_stock = {}
+	arStock = {}
 
 	def __init__(self, strName):
 		self.strName = strName
@@ -333,21 +338,15 @@ class TdxStock(PalmmicroStock):
 		for strName in block_stocks:
 			stock = TdxStock(strName)
 			strSymbol = stock.GetSymbol()
-			cls.ar_stock[strSymbol] = stock
+			cls.arStock[strSymbol] = stock
 			ar.append(strName)
 		sub_hq = tq.subscribe_hq(ar, _tdx_callback_func)
 		print(sub_hq)
-		return cls.ar_stock
+		return cls.arStock
 
 	@classmethod
 	def OnDel(cls, strSymbol: str):
 		pass
-		"""
-		del cls.ar_stock[strSymbol]
-		if len(cls.ar_stock) == 0:
-			print('closing...')
-			#tq.close()
-		"""
 
 	@classmethod
 	def TqDebug(cls, strDebug: str) -> None:
@@ -373,9 +372,11 @@ class TdxStock(PalmmicroStock):
 	@classmethod
 	def GetData(cls, strName):
 		strSymbol = cls.ConvertTdxSymbol(strName)
-		cls.ar_stock[strSymbol].Update()
+		cls.arStock[strSymbol].Update()
+		"""
 		iCur = int(time.time())
 		if iCur - cls.iTimer >= 6:
 			cls.iTimer = iCur
 			#cls._refresh_cache('AG')
 			#cls._refresh_cache('QH')
+		"""

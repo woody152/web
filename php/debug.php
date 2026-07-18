@@ -87,7 +87,7 @@ function DebugEncode($arJson)
 
 function DebugDecode($strJson)
 {
-	return json_decode('{'.$strJson.'}', true);
+	return json_decode("{{$strJson}}", true);
 }
 
 function DebugFormat_date($strFormat, $iTime = false, $strTimeZone = DEBUG_TIME_ZONE)
@@ -141,7 +141,7 @@ function _checkDebugPath()
 function DebugGetPathName($strFileName)
 {
     $strPath = _checkDebugPath();
-    return $strPath.'/'.$strFileName; 
+    return "$strPath/$strFileName"; 
 }
 
 function DebugGetFile()
@@ -151,7 +151,7 @@ function DebugGetFile()
 
 function DebugGetNetValueFile($strSymbol)
 {
-	return DebugGetPathName('netvalue_'.$strSymbol.'.txt');
+	return DebugGetPathName("netvalue_{$strSymbol}.txt");
 }
 
 function DebugIsPalmmicro()
@@ -192,14 +192,14 @@ function DebugVal($iVal, $strPrefix = false, $bAdminOnly = false)
 	$str = strval($iVal);
 	if ($strPrefix)
 	{
-		$str = $strPrefix.': '.$str;
+		$str = "$strPrefix: $str";
 	}
  	DebugString($str, $bAdminOnly); 
 }
 
 function DebugPrint($exp, $strPrefix = false, $bAdminOnly = false)
 {
-	$str = $strPrefix ? $strPrefix : 'Debug print_r begin ...';
+	$str = $strPrefix ?: 'Debug print_r begin ...';
 	$str .= PHP_EOL.print_r($exp, true);
 	DebugString($str, $bAdminOnly);
 }
@@ -207,7 +207,7 @@ function DebugPrint($exp, $strPrefix = false, $bAdminOnly = false)
 function DebugGetPath($strSection)
 {
     $strPath = _checkDebugPath(); 
-    $strPath .= '/'.$strSection;
+    $strPath .= "/$strSection";
     if (is_dir($strPath) == false)  mkdir($strPath);
     
     return $strPath;
@@ -253,6 +253,11 @@ function DebugGetSinaFileName($strSymbol)
 function DebugGetYahooFileName($strSymbol)
 {
     return DebugGetSymbolFile('yahoo', $strSymbol);
+}
+
+function DebugGetEastMoneyFileName($strSymbol)
+{
+    return DebugGetSymbolFile('eastmoney', $strSymbol);
 }
 
 function DebugGetConfigFileName($strSymbol)

@@ -1,6 +1,5 @@
 <?php
 
-// 'JST'
 function ConvertYMD($strDate)
 {
 	return substr($strDate, 0, 4).'-'.substr($strDate, 4, 2).'-'.substr($strDate, 6, 2);
@@ -45,7 +44,7 @@ class YearMonthDay
     function GetNextWeekDayTick()
     {
         if ($this->IsFriday())   			$iSeconds = 3 * SECONDS_IN_DAY;
-        else if ($this->IsSaturday())	$iSeconds = 2 * SECONDS_IN_DAY;
+        else if ($this->IsSaturday())		$iSeconds = 2 * SECONDS_IN_DAY;
         else                      			$iSeconds = SECONDS_IN_DAY;
         return $this->GetTick() + $iSeconds;
     }
@@ -54,7 +53,6 @@ class YearMonthDay
     {
     	clearstatcache(true, $strFileName);
     	$iFileTime = file_exists($strFileName) ? filemtime($strFileName) : 1;
-//    	DebugVal($iFileTime, __FUNCTION__.$strFileName, true);
    		return ($this->GetTick() < ($iFileTime + $iInterval)) ? false : $iFileTime;
     }
     
@@ -146,7 +144,7 @@ class StringYMD extends YearMonthDay
         $arYMD = explode('-', $strYMD);
         if (count($arYMD) != 3)
         {
-        	DebugString('Invalid StringYMD input: '.$strYMD);
+        	DebugString("Invalid StringYMD input: $strYMD");
         	$iTick = time();
         }
         else
@@ -161,7 +159,7 @@ class OldestYMD extends StringYMD
 {
     public function __construct()
     {
-        parent::__construct('2014-01-01');
+        parent::__construct('2024-01-01');
     }
     
     function IsTooOld($strYMD)
@@ -169,7 +167,7 @@ class OldestYMD extends StringYMD
     	$ymd = new StringYMD($strYMD);
     	if ($ymd->GetTick() < $this->GetTick())
     	{
-    		DebugString('Date too old '.$strYMD);
+    		// DebugString("Date too old $strYMD");
     		return true;
     	}
     	return false;
@@ -180,12 +178,12 @@ class OldestYMD extends StringYMD
     	$ymd = new StringYMD($strYMD);
     	if ($ymd->IsWeekend())
     	{
-    		DebugString('Weekend date '.$strYMD);
+    		DebugString("Weekend date $strYMD");
     		return true;
     	}
     	if ($ymd->IsFuture())
     	{
-    		DebugString('Future date '.$strYMD);
+    		DebugString("Future date $strYMD");
     		return true;
     	}
     	return false;
@@ -232,7 +230,7 @@ function GetNextTradingDayYMD($strYMD)
 
 class NowYMD extends TickYMD
 {
-    var $strTimeZone;
+    private $strTimeZone;
     
     public function __construct()
     {
@@ -267,5 +265,4 @@ function GetNowYMD()
 	return $g_now_ymd;
 }
 
-    $g_now_ymd = new NowYMD();
-?>
+	$g_now_ymd = new NowYMD();

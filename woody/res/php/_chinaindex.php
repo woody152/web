@@ -1,5 +1,6 @@
 <?php
 require_once('_fundgroup.php');
+require_once('../../php/stock/kraneshares.php');
 
 class _ChinaIndexAccount extends FundGroupAccount
 {
@@ -11,7 +12,10 @@ class _ChinaIndexAccount extends FundGroupAccount
         $strSymbol = $this->GetName();
 		$ar = [$strSymbol];
 
-        if (in_arrayAshrSymbol($strSymbol))
+		$strUS = false;
+		$strA50 = false;
+		$callback = false;
+		if (in_arrayAshrSymbol($strSymbol))
         {
         	$strUS = 'ASHR';
             $strA50 = 'hf_CHA50CFD';
@@ -19,11 +23,10 @@ class _ChinaIndexAccount extends FundGroupAccount
             $ar[] = $strA50;
            	$callback = '_RealtimeCallback';
         }
-        else
+		else if (in_arrayKstrSymbol($strSymbol))
         {
-            $strUS = false;
-            $strA50 = false;
-            $callback = false;
+        	$strUS = 'KSTR';
+            $ar[] = $strUS;
         }
         StockPrefetchArrayExtendedData($ar);
 
@@ -35,7 +38,16 @@ class _ChinaIndexAccount extends FundGroupAccount
         SzseGetLofShares($this->ref);
 		if ($strUS)
 		{
-	        YahooUpdateNetValue($this->us_ref);
+			switch ($strUS)
+			{
+			case 'KSTR':
+    			if ($strDate = NeedOfficialWebData($this->us_ref))	UpdateKraneNetValue($this->us_ref, $strDate);
+				break;
+
+			default:
+		        YahooUpdateNetValue($this->us_ref);
+				break;
+    		}
    			$this->us_ref->DailyCalibration();
 		}
    		$this->ref->DailyCalibration();
@@ -111,10 +123,12 @@ function GetChinaIndexLinks($sym)
 	$str = '';
     if ($us_ref = $acct->GetUsRef())
 	{
-		if ($us_ref->GetSymbol() == 'ASHR')
-		{
-			$str = GetExternalLink('https://dws.com/US/EN/Product-Detail-Page/ASHR', 'ASHR官网');
-		}	
+		$strSymbol = $us_ref->GetSymbol();
+		$str = match($strSymbol)
+				{'ASHR' => GetExternalLink('https://etf.dws.com/en-us/ASHR-harvest-csi-300-china-a-shares-etf/', 'ASHR官网'),
+				 'KSTR' => GetKraneOfficialLink($strSymbol),
+				 default => ''
+				};	
 	}
 
 	$str .= GetStockCategoryLinks($sym->GetSymbol());

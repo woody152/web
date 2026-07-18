@@ -18,7 +18,12 @@ function GetKraneNetValue($ref, $strPrevDate)
 	
 	date_default_timezone_set('Europe/London');
 	$strSymbol = $ref->GetSymbol();
-	if ($ar = StockDebugJson(DebugGetNetValueFile($strSymbol), GetKraneUrl()."product-json/?pid=7615&type=premium-discount&start=$strPrevDate&end=$strPrevDate"))
+	$iPid = match($strSymbol)
+			{'KWEB' => 7615,
+			 'KSTR' => 8340,
+			 default => 0
+			};
+	if ($ar = StockDebugJson(DebugGetNetValueFile($strSymbol), GetKraneUrl().'product-json/?pid='.strval($iPid)."&type=premium-discount&start=$strPrevDate&end=$strPrevDate"))
 	{
 		if (!isset($ar[0]))			
 		{
@@ -39,4 +44,15 @@ function GetKraneNetValue($ref, $strPrevDate)
 		return number_format($fNetValue, NETVALUE_PRECISION, '.', '');
    	}
     return false;
+}
+
+function UpdateKraneNetValue($ref, $strPrevDate)
+{
+	if ($strNetValue = GetKraneNetValue($ref, $strPrevDate))
+	{
+		$net_sql = GetNetValueHistorySql();
+		$net_sql->WriteDaily($ref->GetStockId(), $strPrevDate, $strNetValue);
+	}
+	return $strNetValue;
+	
 }

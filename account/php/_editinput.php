@@ -15,6 +15,7 @@ require_once('../php/ui/table.php');
 require_once('../php/ui/imagedisp.php');
 
 require_once('../php/stock.php');
+require_once('../php/stock/yahoostockhistory.php');
 
 // https://stock2.finance.sina.com.cn/futures/api/jsonp.php/var%20t1nf_AG2512=/InnerFuturesNewService.getMinLine?symbol=AG2512
 

@@ -185,18 +185,6 @@ class DailyCloseSql extends KeySql
 		}
     }
     
-    function IsInvalidDate($record)
-    {
-		$ymd = new OldestYMD();
-		$strDate = $record['date'];
-    	return $ymd->IsTooOld($strDate) || $ymd->IsInvalid($strDate);
-    }
-    
-    function DeleteInvalidDate()
-    {
-    	return $this->DeleteInvalid('IsInvalidDate');
-    }
-    
     function DeleteByDate($strKeyId, $strDate)
     {
     	if ($strWhere = $this->BuildWhere_key_date($strKeyId, $strDate))
