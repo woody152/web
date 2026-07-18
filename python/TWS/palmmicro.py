@@ -41,10 +41,10 @@ class Palmmicro:
         self.arSendMsg['telegram'] = GetSendMsgArray(WECHAT_KEY)
         for strSymbol, strKey in arSymbolKey.items():
             self.arSendMsg[strSymbol] = GetSendMsgArray(strKey)
-        self.arStock = TdxStock.Init()
+        self.arStock = TdxStock.TqInit()
         self.api = PalmmicroAPI(PalmmicroAPI.FetchData(','.join(arSymbolKey.keys()), TG_TOKEN))
         self.pdf = PalmmicroDataFrame(self.api)
-        self.d = dtale.show(self.pdf.GetDataFrame(), host = '127.0.0.1', port = 40007, column_formats = self.d_column_formats)
+        self.d = dtale.show(self.pdf.GetDataFrame(), host = '127.0.0.1', port = 40007, column_formats = self.d_column_formats, reaper_on = False)
         self.d.open_browser()
   
     def _fetchData(self):

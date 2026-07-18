@@ -1,5 +1,6 @@
 import dtale
 import time
+from datetime import datetime, timezone, timedelta
 
 from _mytoken import BOT_TOKEN
 #from _mytoken import ROT_TOKEN
@@ -77,31 +78,32 @@ def __getSize(arStock, arSymbol, strType = 'SELL'):
 	return arQuantity
 
 def FetchPalmmicroData():
-	arStock = TdxStock.Init()
-	api = PalmmicroAPI(PalmmicroAPI.FetchData(PalmmicroStock.JoinSymbols(arStock), BOT_TOKEN))
+	arSinaStock = SinaStock.TaskInit('fx_susdcny,hf_ES,hf_CL,hf_GC,hf_NQ,nf_AG0')
+	arTdxStock = TdxStock.TqInit()
+	api = PalmmicroAPI(PalmmicroAPI.FetchData(PalmmicroStock.JoinSymbols(arTdxStock), BOT_TOKEN))
 	pdf = PalmmicroDataFrame(api)
 
 	d_column_formats = {'Percent': {'fmt': '0.00%'}, 'SymbolPrice': {'fmt': '0.000'}}
 	d = dtale.show(pdf.GetDataFrame(),
 				   host = '127.0.0.1',
 				   port = 40005,
-				   column_formats = d_column_formats
+				   column_formats = d_column_formats,
+				   reaper_on = False  # <--- 添加这一行，禁用闲置清理
 				   )
 	d.open_browser()
 	
-	arLine = SinaStock.FetchData('fx_susdcny,hf_GC,hf_CL,nf_AG0')
-	if arLine == False:
-		print('无法获得新浪数据')
-		return
-	usdcny_stock = SinaStock(arLine[0])
-	gc_stock = SinaStock(arLine[1])
-	cl_stock = SinaStock(arLine[2])
-	ag0_stock = SinaStock(arLine[3])
+	while True:
+		if all(key in arSinaStock for key in ['CNY', 'nf_AG0']):
+			usdcny_stock = arSinaStock['CNY']
+			#cl_stock = arSinaStock['hf_CL']
+			ag0_stock = arSinaStock['nf_AG0']
+			break
+		time.sleep(1)
 
 	while True:
 		time.sleep(1)
 		bHasData = True
-		for stock in arStock.values():
+		for stock in arTdxStock.values():
 			if (stock.HasData('BUY') and stock.HasData('SELL')) == False:
 				print(stock.GetSymbol(), ' has no data')
 				bHasData = False
@@ -110,21 +112,21 @@ def FetchPalmmicroData():
 			break
 	
 	arCNY = usdcny_stock.GetSymbolPrice()
-	arQuantity = __getSize(arStock, {'SZ162411', 'SZ159518'})
+	arQuantity = __getSize(arTdxStock, {'SZ162411', 'SZ159518'})
 	arQuantityUS = {'XOP': 1000, 'GUSH': 10000}
 	arPriceUS = {'XOP': 136.47, 'GUSH': 23.32}
 	for strSymbol, iQuantity in arQuantity.items():
 		for strSymbolUS, iQuantityUS in arQuantityUS.items():
 			__testXOP(api, strSymbol, strSymbolUS, iQuantity, iQuantityUS, arPriceUS[strSymbolUS], arCNY)
 
-	arQuantity = __getSize(arStock, {'SZ161125', 'SZ159612'})
+	arQuantity = __getSize(arTdxStock, {'SZ161125', 'SZ159612'})
 	arQuantityUS = {'SPY': 100, 'hf_ES': 2}
 	arPriceUS = {'SPY': 515.89, 'hf_ES': 5210.0}
 	for strSymbol, iQuantity in arQuantity.items():
 		for strSymbolUS, iQuantityUS in arQuantityUS.items():
 			__testSPY(api, strSymbol, strSymbolUS, iQuantity, iQuantityUS, arPriceUS[strSymbolUS], arCNY)
     
-	arQuantity = arStock['SZ164701'].GetSymbolSize('BUY')
+	arQuantity = arTdxStock['SZ164701'].GetSymbolSize('BUY')
 	f164701 = api.EstNetValue('SZ164701')
 	__printHoldingEst('SZ164701', f164701)
 	f164701 = api.EstNetValue('SZ164701', {'GLD': 349.23, 'SLV': 46.69})
@@ -136,7 +138,7 @@ def FetchPalmmicroData():
 	__printHedge(api, ar164701, 'SZ164701', 'GLD')
 	print(f"把hf_GC和hf_SI转换成GLD和SLV后, 按持仓算SZ164701: {ar164701['SZ164701']}@{f164701:.3f}, GLD: {ar164701['GLD']}, SLV: {ar164701['SLV']}, hf_GC: {ar164701['hf_GC']}")
     
-	arQuantity = arStock['SZ160723'].GetSymbolSize('BUY')
+	arQuantity = arTdxStock['SZ160723'].GetSymbolSize('BUY')
 	f160723 = api.EstNetValue('SZ160723')
 	__printHoldingEst('SZ160723', f160723)
 	f160723 = api.EstNetValue('SZ160723', {'USO': 60.03})
@@ -157,23 +159,30 @@ def FetchPalmmicroData():
 	__printEst('SZ161226', f161226)
 	f161226 = api.EstNetValue('SZ161226', ag0_stock.GetSymbolPrice());
 	fAG0 = api.ReverseEst({'SZ161226':f161226})
-	ar161226 = api.CalcQuantity('SZ161226', arStock['SZ161226'].GetSymbolSize('SELL') | ag0_stock.GetSymbolSize('SELL'))
+	ar161226 = api.CalcQuantity('SZ161226', arTdxStock['SZ161226'].GetSymbolSize('SELL') | ag0_stock.GetSymbolSize('SELL'))
 	__printHedge(api, ar161226, 'SZ161226', 'nf_AG0')
 	print(f"直接算161226: {ar161226['SZ161226']}@{f161226:.3f}, 反向算nf_AG0: {ar161226['nf_AG0']}@{fAG0:.2f}")
 
-	arMktList = [ag0_stock, cl_stock, gc_stock]
-	bChanged = False
-	for strType in PalmmicroStock.GetTypeList():
-		bChanged |= pdf.ProcessPriceAndSize(arMktList, cl_stock, arStock['SZ160723'], strType)
-		bChanged |= pdf.ProcessPriceAndSize([], ag0_stock, arStock['SZ161226'], strType, usdcny_stock, strTime = '11:19:22')
-	if bChanged:
-		d.data = pdf.GetDataFrame()
-		d.update_settings(column_formats = d_column_formats)
-		#print(d.data)
-		
+	arMktList = list(arSinaStock.values())
 	print("按 Ctrl+C 退出...")
 	try:
 		while True:
+			bChanged = False
+			strHMS = datetime.now(timezone(timedelta(hours=8))).strftime("%H:%M:%S")
+			for stock in arTdxStock.values():
+				for strType in stock.GetTypeList():
+					if stock.HasData(strType):
+						for mkt_stock in arMktList:
+							bChanged |= pdf.ProcessPriceAndSize(arMktList, mkt_stock, stock, strType, usdcny_stock, strHMS)
+						stock.SetUpdated(strType, False)
+			for strMktType in PalmmicroStock.GetTypeList():
+				for mkt_stock in arMktList:
+					mkt_stock.SetUpdated(strMktType, False)
+			if bChanged:
+				d.data = pdf.GetDataFrame()
+				d.update_settings(column_formats = d_column_formats)
+				TdxStock.TqDebug(strHMS + ' D-Tale update ...')
+			#print(strHMS)
 			time.sleep(1)
 	except KeyboardInterrupt:
 		print("已退出")		
