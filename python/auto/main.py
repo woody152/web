@@ -1,12 +1,12 @@
-import dtale
 import time
-from datetime import datetime, timezone, timedelta
+import tkinter as tk
 
 from _mytoken import BOT_TOKEN
 #from _mytoken import ROT_TOKEN
 
 from palmmicrostock import PalmmicroStock, SinaStock, TdxStock
 from palmmicroapi import PalmmicroAPI, PalmmicroDataFrame
+from palmmicroapp import PalmmicroApp
 
 def __printHedge(api, ar, strSymbol, strSymbolUS, iSizeUS = None):
 	if iSizeUS is None:
@@ -83,15 +83,6 @@ def FetchPalmmicroData():
 	api = PalmmicroAPI(PalmmicroAPI.FetchData(PalmmicroStock.JoinSymbols(arTdxStock), BOT_TOKEN))
 	pdf = PalmmicroDataFrame(api)
 
-	d_column_formats = {'Percent': {'fmt': '0.00%'}, 'SymbolPrice': {'fmt': '0.000'}}
-	d = dtale.show(pdf.GetDataFrame(),
-				   host = '127.0.0.1',
-				   port = 40005,
-				   column_formats = d_column_formats,
-				   reaper_on = False  # <--- 添加这一行，禁用闲置清理
-				   )
-	d.open_browser()
-	
 	while True:
 		if all(key in arSinaStock for key in ['CNY', 'nf_AG0']):
 			usdcny_stock = arSinaStock['CNY']
@@ -163,29 +154,7 @@ def FetchPalmmicroData():
 	__printHedge(api, ar161226, 'SZ161226', 'nf_AG0')
 	print(f"直接算161226: {ar161226['SZ161226']}@{f161226:.3f}, 反向算nf_AG0: {ar161226['nf_AG0']}@{fAG0:.2f}")
 
-	arMktList = list(arSinaStock.values())
-	print("按 Ctrl+C 退出...")
-	try:
-		while True:
-			bChanged = False
-			strHMS = datetime.now(timezone(timedelta(hours=8))).strftime("%H:%M:%S")
-			for stock in arTdxStock.values():
-				for strType in stock.GetTypeList():
-					if stock.HasData(strType):
-						for mkt_stock in arMktList:
-							bChanged |= pdf.ProcessPriceAndSize(arMktList, mkt_stock, stock, strType, usdcny_stock, strHMS)
-						stock.SetUpdated(strType, False)
-			for strMktType in PalmmicroStock.GetTypeList():
-				for mkt_stock in arMktList:
-					mkt_stock.SetUpdated(strMktType, False)
-			if bChanged:
-				d.data = pdf.GetDataFrame()
-				d.update_settings(column_formats = d_column_formats)
-				TdxStock.TqDebug(strHMS + ' D-Tale update ...')
-			#print(strHMS)
-			time.sleep(1)
-	except KeyboardInterrupt:
-		print("已退出")		
+	SinaStock.TaskFree()
 
 def calculate_annualized_return(principal, total_return, years):
     # 计算年化收益率公式：final_amount = principal * (1 + rate)^years
@@ -199,5 +168,9 @@ def main():
 	result = calculate_annualized_return(350, 168, 10)
 	print(f"总结: 无敌哥10年赚168万, 本金350万, 年化收益率为: {result:.2f}%")
 	FetchPalmmicroData()
+
+	root = tk.Tk()
+	app = PalmmicroApp(root)
+	root.mainloop()
 
 main()

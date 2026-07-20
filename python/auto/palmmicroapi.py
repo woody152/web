@@ -407,6 +407,8 @@ class PalmmicroAPI(TelegramAPI):
 		return False
 
 	def GetMapping(self) -> Dict[str, List[str]]:
+		if self.config is None:
+			return {}
 		arMapping = {}
 		for strSymbol in self.config.keys():
 			if PalmmicroStock.IsSymbolA(strSymbol):

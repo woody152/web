@@ -1,19 +1,17 @@
-#import aiohttp
-#import asyncio
 import dtale
-#import json
 import requests
-import threading
-import time
+#import threading
+#import time
 
 from palmmicroapi import PalmmicroAPI, PalmmicroDataFrame
-from palmmicrostock import PalmmicroStock, SinaStock, TdxStock
+from palmmicrostock import PalmmicroTask, PalmmicroStock, SinaStock, TdxStock
 
 from nyc_time import GetBeijingTimeDisplay
 
-from _tgprivate import TG_TOKEN
+#from _tgprivate import TG_TOKEN
 from _tgprivate import WECHAT_KEY
-from _tgprivate import arSymbolKey  # QQQ = ['SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941']
+from _tgprivate import WECHAT_QMT_KEY
+from _tgprivate import arSymbolKey
         
 def get_display(strType):
     if strType == 'SELL':
@@ -22,31 +20,35 @@ def get_display(strType):
         return '买入'
     return ''
 
-def GetSendMsgArray(strKey):
-    ar = {'key': strKey,
-          'count': 4,
-          'timer': 0,
-          'msg': {}
-         }
-    return ar
-
 class Palmmicro:
     d_column_formats = {'Percent': {'fmt': '0.00%'}, 'SymbolPrice': {'fmt': '0.000'}}
 
     def __init__(self):
         self.iTimer = 0
-        self.usdcny_stock = None
-        self.ag0_stock = None
+        #self.usdcny_stock = None
+        #self.ag0_stock = None
         self.arSendMsg = {}
-        self.arSendMsg['telegram'] = GetSendMsgArray(WECHAT_KEY)
+        self.arSendMsg['telegram'] = self.GetSendMsgArray('telegram', WECHAT_KEY)
         for strSymbol, strKey in arSymbolKey.items():
-            self.arSendMsg[strSymbol] = GetSendMsgArray(strKey)
+            self.arSendMsg[strSymbol] = self.GetSendMsgArray(strSymbol, strKey)
+        self.arSinaStock = SinaStock.TaskInit()
         self.arStock = TdxStock.TqInit()
-        self.api = PalmmicroAPI(PalmmicroAPI.FetchData(','.join(arSymbolKey.keys()), TG_TOKEN))
+        self.api = PalmmicroAPI(PalmmicroAPI.FetchData(PalmmicroStock.JoinSymbols(arSymbolKey), WECHAT_QMT_KEY))
         self.pdf = PalmmicroDataFrame(self.api)
         self.d = dtale.show(self.pdf.GetDataFrame(), host = '127.0.0.1', port = 40007, column_formats = self.d_column_formats, reaper_on = False)
         self.d.open_browser()
-  
+ 
+    def GetSendMsgArray(self, group, strKey):
+        ar = {'key': strKey,
+              #'count': 4,
+              #'timer': 0,
+              'msg': {}
+             }
+        task = PalmmicroTask(group + 'Msg', self.SendGroupMsg, 4, (group, ))
+        task.start()
+        return ar
+
+    """
     def _fetchData(self):
         iCur = int(time.time())
         if iCur - self.iTimer >= 19:
@@ -56,58 +58,7 @@ class Palmmicro:
                 self.usdcny_stock = SinaStock.UpdateStock(self.usdcny_stock, arLine[0])
                 self.ag0_stock = SinaStock.UpdateStock(self.ag0_stock, arLine[1])
     """
-    async def SendWechatMsgAsync(self, strMsg, group, strType='text'):
-        url = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=' + self.arSendMsg[group]['key']
-        arWechatMsg = {'msgtype': strType,
-                       strType: {'content': strMsg}
-                      }
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(url, json = arWechatMsg, headers = {'Content-Type': 'application/json'}) as response:
-                    if response.status == 200:
-                        response_data = await response.json()
-                        return response_data
-                    else:
-                        print(f'Failed to send POST request. Status code: {response.status}')
-                        return None
-        except aiohttp.ClientError as e:
-            print(f'SendWechatMsgAsync Error occurred: {e}')
-            return None
-    
-    async def _sendMsgAsync(self):
-        tasks = []
-        for group, value in self.arSendMsg.items():
-            if self.__isFree(group):
-                if len(value['msg']) > 0:
-                    strMsg = self.__convert_array_msg(group)
-                    task = asyncio.create_task(self.SendWechatMsgAsync(strMsg, group))
-                    tasks.append(task)
-                    self.arSendMsg[group]['msg'].clear()
-        if tasks:
-            # 等待所有发送任务完成（可选）
-            results = await asyncio.gather(*tasks, return_exceptions=True)
-            # 可以检查results看哪些成功了哪些失败了
-            for i, result in enumerate(results):
-                if isinstance(result, Exception):
-                    print(f'任务{i} 发送失败: {result}')
-            return results
-        return []
-    
-    def _sendMsg(self):
-        #保持原接口不变，内部启动异步发送
-        try:
-            # 尝试获取当前事件循环
-            loop = asyncio.get_running_loop()
-            # 如果已经在异步环境中，直接创建任务
-            asyncio.create_task(self._sendMsgAsync())
-        except RuntimeError:
-            # 没有运行中的事件循环，创建一个新的
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            loop.run_until_complete(self._sendMsgAsync())
-            loop.close()
 
-    """    
     def SendWechatMsg(self, strMsg, group, strType = 'text'):
         url = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=' + self.arSendMsg[group]['key']
         arWechatMsg = {'msgtype': strType,  
@@ -133,6 +84,15 @@ class Palmmicro:
             #self.api.SendMsg(strMsg[:20], TG_TOKEN)
         self.arSendMsg[group]['msg'].clear()
 
+    """
+    def __isFree(self, group):
+        ar = self.arSendMsg[group]
+        iCur = int(time.time())
+        if iCur - ar['timer'] < ar['count']:
+            return False
+        ar['timer'] = iCur
+        return True
+
     def _sendMsg(self):
         for group, value in self.arSendMsg.items():
             if self.__isFree(group):
@@ -141,15 +101,11 @@ class Palmmicro:
                     # 直接开线程发送，不等待
                     t = threading.Thread(target=self.__send_msg, args=(group,), daemon=True)
                     t.start()
+    """
     
-
-    def __isFree(self, group):
-        ar = self.arSendMsg[group]
-        iCur = int(time.time())
-        if iCur - ar['timer'] < ar['count']:
-            return False
-        ar['timer'] = iCur
-        return True
+    def SendGroupMsg(self, group):
+        if len(self.arSendMsg[group]['msg']) > 0:
+            self.__send_msg(group)
 
     def __convert_array_msg(self, group):
         arAll = []
@@ -173,12 +129,12 @@ class Palmmicro:
         elif group in self.arSendMsg:
             ar[strType] = strMsg.replace(' ' + group, '')
 
-    def _processPriceAndSize(self, arMktList, mkt_stock, stock, strType, strSymbol):
+    def _processPriceAndSize(self, mkt_stock, stock, strType, strSymbol, usdcny_stock = None, arMktList = []):
         strMktSymbol = mkt_stock.GetSymbol()
         strMktType = stock.GetPeerType(strType)
         if mkt_stock.HasData(strMktType):
             if stock.IsUpdated(strType) or mkt_stock.IsUpdated(strMktType):
-                if self.pdf.ProcessPriceAndSize(arMktList, mkt_stock, stock, strType, self.usdcny_stock, GetBeijingTimeDisplay()):
+                if self.pdf.ProcessPriceAndSize(arMktList, mkt_stock, stock, strType, usdcny_stock, GetBeijingTimeDisplay()):
                     strMsgType = strSymbol + strMktSymbol + strType
                     ar = self.pdf.GetData(strSymbol, strMktSymbol, strType)
                     fRatio = ar['Percent']
@@ -200,7 +156,9 @@ class Palmmicro:
         return False
        
     def HandleData(self, arMkt):
-        self._fetchData()
+        #self._fetchData()
+        usdcny_stock = self.arSinaStock.get('CNY')
+        ag0_stock = self.arSinaStock.get('nf_AG0')
         bChanged = False
         arMktList = list(arMkt.values())
         for strSymbol in self.api.get_config().keys():
@@ -209,15 +167,17 @@ class Palmmicro:
                 for strType in stock.GetTypeList():
                     if stock.HasData(strType):
                         for mkt_stock in arMkt.values():
-                            bChanged |= self._processPriceAndSize(arMktList, mkt_stock, stock, strType, strSymbol)
-                        bChanged |= self._processPriceAndSize(arMktList, self.ag0_stock, stock, strType, strSymbol)
+                            bChanged |= self._processPriceAndSize(mkt_stock, stock, strType, strSymbol, usdcny_stock, arMktList)
+                        if ag0_stock is not None:
+                            bChanged |= self._processPriceAndSize(ag0_stock, stock, strType, strSymbol)
                         stock.SetUpdated(strType, False)
         for strMktType in PalmmicroStock.GetTypeList():
             for mkt_stock in arMkt.values():
                 mkt_stock.SetUpdated(strMktType, False)
-            self.ag0_stock.SetUpdated(strMktType, False)
+            if ag0_stock is not None:
+                ag0_stock.SetUpdated(strMktType, False)
         if bChanged:
             self.d.data = self.pdf.GetDataFrame()
             self.d.update_settings(column_formats = self.d_column_formats)
-        self._sendMsg()
+        #self._sendMsg()
         

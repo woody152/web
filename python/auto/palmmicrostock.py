@@ -344,14 +344,18 @@ class SinaStock(PalmmicroStock):
 				if strSymbol not in cls.arStock.keys():
 					cls.arStock[strSymbol] = SinaStock(strLine)
 				cls.arStock[strSymbol].UpdateData(strLine)
-		print(PalmmicroTask.GetThreadsDataFrame())
+		#print(PalmmicroTask.GetThreadsDataFrame())
 
 	@classmethod
-	def TaskInit(cls, strSymbols: str = 'fx_susdcny,nf_AG0'):
+	def TaskInit(cls, strSymbols: str = 'fx_susdcny,nf_AG0', interval: int = 19):
 		#cls.ThreadLoop(strSymbols)
-		task = PalmmicroTask(cls.__name__, cls.TaskLoop, 19, (strSymbols, ))
-		task.start()
+		cls.task = PalmmicroTask(cls.__name__, cls.TaskLoop, interval, (strSymbols, ))
+		cls.task.start()
 		return cls.arStock
+	
+	@classmethod
+	def TaskFree(cls):
+		cls.task.stop()
 
 
 class IbkrStock(PalmmicroStock):

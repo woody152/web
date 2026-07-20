@@ -5,7 +5,7 @@ require_once('stockdataarray.php');
 require_once('tutorial/iprules.php');
 
 // 电报公共模板, 返回输入信息
-const TG_DEBUG_VER = '版本053';
+const TG_DEBUG_VER = '版本054';
 const BOT_EOL = "\r\n";
 const MAX_BOT_MSG_LEN = 2048;
 
@@ -86,7 +86,7 @@ class TelegramCallback
 				{
 					$str = "$strIp API访问太频繁".CONTACT_EMAIL;
 				}
-				else if ($strToken == TG_TOKEN || $strToken == WECHAT_QMT_KEY)
+				else if ($strToken == WECHAT_QMT_KEY)
 				{
 					$str = GetStockDataArray($strText);
 				}
@@ -121,7 +121,7 @@ class TelegramCallback
 			} 
 			if ($strIp != '91.108.5.6')
 			{
-				$str = "未授权IP: $strIp";
+				$str = "未授权IP: $strIp, 请检查调用时是否带上了TOKEN参数。";
 				DebugString(__CLASS__.__FUNCTION__.$str);
 	        	$this->ReplyText($str.CONTACT_EMAIL, $strMessageId, $strChatId);
 				return;
