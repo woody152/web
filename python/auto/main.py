@@ -155,6 +155,7 @@ def FetchPalmmicroData():
 	print(f"直接算161226: {ar161226['SZ161226']}@{f161226:.3f}, 反向算nf_AG0: {ar161226['nf_AG0']}@{fAG0:.2f}")
 
 	SinaStock.TaskFree()
+	#TdxStock.TqFree()
 
 def calculate_annualized_return(principal, total_return, years):
     # 计算年化收益率公式：final_amount = principal * (1 + rate)^years

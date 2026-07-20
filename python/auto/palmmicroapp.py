@@ -3,7 +3,6 @@ import threading
 import time
 import tkinter as tk
 
-from datetime import datetime, timezone, timedelta
 from tkinter import ttk, PhotoImage
 
 from _mytoken import BOT_TOKEN
@@ -14,11 +13,11 @@ from palmmicroapi import PalmmicroAPI, PalmmicroDataFrame
 class PalmmicroApp:
 	def __init__(self, root):
 		self.root = root
-		self.root.title("Palmmicro")
+		root.title("Palmmicro")
 		self.running = True
 		
 		# 软件版本号
-		self.version = "0.1"
+		self.version = "0.2"
 		
 		# 创建DataFrame
 		self.df = self.create_dataframe()
@@ -31,7 +30,7 @@ class PalmmicroApp:
 		self.update_thread.start()
 		
 		# 绑定窗口关闭事件
-		self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+		root.protocol("WM_DELETE_WINDOW", self.on_closing)
 
 		icon = PhotoImage(file='redfox.png')
 		root.geometry("800x600")  # 设置窗口大小
@@ -100,7 +99,7 @@ class PalmmicroApp:
 						 '价格', '对冲数量', '对冲价格', '补充内容']
 		
 		# 列宽度设置
-		col_widths = [70, 70, 40, 60, 60, 80, 80, 80, 80, 200]
+		col_widths = [70, 70, 36, 60, 60, 80, 80, 80, 80, 200]
 		
 		# 创建Treeview
 		self.tree = ttk.Treeview(tree_frame, columns=columns, show='headings', 
@@ -150,9 +149,9 @@ class PalmmicroApp:
 			idx = row_tuple.Index
 			
 			if isinstance(idx, tuple):
-				symbol = idx[0]		# type: ignore
-				hedge = idx[1]		# type: ignore
-				type_val = idx[2]	# type: ignore
+				symbol = idx[0]			# type: ignore
+				hedge = idx[1]			# type: ignore
+				type_val = str(idx[2])	# type: ignore
 			else:
 				symbol = str(idx)
 				hedge = ''
@@ -160,15 +159,15 @@ class PalmmicroApp:
 			
 			# 获取数据列
 			time_val = row_tuple.Time
-			percent_val = row_tuple.Percent
-			symbol_size_val = row_tuple.SymbolSize
+			percent_val = float(row_tuple.Percent)		# type: ignore
+			symbol_size_val = int(row_tuple.SymbolSize)	# type: ignore
 			symbol_price_val = row_tuple.SymbolPrice
-			hedge_size_val = row_tuple.HedgeSize
+			hedge_size_val = int(row_tuple.HedgeSize)	# type: ignore
 			hedge_price_val = row_tuple.HedgePrice
 			note_val = row_tuple.Note
 			
 			# 格式化各列
-			percent_str = f"{percent_val:.2f}%"
+			percent_str = f"{percent_val * 100.0:.2f}%"
 			symbol_price_str = f"{symbol_price_val:.3f}"
 			hedge_price_str = f"{hedge_price_val:.2f}"
 			
@@ -185,9 +184,9 @@ class PalmmicroApp:
 			
 			# 插入行
 			item_id = self.tree.insert('', tk.END, values=(
-				show_symbol, show_hedge, type_val,
-				time_val, percent_str, int(symbol_size_val),			# type: ignore
-				symbol_price_str, int(hedge_size_val), hedge_price_str,	# type: ignore
+				show_symbol, show_hedge, PalmmicroStock.GetTypeDisplay(type_val),
+				time_val, percent_str, symbol_size_val,
+				symbol_price_str, hedge_size_val, hedge_price_str,
 				note_val
 			))
 			
@@ -217,12 +216,11 @@ class PalmmicroApp:
 	def update_data(self):
 		arMktList = list(self.arSinaStock.values())
 		bChanged = False
-		strHMS = datetime.now(timezone(timedelta(hours=8))).strftime("%H:%M:%S")
 		for stock in self.arTdxStock.values():
 			for strType in stock.GetTypeList():
 				if stock.HasData(strType):
 					for mkt_stock in arMktList:
-						bChanged |= self.pdf.ProcessPriceAndSize(arMktList, mkt_stock, stock, strType, self.arSinaStock.get('CNY'), strHMS)
+						bChanged |= self.pdf.ProcessPriceAndSize(stock, mkt_stock, strType, self.arSinaStock.get('CNY'), arMktList)
 					stock.SetUpdated(strType, False)
 		for strMktType in PalmmicroStock.GetTypeList():
 			for mkt_stock in arMktList:
@@ -251,6 +249,7 @@ class PalmmicroApp:
 		# 在这里可以添加需要释放的资源
 		# 例如：关闭数据库连接、保存配置文件、释放大对象等
 		SinaStock.TaskFree()
+		TdxStock.TqFree()
 		
 		# 清理DataFrame
 		if hasattr(self, 'df'):

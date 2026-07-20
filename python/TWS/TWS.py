@@ -19,8 +19,8 @@ def IsChinaMarketOpen():
         return True
     elif iTime >= 1300 and iTime < 1500:
         return True
-    return False
-    #return True
+    #return False
+    return True
 
 def IsMarketOpen():
     iTime = GetExchangeTime()
@@ -81,7 +81,7 @@ class MyEWrapper(EWrapper):
             self.arOrder['XOP'] = GetOrderArray()
             self.arOrder['MES' + self.strCurFuture] = GetOrderArray()
             self.arOrder['MNQ' + self.strCurFuture] = GetOrderArray()
-            self.arOrder['MCL202608'] = GetOrderArray()
+            self.arOrder['MCL202609'] = GetOrderArray()
             self.arOrder['MGC202608'] = GetOrderArray()
         else:
             #self.arOrder['TLT'] = GetOrderArray([80.90, 84.19, 85.21, 86.40, 86.62, 86.72, 87.59, 89.76, 91.88], 100, 1, 8)

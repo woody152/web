@@ -214,6 +214,12 @@ class PalmmicroStock:
 		return ['BUY', 'SELL']
 
 	@staticmethod
+	def GetTypeDisplay(strType: str) -> str:
+		if strType == 'SELL':
+			return '卖'
+		return '买'
+
+	@staticmethod
 	def GetPeerType(strType: str) -> str:
 		if strType == 'SELL':
 			return 'BUY'
@@ -459,6 +465,10 @@ class TdxStock(PalmmicroStock):
 		sub_hq = tq.subscribe_hq(ar, _tdx_callback_func)
 		print(sub_hq)
 		return cls.arStock
+
+	@classmethod
+	def TqFree(cls):
+		tq.close()
 
 	@classmethod
 	def TqDebug(cls, strDebug: str) -> None:

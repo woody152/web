@@ -2,6 +2,8 @@ import math
 import pandas as pd
 import requests
 import time
+
+from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, List, Optional, Union
 
 from palmmicrostock import PalmmicroStock
@@ -551,7 +553,12 @@ class PalmmicroDataFrame:
 				return self.UpdateData(strSymbol, strMktSymbol, strType, row)
 		return False
 	
-	def ProcessPriceAndSize(self, arMktList, mkt_stock, stock, strType, usdcny_stock = None, strTime = '00:00:00'):
+	@staticmethod
+	def GetBeijingTime():
+		return datetime.now(timezone(timedelta(hours=8))).strftime("%H:%M:%S")
+	
+	def ProcessPriceAndSize(self, stock, mkt_stock, strType, usdcny_stock = None, arMktList = []):
+		strTime = self.GetBeijingTime()
 		strSymbol = stock.GetSymbol()
 		strMktType = stock.GetPeerType(strType)
 		strMktSymbol = mkt_stock.GetSymbol()

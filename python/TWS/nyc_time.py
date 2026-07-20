@@ -25,8 +25,3 @@ def GetExchangeTime(strName = 'NYSE'):
     # Extract the hour and minute in 'America/New_York' time zone
     iTime = now_ny.hour * 100 + now_ny.minute 
     return iTime
-
-def GetBeijingTimeDisplay():
-    utc8 = timezone(timedelta(hours=8))
-    beijing_time = datetime.now(utc8)
-    return beijing_time.strftime("%H:%M:%S")
