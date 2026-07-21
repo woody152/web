@@ -17,7 +17,7 @@ class PalmmicroApp:
 		self.running = True
 		
 		# 软件版本号
-		self.version = "0.2"
+		self.version = "0.3"
 		
 		# 创建DataFrame
 		self.df = self.create_dataframe()
@@ -26,7 +26,7 @@ class PalmmicroApp:
 		self.setup_ui()
 		
 		# 启动数据更新线程
-		self.update_thread = threading.Thread(target=self.update_data_loop, daemon=True)
+		self.update_thread = threading.Thread(target = self.update_data_loop, daemon = True, name = f"{self.__class__.__name__}-{self.version}")
 		self.update_thread.start()
 		
 		# 绑定窗口关闭事件
@@ -210,6 +210,7 @@ class PalmmicroApp:
 				self.root.after(0, self.refresh_treeview)
 				self.d.data = self.pdf.GetDataFrame()
 				self.d.update_settings(column_formats = self.d_column_formats)
+				print(PalmmicroDataFrame.GetBeijingTime())
 				print(PalmmicroTask.GetThreadsDataFrame())
 			time.sleep(1)
 	
@@ -218,10 +219,11 @@ class PalmmicroApp:
 		bChanged = False
 		for stock in self.arTdxStock.values():
 			for strType in stock.GetTypeList():
-				if stock.HasData(strType):
-					for mkt_stock in arMktList:
+				strMktType = stock.GetPeerType(strType)
+				for mkt_stock in arMktList:
+					if stock.IsUpdated(strType) or mkt_stock.IsUpdated(strMktType):
 						bChanged |= self.pdf.ProcessPriceAndSize(stock, mkt_stock, strType, self.arSinaStock.get('CNY'), arMktList)
-					stock.SetUpdated(strType, False)
+				stock.SetUpdated(strType, False)
 		for strMktType in PalmmicroStock.GetTypeList():
 			for mkt_stock in arMktList:
 				mkt_stock.SetUpdated(strMktType, False)
@@ -249,7 +251,7 @@ class PalmmicroApp:
 		# 在这里可以添加需要释放的资源
 		# 例如：关闭数据库连接、保存配置文件、释放大对象等
 		SinaStock.TaskFree()
-		TdxStock.TqFree()
+		#TdxStock.TqFree()
 		
 		# 清理DataFrame
 		if hasattr(self, 'df'):

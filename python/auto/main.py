@@ -1,3 +1,4 @@
+import sys
 import time
 import tkinter as tk
 
@@ -5,7 +6,7 @@ from _mytoken import BOT_TOKEN
 #from _mytoken import ROT_TOKEN
 
 from palmmicrostock import PalmmicroStock, SinaStock, TdxStock
-from palmmicroapi import PalmmicroAPI, PalmmicroDataFrame
+from palmmicroapi import PalmmicroAPI
 from palmmicroapp import PalmmicroApp
 
 def __printHedge(api, ar, strSymbol, strSymbolUS, iSizeUS = None):
@@ -78,15 +79,13 @@ def __getSize(arStock, arSymbol, strType = 'SELL'):
 	return arQuantity
 
 def FetchPalmmicroData():
-	arSinaStock = SinaStock.TaskInit('fx_susdcny,hf_ES,hf_CL,hf_GC,hf_NQ,nf_AG0')
+	arSinaStock = SinaStock.TaskInit()
 	arTdxStock = TdxStock.TqInit()
 	api = PalmmicroAPI(PalmmicroAPI.FetchData(PalmmicroStock.JoinSymbols(arTdxStock), BOT_TOKEN))
-	pdf = PalmmicroDataFrame(api)
 
 	while True:
 		if all(key in arSinaStock for key in ['CNY', 'nf_AG0']):
 			usdcny_stock = arSinaStock['CNY']
-			#cl_stock = arSinaStock['hf_CL']
 			ag0_stock = arSinaStock['nf_AG0']
 			break
 		time.sleep(1)
@@ -120,14 +119,14 @@ def FetchPalmmicroData():
 	arQuantity = arTdxStock['SZ164701'].GetSymbolSize('BUY')
 	f164701 = api.EstNetValue('SZ164701')
 	__printHoldingEst('SZ164701', f164701)
-	f164701 = api.EstNetValue('SZ164701', {'GLD': 349.23, 'SLV': 46.69})
-	ar164701 = api.CalcQuantity('SZ164701', arQuantity | {'GLD': 100, 'SLV': 100})
+	f164701 = api.EstNetValue('SZ164701', {'GLD': 349.23})
+	ar164701 = api.CalcQuantity('SZ164701', arQuantity | {'GLD': 100})
 	__printHedge(api, ar164701, 'SZ164701', 'GLD')
-	print(f"按持仓算SZ164701: {ar164701['SZ164701']}@{f164701:.3f}, GLD: {ar164701['GLD']}, SLV: {ar164701['SLV']}")
-	f164701 = api.EstNetValue('SZ164701', {'hf_GC': 3816.76, 'hf_SI': 52.03})
-	ar164701 = api.CalcQuantity('SZ164701', arQuantity | {'hf_GC': 1, 'SLV': 100})
+	print(f"按持仓算SZ164701: {ar164701['SZ164701']}@{f164701:.3f}, GLD: {ar164701['GLD']}")
+	f164701 = api.EstNetValue('SZ164701', {'hf_GC': 3816.76})
+	ar164701 = api.CalcQuantity('SZ164701', arQuantity | {'hf_GC': 1})
 	__printHedge(api, ar164701, 'SZ164701', 'GLD')
-	print(f"把hf_GC和hf_SI转换成GLD和SLV后, 按持仓算SZ164701: {ar164701['SZ164701']}@{f164701:.3f}, GLD: {ar164701['GLD']}, SLV: {ar164701['SLV']}, hf_GC: {ar164701['hf_GC']}")
+	print(f"把hf_GC转换成GLD后, 按持仓算SZ164701: {ar164701['SZ164701']}@{f164701:.3f}, GLD: {ar164701['GLD']}, hf_GC: {ar164701['hf_GC']}")
     
 	arQuantity = arTdxStock['SZ160723'].GetSymbolSize('BUY')
 	f160723 = api.EstNetValue('SZ160723')
@@ -164,7 +163,6 @@ def calculate_annualized_return(principal, total_return, years):
     return rate * 100  # 转换为百分比
 
 def main():
-	import sys
 	print(f"Hello, World! {sys.version}")
 	result = calculate_annualized_return(350, 168, 10)
 	print(f"总结: 无敌哥10年赚168万, 本金350万, 年化收益率为: {result:.2f}%")

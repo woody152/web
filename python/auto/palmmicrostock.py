@@ -62,7 +62,7 @@ class PalmmicroTask:
 			# 首次调度，延迟delay秒后执行
 			self.event_id = self.scheduler.enter(delay, 1, self._execute_and_reschedule)
 			# 启动调度器线程
-			self.thread = threading.Thread(target = self._run_scheduler, daemon = self.daemon, name = f"Scheduler-{self.name}")
+			self.thread = threading.Thread(target = self._run_scheduler, daemon = self.daemon, name = f"{self.__class__.__name__}-{self.name}")
 			self.thread.start()
 			print(f"任务 '{self.name}' 已启动，首次执行延迟 {delay} 秒")
 	
@@ -191,7 +191,9 @@ class PalmmicroStock:
 		return self.get_value(strType + '_price') is not None and self.get_value(strType + '_size') is not None
 
 	def IsUpdated(self, strType: str):
-		return self.get_value(strType + '_updated')
+		if self.HasData(strType):
+			return self.get_value(strType + '_updated')
+		return False
 
 	def SetUpdated(self, strType: str, bStatus: bool = True):
 		if strType in self.GetTypeList():
@@ -383,11 +385,6 @@ class IbkrStock(PalmmicroStock):
 		return {self.GetName(): fPrice}
 
 
-def _tdx_callback_func(data_str):
-	#print('callback data ', data_str, int(time.time()))
-	code_json = json.loads(data_str)
-	TdxStock.GetData(code_json.get('Code'))
-
 class TdxStock(PalmmicroStock):
 	arStock = {}
 
@@ -462,7 +459,7 @@ class TdxStock(PalmmicroStock):
 			strSymbol = stock.GetSymbol()
 			cls.arStock[strSymbol] = stock
 			ar.append(strName)
-		sub_hq = tq.subscribe_hq(ar, _tdx_callback_func)
+		sub_hq = tq.subscribe_hq(ar, cls.TqCallback)
 		print(sub_hq)
 		return cls.arStock
 
@@ -491,8 +488,9 @@ class TdxStock(PalmmicroStock):
 	"""
 
 	@classmethod
-	def GetData(cls, strName):
-		strSymbol = cls.ConvertTdxSymbol(strName)
+	def TqCallback(cls, data_str):
+		code_json = json.loads(data_str)
+		strSymbol = cls.ConvertTdxSymbol(code_json.get('Code'))
 		cls.arStock[strSymbol].Update()
 		"""
 		#cls._refresh_cache('AG')
