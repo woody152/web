@@ -63,7 +63,6 @@ class TelegramAPI:
 		except requests.exceptions.RequestException as e:
 			print('SendMsg Error occurred:', e)
 
-
 class PalmmicroAPI(TelegramAPI):
 	# 定义并初始化字典静态变量 arMultiplier，使用 strSymbol 作为键（整数倍率）
 	arMultiplier: Dict[str, int] = {'hf_CL': 100,	# MCL:100, CL:1000
@@ -442,7 +441,6 @@ class PalmmicroAPI(TelegramAPI):
 				arMapping[strSymbol] = arList
 		return arMapping
 
-
 class PalmmicroDataFrame:
 	def __init__(self, api):
 		self.api = api
@@ -463,7 +461,7 @@ class PalmmicroDataFrame:
 	
 	@staticmethod
 	def _build_row(time = '00:00:00', estprice = None, symbolqty = 0, symbolprice = 0.0, hedgeqty = 0, hedgeprice = 0.0, note = ''):
-		if estprice is None:
+		if estprice is None or abs(estprice) < 0.000001:
 			fPercent = 0.0
 		else:
 			fPercent = symbolprice / estprice - 1.0
@@ -555,7 +553,7 @@ class PalmmicroDataFrame:
 	
 	@staticmethod
 	def GetBeijingTime():
-		return datetime.now(timezone(timedelta(hours=8))).strftime("%H:%M:%S")
+		return datetime.now(timezone(timedelta(hours = 8))).strftime('%H:%M:%S')
 	
 	def ProcessPriceAndSize(self, stock, mkt_stock, strType, usdcny_stock = None, arMktList = []):
 		strTime = self.GetBeijingTime()

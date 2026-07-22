@@ -7,6 +7,11 @@ import sched
 import sys
 import time
 import threading
+
+from ibapi.client import EClient
+from ibapi.wrapper import EWrapper
+from ibapi.contract import Contract
+
 from typing import Any, Callable, Dict, List, Optional
 
 sys.path.append('C:/new_tdx64/PYPlugins/user')
@@ -80,11 +85,10 @@ class PalmmicroTask:
 					self.scheduler.cancel(self.event_id)
 				except ValueError:
 					pass  # 事件可能已经执行了
-			
 			print(f"任务 '{self.name}' 已停止")
 		
 		if wait and self.thread and self.thread.is_alive():
-			self.thread.join(timeout=5)
+			self.thread.join(timeout = 5)
 	
 	def is_alive(self) -> bool:
 		#检查任务是否在运行
@@ -101,12 +105,10 @@ class PalmmicroTask:
 	
 		# 获取所有线程的栈帧
 		frames = sys._current_frames()
-		thread_data: Dict[str, Any] = {'name': [], 'ident': [], 'native_id': [], 'alive': [], 'daemon': [], 'main': [], 'current': [], 'filename': [], 'line': [], 'function': []}
+		thread_data: Dict[str, Any] = {'name': [], 'ident': [], 'alive': [], 'daemon': [], 'main': [], 'current': [], 'filename': [], 'line': [], 'function': []}
 		for t in threads:
 			thread_data['name'].append(t.name)
 			thread_data['ident'].append(t.ident)
-			native_id = getattr(t, 'native_id', None)
-			thread_data['native_id'].append(native_id)
 			thread_data['alive'].append(t.is_alive())
 			thread_data['daemon'].append(t.daemon)
 			thread_data['main'].append(t is main_thread)
@@ -123,7 +125,6 @@ class PalmmicroTask:
 				thread_data['line'].append(None)
 				thread_data['function'].append(None)
 		return pd.DataFrame(thread_data)
-
 
 class PalmmicroStock:
 	def __init__(self, strSymbol: str, strName = None):
@@ -218,8 +219,8 @@ class PalmmicroStock:
 	@staticmethod
 	def GetTypeDisplay(strType: str) -> str:
 		if strType == 'SELL':
-			return '卖'
-		return '买'
+			return '卖出'
+		return '买入'
 
 	@staticmethod
 	def GetPeerType(strType: str) -> str:
@@ -251,7 +252,6 @@ class PalmmicroStock:
 	@staticmethod
 	def JoinSymbols(arStock):
 		return ','.join(arStock.keys())
-	
 		
 #新浪股票类，继承自 PalmmicroStock, 使用新浪接口返回的原始数据字符串进行初始化, 格式如: 'var hq_str_sh600036="招商银行,36.50,36.48,...";'
 class SinaStock(PalmmicroStock):
@@ -336,14 +336,6 @@ class SinaStock(PalmmicroStock):
 		return False
 
 	@classmethod
-	def UpdateStock(cls, stock, strLine):
-		if stock is None:
-			stock = SinaStock(strLine)
-		else:
-			stock.Update(strLine)
-		return stock
-
-	@classmethod
 	def TaskLoop(cls, strSymbols):
 		arLine = cls.FetchData(strSymbols)
 		if arLine:
@@ -364,26 +356,6 @@ class SinaStock(PalmmicroStock):
 	@classmethod
 	def TaskFree(cls):
 		cls.task.stop()
-
-
-class IbkrStock(PalmmicroStock):
-	def __init__(self, strName):
-		if strName.startswith('MCL'):
-			strSymbol = 'hf_CL'
-		elif strName.startswith('MES'):
-			strSymbol = 'hf_ES'
-		elif strName.startswith('MGC'):
-			strSymbol = 'hf_GC'
-		elif strName.startswith('MNQ'):
-			strSymbol = 'hf_NQ'
-		else:
-			strSymbol = strName
-		super().__init__(strSymbol, strName)
-
-	def GetNamePrice(self, strType: str = 'LAST') -> Dict[str, float]:
-		(_, fPrice), = self.GetSymbolPrice(strType).items()
-		return {self.GetName(): fPrice}
-
 
 class TdxStock(PalmmicroStock):
 	arStock = {}
@@ -496,3 +468,147 @@ class TdxStock(PalmmicroStock):
 		#cls._refresh_cache('AG')
 		#cls._refresh_cache('QH')
 		"""
+
+class PalmmicroWrapper(EWrapper):
+	def __init__(self, client, arMapping):
+		self.client = client
+		self.arSymbols = list(set(s for sublist in arMapping.values() for s in sublist))
+		self.arSymbols.remove('nf_AG0')
+		print(self.arSymbols)
+		self.arStock = {}
+
+	@staticmethod
+	def GetFutureSymbol(strSymbol):
+		ar = {'hf_CL': 'MCL202609',
+			  'hf_GC': 'MCL202608',
+			  'hf_ES': 'MES202609',
+			  'hf_NQ': 'MNQ202609'
+			 }
+		combined = ar[strSymbol]
+		prefix, date = re.match(r'([A-Za-z]+)(\d+)', combined).groups()	# type: ignore
+		return prefix, date, combined
+
+	def nextValidId(self, orderId: int):
+		self.iOrderId = orderId
+		self.iRequestId = 0
+		self.arContract = {}
+		for strSymbol in self.arSymbols:
+			contract = Contract()
+			if strSymbol.startswith('hf_'):
+				prefix, date, combined = self.GetFutureSymbol(strSymbol)
+				contract.secType = 'FUT'
+				if strSymbol == 'hf_CL':
+					contract.exchange = 'NYMEX'
+				elif strSymbol == 'hf_GC':
+					contract.exchange = 'COMEX'
+				elif strSymbol == 'hf_ES' or strSymbol == 'hf_NQ':
+					contract.exchange = 'CME'
+				contract.lastTradeDateOrContractMonth = date
+			else:
+				prefix = strSymbol
+				combined = strSymbol
+				contract.secType = 'STK'
+				#contract.exchange = 'OVERNIGHT'
+				contract.exchange = 'SMART'
+			contract.symbol = prefix
+			contract.currency = 'USD'
+			self.arContract[combined] = contract
+			self.iRequestId += 1
+			self.client.reqMktData(self.iRequestId, contract, '233', False, False, [])
+			self.arStock[self.iRequestId] = IbkrStock(combined)
+
+	def error(self, reqId, errorCode, errorString, *args):
+		print('Error:', reqId, errorCode, errorString)
+		if args:
+			print(args[0])
+
+	def connectionClosed(self):
+		print('IB连接已关闭')
+
+	def tickPrice(self, reqId, tickType, price, attrib):
+		if price > 0.0:
+			stock = self.arStock[reqId]
+			if tickType == 1:  # Bid price
+				stock.SetPrice(price, 'BUY')
+			elif tickType == 2:  # Ask price
+				stock.SetPrice(price, 'SELL')
+			elif tickType == 4: # Last price
+				stock.SetPrice(price)
+			else:
+				...
+				#print(stock.GetName(), price, tickType)
+
+	def tickSize(self, reqId, tickType, size):
+		stock = self.arStock[reqId]
+		iSize = int(size)
+		if tickType == 0:  # Bid size
+			stock.SetSize(iSize, 'BUY')
+		elif tickType == 3:  # Ask size
+			stock.SetSize(iSize, 'SELL')
+		else:
+			...
+			#print(stock.GetName(), iSize, tickType)
+
+	def tickString(self, reqId, tickType, value):
+		stock = self.arStock[reqId]
+		if tickType == 48:  # RT_VOLUME
+			arParts = value.split(';')
+			if len(arParts) >= 6 and arParts[4] != '': 
+				fPrice = float(arParts[4])
+				(strSymbol, fOld), = stock.GetNamePrice('VWAP').items()
+				if strSymbol.startswith('MES') or strSymbol.startswith('MNQ'):
+					fPrice = round(4.0 * fPrice) / 4.0
+				fPrice = round(fPrice, 2)
+				if fOld is None or abs(fPrice - fOld) > 0.005:
+					stock.SetPrice(fPrice, 'VWAP')
+					#print(strSymbol, 'VWAP', fPrice)
+		else:
+			...
+			#print(stock.GetName(), value, tickType)
+
+	def marketDataType(self, reqId: int, marketDataType: int):
+		if marketDataType != 1:
+			stock = self.arStock[reqId]
+			print(stock.GetName(), '无实时数据')
+					
+
+	def FreeMktData(self):
+		for iRequestId in self.arStock.keys():
+			self.client.cancelMktData(iRequestId)
+
+	def GetStocks(self):
+		return self.arStock
+    
+class IbkrStock(PalmmicroStock):
+	def __init__(self, strName):
+		if strName.startswith('MCL'):
+			strSymbol = 'hf_CL'
+		elif strName.startswith('MES'):
+			strSymbol = 'hf_ES'
+		elif strName.startswith('MGC'):
+			strSymbol = 'hf_GC'
+		elif strName.startswith('MNQ'):
+			strSymbol = 'hf_NQ'
+		else:
+			strSymbol = strName
+		super().__init__(strSymbol, strName)
+
+	def GetNamePrice(self, strType: str = 'LAST') -> Dict[str, float]:
+		(_, fPrice), = self.GetSymbolPrice(strType).items()
+		return {self.GetName(): fPrice}
+
+	@classmethod
+	def InitAPI(cls, arMapping: Dict[str, List[str]], port = 7497, id = 1):	# arMapping from PalmmicroAPI.GetMapping()
+		cls.client = EClient(PalmmicroWrapper(None, arMapping))
+		cls.client.wrapper = PalmmicroWrapper(cls.client, arMapping)
+		cls.client.connect('127.0.0.1', port, clientId = id)
+		cls.ib_thread = threading.Thread(target = cls.client.run, daemon = True, name = f"{cls.__name__}-{port}-{id}")
+		cls.ib_thread.start()
+		return cls.client.wrapper.GetStocks()
+
+	@classmethod
+	def FreeAPI(cls):
+		cls.client.wrapper.FreeMktData()
+		cls.client.disconnect()
+		if cls.ib_thread.is_alive():
+			cls.ib_thread.join(timeout = 5)

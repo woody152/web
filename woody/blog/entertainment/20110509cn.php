@@ -123,9 +123,23 @@ END;
 	EchoHtmlElement(GetWechatPay(4));
 }
 
+function Echo20260721($strHead)
+{
+	$strHead = GetHeadElement($strHead);
+	$strAdsense = GetNameLink('adsense', 'Adsense');
+
+    echo <<<END
+	$strHead
+<p>2026年7月21日 周二
+<br />一年半后收到了第六笔100.21美元的收入, 还是牛市套利机会多, {$strAdsense}统计的单日最高真人访问页面已经接近两万。
+</p>
+END;
+}
+
 	Echo20211222(GetNameTag('forth', '第四笔').'Adsense收入');
 	Echo20250121(GetNameTag('fifth', '第五笔').'Adsense收入');
 	Echo20260504('开始使用支付宝');
+	Echo20260721(GetNameTag('sixth', '第六笔').'Adsense收入');
 ?>
 
 </div>
