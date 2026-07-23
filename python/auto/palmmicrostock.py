@@ -508,8 +508,8 @@ class PalmmicroWrapper(EWrapper):
 				prefix = strSymbol
 				combined = strSymbol
 				contract.secType = 'STK'
-				#contract.exchange = 'OVERNIGHT'
-				contract.exchange = 'SMART'
+				contract.exchange = 'OVERNIGHT'
+				#contract.exchange = 'SMART'
 			contract.symbol = prefix
 			contract.currency = 'USD'
 			self.arContract[combined] = contract
