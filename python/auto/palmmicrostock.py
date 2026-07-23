@@ -14,9 +14,6 @@ from ibapi.contract import Contract
 
 from typing import Any, Callable, Dict, List, Optional
 
-sys.path.append('C:/new_tdx64/PYPlugins/user')
-from tqcenter import tq	# type: ignore
-
 #单个定时任务类，封装任务及其调度信息
 class PalmmicroTask:
 	def __init__(self, name: str, func: Callable, interval: int, args: tuple = (), kwargs: Optional[Dict[str, Any]] = None, daemon: bool = True):
@@ -127,6 +124,8 @@ class PalmmicroTask:
 		return pd.DataFrame(thread_data)
 
 class PalmmicroStock:
+	_global_lock = threading.Lock()
+
 	def __init__(self, strSymbol: str, strName = None):
 		self._data = {'symbol': strSymbol,
 					  'LAST_price': None,
@@ -201,16 +200,18 @@ class PalmmicroStock:
 			self.set_value(strType + '_updated', bStatus)
 		
 	def SetPrice(self, fPrice: float, strType: str = 'LAST') -> None:
-		fOld = self.get_value(strType + '_price')
-		if fOld is None or abs(fOld - fPrice) > 0.0001:
-			self.set_value(strType + '_price', fPrice)
-			self.SetUpdated(strType)
+		with PalmmicroStock._global_lock:
+			fOld = self.get_value(strType + '_price')
+			if fOld is None or abs(fOld - fPrice) > 0.0001:
+				self.set_value(strType + '_price', fPrice)
+				self.SetUpdated(strType)
 			
 	def SetSize(self, iSize: int, strType: str) -> None:
-		iOld = self.get_value(strType + '_size')
-		if iOld is None or iOld != iSize:
-			self.set_value(strType + '_size', iSize)
-			self.SetUpdated(strType)
+		with PalmmicroStock._global_lock:
+			iOld = self.get_value(strType + '_size')
+			if iOld is None or iOld != iSize:
+				self.set_value(strType + '_size', iSize)
+				self.SetUpdated(strType)
 
 	@staticmethod
 	def GetTypeList() -> List[str]:
@@ -236,6 +237,12 @@ class PalmmicroStock:
 	def IsSymbolA(strSymbol: str) -> bool:
 		pattern = r'^(SH|SZ|BJ)\d{6}$'
 		if re.match(pattern, strSymbol):
+			return True
+		return False
+
+	@staticmethod
+	def IsFutureSymbol(strSymbol: str) -> bool:
+		if strSymbol.startswith('hf_'):
 			return True
 		return False
 
@@ -280,7 +287,7 @@ class SinaStock(PalmmicroStock):
 			if code_part:
 				if code_part.startswith('fx_'):
 					strSymbol = code_part[-3:].upper()	# 'CNY'
-				elif code_part.startswith('hf_') or code_part.startswith('nf_'):
+				elif PalmmicroStock.IsFutureSymbol(code_part) or code_part.startswith('nf_'):
 					strSymbol = code_part				# 'hf_CL, nf_AG0'
 				elif code_part.startswith('gb_'):
 					strSymbol = code_part[3:].upper()	# 'XOP'
@@ -312,7 +319,7 @@ class SinaStock(PalmmicroStock):
 				parts = data_content.split(',')
 				if strSinaSymbol.startswith('fx_'):
 					self.__set_price_and_size(parts, 8)
-				elif strSinaSymbol.startswith('hf_'):
+				elif self.IsFutureSymbol(strSinaSymbol):
 					self.__set_price_and_size(parts, 0, 2, 3, 10, 11)
 				elif strSinaSymbol.startswith('nf_'):
 					self.__set_price_and_size(parts, 8, 6, 7, 11, 12)
@@ -340,7 +347,7 @@ class SinaStock(PalmmicroStock):
 		arLine = cls.FetchData(strSymbols)
 		if arLine:
 			for strLine in arLine:
-				strSymbol, strName = cls.ParseSymbol(strLine)
+				strSymbol, _ = cls.ParseSymbol(strLine)
 				if strSymbol not in cls.arStock.keys():
 					cls.arStock[strSymbol] = SinaStock(strLine)
 				cls.arStock[strSymbol].UpdateData(strLine)
@@ -348,7 +355,6 @@ class SinaStock(PalmmicroStock):
 
 	@classmethod
 	def TaskInit(cls, strSymbols: str = 'fx_susdcny,nf_AG0', interval: int = 19):
-		#cls.ThreadLoop(strSymbols)
 		cls.task = PalmmicroTask(cls.__name__, cls.TaskLoop, interval, (strSymbols, ))
 		cls.task.start()
 		return cls.arStock
@@ -359,13 +365,15 @@ class SinaStock(PalmmicroStock):
 
 class TdxStock(PalmmicroStock):
 	arStock = {}
+	tq = None
 
 	def __init__(self, strName):
 		super().__init__(self.ConvertTdxSymbol(strName), strName)
 
 	def Update(self) -> None:
 		try:
-			data_dict = tq.get_market_snapshot(self.GetName(), ['ErrorId', 'Now', 'Buyp', 'Buyv', 'Sellp', 'Sellv'])
+			if self.tq is not None:
+				data_dict = self.tq.get_market_snapshot(self.GetName(), ['ErrorId', 'Now', 'Buyp', 'Buyv', 'Sellp', 'Sellv'])
 		except Exception as e:
 			print(f"tq.get_market_snapshot异常: {e}")
 			return
@@ -418,31 +426,52 @@ class TdxStock(PalmmicroStock):
 
 	@classmethod
 	def TqInit(cls, strBlockCode: str = 'PLMM'):
-		tq.initialize(__file__)
+		sys.path.append('C:/new_tdx64/PYPlugins/user')
+		try:
+			from tqcenter import tq	# type: ignore
+			tq.initialize(__file__)
+			cls.tq = tq
+		except ImportError:
+			print('⚠️ tqcenter 模块不存在, TQ 功能不可用')
+		except RuntimeError as e:
+			print(f"⚠️ TQ 初始化失败: {e}")
+		except SystemExit:
+			# ErrorId=20 导致的退出
+			print('⚠️ TQ 检测到致命错误')
+			# 这里程序会退出，所以后续代码不会执行
+		except Exception as e:
+			print(f"⚠️ TQ 未知错误: {e}")
+
+		# 后续使用
+		if cls.tq is None:
+			return None
 
 		#match_stkinfo = tq.get_match_stkinfo('USDCNY')
 		#print(match_stkinfo)
 		block_stocks = tq.get_stock_list_in_sector(strBlockCode, 1)
 		#print(block_stocks)
 
-		ar = []
-		for strName in block_stocks:
-			stock = TdxStock(strName)
-			strSymbol = stock.GetSymbol()
-			cls.arStock[strSymbol] = stock
-			ar.append(strName)
-		sub_hq = tq.subscribe_hq(ar, cls.TqCallback)
-		print(sub_hq)
+		if len(block_stocks) > 0:
+			ar = []
+			for strName in block_stocks:
+				stock = TdxStock(strName)
+				strSymbol = stock.GetSymbol()
+				cls.arStock[strSymbol] = stock
+				ar.append(strName)
+			sub_hq = tq.subscribe_hq(ar, cls.TqCallback)
+			cls.TqDebug(sub_hq)
 		return cls.arStock
 
 	@classmethod
 	def TqFree(cls):
-		tq.close()
+		if cls.tq is not None:
+			cls.tq.close()
 
 	@classmethod
 	def TqDebug(cls, strDebug: str) -> None:
 		try:
-			tq.send_message(strDebug)
+			if cls.tq is not None:
+				cls.tq.send_message(strDebug)
 		except Exception as e:
 			print(f"TqDebug异常: {e}")
 
@@ -470,21 +499,29 @@ class TdxStock(PalmmicroStock):
 		"""
 
 class PalmmicroWrapper(EWrapper):
-	def __init__(self, client, arMapping):
+	def __init__(self, client, arMapping = None):
 		self.client = client
-		self.arSymbols = list(set(s for sublist in arMapping.values() for s in sublist))
-		self.arSymbols.remove('nf_AG0')
-		print(self.arSymbols)
-		self.arStock = {}
+		if arMapping is not None:
+			self.arSymbols = list(set(s for sublist in arMapping.values() for s in sublist))
+			self.arSymbols.remove('nf_AG0')
+			TdxStock.TqDebug(','.join(self.arSymbols))
+			self.arStock = {}
 
-	@staticmethod
-	def GetFutureSymbol(strSymbol):
-		ar = {'hf_CL': 'MCL202609',
-			  'hf_GC': 'MGC202608',
-			  'hf_ES': 'MES202609',
-			  'hf_NQ': 'MNQ202609'
-			 }
-		combined = ar[strSymbol]
+	arFutureDict = {'hf_CL': 'MCL202609',
+					'hf_GC': 'MGC202608',
+					'hf_ES': 'MES202609',
+					'hf_NQ': 'MNQ202609'
+				   }
+
+	@classmethod
+	def GetSymbolDisplay(cls, strSymbol):
+		if PalmmicroStock.IsFutureSymbol(strSymbol):
+			return cls.arFutureDict[strSymbol]
+		return strSymbol
+	
+	@classmethod
+	def GetFutureSymbol(cls, strSymbol):
+		combined = cls.arFutureDict[strSymbol]
 		prefix, date = re.match(r'([A-Za-z]+)(\d+)', combined).groups()	# type: ignore
 		return prefix, date, combined
 
@@ -494,7 +531,7 @@ class PalmmicroWrapper(EWrapper):
 		self.arContract = {}
 		for strSymbol in self.arSymbols:
 			contract = Contract()
-			if strSymbol.startswith('hf_'):
+			if PalmmicroStock.IsFutureSymbol(strSymbol):
 				prefix, date, combined = self.GetFutureSymbol(strSymbol)
 				contract.secType = 'FUT'
 				if strSymbol == 'hf_CL':
@@ -508,8 +545,8 @@ class PalmmicroWrapper(EWrapper):
 				prefix = strSymbol
 				combined = strSymbol
 				contract.secType = 'STK'
-				contract.exchange = 'OVERNIGHT'
-				#contract.exchange = 'SMART'
+				#contract.exchange = 'OVERNIGHT'
+				contract.exchange = 'SMART'
 			contract.symbol = prefix
 			contract.currency = 'USD'
 			self.arContract[combined] = contract
@@ -598,8 +635,8 @@ class IbkrStock(PalmmicroStock):
 		return {self.GetName(): fPrice}
 
 	@classmethod
-	def InitAPI(cls, arMapping: Dict[str, List[str]], port = 7497, id = 1):	# arMapping from PalmmicroAPI.GetMapping()
-		cls.client = EClient(PalmmicroWrapper(None, arMapping))
+	def InitAPI(cls, arMapping: Dict[str, List[str]], port = 7497, id = 2):	# arMapping from PalmmicroAPI.GetMapping(), usually id 0 for master API, 1 for excel
+		cls.client = EClient(PalmmicroWrapper(None))
 		cls.client.wrapper = PalmmicroWrapper(cls.client, arMapping)
 		cls.client.connect('127.0.0.1', port, clientId = id)
 		cls.ib_thread = threading.Thread(target = cls.client.run, daemon = True, name = f"{cls.__name__}-{port}-{id}")

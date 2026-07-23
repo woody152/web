@@ -26,6 +26,18 @@ function _inBlackList($strIp)
 	return false;
 }
 
+function _allowTest()
+{
+	$ymd = GetNowYMD();
+	if ($ymd->IsWeekDay())
+	{
+		$iHourMinute = $ymd->GetHourMinute();
+		if ($iHourMinute > 915 && $iHourMinute < 1130)		return false;
+		if ($iHourMinute > 1300 && $iHourMinute < 1500)		return false;
+	}
+	return true;
+}
+
 class TelegramCallback
 {
 	function SetCallback()
@@ -86,7 +98,7 @@ class TelegramCallback
 				{
 					$str = "$strIp API访问太频繁".CONTACT_EMAIL;
 				}
-				else if ($strToken == WECHAT_QMT_KEY)
+				else if (_allowTest() || $strToken == WECHAT_QMT_KEY)
 				{
 					$str = GetStockDataArray($strText);
 				}

@@ -5,7 +5,6 @@ function _chinaMoneyNeedData($strDate)
 	$net_sql = GetNetValueHistorySql();
     if ($net_sql->GetRecord(SqlGetStockId('USCNY'), $strDate))
     {
-//    	DebugString('Database entry existed');
     	return false;
     }
     return $strDate;
@@ -13,7 +12,7 @@ function _chinaMoneyNeedData($strDate)
 
 function _chinaMoneyInsertData($strMoney, $strDate, $strPrice)
 {
-	DebugString('Insert '.$strMoney);
+	DebugString("Insert $strMoney");
 	$net_sql = GetNetValueHistorySql();
 	$net_sql->InsertDaily(SqlGetStockId($strMoney), $strDate, $strPrice);
 }
@@ -21,7 +20,7 @@ function _chinaMoneyInsertData($strMoney, $strDate, $strPrice)
 function GetChinaMoney($ref)
 {
     if (_chinaMoneyNeedData($ref->GetDate()) == false)			return;
-	if ($ref->GetHourMinute() < 915)									return;	// Data not updated until 9:15
+	if ($ref->GetHourMinute() < 915)							return;	// Data not updated until 9:15
     
 	$ref->SetTimeZone();
 	if ($ar = StockDebugJson(DebugGetChinaMoneyFile(), GetChinaMoneyJsonUrl()))
@@ -35,7 +34,7 @@ function GetChinaMoney($ref)
     			{
     				$strPair = $arPair['vrtEName'];
     				$strPrice = $arPair['price'];
-    				DebugString($strPair.' '.$strPrice);
+    				DebugString("strPair $strPrice");
     				switch ($strPair)
     				{
     				case 'USD/CNY':
@@ -60,5 +59,3 @@ function GetChinaMoney($ref)
 		}
 	}
 }
-
-?>

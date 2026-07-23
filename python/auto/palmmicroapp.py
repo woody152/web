@@ -5,9 +5,7 @@ import tkinter as tk
 
 from tkinter import ttk, PhotoImage
 
-from _mytoken import BOT_TOKEN
-
-from palmmicrostock import PalmmicroStock, SinaStock, TdxStock, IbkrStock
+from palmmicrostock import PalmmicroWrapper, PalmmicroStock, SinaStock, TdxStock, IbkrStock
 from palmmicroapi import PalmmicroAPI, PalmmicroDataFrame
 
 class PalmmicroApp:
@@ -17,20 +15,19 @@ class PalmmicroApp:
 		self.running = True
 		
 		# 软件版本号
-		self.version = '0.51'
+		self.version = '0.53'
 		
 		# 创建DataFrame
 		self.df = self.create_dataframe()
+		# 启动数据更新线程
+		if self.df is not None:
+			self.update_thread = threading.Thread(target = self.update_data_loop, daemon = True, name = f"{self.__class__.__name__}-{self.version}")
+			self.update_thread.start()
+			# 绑定窗口关闭事件
+			root.protocol('WM_DELETE_WINDOW', self.on_closing)
 		
 		# 创建UI
 		self.setup_ui()
-		
-		# 启动数据更新线程
-		self.update_thread = threading.Thread(target = self.update_data_loop, daemon = True, name = f"{self.__class__.__name__}-{self.version}")
-		self.update_thread.start()
-		
-		# 绑定窗口关闭事件
-		root.protocol('WM_DELETE_WINDOW', self.on_closing)
 
 		icon = PhotoImage(file = 'redfox.png')
 		root.geometry('1024x768')  # 设置窗口大小
@@ -40,9 +37,31 @@ class PalmmicroApp:
 		root.icon_image = icon	
 	
 	def create_dataframe(self):
-		self.arSinaStock = SinaStock.TaskInit()
 		self.arTdxStock = TdxStock.TqInit()
-		api = PalmmicroAPI(PalmmicroAPI.FetchData(PalmmicroStock.JoinSymbols(self.arTdxStock), BOT_TOKEN))
+		if self.arTdxStock is None:
+			self.strError = '没有找到通达信Python软件, 请先安装运行64位通达信程序。'
+			return None
+		else:
+			if len(self.arTdxStock) == 0:
+				self.strError = '没有找到通达信自定义板块PLMM, 请先在自定义板块设置中导入Palmmicro.EBK文件。'
+				TdxStock.TqDebug(self.strError)
+				return None
+
+		self.arSinaStock = SinaStock.TaskInit()
+
+		try:
+			from _mytoken import BOT_TOKEN
+			strToken = BOT_TOKEN
+		except (ImportError, AttributeError):
+			# 模块不存在或没有 BOT_TOKEN 变量
+			strToken = 'palmmicro'
+		config_dict = PalmmicroAPI.FetchData(PalmmicroStock.JoinSymbols(self.arTdxStock), strToken)
+		if config_dict is None or isinstance(config_dict, dict) == False:
+			self.strError = '没有正确获得PalmmicroAPI接口数据。如果有正确的KEY, 请重新运行程序, 没有KEY的请联系woody@palmmicro.com邮箱。'
+			TdxStock.TqDebug(self.strError)
+			return None
+
+		api = PalmmicroAPI(config_dict)
 		self.pdf = PalmmicroDataFrame(api)
 		self.arIbkrStock = IbkrStock.InitAPI(api.GetMapping())
 
@@ -53,7 +72,7 @@ class PalmmicroApp:
 							port = 40005,
 							column_formats = self.d_column_formats,
 							reaper_on = False
-						   )
+					   	   )
 		self.d.open_browser()
 		return df
 	
@@ -72,13 +91,15 @@ class PalmmicroApp:
 		
 		version_label = ttk.Label(header_frame, text = f"版本: {self.version}", font = ('Arial', 10))
 		version_label.pack(side=tk.RIGHT)
-		
+
 		# 先创建状态栏（在Treeview之前）
-		self.status_label = ttk.Label(main_frame, text = '就绪', relief = tk.SUNKEN, anchor = tk.W)
+		strStatus = self.strError if self.df is None else '就绪'
+		self.status_label = ttk.Label(main_frame, text = strStatus, relief = tk.SUNKEN, anchor = tk.W)
 		self.status_label.pack(fill = tk.X, pady = (10, 0), side = tk.BOTTOM)
-		
-		# 创建Treeview来显示DataFrame
-		self.create_treeview(main_frame)
+
+		if self.df is not None:
+			# 创建Treeview来显示DataFrame
+			self.create_treeview(main_frame)
 	
 	def create_treeview(self, parent):
 		"""创建Treeview显示DataFrame(带三重索引, 显示方式与print一致)"""
@@ -98,7 +119,7 @@ class PalmmicroApp:
 		display_names = ['代码', '对冲代码', '方向', '时间', '溢价', '数量', '价格', '对冲数量', '对冲价格', '补充内容']
 		
 		# 列宽度设置
-		col_widths = [70, 70, 36, 60, 60, 80, 80, 80, 80, 300]
+		col_widths = [70, 74, 36, 60, 60, 80, 80, 80, 80, 300]
 		
 		# 创建Treeview
 		self.tree = ttk.Treeview(tree_frame, columns = columns, show = 'headings', 
@@ -136,7 +157,7 @@ class PalmmicroApp:
 			self.tree.delete(item)
 		
 		# 过滤掉SymbolSize为0的行
-		filtered_df = self.df[self.df['SymbolSize'] != 0]
+		filtered_df = self.df[self.df['SymbolSize'] != 0]	# type: ignore
 		
 		# 用于跟踪已显示的Symbol和Hedge组合
 		shown_symbols = set()
@@ -177,7 +198,7 @@ class PalmmicroApp:
 			
 			# 决定是否显示Hedge（在同一个Symbol下，只在第一次出现时显示）
 			hedge_key = (symbol, hedge)
-			show_hedge = hedge if hedge_key not in shown_hedge_pairs else ''
+			show_hedge = PalmmicroWrapper.GetSymbolDisplay(hedge) if hedge_key not in shown_hedge_pairs else ''
 			if hedge_key not in shown_hedge_pairs:
 				shown_hedge_pairs.add(hedge_key)
 			
@@ -197,7 +218,7 @@ class PalmmicroApp:
 		# 更新状态
 		if hasattr(self, 'status_label'):
 			filtered_count = len(filtered_df)
-			total_count = len(self.df)
+			total_count = len(self.df)	# type: ignore
 			self.status_label.config(text = f"显示行数: {filtered_count} (共{total_count}行，过滤{total_count - filtered_count}行)")
 	
 	def update_data_loop(self):
@@ -211,40 +232,40 @@ class PalmmicroApp:
 			time.sleep(1)
 	
 	def update_data(self):
-		arMktList = list(self.arIbkrStock.values())
-		arMktList.append(self.arSinaStock['nf_AG0'])
-		bChanged = False
-		for stock in self.arTdxStock.values():
-			for strType in stock.GetTypeList():
-				strMktType = stock.GetPeerType(strType)
+		with PalmmicroStock._global_lock:
+			arMktList = list(self.arIbkrStock.values())
+			arMktList.append(self.arSinaStock['nf_AG0'])
+			bChanged = False
+			for stock in self.arTdxStock.values():	# type: ignore
+				for strType in stock.GetTypeList():
+					strMktType = stock.GetPeerType(strType)
+					for mkt_stock in arMktList:
+						if stock.IsUpdated(strType) or mkt_stock.IsUpdated(strMktType):
+							bChanged |= self.pdf.ProcessPriceAndSize(stock, mkt_stock, strType, self.arSinaStock.get('CNY'), arMktList)
+					stock.SetUpdated(strType, False)
+			for strMktType in PalmmicroStock.GetTypeList():
 				for mkt_stock in arMktList:
-					if stock.IsUpdated(strType) or mkt_stock.IsUpdated(strMktType):
-						bChanged |= self.pdf.ProcessPriceAndSize(stock, mkt_stock, strType, self.arSinaStock.get('CNY'), arMktList)
-				stock.SetUpdated(strType, False)
-		for strMktType in PalmmicroStock.GetTypeList():
-			for mkt_stock in arMktList:
-				mkt_stock.SetUpdated(strMktType, False)
-		return bChanged
+					mkt_stock.SetUpdated(strMktType, False)
+			return bChanged
 	
 	def on_closing(self):
 		"""窗口关闭时的回调函数 - 释放资源"""
-		print('正在关闭PalmmicroApp...')
+		TdxStock.TqDebug('正在关闭PalmmicroApp...')
 		
 		# 停止更新线程
 		self.running = False
 		if self.update_thread.is_alive():
-			self.update_thread.join(timeout = 0.5)
+			self.update_thread.join(timeout = 1)
 		
 		# 释放资源
 		self.cleanup_resources()
 		
 		# 关闭窗口
 		self.root.destroy()
-		print('PalmmicroApp已关闭')
 	
 	def cleanup_resources(self):
 		"""释放资源接口"""
-		print('释放资源...')
+		TdxStock.TqDebug('释放资源...')
 		# 在这里可以添加需要释放的资源
 		# 例如：关闭数据库连接、保存配置文件、释放大对象等
 		IbkrStock.FreeAPI()
@@ -259,5 +280,3 @@ class PalmmicroApp:
 		if hasattr(self, 'tree'):
 			for item in self.tree.get_children():
 				self.tree.delete(item)
-		
-		print('资源已释放')

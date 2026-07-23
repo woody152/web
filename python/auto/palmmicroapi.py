@@ -41,11 +41,11 @@ class TelegramAPI:
 			response.raise_for_status()  # Raise an exception for HTTP errors
 			if response.status_code == 200:
 				response_data = response.json()  # Parse the JSON response data
-				#print('Response data:', response_data)
-				return response_data['text']
-			else:
-				print('Failed to send POST request. Status code:', response.status_code)
-		except requests.exceptions.RequestException as e:
+				text = response_data.get('text')
+				if text is None:
+					print('FetchData 警告：响应中缺少 text 字段')
+				return text
+		except (requests.exceptions.RequestException, KeyError, ValueError) as e:
 			print('FetchData error:', e)
 		return None
 
@@ -454,8 +454,8 @@ class PalmmicroDataFrame:
 						   'Type': side}
 					rows.append(row | self._build_row())
 		df_flat = pd.DataFrame(data=rows)
-		#self.df = df_flat.set_index(self.index_names).sort_index()
-		self.df = df_flat.set_index(self.index_names)
+		self.df = df_flat.set_index(self.index_names).sort_index()
+		#self.df = df_flat.set_index(self.index_names)
 
 	def GetDataFrame(self):
 		return self.df

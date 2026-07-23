@@ -1,14 +1,13 @@
-import sys
-import time
+#import time
 import tkinter as tk
 
-from _mytoken import BOT_TOKEN
-#from _mytoken import ROT_TOKEN
+#from _mytoken import BOT_TOKEN
 
-from palmmicrostock import PalmmicroStock, SinaStock, TdxStock
-from palmmicroapi import PalmmicroAPI
+#from palmmicrostock import PalmmicroStock, SinaStock, TdxStock
+#from palmmicroapi import PalmmicroAPI
 from palmmicroapp import PalmmicroApp
 
+"""
 def __printHedge(api, ar, strSymbol, strSymbolUS, iSizeUS = None):
 	if iSizeUS is None:
 		iSizeUS = ar[strSymbolUS]
@@ -79,8 +78,8 @@ def __getSize(arStock, arSymbol, strType = 'SELL'):
 	return arQuantity
 
 def FetchPalmmicroData():
-	arSinaStock = SinaStock.TaskInit()
 	arTdxStock = TdxStock.TqInit()
+	arSinaStock = SinaStock.TaskInit()
 	api = PalmmicroAPI(PalmmicroAPI.FetchData(PalmmicroStock.JoinSymbols(arTdxStock), BOT_TOKEN))
 
 	while True:
@@ -161,14 +160,17 @@ def calculate_annualized_return(principal, total_return, years):
     # 解方程：rate = (final_amount / principal)^(1/years) - 1
     rate = ((principal + total_return) / principal) ** (1 / years) - 1
     return rate * 100  # 转换为百分比
+"""
 
 def main():
 	"""
+	import sys
 	print(f"Hello, World! {sys.version}")
 	result = calculate_annualized_return(350, 168, 10)
 	print(f"总结: 无敌哥10年赚168万, 本金350万, 年化收益率为: {result:.2f}%")
 	FetchPalmmicroData()
 	"""
+
 	root = tk.Tk()
 	app = PalmmicroApp(root)
 	root.mainloop()
