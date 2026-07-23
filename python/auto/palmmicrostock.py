@@ -480,7 +480,7 @@ class PalmmicroWrapper(EWrapper):
 	@staticmethod
 	def GetFutureSymbol(strSymbol):
 		ar = {'hf_CL': 'MCL202609',
-			  'hf_GC': 'MCL202608',
+			  'hf_GC': 'MGC202608',
 			  'hf_ES': 'MES202609',
 			  'hf_NQ': 'MNQ202609'
 			 }

@@ -41,7 +41,7 @@ class TelegramAPI:
 			response.raise_for_status()  # Raise an exception for HTTP errors
 			if response.status_code == 200:
 				response_data = response.json()  # Parse the JSON response data
-                #print('Response data:', response_data)
+				#print('Response data:', response_data)
 				return response_data['text']
 			else:
 				print('Failed to send POST request. Status code:', response.status_code)
