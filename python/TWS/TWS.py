@@ -9,21 +9,19 @@ from ibapi.contract import Contract
 from ibapi.order import Order
 
 from palmmicro import Palmmicro
-from palmmicrostock import IbkrStock
-
-from nyc_time import GetExchangeTime
+from palmmicrostock import PalmmicroWrapper, PalmmicroStock, IbkrStock
 
 def IsChinaMarketOpen():
-    iTime = GetExchangeTime('SZSE')
+    iTime = PalmmicroStock.GetExchangeTime('SZSE')
     if iTime >= 915 and iTime < 1130:
         return True
     elif iTime >= 1300 and iTime < 1500:
         return True
-    return False
-    #return True
+    #return False
+    return True
 
 def IsMarketOpen():
-    iTime = GetExchangeTime()
+    iTime = PalmmicroStock.GetExchangeTime()
     if iTime >= 930 and iTime < 1600:
         #pass
         return True
@@ -304,13 +302,6 @@ class MyEWrapper(EWrapper):
         if self.palmmicro is not None and IsChinaMarketOpen():
             self.palmmicro.HandleData(self.arMkt)
 
-def GetContractExchange():
-    iTime = GetExchangeTime()
-    if iTime >= 350 and iTime < 2000:
-        return 'SMART'
-    return 'OVERNIGHT'
-
-
 class MyEClient(EClient):
     """
     def __init__(self, wrapper):
@@ -341,7 +332,7 @@ class MyEClient(EClient):
     def StockReqMktData(self, strSymbol):
         contract = Contract()
         contract.secType = 'STK'
-        contract.exchange = GetContractExchange()
+        contract.exchange = PalmmicroWrapper.GetStockContractExchange()     # GetContractExchange()
         return self.callReqMktData(strSymbol, contract)
 
     def IndexReqMktData(self, strSymbol):

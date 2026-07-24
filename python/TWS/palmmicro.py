@@ -16,8 +16,8 @@ class Palmmicro:
     d_column_formats = {'Percent': {'fmt': '0.00%'}, 'SymbolPrice': {'fmt': '0.000'}}
 
     def __init__(self):
-        self.arSinaStock = SinaStock.TaskInit()
         self.arStock = TdxStock.TqInit()
+        self.arSinaStock = SinaStock.TaskInit()
         self.api = PalmmicroAPI(PalmmicroAPI.FetchData(PalmmicroStock.JoinSymbols(arSymbolKey), WECHAT_QMT_KEY))
         self.pdf = PalmmicroDataFrame(self.api)
         self.d = dtale.show(self.pdf.GetDataFrame(), host = '127.0.0.1', port = 40007, column_formats = self.d_column_formats, reaper_on = False)
@@ -111,27 +111,33 @@ class Palmmicro:
                 self._postMsg(strDebug, strMsgType, strSymbol)
                 return True
         return False
+
+    def _lockAndHandleData(self, arMktList, usdcny_stock):
+        with PalmmicroStock._global_lock:
+            bChanged = False
+            for strSymbol in self.api.get_config().keys():
+                stock = self.arStock.get(strSymbol)
+                if stock is not None:
+                    for strType in stock.GetTypeList():
+                        for mkt_stock in arMktList:
+                            bChanged |= self._processPriceAndSize(stock, mkt_stock, strType, strSymbol, usdcny_stock, arMktList)
+                        #if ag0_stock is not None:
+                            #bChanged |= self._processPriceAndSize(stock, ag0_stock, strType, strSymbol)
+                        stock.SetUpdated(strType, False)
+            for strMktType in PalmmicroStock.GetTypeList():
+                for mkt_stock in arMktList:
+                    mkt_stock.SetUpdated(strMktType, False)
+                #if ag0_stock is not None:
+                    #ag0_stock.SetUpdated(strMktType, False)
+            return bChanged
        
     def HandleData(self, arMkt):
         usdcny_stock = self.arSinaStock.get('CNY')
         ag0_stock = self.arSinaStock.get('nf_AG0')
-        bChanged = False
         arMktList = list(arMkt.values())
-        for strSymbol in self.api.get_config().keys():
-            stock = self.arStock.get(strSymbol)
-            if stock is not None:
-                for strType in stock.GetTypeList():
-                    for mkt_stock in arMkt.values():
-                        bChanged |= self._processPriceAndSize(stock, mkt_stock, strType, strSymbol, usdcny_stock, arMktList)
-                    if ag0_stock is not None:
-                        bChanged |= self._processPriceAndSize(stock, ag0_stock, strType, strSymbol)
-                    stock.SetUpdated(strType, False)
-        for strMktType in PalmmicroStock.GetTypeList():
-            for mkt_stock in arMkt.values():
-                mkt_stock.SetUpdated(strMktType, False)
-            if ag0_stock is not None:
-                ag0_stock.SetUpdated(strMktType, False)
-        if bChanged:
+        if ag0_stock is not None:
+            arMktList.append(ag0_stock)
+        if self._lockAndHandleData(arMktList, usdcny_stock):
             self.d.data = self.pdf.GetDataFrame()
             self.d.update_settings(column_formats = self.d_column_formats)
         

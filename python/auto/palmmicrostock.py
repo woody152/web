@@ -8,6 +8,9 @@ import sys
 import time
 import threading
 
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 from ibapi.client import EClient
 from ibapi.wrapper import EWrapper
 from ibapi.contract import Contract
@@ -259,6 +262,14 @@ class PalmmicroStock:
 	@staticmethod
 	def JoinSymbols(arStock):
 		return ','.join(arStock.keys())
+
+	@staticmethod
+	def GetExchangeTime(strName = 'NYSE'):
+		exchange_timezones = {'NYSE': 'America/New_York','SZSE': 'Asia/Shanghai'}
+		if strName not in exchange_timezones:
+			raise ValueError(f'Unsupported exchange: {strName}')
+		now_exchange = datetime.now(ZoneInfo(exchange_timezones[strName]))
+		return now_exchange.hour * 100 + now_exchange.minute
 		
 #新浪股票类，继承自 PalmmicroStock, 使用新浪接口返回的原始数据字符串进行初始化, 格式如: 'var hq_str_sh600036="招商银行,36.50,36.48,...";'
 class SinaStock(PalmmicroStock):
@@ -545,8 +556,7 @@ class PalmmicroWrapper(EWrapper):
 				prefix = strSymbol
 				combined = strSymbol
 				contract.secType = 'STK'
-				#contract.exchange = 'OVERNIGHT'
-				contract.exchange = 'SMART'
+				contract.exchange = self.GetStockContractExchange()
 			contract.symbol = prefix
 			contract.currency = 'USD'
 			self.arContract[combined] = contract
@@ -607,7 +617,6 @@ class PalmmicroWrapper(EWrapper):
 		if marketDataType != 1:
 			stock = self.arStock[reqId]
 			print(stock.GetName(), '无实时数据')
-					
 
 	def FreeMktData(self):
 		for iRequestId in self.arStock.keys():
@@ -615,7 +624,14 @@ class PalmmicroWrapper(EWrapper):
 
 	def GetStocks(self):
 		return self.arStock
-    
+
+	@staticmethod
+	def GetStockContractExchange():
+		iTime = PalmmicroStock.GetExchangeTime()
+		if iTime >= 350 and iTime < 2000:
+			return 'SMART'
+		return 'OVERNIGHT'
+
 class IbkrStock(PalmmicroStock):
 	def __init__(self, strName):
 		if strName.startswith('MCL'):

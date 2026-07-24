@@ -15,7 +15,7 @@ class PalmmicroApp:
 		self.running = True
 		
 		# 软件版本号
-		self.version = '0.53'
+		self.version = '0.6'
 		
 		# 创建DataFrame
 		self.df = self.create_dataframe()
@@ -97,9 +97,8 @@ class PalmmicroApp:
 		self.status_label = ttk.Label(main_frame, text = strStatus, relief = tk.SUNKEN, anchor = tk.W)
 		self.status_label.pack(fill = tk.X, pady = (10, 0), side = tk.BOTTOM)
 
-		if self.df is not None:
-			# 创建Treeview来显示DataFrame
-			self.create_treeview(main_frame)
+		# 创建Treeview来显示DataFrame
+		self.create_treeview(main_frame)
 	
 	def create_treeview(self, parent):
 		"""创建Treeview显示DataFrame(带三重索引, 显示方式与print一致)"""
@@ -147,8 +146,9 @@ class PalmmicroApp:
 		# 存储列名用于数据更新
 		self.column_names = columns
 		
-		# 初始化显示数据
-		self.refresh_treeview()
+		if self.df is not None:
+			# 初始化显示数据
+			self.refresh_treeview()
 	
 	def refresh_treeview(self):
 		"""刷新Treeview显示(保留三重索引, 与print一致)"""
@@ -230,11 +230,9 @@ class PalmmicroApp:
 				self.d.data = self.pdf.GetDataFrame()
 				self.d.update_settings(column_formats = self.d_column_formats)
 			time.sleep(1)
-	
-	def update_data(self):
+
+	def _lock_and_update_data(self, arMktList):
 		with PalmmicroStock._global_lock:
-			arMktList = list(self.arIbkrStock.values())
-			arMktList.append(self.arSinaStock['nf_AG0'])
 			bChanged = False
 			for stock in self.arTdxStock.values():	# type: ignore
 				for strType in stock.GetTypeList():
@@ -247,6 +245,13 @@ class PalmmicroApp:
 				for mkt_stock in arMktList:
 					mkt_stock.SetUpdated(strMktType, False)
 			return bChanged
+		
+	def update_data(self):
+		arMktList = list(self.arIbkrStock.values())
+		ag0_stock = self.arSinaStock.get('nf_AG0')
+		if ag0_stock is not None:
+			arMktList.append(ag0_stock)
+		return self._lock_and_update_data(arMktList)
 	
 	def on_closing(self):
 		"""窗口关闭时的回调函数 - 释放资源"""
