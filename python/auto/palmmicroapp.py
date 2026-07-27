@@ -15,7 +15,7 @@ class PalmmicroApp:
 		self.running = True
 		
 		# 软件版本号
-		self.version = '0.6'
+		self.version = '0.61'
 		
 		# 创建DataFrame
 		self.df = self.create_dataframe()
@@ -35,16 +35,19 @@ class PalmmicroApp:
 		root.iconphoto(True, icon)
 		# 保持引用，防止被垃圾回收
 		root.icon_image = icon	
-	
+
+	def _debug(self, strDebug: str):
+		self.strError = strDebug
+		TdxStock.TqDebug(strDebug)
+						
 	def create_dataframe(self):
 		self.arTdxStock = TdxStock.TqInit()
 		if self.arTdxStock is None:
-			self.strError = '没有找到通达信Python软件, 请先安装运行64位通达信程序。'
+			self.strError = '没有找到通达信Python软件, 请先安装运行支持Python接口的64位通达信程序。'
 			return None
 		else:
 			if len(self.arTdxStock) == 0:
-				self.strError = '没有找到通达信自定义板块PLMM, 请先在自定义板块设置中导入Palmmicro.EBK文件。'
-				TdxStock.TqDebug(self.strError)
+				self._debug('没有找到通达信自定义板块PLMM, 请先在自定义板块设置中导入Palmmicro.EBK文件。')
 				return None
 
 		self.arSinaStock = SinaStock.TaskInit()
@@ -56,10 +59,13 @@ class PalmmicroApp:
 			# 模块不存在或没有 BOT_TOKEN 变量
 			strToken = 'palmmicro'
 		config_dict = PalmmicroAPI.FetchData(PalmmicroStock.JoinSymbols(self.arTdxStock), strToken)
-		if config_dict is None or isinstance(config_dict, dict) == False:
-			self.strError = '没有正确获得PalmmicroAPI接口数据。如果有正确的KEY, 请重新运行程序, 没有KEY的请联系woody@palmmicro.com邮箱。'
-			TdxStock.TqDebug(self.strError)
+		if config_dict is None:
+			self._debug('连接PalmmicroAPI接口失败, 请重新运行程序。多次失败的话可以尝试换一个网络和IP地址后再连接。')
 			return None
+		else:
+			if isinstance(config_dict, dict) == False:
+				self._debug('没有正确获得PalmmicroAPI接口数据, 请附带错误原因联系woody@palmmicro.com。原因是: ' + config_dict)
+				return None
 
 		api = PalmmicroAPI(config_dict)
 		self.pdf = PalmmicroDataFrame(api)
@@ -86,14 +92,14 @@ class PalmmicroApp:
 		header_frame = ttk.Frame(main_frame)
 		header_frame.pack(fill = tk.X, pady = (0, 10))
 		
-		title_label = ttk.Label(header_frame, text = '企业微信数据本地部署软件', font = ('Arial', 12, 'bold'))
+		title_label = ttk.Label(header_frame, text = '企业微信消息本地化部署软件', font = ('Arial', 12, 'bold'))
 		title_label.pack(side=tk.LEFT)
 		
 		version_label = ttk.Label(header_frame, text = f"版本: {self.version}", font = ('Arial', 10))
 		version_label.pack(side=tk.RIGHT)
 
 		# 先创建状态栏（在Treeview之前）
-		strStatus = self.strError if self.df is None else '就绪'
+		strStatus = self.strError if self.df is None else '请在通达信TQ策略管理器中查看更多状态信息'
 		self.status_label = ttk.Label(main_frame, text = strStatus, relief = tk.SUNKEN, anchor = tk.W)
 		self.status_label.pack(fill = tk.X, pady = (10, 0), side = tk.BOTTOM)
 

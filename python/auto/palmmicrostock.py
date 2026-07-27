@@ -389,7 +389,7 @@ class TdxStock(PalmmicroStock):
 			print(f"tq.get_market_snapshot异常: {e}")
 			return
 		#print(data_dict)
-		if data_dict['ErrorId'] == '0':	
+		if data_dict.get('ErrorId') == '0':	
 			self.SetPrice(float(data_dict['Buyp'][0]), 'BUY')
 			self.SetPrice(float(data_dict['Sellp'][0]), 'SELL')
 			self.SetPrice(float(data_dict['Now']))
@@ -567,10 +567,10 @@ class PalmmicroWrapper(EWrapper):
 	def error(self, reqId, errorCode, errorString, *args):
 		print('Error:', reqId, errorCode, errorString)
 		if args:
-			print(args[0])
+			TdxStock.TqDebug(args[0])
 
 	def connectionClosed(self):
-		print('IB连接已关闭')
+		TdxStock.TqDebug('IB连接已关闭')
 
 	def tickPrice(self, reqId, tickType, price, attrib):
 		if price > 0.0:

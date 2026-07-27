@@ -5,7 +5,7 @@ function _getPortfolioTestVal($iShares, $strSymbol)
 {
 	$iQuantity = match($strSymbol)
     			 {'KWEB' => 200,
-				  'SH600104' => 12000,
+				  'SH600104' => 11500,
 				  'TLT' => 500,
 				  default => 0
 				 };
