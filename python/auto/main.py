@@ -156,8 +156,8 @@ def FetchPalmmicroData():
 	#TdxStock.TqFree()
 
 def calculate_annualized_return(principal, total_return, years):
-    # 计算年化收益率公式：final_amount = principal * (1 + rate)^years
-    # 解方程：rate = (final_amount / principal)^(1/years) - 1
+    # 计算年化收益率公式: final_amount = principal * (1 + rate)^years
+    # 解方程: rate = (final_amount / principal)^(1/years) - 1
     rate = ((principal + total_return) / principal) ** (1 / years) - 1
     return rate * 100  # 转换为百分比
 """

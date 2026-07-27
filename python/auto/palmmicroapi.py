@@ -6,7 +6,7 @@ import time
 from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, List, Optional, Union
 
-from palmmicrostock import PalmmicroStock
+from palmmicrostock import PalmmicroWrapper, PalmmicroStock
 
 def _get_floor_quantity(iQuantity: int) -> float:
     fQuantity = iQuantity / 100.0
@@ -570,3 +570,62 @@ class PalmmicroDataFrame:
 			if strHedgeSymbol == strMktSymbol:
 				return self._calcCalibrationArbitrage(mkt_stock, strMktType, strMktSymbol, stock, strType, usdcny_stock, strTime)
 		return False
+
+	def GetDisplayDataFrame(self) -> pd.DataFrame:
+		"""
+		返回Treeview显示用的DataFrame, 带三重索引的显示优化:
+		- Symbol 只在第一次出现时显示
+		- Hedge 在同一个 Symbol 下只在第一次出现时显示
+		- 保留 IsNegative 列用于红色标记（放在 Percent 后面）
+		- 过滤掉 SymbolSize == 0 的行
+		- 所有数值字段已格式化为显示字符串
+		"""
+
+		# 复制一份，避免修改原始数据
+		display_df = self.df.copy()
+	
+		# 过滤掉 SymbolSize == 0 的行
+		display_df = display_df[display_df['SymbolSize'] != 0]
+	
+		# 记录原始 Percent 值用于判断是否为负数
+		display_df['IsNegative'] = display_df['Percent'] < 0
+	
+		# 格式化 Percent 为百分比字符串
+		display_df['Percent'] = display_df['Percent'].apply(lambda x: f"{x * 100.0:.2f}%")
+	
+		# 格式化 SymbolPrice 为三位小数
+		display_df['SymbolPrice'] = display_df['SymbolPrice'].apply(lambda x: f"{x:.3f}")
+	
+		# 格式化 HedgePrice 为两位小数
+		display_df['HedgePrice'] = display_df['HedgePrice'].apply(lambda x: f"{x:.2f}")
+	
+		# 重置索引，将三重索引变为普通列
+		display_df = display_df.reset_index()
+	
+		display_df = display_df.rename(columns={'level_0': 'Symbol', 'level_1': 'Hedge', 'level_2': 'Type'})
+	
+		# 保存原始 Symbol 值用于 Hedge 分组判断（在转换之前）
+		display_df['_orig_symbol'] = display_df['Symbol']
+	
+		display_df['Type'] = display_df['Type'].apply(PalmmicroStock.GetTypeDisplay)
+		display_df['Hedge'] = display_df['Hedge'].apply(PalmmicroWrapper.GetSymbolDisplay)
+	
+		# Symbol 只在第一次出现时显示
+		display_df['Symbol'] = display_df['Symbol'].mask(display_df['Symbol'].duplicated(),	'')
+
+		# Hedge 在同一个原始 Symbol 下，只显示不同的值
+		# 对每个原始 Symbol 分组，Hedge 重复的显示为空
+		display_df['Hedge'] = display_df.groupby('_orig_symbol')['Hedge'].transform(lambda x: x.where(~x.duplicated(), ''))
+	
+		# 删除辅助列
+		display_df = display_df.drop(columns=['_orig_symbol'])
+	
+		# 按指定顺序排列列，IsNegative 放在 Percent 后面
+		columns_order = ['Symbol', 'Hedge', 'Type', 'Time', 'Percent', 'IsNegative', 'SymbolSize', 'SymbolPrice', 'HedgeSize', 'HedgePrice', 'Note']
+		display_df = display_df[columns_order]
+		columns_order = ['代码', '对冲代码', '方向', '时间', '溢价', '折价', '数量', '价格', '对冲数量', '对冲价格', '补充内容']
+		display_df.columns = columns_order
+
+		# 返回包含指定列顺序的完整 DataFrame
+		return display_df
+	

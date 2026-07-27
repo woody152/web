@@ -26,6 +26,40 @@ class Palmmicro:
         self.arSendMsg['telegram'] = self.GetSendMsgArray('telegram', WECHAT_KEY)
         for strSymbol, strKey in arSymbolKey.items():
             self.arSendMsg[strSymbol] = self.GetSendMsgArray(strSymbol, strKey)
+        task = PalmmicroTask('Snapshot', self.SendSnapshot, 4, (WECHAT_QMT_KEY, ))
+        task.start(3)
+
+    def SendSnapshot(self, strKey):
+        df = self.pdf.GetDisplayDataFrame()
+        json_data = df.to_json(orient = 'split', date_format = 'iso', force_ascii = False)
+        headers = {'Content-Type': 'application/json', 'X-API-Key': strKey}  # API Key放在请求头中
+        try:
+            response = requests.post('https://palmmicro.com/php/test/dfreceiver.php', data = json_data, headers = headers, timeout = 3)  # 设置超时
+            # 检查响应
+            if response.status_code == 200:
+                ...
+                """
+                result = response.json()
+                print(f"✅ 数据发送成功")
+                print(f"   - 状态: {result.get('message')}")
+                print(f"   - 行数: {result.get('rows', 0)}")
+                print(f"   - 大小: {result.get('size_bytes', 0)} bytes")
+                """
+            elif response.status_code == 401:
+                print("❌ 错误: 缺少API Key")
+            elif response.status_code == 403:
+                print("❌ 错误: API Key无效")
+            elif response.status_code == 413:
+                print("❌ 错误: 数据太大")
+            else:
+                print(f"❌ 错误: HTTP {response.status_code}")
+                print(f"   响应: {response.text}")
+        except requests.exceptions.ConnectionError:
+            print("❌ 错误: 无法连接到服务器")
+        except requests.exceptions.Timeout:
+            print("❌ 错误: 请求超时")
+        except Exception as e:
+            print(f"❌ 错误: {e}")
  
     def GetSendMsgArray(self, group, strKey):
         ar = {'key': strKey,

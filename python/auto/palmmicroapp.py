@@ -5,7 +5,7 @@ import tkinter as tk
 
 from tkinter import ttk, PhotoImage
 
-from palmmicrostock import PalmmicroWrapper, PalmmicroStock, SinaStock, TdxStock, IbkrStock
+from palmmicrostock import PalmmicroStock, SinaStock, TdxStock, IbkrStock
 from palmmicroapi import PalmmicroAPI, PalmmicroDataFrame
 
 class PalmmicroApp:
@@ -15,7 +15,7 @@ class PalmmicroApp:
 		self.running = True
 		
 		# 软件版本号
-		self.version = '0.61'
+		self.version = '0.66'
 		
 		# 创建DataFrame
 		self.df = self.create_dataframe()
@@ -104,7 +104,8 @@ class PalmmicroApp:
 		self.status_label.pack(fill = tk.X, pady = (10, 0), side = tk.BOTTOM)
 
 		# 创建Treeview来显示DataFrame
-		self.create_treeview(main_frame)
+		if self.df is not None:
+			self.create_treeview(main_frame)
 	
 	def create_treeview(self, parent):
 		"""创建Treeview显示DataFrame(带三重索引, 显示方式与print一致)"""
@@ -118,10 +119,15 @@ class PalmmicroApp:
 		
 		# 定义列 - 与print(DataFrame)一致，不重复显示索引
 		# 索引列只显示一次：Symbol, Hedge, Type 作为前3列
-		columns = ['Symbol', 'Hedge', 'Type', 'Time', 'Percent', 'SymbolSize', 'SymbolPrice', 'HedgeSize', 'HedgePrice', 'Note']
+		#columns = ['Symbol', 'Hedge', 'Type', 'Time', 'Percent', 'SymbolSize', 'SymbolPrice', 'HedgeSize', 'HedgePrice', 'Note']
+		df_reset = self.df.reset_index()	# type: ignore
+		columns = df_reset.columns.to_list()
 		
 		# 列显示名称
-		display_names = ['代码', '对冲代码', '方向', '时间', '溢价', '数量', '价格', '对冲数量', '对冲价格', '补充内容']
+		#display_names = ['代码', '对冲代码', '方向', '时间', '溢价', '数量', '价格', '对冲数量', '对冲价格', '补充内容']
+		display_df = self.pdf.GetDisplayDataFrame()
+		display_names = display_df.columns.to_list()
+		display_names.remove('折价')
 		
 		# 列宽度设置
 		col_widths = [70, 74, 36, 60, 60, 80, 80, 80, 80, 300]
@@ -149,78 +155,24 @@ class PalmmicroApp:
 		tree_frame.grid_rowconfigure(0, weight = 1)
 		tree_frame.grid_columnconfigure(0, weight = 1)
 		
-		# 存储列名用于数据更新
-		self.column_names = columns
-		
-		if self.df is not None:
-			# 初始化显示数据
-			self.refresh_treeview()
+		# 初始化显示数据
+		self.refresh_treeview()
 	
 	def refresh_treeview(self):
 		"""刷新Treeview显示(保留三重索引, 与print一致)"""
 		# 清空现有数据
 		for item in self.tree.get_children():
 			self.tree.delete(item)
-		
-		# 过滤掉SymbolSize为0的行
-		filtered_df = self.df[self.df['SymbolSize'] != 0]	# type: ignore
-		
-		# 用于跟踪已显示的Symbol和Hedge组合
-		shown_symbols = set()
-		shown_hedge_pairs = set()  # 记录(Symbol, Hedge)组合
-		
-		# 获取数据并格式化
-		for row_tuple in filtered_df.itertuples():
-			# 从索引中获取三重索引值
-			idx = row_tuple.Index
-			
-			if isinstance(idx, tuple):
-				symbol = idx[0]			# type: ignore
-				hedge = idx[1]			# type: ignore
-				type_val = str(idx[2])	# type: ignore
-			else:
-				symbol = str(idx)
-				hedge = ''
-				type_val = ''
-			
-			# 获取数据列
-			time_val = row_tuple.Time
-			percent_val = float(row_tuple.Percent)		# type: ignore
-			symbol_size_val = int(row_tuple.SymbolSize)	# type: ignore
-			symbol_price_val = row_tuple.SymbolPrice
-			hedge_size_val = int(row_tuple.HedgeSize)	# type: ignore
-			hedge_price_val = row_tuple.HedgePrice
-			note_val = row_tuple.Note
-			
-			# 格式化各列
-			percent_str = f"{percent_val * 100.0:.2f}%"
-			symbol_price_str = f"{symbol_price_val:.3f}"
-			hedge_price_str = f"{hedge_price_val:.2f}"
-			
-			# 决定是否显示Symbol（只在第一次出现时显示）
-			show_symbol = symbol if symbol not in shown_symbols else ''
-			if symbol not in shown_symbols:
-				shown_symbols.add(symbol)
-			
-			# 决定是否显示Hedge（在同一个Symbol下，只在第一次出现时显示）
-			hedge_key = (symbol, hedge)
-			show_hedge = PalmmicroWrapper.GetSymbolDisplay(hedge) if hedge_key not in shown_hedge_pairs else ''
-			if hedge_key not in shown_hedge_pairs:
-				shown_hedge_pairs.add(hedge_key)
-			
-			# 插入行
-			item_id = self.tree.insert('', tk.END, values = (
-				show_symbol, show_hedge, PalmmicroStock.GetTypeDisplay(type_val),
-				time_val, percent_str, symbol_size_val,
-				symbol_price_str, hedge_size_val, hedge_price_str,
-				note_val
-			))
-			
+
+		filtered_df = self.pdf.GetDisplayDataFrame()
+		for row_num, (index, row) in enumerate(filtered_df.iterrows()):			
+			item_id = self.tree.insert('', tk.END, values = (row.iloc[0], row.iloc[1], row.iloc[2], row.iloc[3], row.iloc[4], row.iloc[6], row.iloc[7], row.iloc[8], row.iloc[9], row.iloc[10]))
+
 			# 如果Percent为负数，设置该行为红色
-			if percent_val < 0.0:		# type: ignore
+			if row.iloc[5]:
 				self.tree.tag_configure('red', foreground = 'red')
 				self.tree.item(item_id, tags = ('red',))
-		
+
 		# 更新状态
 		if hasattr(self, 'status_label'):
 			filtered_count = len(filtered_df)

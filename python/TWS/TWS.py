@@ -17,8 +17,8 @@ def IsChinaMarketOpen():
         return True
     elif iTime >= 1300 and iTime < 1500:
         return True
-    return False
-    #return True
+    #return False
+    return True
 
 def IsMarketOpen():
     iTime = PalmmicroStock.GetExchangeTime()
@@ -83,8 +83,8 @@ class MyEWrapper(EWrapper):
             self.arOrder['MGC202608'] = GetOrderArray()
         else:
             #self.arOrder['TLT'] = GetOrderArray([80.90, 84.19, 85.21, 86.40, 86.62, 86.72, 87.59, 89.76, 91.88], 100, 1, 8)
-            self.arOrder['SPX'] = GetOrderArray([5177.26, 6293.95, 7182.92, 7368.55, 7464.93, 7493.99, 7498.06, 7619.43, 8071.89])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0052, 4, 7)
+            self.arOrder['SPX'] = GetOrderArray([5177.26, 6380.83, 7223.96, 7387.16, 7457.11, 7486.57, 7497.04, 7606.92, 8067.09])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0048, 5, 7)
             self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0182, -1, -1)
             
     def nextValidId(self, orderId: int):
