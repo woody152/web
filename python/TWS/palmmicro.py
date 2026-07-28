@@ -26,8 +26,8 @@ class Palmmicro:
         self.arSendMsg['telegram'] = self.GetSendMsgArray('telegram', WECHAT_KEY)
         for strSymbol, strKey in arSymbolKey.items():
             self.arSendMsg[strSymbol] = self.GetSendMsgArray(strSymbol, strKey)
-        task = PalmmicroTask('Snapshot', self.SendSnapshot, 4, (WECHAT_QMT_KEY, ))
-        task.start(3)
+        #task = PalmmicroTask('Snapshot', self.SendSnapshot, 4, (WECHAT_QMT_KEY, ))
+        #task.start(3)
 
     def SendSnapshot(self, strKey):
         df = self.pdf.GetDisplayDataFrame()

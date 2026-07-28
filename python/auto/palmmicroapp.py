@@ -1,4 +1,5 @@
 import dtale
+import pandas as pd
 import threading
 import time
 import tkinter as tk
@@ -7,6 +8,7 @@ from tkinter import ttk, PhotoImage
 
 from palmmicrostock import PalmmicroStock, SinaStock, TdxStock, IbkrStock
 from palmmicroapi import PalmmicroAPI, PalmmicroDataFrame
+from palmmicrosocket import PalmmicroSocket
 
 class PalmmicroApp:
 	def __init__(self, root):
@@ -15,7 +17,7 @@ class PalmmicroApp:
 		self.running = True
 		
 		# 软件版本号
-		self.version = '0.66'
+		self.version = '0.7'
 		
 		# 创建DataFrame
 		self.df = self.create_dataframe()
@@ -23,6 +25,11 @@ class PalmmicroApp:
 		if self.df is not None:
 			self.update_thread = threading.Thread(target = self.update_data_loop, daemon = True, name = f"{self.__class__.__name__}-{self.version}")
 			self.update_thread.start()
+
+			#查找并且打开self.sender的注释语句把DataFrame数据发送到公网, 后面还有一个self.sender.stop()
+			#self.sender = PalmmicroSocket("wss://palmmicro.onrender.com/ws", self.get_current_data)
+			#self.sender.start()
+						
 			# 绑定窗口关闭事件
 			root.protocol('WM_DELETE_WINDOW', self.on_closing)
 		
@@ -35,6 +42,10 @@ class PalmmicroApp:
 		root.iconphoto(True, icon)
 		# 保持引用，防止被垃圾回收
 		root.icon_image = icon	
+
+	def get_current_data(self) -> pd.DataFrame:
+		"""回调函数 - 返回当前最新数据"""
+		return self.pdf.GetDisplayDataFrame()
 
 	def _debug(self, strDebug: str):
 		self.strError = strDebug
@@ -227,10 +238,9 @@ class PalmmicroApp:
 		self.root.destroy()
 	
 	def cleanup_resources(self):
-		"""释放资源接口"""
+		# 在这里可以添加需要释放的资源例如：关闭数据库连接、保存配置文件、释放大对象等
 		TdxStock.TqDebug('释放资源...')
-		# 在这里可以添加需要释放的资源
-		# 例如：关闭数据库连接、保存配置文件、释放大对象等
+		#self.sender.stop()
 		IbkrStock.FreeAPI()
 		SinaStock.TaskFree()
 		#TdxStock.TqFree()
