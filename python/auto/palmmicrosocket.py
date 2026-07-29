@@ -133,7 +133,7 @@ class PalmmicroSocket:
 				self.websocket.send(json.dumps(message)), 
 				timeout=10
 			)
-			print(f"✓ 发送: {len(df)}行")
+			#print(f"✓ 发送: {len(df)}行")
 			
 		except asyncio.TimeoutError:
 			print("⚠ 发送超时")

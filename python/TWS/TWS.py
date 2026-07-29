@@ -17,8 +17,8 @@ def IsChinaMarketOpen():
         return True
     elif iTime >= 1300 and iTime < 1500:
         return True
-    #return False
-    return True
+    return False
+    #return True
 
 def IsMarketOpen():
     iTime = PalmmicroStock.GetExchangeTime()
