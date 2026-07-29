@@ -17,12 +17,12 @@ class PalmmicroApp:
 		self.running = True
 		
 		# 软件版本号
-		self.version = '0.7'
+		self.version = '0.71'
 		
 		# 创建DataFrame
 		self.df = self.create_dataframe()
-		# 启动数据更新线程
 		if self.df is not None:
+			# 启动数据更新线程
 			self.update_thread = threading.Thread(target = self.update_data_loop, daemon = True, name = f"{self.__class__.__name__}-{self.version}")
 			self.update_thread.start()
 

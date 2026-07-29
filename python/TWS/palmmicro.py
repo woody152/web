@@ -1,9 +1,11 @@
 import dtale
+import pandas as pd
 import requests
 #import threading
 #import time
 
 from palmmicroapi import PalmmicroAPI, PalmmicroDataFrame
+from palmmicrosocket import PalmmicroSocket
 from palmmicrostock import PalmmicroTask, PalmmicroStock, SinaStock, TdxStock
 
 #from _tgprivate import TG_TOKEN
@@ -28,7 +30,13 @@ class Palmmicro:
             self.arSendMsg[strSymbol] = self.GetSendMsgArray(strSymbol, strKey)
         #task = PalmmicroTask('Snapshot', self.SendSnapshot, 4, (WECHAT_QMT_KEY, ))
         #task.start(3)
+        self.sender = PalmmicroSocket("wss://palmmicro.onrender.com/ws", self.get_current_data)
+        self.sender.start()
 
+    def get_current_data(self) -> pd.DataFrame:
+        return self.pdf.GetDisplayDataFrame()
+
+    """
     def SendSnapshot(self, strKey):
         df = self.pdf.GetDisplayDataFrame()
         json_data = df.to_json(orient = 'split', date_format = 'iso', force_ascii = False)
@@ -38,13 +46,11 @@ class Palmmicro:
             # 检查响应
             if response.status_code == 200:
                 ...
-                """
-                result = response.json()
-                print(f"✅ 数据发送成功")
-                print(f"   - 状态: {result.get('message')}")
-                print(f"   - 行数: {result.get('rows', 0)}")
-                print(f"   - 大小: {result.get('size_bytes', 0)} bytes")
-                """
+                #result = response.json()
+                #print(f"✅ 数据发送成功")
+                #print(f"   - 状态: {result.get('message')}")
+                #print(f"   - 行数: {result.get('rows', 0)}")
+                #print(f"   - 大小: {result.get('size_bytes', 0)} bytes")
             elif response.status_code == 401:
                 print("❌ 错误: 缺少API Key")
             elif response.status_code == 403:
@@ -60,6 +66,7 @@ class Palmmicro:
             print("❌ 错误: 请求超时")
         except Exception as e:
             print(f"❌ 错误: {e}")
+    """
  
     def GetSendMsgArray(self, group, strKey):
         ar = {'key': strKey,
