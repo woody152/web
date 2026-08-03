@@ -1,7 +1,6 @@
 import threading
 import time
 
-# python -m pip install setuptools
 # python setup.py install
 from ibapi.client import EClient
 from ibapi.wrapper import EWrapper
@@ -83,8 +82,8 @@ class MyEWrapper(EWrapper):
             self.arOrder['MGC202608'] = GetOrderArray()
         else:
             #self.arOrder['TLT'] = GetOrderArray([80.90, 84.19, 85.21, 86.40, 86.62, 86.72, 87.59, 89.76, 91.88], 100, 1, 8)
-            self.arOrder['SPX'] = GetOrderArray([5177.26, 6380.83, 7223.96, 7380.99, 7433.11, 7472.08, 7495.61, 7610.23, 8067.09])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0047, 3, 4)
+            self.arOrder['SPX'] = GetOrderArray([5177.26, 6380.83, 7223.96, 7328.71, 7398.93, 7429.72, 7480.70, 7632.68, 8067.09])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0044, 4, 6)
             self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0182, -1, -1)
             
     def nextValidId(self, orderId: int):
@@ -332,7 +331,7 @@ class MyEClient(EClient):
     def StockReqMktData(self, strSymbol):
         contract = Contract()
         contract.secType = 'STK'
-        contract.exchange = PalmmicroWrapper.GetStockContractExchange()     # GetContractExchange()
+        contract.exchange = PalmmicroWrapper.GetStockContractExchange()
         return self.callReqMktData(strSymbol, contract)
 
     def IndexReqMktData(self, strSymbol):

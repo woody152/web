@@ -561,7 +561,8 @@ class PalmmicroWrapper(EWrapper):
 			contract.currency = 'USD'
 			self.arContract[combined] = contract
 			self.iRequestId += 1
-			self.client.reqMktData(self.iRequestId, contract, '233', False, False, [])
+			#self.client.reqMktData(self.iRequestId, contract, '233', False, False, [])
+			self.client.reqMktData(self.iRequestId, contract, '', False, False, [])
 			self.arStock[self.iRequestId] = IbkrStock(combined)
 
 	def error(self, reqId, errorCode, errorString, *args):

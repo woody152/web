@@ -597,7 +597,7 @@ class PalmmicroDataFrame:
 		display_df['SymbolPrice'] = display_df['SymbolPrice'].apply(lambda x: f"{x:.3f}")
 	
 		# 格式化 HedgePrice 为两位小数
-		display_df['HedgePrice'] = display_df['HedgePrice'].apply(lambda x: f"{x:.2f}")
+		#display_df['HedgePrice'] = display_df['HedgePrice'].apply(lambda x: f"{x:.2f}")
 	
 		# 重置索引，将三重索引变为普通列
 		display_df = display_df.reset_index()

@@ -30,13 +30,13 @@ class Palmmicro:
             self.arSendMsg[strSymbol] = self.GetSendMsgArray(strSymbol, strKey)
         #task = PalmmicroTask('Snapshot', self.SendSnapshot, 4, (WECHAT_QMT_KEY, ))
         #task.start(3)
-        self.sender = PalmmicroSocket("wss://palmmicro.onrender.com/ws", self.get_current_data)
-        self.sender.start()
+        #self.sender = PalmmicroSocket("wss://palmmicro.onrender.com/ws", self.get_current_data)
+        #self.sender.start()
 
+    """
     def get_current_data(self) -> pd.DataFrame:
         return self.pdf.GetDisplayDataFrame()
 
-    """
     def SendSnapshot(self, strKey):
         df = self.pdf.GetDisplayDataFrame()
         json_data = df.to_json(orient = 'split', date_format = 'iso', force_ascii = False)
