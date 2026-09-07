@@ -15,32 +15,35 @@ function GetForeignMarketCloseTick($strDate, $strType)
 	switch ($strType)
 	{
 	case 'EU':
-		$strCheck = 'znb_DAX';
+		$arCheck = ['znb_DAX', 'znb_CAC', 'znb_UKX', 'znb_SWI20'];
 		$strTimezone = 'Europe/Berlin';
 		$strCloseTime = '17:30:00';
 		break;
 	
 	case 'JP':
-		$strCheck = 'znb_NKY';
+		$arCheck = ['znb_NKY'];
 		$strTimezone = 'Asia/Tokyo';
 		$strCloseTime = '15:30:00';
 		break;
 	
 	case 'HK':
-		$strCheck = '^HSI';
+		$arCheck = ['^HSI'];
 		$strTimezone = 'Asia/Hong_Kong';
 		$strCloseTime = '16:08:00';
 		break;
 	}
-	if (SqlGetHistoryByDate(SqlGetStockId($strCheck), $strDate) === false)
+	foreach($arCheck as $strCheck)
 	{
-		// DebugString(__FUNCTION__.' no data of '.$strCheck.' on '.$strDate);
-		return false;
-	}
+		if (SqlGetHistoryByDate(SqlGetStockId($strCheck), $strDate) === false)
+		{
+			// DebugString(__FUNCTION__.' no data of '.$strCheck.' on '.$strDate);
+			return false;
+		}
+	}	
 
 	$strOldTimezone = date_default_timezone_get();
 	date_default_timezone_set($strTimezone);
-	$iTick = strtotime($strDate.' '.$strCloseTime);
+	$iTick = strtotime("$strDate $strCloseTime");
 	date_default_timezone_set($strOldTimezone);
 	return $iTick;
 }
@@ -61,10 +64,8 @@ class MyStockReference extends MysqlReference
    				if ($now_ymd->GetYMD() == $strDate)
    				{
    					$iHourMinute = $now_ymd->GetHourMinute();
-//   					DebugVal($iHourMinute, __FUNCTION__.' '.$strSymbol, true);
    					if ($iHourMinute < 2100)
    					{
-//   						DebugString(__FUNCTION__.' update history '.$strSymbol.' on '.$strDate, true);
    						$this->_updateStockHistory($strStockId, $strDate);
    					}
    					if ($now_ymd->IsStockTradingHourEnd())	$this->_updateStockEma($strStockId, $strDate);
@@ -76,12 +77,9 @@ class MyStockReference extends MysqlReference
 				{
 					$tick_sql = new StockTickSql();
 					$ymd = new TickYMD($tick_sql->ReadInt($strStockId));
-					//if ($ymd->GetYMD() == $this->GetDate())
-					//{
-						$this->SetTime($ymd->GetHMS());
-						$this->SetExternalLink($strSymbol);
-						$this->SetHasData();
-					//}
+					$this->SetTime($ymd->GetHMS());
+					$this->SetExternalLink($strSymbol);
+					$this->SetHasData();
 				}
    			}
    			
@@ -196,5 +194,3 @@ class MyStockReference extends MysqlReference
     	}
     }
 }
-
-?>

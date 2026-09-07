@@ -7,7 +7,7 @@ function _getStockQuantity()
 	$strQuantity = SqlCleanString($_POST['quantity']);
 	if ($_POST['type'] == '0')    // sell
 	{
-	    $strQuantity = '-'.$strQuantity;
+	    $strQuantity = "-$strQuantity";
 	}
 	return $strQuantity; 
 }
@@ -24,7 +24,7 @@ function _getStockCost($strGroupItemId, $strQuantity, $strPrice)
    		$sym = GetGroupItemSym($strGroupItemId);
    		if ($sym->IsSinaFuture())
    		{
-   			$fCommission = 0.62;
+   			$fCommission = 0.61;
    		}
    		else if ($sym->IsSinaForex())
    		{
@@ -265,5 +265,3 @@ class _SubmitTransactionAccount extends StockAccount
     	UpdateStockGroupItem($strGroupId, $strGroupItemId);
     }
 }
-
-?>

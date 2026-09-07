@@ -3,16 +3,33 @@ require_once('_qdiigroup.php');
 
 class _QdiiEuAccount extends QdiiGroupAccount
 {
+    private $eng_ref;
+    private $swi_ref;
+
     function Create() 
     {
         $strSymbol = $this->GetName();
+        $strEng = 'znb_UKX';
+        $strSwi = 'znb_SWI20';
         $arLev = $this->GetLeverageSymbols(QdiiEuGetEstSymbol($strSymbol));
-        StockPrefetchArrayExtendedData([...$arLev, $strSymbol]);
+        StockPrefetchArrayExtendedData([...$arLev, $strSymbol, $strSwi, $strEng]);
 
         $this->ref = new QdiiEuReference($strSymbol);
+        $this->eng_ref = new MyStockReference($strEng);
+        $this->swi_ref = new MyStockReference($strSwi);
 		$this->QdiiCreateGroup($arLev);
-    } 
-} 
+    }
+
+	function GetEngRef()
+	{
+		return $this->eng_ref;
+	}
+
+	function GetSwiRef()
+	{
+		return $this->swi_ref;
+	}
+}
 
 function EchoAll()
 {
@@ -22,7 +39,7 @@ function EchoAll()
    	$ref = $acct->GetRef();
    	
     EchoFundEstParagraph($ref);
-    EchoReferenceParagraph([...$acct->GetStockRefArray(), ...$ref->GetForexRefArray()], $acct->IsAdmin());
+    EchoReferenceParagraph([...$acct->GetStockRefArray(), $acct->GetEngRef(), $acct->GetSwiRef(), ...$ref->GetForexRefArray()], $acct->IsAdmin());
     $acct->EchoCommonParagraphs();
     if ($group = $acct->EchoTransaction()) 
     {

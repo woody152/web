@@ -29,7 +29,7 @@ function __getPosDisplay($ref, $fPos, $arRatio, &$bMatch, $bAdmin)
 {
 	$strPos = number_format($fPos, 2);
 	if ($strPos != number_format($ref->GetPosition(), 2))	$bMatch = false;
-	if ($fPos > 0.25 && $fPos < 1.25)
+	if ($fPos > 0.618 && $fPos < 1.618)
 	{
 		if ($bAdmin && $bMatch === false)
 		{
@@ -345,7 +345,7 @@ function EchoAll()
 	
     if ($ref = $acct->EchoStockGroup())
     {
-    	if (($strInput = GetEditInput()) === false)		$strInput = '1.0';
+    	if (($strInput = GetEditInput()) === false)		$strInput = '0.618';
     	EchoEditInputForm('进行'.EXHAUSTIVE_HOLDINGS_DISPLAY.'计算的'.TableColumnGetNetValue().'涨跌%阈值', $strInput);
     	if ($strInput != '')
     	{

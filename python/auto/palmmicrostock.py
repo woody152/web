@@ -192,6 +192,13 @@ class PalmmicroStock:
 	
 	def HasData(self, strType: str) -> bool:
 		return self.get_value(strType + '_price') is not None and self.get_value(strType + '_size') is not None
+		"""
+		if self.get_value(strType + '_price') is not None and self.get_value(strType + '_size') is not None:
+			#if self.get_value('LAST_price') is not None:
+			if self._data[strType + '_price'] > 0.001:
+				return True
+		return False
+		"""
 
 	def IsUpdated(self, strType: str):
 		if self.HasData(strType):

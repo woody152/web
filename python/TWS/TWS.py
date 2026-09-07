@@ -82,9 +82,9 @@ class MyEWrapper(EWrapper):
             self.arOrder['MGC202612'] = GetOrderArray()
         else:
             #self.arOrder['TLT'] = GetOrderArray([80.90, 84.19, 85.21, 86.40, 86.62, 86.72, 87.59, 89.76, 91.88], 100, 1, 8)
-            self.arOrder['SPX'] = GetOrderArray([5220.15, 6602.11, 7064.55, 7383.94, 7668.39, 7669.09, 7716.27, 7952.84, 7984.06])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0019, 3, 5)
-            self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0116, -1, -1)
+            self.arOrder['SPX'] = GetOrderArray([5235.75, 6688.72, 7118.57, 7488.08, 7594.17, 7601.11, 7682.98, 7686.72, 7708.18, 7815.25, 7857.59, 8141.69])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0008, 7, -1)
+            self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0095, -1, 9)
             
     def nextValidId(self, orderId: int):
         self.client.StartStreaming(orderId)
@@ -114,8 +114,8 @@ class MyEWrapper(EWrapper):
 
     def __get_sell_symbol(self, strSymbol):
         if strSymbol.startswith('MES'):
-            #return 'MES' + self.strNextFuture
-            return 'MES' + self.strCurFuture
+            return 'MES' + self.strNextFuture
+            #return 'MES' + self.strCurFuture
         else:
             return strSymbol
 

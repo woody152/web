@@ -553,7 +553,8 @@ class PalmmicroDataFrame:
 				iMktSize = arReal[strMktSymbol]
 			else:
 				iMktSize = arQuantity[strMktSymbol]
-			if iMktSize > 0:
+			#if iMktSize > 0:
+			if iMktSize > 0 and arSrcPrice[strMktSymbol] > 0.001:
 				fEst = self.api.EstNetValue(strSymbol, arSrcPrice)
 				row = self._build_row(strTime, fEst, iSize, fPrice, iMktSize, arSrcPrice[strMktSymbol], strDebug)
 				return self.UpdateData(strSymbol, strMktSymbol, strType, row)

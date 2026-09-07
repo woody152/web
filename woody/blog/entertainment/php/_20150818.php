@@ -980,7 +980,7 @@ function Echo20240606($strHead)
 	$strSZ164824 = GetGroupStockLink('SZ164824', true);
 	$strQdiiJp = _getStockMenuLink('qdiijp');
 	$strQdiiEu = _getStockMenuLink('qdiieu');
-	$strSina = GetExternalLink('https://finance.sina.com.cn/money/globalindex/', '新浪环球市场');
+	$strSina = GetExternalLink(GetSinaFinanceUrl().'/money/globalindex/', '新浪环球市场');
 	$strSENSEX = GetSinaDataLink('znb_SENSEX');
 	$strCalibration = GetNameLink('calibrationhistory', CALIBRATION_HISTORY_DISPLAY);
 	$strQdii = _getStockMenuLink('qdii');

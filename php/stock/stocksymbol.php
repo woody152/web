@@ -3,7 +3,7 @@
 /* https://finance.sina.com.cn/money/globalindex/ 
 https://finance.sina.com.cn/money/globalindex/asia.shtml
 gb_dji,gb_ixic,gb_inx,
-znb_UKX,znb_DAX,znb_INDEXCF,znb_CAC,znb_SMI,znb_FTSEMIB,znb_MADX,znb_OMX,znb_HEX,znb_OSEAX,znb_ISEQ,znb_AEX,znb_IBEX,znb_SX5E,znb_XU100,znb_NKY,znb_TWJQ,znb_FSSTI,znb_KOSPI,znb_FBMKLCI,znb_SET,znb_JCI,znb_PCOMP,znb_KSE100,znb_SENSEX,znb_VNINDEX,znb_CSEALL,znb_SASEIDX,znb_SPTSX,znb_MEXBOL,znb_IBOV,znb_MERVAL,znb_AS51,znb_NZSE50FG,znb_CASE,znb_JALSH
+znb_UKX,znb_DAX,znb_INDEXCF,znb_CAC,znb_SWI20,znb_FTSEMIB,znb_MADX,znb_OMX,znb_HEX,znb_OSEAX,znb_ISEQ,znb_AEX,znb_IBEX,znb_SX5E,znb_XU100,znb_NKY,znb_TWJQ,znb_FSSTI,znb_KOSPI,znb_FBMKLCI,znb_SET,znb_JCI,znb_PCOMP,znb_KSE100,znb_SENSEX,znb_VNINDEX,znb_CSEALL,znb_SASEIDX,znb_SPTSX,znb_MEXBOL,znb_IBOV,znb_MERVAL,znb_AS51,znb_NZSE50FG,znb_CASE,znb_JALSH
 rt_hkHSSI,hkHSSI_i,rt_hkCSCSHQ
 
 分类,代码,名称,仓位,相关指数,指数代码,申购费,申购状态,赎回费,赎回状态
@@ -951,16 +951,22 @@ class StockSymbol
 			switch ($str)
 			{
 			case 'CAC':
-				return $strIndexPrefix.'FCHI';
+				return "{$strIndexPrefix}FCHI";
 				
 			case 'DAX':
-				return $strIndexPrefix.'GDAXI';
+				return "{$strIndexPrefix}GDAXI";
 				
 			case 'NKY':
-				return $strIndexPrefix.'N225';
+				return "{$strIndexPrefix}N225";
 				
 			case 'SENSEX':
-				return $strIndexPrefix.'BSESN';
+				return "{$strIndexPrefix}BSESN";
+
+			case 'SWI20':
+				return "SPI20.SW";
+
+            case 'UKX':
+				return "{$strIndexPrefix}FTSE";
 			}
 		}
         else if ($this->IsIndex())
@@ -1013,6 +1019,8 @@ class StockSymbol
 			case 'NKY':
 			case 'TPX':
 			case 'SENSEX':	// PRC 1145
+			case 'SWI20':
+            case 'UKX':
     			if ($iHourMinute < 900)		return true;
     			break;
 	   		}
@@ -1041,6 +1049,8 @@ class StockSymbol
     		{
 			case 'CAC':
 			case 'DAX':
+			case 'SWI20':
+            case 'UKX':
     			if ($iHourMinute > 1805)		return true;	// DAX30 指数交易时间为09:00 - 17:30（CET）
     			break;
     			
@@ -1131,6 +1141,12 @@ class StockSymbol
 
 			case 'SENSEX':
 				return 'Asia/Kolkata';
+
+			case 'SWI20':
+				return 'Europe/Zurich';
+
+            case 'UKX':
+				return 'Europe/London';
 			}
 		}
         else if ($this->IsSymbolA() || $this->IsSymbolH())	{}

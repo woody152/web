@@ -119,6 +119,7 @@ function isValidXml($str)
     return $xml;
 }
 
+// https://dataspanapi.wisdomtree.com/productperformance/performance/?ticker=CRUD+LN&startDate=2026-08-23&endDate=2026-09-06
 function _getSimpleTestString($strInput, $bChinese)
 {
 	if (str_starts_with($strInput, 'http'))
@@ -127,7 +128,7 @@ function _getSimpleTestString($strInput, $bChinese)
     	{
     		$strFileName = DebugGetPathName('simpletest.txt');
     		file_put_contents($strFileName, $strRead);
-    		DebugString('Saved '.$strInput.' to '.basename($strFileName));
+    		DebugString("Saved $strInput to ".basename($strFileName));
    		   	$strNewLine = GetHtmlNewLine();
     		$str = GetFileDebugLink($strFileName).$strNewLine;
     		if ($ar = json_decode($strRead, true))
@@ -147,7 +148,10 @@ function _getSimpleTestString($strInput, $bChinese)
     		}
    			$str .= ConvertToHtmlDisplay($strOutput);
     	}
-    	else	$str = $bChinese ? 'Curl读错误' : 'Curl read error';
+    	else
+		{
+			$str = $bChinese ? 'Curl读错误' : 'Curl read error';
+		}
 	}
 	else
 	{

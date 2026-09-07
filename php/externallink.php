@@ -249,12 +249,12 @@ function GetSinaHkStockLink($sym)
     return GetExternalLink($strHttp, $strSymbol);
 }
 
-// https://quotes.sina.cn/global/hq/quotes.php?code=NKY
+// https://finance.sina.com.cn/stock/globalindex/quotes/SWI20
 function GetSinaStockLink($sym)
 {
 	if ($str = $sym->IsSinaGlobalIndex())
 	{
-		return GetExternalLink('https://quotes.sina.cn/global/hq/quotes.php?code='.$str, $str);
+		return GetExternalLink(GetSinaFinanceUrl()."/stock/globalindex/quotes/$str", $str);
 	}
     else if ($sym->IsSymbolA())
     {
