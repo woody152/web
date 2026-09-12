@@ -201,9 +201,9 @@ function SqlGetStockGroupItemSymbolArray($item_sql)
     			$sym = new StockSymbol($strSymbol);
     			if ($sym->IsTradable())
     			{
-    				if ($sym->IsSymbolA())		$arA[$str] = $strSymbol;
-    				else if ($sym->IsSymbolH())	$arH[$str] = $strSymbol;
-    				else						$arUS[$str] = $strSymbol;
+    				if ($sym->IsSymbolA())			$arA[$str] = $strSymbol;
+    				else if ($sym->IsSymbolH())		$arH[$str] = $strSymbol;
+					else if ($sym->IsSymbolUS())	$arUS[$str] = $strSymbol;
     			}
     		}
 		}

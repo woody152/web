@@ -156,9 +156,9 @@ function UpdateYahooHistoryChart($ref)
 	$strStockId = $ref->GetStockId();
 	$strCurDate = $ref->GetDate();
    	$date_sql = new StockHistoryDateSql();
-   	if ($strCurDate == $date_sql->ReadDate($strStockId))
+   	if ($strCurDate !== false && $strCurDate == $date_sql->ReadDate($strStockId))
     {
-        DebugString(__FUNCTION__.' already updated', true);
+        DebugString(__FUNCTION__." already updated on $strCurDate", true);
 		return false;
 	}
     
@@ -221,7 +221,7 @@ function UpdateYahooHistoryChart($ref)
 		DebugVal($iModified, 'Modified');
         // Yahoo has wrong Chinese and Hongkong holiday record with '0' volume 
 		$his_sql->DeleteByZeroVolume($strStockId);
-		$date_sql->WriteDate($strStockId, $strCurDate);
+		if ($strCurDate !== false)  $date_sql->WriteDate($strStockId, $strCurDate);
 		unlinkConfigFile($ref->GetSymbol());
 		return true;
    	}

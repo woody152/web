@@ -82,9 +82,9 @@ class MyEWrapper(EWrapper):
             self.arOrder['MGC202612'] = GetOrderArray()
         else:
             #self.arOrder['TLT'] = GetOrderArray([80.90, 84.19, 85.21, 86.40, 86.62, 86.72, 87.59, 89.76, 91.88], 100, 1, 8)
-            self.arOrder['SPX'] = GetOrderArray([5235.75, 6688.72, 7118.57, 7488.08, 7594.17, 7601.11, 7682.98, 7686.72, 7708.18, 7815.25, 7857.59, 8141.69])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0008, 7, -1)
-            self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0095, -1, 9)
+            self.arOrder['SPX'] = GetOrderArray([5235.75, 6688.72, 7174.22, 7517.21, 7580.98, 7655.05, 7673.76, 7686.67, 7792.36, 7860.21, 8141.69])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0005, 4, -1)
+            self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0094, -1, 8)
             
     def nextValidId(self, orderId: int):
         self.client.StartStreaming(orderId)

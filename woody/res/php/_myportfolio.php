@@ -123,7 +123,7 @@ function _echoPortfolio($portfolio, $sql, $strMemberId, $bAdmin)
 		                $ref = $trans->GetRef();
 		                if ($ref->IsSymbolA())			$arTransA[] = $trans;
 		                else if ($ref->IsSymbolH())     $arTransH[] = $trans;
-		                else			                $arTransUS[] = $trans;
+		                else if ($ref->IsSymbolUS())     $arTransUS[] = $trans;
 		            }
 		        }
 		    }

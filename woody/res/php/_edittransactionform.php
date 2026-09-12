@@ -17,13 +17,16 @@ function _getPriceOption($strGroupItemId, $strPrice)
     {
     	$ar = [];
     	$iPrecision = $sym->GetPrecision();
-    	$fPrice = round($strPrice, $iPrecision);
-    	$iPow = pow(10, $iPrecision);
-    	for ($i = -5; $i <= 5; $i ++)
-    	{
-    		$f = floatval($i) / $iPow;
-    		$ar[] = strval($fPrice + $f);
-    	}
+		if ($strPrice)
+		{
+	    	$fPrice = round($strPrice, $iPrecision);
+    		$iPow = pow(10, $iPrecision);
+    		for ($i = -5; $i <= 5; $i ++)
+    		{
+    			$f = floatval($i) / $iPow;
+    			$ar[] = strval($fPrice + $f);
+    		}
+		}	
     	return $ar;
     }
     return false;
@@ -166,8 +169,16 @@ function StockEditTransactionForm($acct, $strSubmit, $strGroupId = false, $strGr
     	$strCost = '';
     	$strRemark = _getSuggestedRemark($item_sql, $strGroupItemId);
     	if ($strGroupItemId === false)		$strGroupItemId = _getFirstGroupItem($item_sql);
-    	$strPrice = $arPrice[$strGroupItemId];
-    	$strQuantity = $arQuantity[$strGroupItemId];
+		if ($strGroupItemId)
+		{
+	    	$strPrice = $arPrice[$strGroupItemId];
+    		$strQuantity = $arQuantity[$strGroupItemId];
+		}
+		else
+		{
+			$strPrice = '';
+			$strQuantity = '';
+		}
     }
 
 	$strPriceArray = HtmlGetJsArray($arPrice);

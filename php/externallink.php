@@ -268,7 +268,11 @@ function GetSinaStockLink($sym)
     {
     	return GetSinaHkStockLink($sym);
     }
-  	return GetSinaUsStockLink($sym);
+    else if ($sym->IsSymbolUS())
+    {
+	  	return GetSinaUsStockLink($sym);
+	}
+	return $sym->GetSymbol();
 }
 
 function GetSinaFutureLink($sym)

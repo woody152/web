@@ -33,7 +33,7 @@ class StockGroup
             $this->multi_amount->fHKD += $trans->GetValue();
             $this->multi_profit->fHKD += $trans->GetProfit();
         }
-        else 
+        else if ($sym->IsSymbolUS())
         {
             $this->multi_amount->fUSD += $trans->GetValue();
             $this->multi_profit->fUSD += $trans->GetProfit();

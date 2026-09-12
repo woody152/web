@@ -184,9 +184,8 @@ function _addHoldingsSymbol(&$ar, $strSymbol)
     		_addFundPairSymbol($ar, $strHoldingSymbol);
     		
     		$holding_sym = new StockSymbol($strHoldingSymbol);
-    		if ($holding_sym->IsSymbolA())	{}
-    		if ($holding_sym->IsSymbolH())	$ar[] = 'fx_shkdcny';
-    		else							$ar[] = 'fx_susdcny';
+    		if ($holding_sym->IsSymbolH())			$ar[] = 'fx_shkdcny';
+    		else if ($holding_sym->IsSymbolUS())	$ar[] = 'fx_susdcny';
     	}
     }
 }
@@ -254,7 +253,7 @@ function _getAllSymbolArray($strSymbol)
         }
         if ($strSymbolAdr = SqlGetHadrPair($strSymbol))		$ar[] = $strSymbolAdr;
     }
-    else
+    else if ($sym->IsSymbolUS())
     {
        	_addHoldingsSymbol($ar, $strSymbol);
     	if ($strSymbolH = SqlGetAdrhPair($strSymbol))

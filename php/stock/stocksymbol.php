@@ -517,6 +517,9 @@ class StockSymbol
     // Index start with ^
     var $strFirstChar = false;
     var $strOthers;
+
+	// Separated by .
+	private $strSuffix = false;
     
     // Chinese market
     var $strDigitA = false;     // 162411
@@ -563,9 +566,22 @@ class StockSymbol
     {
         if ($this->IsSymbolA())     return false;
         if ($this->IsSymbolH())     return false;
+        if ($this->IsSymbolJP())     return false;
         return true;
     }
     
+	private function _findSuffix()
+	{
+		$iPos = strpos($this->strSymbol, '.');
+		$this->strSuffix = ($iPos !== false) ? substr($this->strSymbol, $iPos + 1) : 'x';
+	}
+
+	function IsSymbolJP()
+	{
+		if ($this->strSuffix === false)		$this->_findSuffix();
+		return ($this->strSuffix == 'T') ? true : false;
+	}
+
     function IsSymbolH()
     {
         if ($this->iDigitH >= 0)   return true;
@@ -887,7 +903,7 @@ class StockSymbol
     {
     	if ($this->IsSinaGlobalIndex())			return $this->strSymbol;
     	
-        $strSymbol = str_replace('.', '$', $this->strSymbol);
+        $strSymbol = $this->strSymbol;
         $strLower = strtolower($strSymbol);
         if ($this->IsIndex())
         {
@@ -895,15 +911,19 @@ class StockSymbol
 			else if ($this->GetSinaIndexUS())	return SINA_US_PREFIX.$this->strSinaIndexUS;
             else                                return false;
         }
-        else if ($this->IsSymbolH())
-        {   // Hongkong market
-            return SINA_HK_PREFIX.$strSymbol;    
-        }
         else if ($this->IsSymbolA())
         {
             return $strLower;
         }
-        return SINA_US_PREFIX.$strLower;
+        else if ($this->IsSymbolH())
+        {   // Hongkong market
+            return SINA_HK_PREFIX.$strSymbol;    
+        }
+        else if ($this->IsSymbolJP())
+        {
+            return false;
+        }
+        return SINA_US_PREFIX.str_replace('.', '$', $strLower);		// BRK.A -> gb_brk$a
     }
 
 /*上证综指代码: 000001.ss, 深证成指代码: 399001.SZ, 沪深300代码: 000300.ss 下面就是世界股票交易所的网址和缩写, 要查找哪个股票交易所的数据, 就按照上面的格式以此类推. 
@@ -926,7 +946,7 @@ class StockSymbol
     	$strIndexPrefix = '%5E';		// ^HSI
     	$strHK = '.hk';
     	
-        $strSymbol = str_replace('.', '-', $this->strSymbol);
+        $strSymbol = $this->strSymbol;
         if ($str = $this->IsSinaFutureUS())
         {
         	switch ($str)
@@ -980,14 +1000,21 @@ class StockSymbol
 				return $strIndexPrefix.$this->strOthers;	// index ^HSI
 			}
         }
-        else if ($this->IsSymbolH())					return $this->strOthers.$strHK;	// Hongkong market
         else if ($this->IsSymbolA())
         {
             if ($this->strPrefixA == SH_PREFIX)			return $this->strDigitA.'.ss';	// Shanghai market
             else if ($this->strPrefixA == SZ_PREFIX)	return $this->strDigitA.'.sz';	// Shenzhen market
             else if ($this->strPrefixA == BJ_PREFIX)	return $this->strDigitA.'.bj';	// Beijing market
         }
-        return $strSymbol;
+        else if ($this->IsSymbolH())
+		{
+			return $this->strOthers.$strHK;	// Hongkong market
+		}
+		else if ($this->IsSymbolJP())
+		{
+			return $strSymbol;
+		}
+        return str_replace('.', '-', $strSymbol);	// BRK.A -> BRK-A
     }
     
     function GetPrecision()
@@ -1000,8 +1027,9 @@ class StockSymbol
     function IsTradable()
     {
     	if ($this->IsSinaGlobalIndex())	return false;
-    	if ($this->IsIndex())				return false;
+    	if ($this->IsIndex())			return false;
     	if ($this->IsIndexA())			return false;
+        if ($this->IsSymbolJP())        return false;
 //    	if ($this->IsForex())			return false;
 //    	if ($this->IsSinaFuture())	return false;
     	return true;
@@ -1029,7 +1057,7 @@ class StockSymbol
    		{
    			if ($iHourMinute < 915)		return true;
    		}
-   		else if ($this->IsSymbolH())
+   		else if ($this->IsSymbolH() || $this->IsSymbolJP())
    		{	// Hongkong market from 9:00 to 16:10
    			if ($iHourMinute < 900)		return true;
    		}
@@ -1079,6 +1107,10 @@ class StockSymbol
    		{	// Hongkong market from 9:00 to 16:10
    			if ($iHourMinute > 1615)				return true;
    		}
+   		else if ($this->IsSymbolJP())
+   		{	// Japan market from 9:00 to 15:30
+   			if ($iHourMinute > 1535)				return true;
+   		}
    		else
    		{   // US extended hours trading from 4am to 8pm
    			if ($iHourMinute > 2005)				return true;
@@ -1117,6 +1149,7 @@ class StockSymbol
     function GetTimeZone()
     {
     	$strEDT = 'America/New_York';
+		$strJP = 'Asia/Tokyo';
     	
         if ($this->IsSinaFund())							{}
         else if ($this->IsSinaFuture())
@@ -1137,7 +1170,7 @@ class StockSymbol
 				
 			case 'NKY':
 			case 'TPX':
-				return 'Asia/Tokyo';
+				return $strJP;
 
 			case 'SENSEX':
 				return 'Asia/Kolkata';
@@ -1150,6 +1183,7 @@ class StockSymbol
 			}
 		}
         else if ($this->IsSymbolA() || $this->IsSymbolH())	{}
+		else if ($this->IsSymbolJP())						return $strJP;
         else												return $strEDT;
         return 'Asia/Shanghai';
     }

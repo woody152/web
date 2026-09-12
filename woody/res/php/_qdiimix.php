@@ -38,6 +38,15 @@ class _QdiiMixAccount extends FundGroupAccount
         	}
         }
 
+    	foreach ($this->ref->GetHoldingsRefArray() as $holding_ref)
+    	{
+			if ($holding_ref->IsSymbolJP())
+			{
+				// DebugString('JP Symbol: '.$holding_ref->GetSymbol());
+	   			YahooUpdatePrice($holding_ref, $this->ref, 'znb_NKY');
+			}	
+    	}
+
         GetChinaMoney($this->ref);
         SzseGetLofShares($this->ref);
         $this->CreateGroup($arRef);

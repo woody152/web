@@ -1,10 +1,11 @@
 <?php
 
-function RefAdjustForex($ref, $fAdjustHKD, $fAdjustUSD)
+function RefAdjustForex($ref, $fAdjustHKD, $fAdjustJPY, $fAdjustUSD)
 {
-	if ($ref->IsSymbolA())		$fAdjust = 1.0;
-	else if ($ref->IsSymbolH())	$fAdjust = $fAdjustHKD;
-	else						$fAdjust = $fAdjustUSD;
+	if ($ref->IsSymbolA())			$fAdjust = 1.0;
+	else if ($ref->IsSymbolH())		$fAdjust = $fAdjustHKD;
+	else if ($ref->IsSymbolJP())	$fAdjust = $fAdjustJPY;
+	else if ($ref->IsSymbolUS())	$fAdjust = $fAdjustUSD;
 	return $fAdjust;
 }
 
@@ -21,6 +22,9 @@ class HoldingsReference extends MyStockReference
     var $usdcny_ref = false;
     var $hkcny_ref = false;
     var $hkdcny_ref = false;
+    private $jpcny_ref = false;
+    private $jpycny_ref = false;
+    
     
     var $ar_holdings_ref = [];
     var $ar_realtime_ref = [];
@@ -39,6 +43,7 @@ class HoldingsReference extends MyStockReference
     
     var $fRatioCN = false;
     var $fRatioHK = false;
+    private $fRatioJP = false;
     var $fRatioUS = false;
     
     public function __construct($strSymbol) 
@@ -84,7 +89,14 @@ class HoldingsReference extends MyStockReference
 						if ($this->hkdcny_ref === false)	$this->hkdcny_ref = new MyStockReference('fx_shkdcny');
 						if ($strDateH === false)			$strDateH = $holding_ref->GetDate();
 					}
-					else
+					else if ($holding_ref->IsSymbolJP())
+					{
+						_add_holdings_ratio($this->fRatioJP, $fRatio);
+						if ($this->jpcny_ref === false)		$this->jpcny_ref = new CnyReference('JPCNY');
+						if ($this->jpycny_ref === false)	$this->jpycny_ref = new MyStockReference('fx_sjpycny');
+						// if ($strDateJP === false)			$strDateJP = $holding_ref->GetDate();
+					}
+					else if ($holding_ref->IsSymbolUS())
 					{
 						_add_holdings_ratio($this->fRatioUS, $fRatio);
 						if ($this->uscny_ref === false)		$this->uscny_ref = new CnyReference('USCNY');
@@ -187,6 +199,9 @@ class HoldingsReference extends MyStockReference
 					$fProportion /= $this->uscny_ref->GetVal($strDate) / $this->hkcny_ref->GetVal($strDate);
 					$fProportion *= $this->uscny_ref->GetVal($strPrevDate) / $this->hkcny_ref->GetVal($strPrevDate);
 				}
+				else if ($ref->IsSymbolJP())
+				{
+				}
 				$ar[] = $fProportion;
 			}
 			else
@@ -212,6 +227,7 @@ class HoldingsReference extends MyStockReference
     	$str = '';
     	if ($this->fRatioCN !== false)	$str .= 'A股'.number_format($this->fRatioCN).'% ';
     	if ($this->fRatioHK !== false)	$str .= '港股'.number_format($this->fRatioHK).'% ';
+    	if ($this->fRatioJP !== false)	$str .= '日股'.number_format($this->fRatioJP).'% ';
     	if ($this->fRatioUS !== false)	$str .= '美股'.number_format($this->fRatioUS).'% ';
     	return rtrim($str, ' ');
     }
@@ -252,6 +268,12 @@ class HoldingsReference extends MyStockReference
     	if (($strDate === false) && $this->IsEtfA())	return $this->_adjustToCNY($this->uscny_ref, $this->usdcny_ref);
 		return $this->_adjustToCNY($this->uscny_ref, $this->uscny_ref, $strDate);
     }
+
+    function GetAdjustJPY($strDate = false)
+    {
+    	if (($strDate === false) && $this->IsEtfA())	return $this->_adjustToCNY($this->jpcny_ref, $this->jpycny_ref);
+		return $this->_adjustToCNY($this->jpcny_ref, $this->jpycny_ref, $strDate);
+    }
     
     function GetAdjustHKD($strDate = false)
     {
@@ -288,6 +310,7 @@ class HoldingsReference extends MyStockReference
     {
 //    	$arStrict = GetSecondaryListingArray();    	
     	$fAdjustHKD = $this->GetAdjustHKD($strDate);
+    	$fAdjustJPY = $this->GetAdjustJPY($strDate);
 		$fAdjustUSD = $this->GetAdjustUSD($strDate);
     	
 		$his_sql = GetStockHistorySql();
@@ -335,7 +358,7 @@ class HoldingsReference extends MyStockReference
 				if ($arHoldingsDateHistory[$strStockId] > MIN_FLOAT_VAL)
 				{
 					$fChange = $fRatio * ($fPrice / $arHoldingsDateHistory[$strStockId]);
-					$fChange /= RefAdjustForex($ref, $fAdjustHKD, $fAdjustUSD);
+					$fChange /= RefAdjustForex($ref, $fAdjustHKD, $fAdjustJPY, $fAdjustUSD);
 					$fTotalChange += $fChange;
 				}	
 			}
@@ -343,7 +366,7 @@ class HoldingsReference extends MyStockReference
 		
 		if ($fTotalRatio > MIN_FLOAT_VAL)	$fTotalChange /= $fTotalRatio;
 		$fTotalChange -= 1.0;
-		$fTotalChange *= RefAdjustForex($this, $fAdjustHKD, $fAdjustUSD);
+		$fTotalChange *= RefAdjustForex($this, $fAdjustHKD, $fAdjustJPY, $fAdjustUSD);
 		$fTotalChange *= $this->GetPosition();
 		$fNewNetValue = floatval($this->strNetValue) * (1.0 + $fTotalChange);
 		return $fNewNetValue; 

@@ -24,7 +24,7 @@ class StockHistorySql extends DailyCloseSql
         return $this->CreateDailyCloseTable($str);
     }
 
-    function WriteHistory($strStockId, $strDate, $strClose, $strVolume = '', $strAdjClose = false)
+    function WriteHistory($strStockId, $strDate, $strClose, $strVolume = '100', $strAdjClose = false)
     {
     	if ($strAdjClose == false)	$strAdjClose = $strClose;
     	

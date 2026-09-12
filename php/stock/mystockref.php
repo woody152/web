@@ -10,6 +10,19 @@ function _getCalibrationFromBase($strBase)
 	return false;
 }
 
+function CheckForeignMarket($strDate, $arMarket)
+{
+	foreach($arMarket as $strCheck)
+	{
+		if (SqlGetHistoryByDate(SqlGetStockId($strCheck), $strDate) === false)
+		{
+			// DebugString(__FUNCTION__.' no data of '.$strCheck.' on '.$strDate);
+			return false;
+		}
+	}
+	return true;
+}
+
 function GetForeignMarketCloseTick($strDate, $strType)
 {
 	switch ($strType)
@@ -32,14 +45,15 @@ function GetForeignMarketCloseTick($strDate, $strType)
 		$strCloseTime = '16:08:00';
 		break;
 	}
-	foreach($arCheck as $strCheck)
+/*	foreach($arCheck as $strCheck)
 	{
 		if (SqlGetHistoryByDate(SqlGetStockId($strCheck), $strDate) === false)
 		{
 			// DebugString(__FUNCTION__.' no data of '.$strCheck.' on '.$strDate);
 			return false;
 		}
-	}	
+	}*/
+	if (CheckForeignMarket($strDate, $arCheck) === false)	return false;
 
 	$strOldTimezone = date_default_timezone_get();
 	date_default_timezone_set($strTimezone);
@@ -77,7 +91,10 @@ class MyStockReference extends MysqlReference
 				{
 					$tick_sql = new StockTickSql();
 					$ymd = new TickYMD($tick_sql->ReadInt($strStockId));
-					$this->SetTime($ymd->GetHMS());
+
+					if ($this->IsSymbolJP())	$strTime = "15:30:00";
+					else						$strTime = $ymd->GetHMS();
+					$this->SetTime($strTime);
 					$this->SetExternalLink($strSymbol);
 					$this->SetHasData();
 				}

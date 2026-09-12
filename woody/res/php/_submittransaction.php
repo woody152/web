@@ -40,8 +40,11 @@ function _getStockCost($strGroupItemId, $strQuantity, $strPrice)
    				if ($fCommission < 5.0)		$fCommission = 5.0;
    			}
    		}
-   		else if ($sym->IsSymbolH())			$fCommission = $fAmount * 0.002;
-   		else
+   		else if ($sym->IsSymbolH())
+		{
+			$fCommission = $fAmount * 0.002;
+		}
+   		else if ($sym->IsSymbolUS())
    		{
    			if ($fQuantityAbs < 200.0)		$fCommission = 1.0;
    			else							$fCommission = 0.005 * $fQuantityAbs;

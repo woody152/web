@@ -92,7 +92,7 @@ function _getMyStockLinks($sym, $bAdmin)
    			$str .= ' '.GetStockOptionLink(STOCK_OPTION_HA, $strSymbol);
    			$str .= ' '.GetStockOptionLink(STOCK_OPTION_ADR, $strSymbol);
    		}
-   		else
+   		else if ($sym->IsSymbolUS())
    		{
    			if ($sym->IsTradable())	$str .= _getFundOptionLinks($strSymbol);
    		}

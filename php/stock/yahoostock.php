@@ -157,7 +157,7 @@ function GetYahooChartData($strYahooSymbol, $strFileName, $strRange = '2y')
 	return false;
 }
 
-function _yahooStockGetData($strSymbol, $strStockId)
+function _yahooStockGetDaily($strSymbol, $strDate)
 { 
    	if ($arResult = GetYahooChartData($strSymbol, DebugGetYahooFileName($strSymbol), '1d'))
    	{
@@ -165,7 +165,33 @@ function _yahooStockGetData($strSymbol, $strStockId)
    		$arIndicators = $arResult['indicators'];
 		$arAdjClose = $arIndicators['adjclose'][0]['adjclose'];
 
-		$net_sql = GetNetValueHistorySql();
+		// $net_sql = GetNetValueHistorySql();
+		for ($i = 0; $i < count($arTimeStamp); $i ++)
+		{
+    		$ymd = new TickYMD(intval($arTimeStamp[$i]));
+			if ($strDate == $ymd->GetYMD())		return mysql_round($arAdjClose[$i]);
+            /*
+    		$strDate = $ymd->GetYMD();
+    		$strNetValue = mysql_round($arAdjClose[$i]);
+    		if ($net_sql->WriteDaily($strStockId, $strDate, $strNetValue))
+    		{
+    			DebugString(__FUNCTION__.' Update net value for '.$strSymbol.' '.$strDate.' '.$strNetValue);
+    			return [$strNetValue, $strDate];
+    		}*/
+		}
+   	}
+    return false;
+}
+
+function _yahooStockGetData($strSymbol, $strStockId, $strDate, $net_sql)
+{ 
+/*   	if ($arResult = GetYahooChartData($strSymbol, DebugGetYahooFileName($strSymbol), '1d'))
+   	{
+   		$arTimeStamp = $arResult['timestamp'];
+   		$arIndicators = $arResult['indicators'];
+		$arAdjClose = $arIndicators['adjclose'][0]['adjclose'];
+
+		// $net_sql = GetNetValueHistorySql();
 		for ($i = 0; $i < count($arTimeStamp); $i ++)
 		{
     		$ymd = new TickYMD(intval($arTimeStamp[$i]));
@@ -177,17 +203,24 @@ function _yahooStockGetData($strSymbol, $strStockId)
     			return [$strNetValue, $strDate];
     		}
 		}
-   	}
+   	}*/
+	if ($strNetValue = _yahooStockGetDaily($strSymbol, $strDate))
+	{
+  		if ($net_sql->WriteDaily($strStockId, $strDate, $strNetValue))
+   		{
+   			DebugString(__FUNCTION__.' Update net value for '.$strSymbol.' '.$strDate.' '.$strNetValue);
+   			return $strNetValue;
+   		}
+	}	
     return false;
 }
 
 // force update, no any condition checking as in YahooUpdateNetValue
 function YahooGetNetValue($ref)
 {
-	// date_default_timezone_set('America/New_York');
 	$ref->SetTimeZone();
 	$strSymbol = $ref->GetSymbol();
-	return _yahooStockGetData(($ref->IsIndex() ? $strSymbol : BuildYahooNetValueSymbol($strSymbol)), $ref->GetStockId());
+	return _yahooStockGetData(($ref->IsIndex() ? $strSymbol : BuildYahooNetValueSymbol($strSymbol)), $ref->GetStockId(), $ref->GetDate(), GetNetValueHistorySql());
 }
 
 function _yahooGetNetValueSymbol($sym, $strSymbol)
@@ -219,20 +252,37 @@ function _yahooGetNetValueSymbol($sym, $strSymbol)
    	return BuildYahooNetValueSymbol($strSymbol);
 }
 
+function _checkMarketClose($strDate, $iClose)
+{
+    $now_ymd = GetNowYMD();
+    $iHourMinute = $now_ymd->GetHourMinute();
+   	if ($now_ymd->GetYMD() == $strDate)
+   	{
+   		if ($iHourMinute < $iClose)
+   		{
+			// DebugString($strSymbol.': Market not closed');
+   			return false;
+   		}
+    }
+	return true;
+}
+
 function YahooUpdateNetValue($ref)
 {
-	if ($ref->HasData() == false)	return;
+	if ($ref->HasData() == false)	return false;
 	
 	$strSymbol = $ref->GetSymbol();
-	if (($strNetValueSymbol = _yahooGetNetValueSymbol($ref, $strSymbol)) === false)		return;
+	if (($strNetValueSymbol = _yahooGetNetValueSymbol($ref, $strSymbol)) === false)		return false;
 	
-	// date_default_timezone_set('America/New_York');
 	$ref->SetTimeZone();
 	$net_sql = GetNetValueHistorySql();
 	$strStockId = $ref->GetStockId();
 	$strDate = $ref->GetDate();
-    if ($net_sql->GetRecord($strStockId, $strDate))	return;	// already have today's data
+    if ($net_sql->GetRecord($strStockId, $strDate))		return false;	// already have today's data
+
+	if (_checkMarketClose($strDate, 1655) === false)	return false;	
 	
+	/*
     $now_ymd = GetNowYMD();
     $iHourMinute = $now_ymd->GetHourMinute();
    	if ($now_ymd->GetYMD() == $strDate)
@@ -240,9 +290,9 @@ function YahooUpdateNetValue($ref)
    		if ($iHourMinute < 1655)
    		{
 			// DebugString($strSymbol.': Market not closed');
-   			return;
+   			return false;
    		}
-    }
+    }*/
 	/* else
     {
    		if ($iHourMinute > 900)
@@ -252,5 +302,28 @@ function YahooUpdateNetValue($ref)
    		}
     }
 	*/
-	return _yahooStockGetData($strNetValueSymbol, $strStockId);    
+	return _yahooStockGetData($strNetValueSymbol, $strStockId, $strDate, $net_sql);    
+}
+
+function YahooUpdatePrice($ref, $date_ref, $strMarket)
+{
+	$ref->SetTimeZone();
+	$strDate = $date_ref->GetDate();
+	if (CheckForeignMarket($strDate, [$strMarket]) === false)	return false;
+
+	$his_sql = GetStockHistorySql();
+	$strStockId = $ref->GetStockId();
+    if ($his_sql->GetRecord($strStockId, $strDate))		return false;	// already have today's data
+	
+	if (_checkMarketClose($strDate, 1555) === false)	return false;	
+
+	if ($strClose = _yahooStockGetDaily($ref->GetYahooSymbol(), $strDate))
+	{
+  		if ($his_sql->WriteHistory($strStockId, $strDate, $strClose))
+   		{
+   			DebugString(__FUNCTION__.' Update close price for '.$strDate.' '.$strClose);
+   			return $strClose;
+   		}
+	}
+	return false;
 }

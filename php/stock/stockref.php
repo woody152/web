@@ -8,14 +8,14 @@ class StockReference extends StockSymbol
     var $strExternalLink = false;          // External link help to interprete the original data
     
     // original data
-    var $strPrice;                    // Current trading price string
-    var $strPrevPrice;               // Previous close price string
-    var $strDate;                     // 2014-11-13
-    var $strTime;			            // 08:55:00        
+    var $strPrice;			// Current trading price string
+    var $strPrevPrice;		// Previous close price string
+    var $strDate = false;	// 2014-11-13
+    var $strTime;			// 08:55:00        
     
     var $strName = '';
     
-    var $strOpen;                     // open price
+    var $strOpen;			// open price
     var $strHigh;
     var $strLow;
     var $strVolume = '0';
