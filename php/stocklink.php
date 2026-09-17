@@ -27,6 +27,7 @@ define('QDII_EU_DISPLAY', '欧洲QDII');
 
 define('HOLDINGS_DISPLAY', '基金'.STOCK_DISP_HOLDING);
 define('QUARTER_REPORT_DISPLAY', '季报'.STOCK_DISP_HOLDING);
+define('QUARTER_SIM_DISPLAY', '模拟'.STOCK_DISP_HOLDING);
 
 define('STOCK_OPTION_ADR', '修改H股对应ADR代码');
 define('STOCK_OPTION_AH', '修改A股对应H股代码');
@@ -42,6 +43,7 @@ define('STOCK_OPTION_HOLDINGS', '修改'.HOLDINGS_DISPLAY);
 define('STOCK_OPTION_NETVALUE', '修改'.STOCK_DISP_NETVALUE);
 define('STOCK_OPTION_PREMIUM', '期货升水');
 define('STOCK_OPTION_REPORT', '修改'.QUARTER_REPORT_DISPLAY);
+define('STOCK_OPTION_SIM', '修改'.QUARTER_SIM_DISPLAY);
 define('STOCK_OPTION_SHARE_DIFF', '场内新增(万)');
 define('STOCK_OPTION_SPLIT', '拆股或合股');
 
@@ -257,6 +259,7 @@ function GetStockOptionArray()
             'editnetvalue' => STOCK_OPTION_NETVALUE,
             'editpremium' => STOCK_OPTION_PREMIUM,
             'editquarterreport' => STOCK_OPTION_REPORT,
+            'editquartersim' => STOCK_OPTION_SIM,
             'editsharesdiff' => STOCK_OPTION_SHARE_DIFF,
     		'editstock' => STOCK_OPTION_EDIT,
             'editstockadr' => STOCK_OPTION_ADR,

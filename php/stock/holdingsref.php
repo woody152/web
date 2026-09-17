@@ -2,10 +2,10 @@
 
 function RefAdjustForex($ref, $fAdjustHKD, $fAdjustJPY, $fAdjustUSD)
 {
-	if ($ref->IsSymbolA())			$fAdjust = 1.0;
-	else if ($ref->IsSymbolH())		$fAdjust = $fAdjustHKD;
-	else if ($ref->IsSymbolJP())	$fAdjust = $fAdjustJPY;
-	else if ($ref->IsSymbolUS())	$fAdjust = $fAdjustUSD;
+	if ($ref->IsSymbolA())								$fAdjust = 1.0;
+	else if ($ref->IsSymbolH())							$fAdjust = $fAdjustHKD;
+	else if ($ref->IsSymbolJP())						$fAdjust = $fAdjustJPY;
+	else if ($ref->IsSymbolUK() || $ref->IsSymbolUS())	$fAdjust = $fAdjustUSD;
 	return $fAdjust;
 }
 
@@ -41,10 +41,11 @@ class HoldingsReference extends MyStockReference
     var $fFairNetValue = false;
     var $fRealtimeNetValue = false;
     
-    var $fRatioCN = false;
-    var $fRatioHK = false;
+    private $fRatioCN = false;
+    private $fRatioHK = false;
     private $fRatioJP = false;
-    var $fRatioUS = false;
+    private $fRatioUK = false;
+    private $fRatioUS = false;
     
     public function __construct($strSymbol) 
     {
@@ -94,7 +95,10 @@ class HoldingsReference extends MyStockReference
 						_add_holdings_ratio($this->fRatioJP, $fRatio);
 						if ($this->jpcny_ref === false)		$this->jpcny_ref = new CnyReference('JPCNY');
 						if ($this->jpycny_ref === false)	$this->jpycny_ref = new MyStockReference('fx_sjpycny');
-						// if ($strDateJP === false)			$strDateJP = $holding_ref->GetDate();
+					}
+					else if ($holding_ref->IsSymbolUK())
+					{
+						_add_holdings_ratio($this->fRatioUK, $fRatio);
 					}
 					else if ($holding_ref->IsSymbolUS())
 					{
@@ -201,6 +205,8 @@ class HoldingsReference extends MyStockReference
 				}
 				else if ($ref->IsSymbolJP())
 				{
+					$fProportion /= $this->uscny_ref->GetVal($strDate) / $this->jpcny_ref->GetVal($strDate);
+					$fProportion *= $this->uscny_ref->GetVal($strPrevDate) / $this->jpcny_ref->GetVal($strPrevDate);
 				}
 				$ar[] = $fProportion;
 			}
@@ -228,6 +234,7 @@ class HoldingsReference extends MyStockReference
     	if ($this->fRatioCN !== false)	$str .= 'A股'.number_format($this->fRatioCN).'% ';
     	if ($this->fRatioHK !== false)	$str .= '港股'.number_format($this->fRatioHK).'% ';
     	if ($this->fRatioJP !== false)	$str .= '日股'.number_format($this->fRatioJP).'% ';
+    	if ($this->fRatioUK !== false)	$str .= '英股'.number_format($this->fRatioUK).'% ';
     	if ($this->fRatioUS !== false)	$str .= '美股'.number_format($this->fRatioUS).'% ';
     	return rtrim($str, ' ');
     }

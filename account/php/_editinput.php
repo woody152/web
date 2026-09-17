@@ -469,10 +469,21 @@ function _getSinaJsFutureArray($bChinese)
 	return ['Current price', 'The percentage of current price change', 'Bid price', 'Ask price', 'Today high', 'Today low', 'Time', 'Last settlement price', 'Open price', 'Volume', 'Bid quantity?', 'Ask quantity?', 'Date', 'GB2312 coded name'];
 }
 
-function _getSinaJsForexArray($bChinese)
+function _getSinaJsForexArray($bChinese, $bForex = true)
 {
-	if ($bChinese)	return ['时间', '?', '?', '昨日收盘价', '振幅*10000', STOCK_DISP_OPEN, STOCK_DISP_HIGH, STOCK_DISP_LOW, '当前价格', 'GB2312编码的名字', '相对昨日收盘价的变化百分比', '相对昨日收盘价的变化', '振幅百分比', '?', '?', '?', '?', '日期'];
-	return ['Time', '?', '?', 'Last close', 'Amplitude*10000', 'Open price', 'Today high', 'Today low', 'Current price', 'GB2312 coded name', '% Change from last close', 'Change from last close', '% amplitude', '?', '?', '?', '?', 'Date'];
+	if ($bChinese)
+	{
+		$ar = ['时间', '?', '?', '昨日收盘价', '振幅*10000', STOCK_DISP_OPEN, STOCK_DISP_HIGH, STOCK_DISP_LOW, '当前价格', 'GB2312编码的名字', '相对昨日收盘价的变化百分比'];
+		$arMid = $bForex ? ['相对昨日收盘价的变化', '振幅百分比', '?', '?', '?', '?'] : [];
+		$arDate = ['日期'];
+	}
+	else
+	{
+		$ar = ['Time', '?', '?', 'Last close', 'Amplitude*10000', 'Open price', 'Today high', 'Today low', 'Current price', 'GB2312 coded name', '% Change from last close'];
+		$arMid = $bForex ? ['Change from last close', '% amplitude', '?', '?', '?', '?'] : [];
+		$arDate = ['Date'];
+	}
+	return [...$ar, ...$arMid, ...$arDate];
 }
 
 function _getSinaJsHongkongArray($bChinese)
@@ -504,6 +515,7 @@ function _getSinaJsInterpretationArray($strSymbol, $bChinese)
 	else if (str_starts_with($strSymbol, SINA_US_PREFIX))				return _getSinaJsAmericanArray($bChinese);
 	else if (str_starts_with($strSymbol, SINA_FUTURE_PREFIX))			return _getSinaJsFutureArray($bChinese);
 	else if (str_starts_with($strSymbol, SINA_CN_FUTURE_PREFIX))		return _getSinaJsChineseFutureArray($bChinese);
+	else if (str_starts_with($strSymbol, SINA_BTC_PREFIX))				return _getSinaJsForexArray($bChinese, false);
 	else if (str_starts_with($strSymbol, SINA_FOREX_PREFIX))			return _getSinaJsForexArray($bChinese);
 	else if (str_starts_with($strSymbol, SINA_HK_PREFIX))				return _getSinaJsHongkongArray($bChinese);	// rt_hkHSCEI, rt_hk00386
 	return false;

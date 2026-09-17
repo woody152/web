@@ -51,13 +51,14 @@ T+0 QDII 亚洲,161124,港股小盘LOF,95%,恒生小型股,HSSI,1.20%,开放申�
 https://quotes.sina.cn/hk/company/quotes/view/hssi
 */
 
-define('SINA_FOREX_PREFIX', 'fx_s');
-define('SINA_FUTURE_PREFIX', 'hf_');
-define('SINA_CN_FUTURE_PREFIX', 'nf_');
-define('SINA_FUND_PREFIX', 'f_');
-define('SINA_INDEX_PREFIX', 'znb_');
-define('SINA_HK_PREFIX', 'rt_hk');
-define('SINA_US_PREFIX', 'gb_');
+const SINA_BTC_PREFIX = 'btc_';
+const SINA_FOREX_PREFIX = 'fx_s';
+const SINA_FUTURE_PREFIX = 'hf_';
+const SINA_CN_FUTURE_PREFIX = 'nf_';
+const SINA_FUND_PREFIX = 'f_';
+const SINA_INDEX_PREFIX = 'znb_';
+const SINA_HK_PREFIX = 'rt_hk';
+const SINA_US_PREFIX = 'gb_';
 
 define('BJ_PREFIX', 'BJ');
 define('SH_PREFIX', 'SH');
@@ -207,6 +208,21 @@ function in_arrayXbiQdii($strSymbol)
     return in_array($strSymbol, QdiiGetXbiSymbolArray());
 }
 
+function GetMsciUs50SymbolArray()
+{
+	return ['SH513850', 'SZ159577'];
+}
+
+function QdiiGetHolingsSymbolArray()
+{
+    return ['SZ159509', 'SZ159529',	...GetMsciUs50SymbolArray()];
+}
+
+function in_arrayHoldingsQdii($strSymbol)
+{
+    return in_array($strSymbol, QdiiGetHolingsSymbolArray());
+}
+
 function QdiiGetSymbolArray()
 {
     return ['SH501300', 'SH513290', 'SH513400', 'SZ160140', 'SZ161126', 'SZ161128', 'SZ162415', 'SZ164906',
@@ -214,7 +230,8 @@ function QdiiGetSymbolArray()
     	    ...QdiiGetXopSymbolArray(),
             ...QdiiGetOilSymbolArray(),
             ...QdiiGetQqqSymbolArray(),
-            ...QdiiGetSpySymbolArray()];
+            ...QdiiGetSpySymbolArray(),
+			...QdiiGetHolingsSymbolArray()];
 }
 
 function in_arrayQdii($strSymbol)
@@ -256,13 +273,24 @@ function QdiiHkGetIndexSymbolArray()
 {
     return ['^HSI', '^HSCE', '^HSSI', '^HSTECH'];
 }
- 
+
+function QdiiHkGetHoldingsSymbolArray()
+{
+	return ['SH513090', 'SH513230', 'SH513750', 'SH513990', 'SZ159567', 'SZ159570', 'SZ159615', 'SZ159751', 'SZ159792'];
+}
+
+function in_arrayHoldingsQdiiHk($strSymbol)
+{
+    return in_array($strSymbol, QdiiHkGetHoldingsSymbolArray());
+}
+
 function QdiiHkGetSymbolArray()
 {
 	return ['SH501025', 'SZ161124',
 			...QdiiHkGetTechSymbolArray(),
 			...QdiiHkGetHSharesSymbolArray(),
-			...QdiiHkGetHangSengSymbolArray()];
+			...QdiiHkGetHangSengSymbolArray(),
+			...QdiiHkGetHoldingsSymbolArray()];
 }
 
 function in_arrayQdiiHk($strSymbol)
@@ -315,21 +343,6 @@ function GetChinaInternetSymbolArray()
 	return ['SH513050', 'SH513220', 'SZ159605', 'SZ159607'];
 }
 
-function GetMsciUs50SymbolArray()
-{
-	return ['SH513850', 'SZ159577'];
-}
-
-function GetHkMixSymbolArray()
-{
-	return ['SH513090', 'SH513230', 'SH513750', 'SH513990', 'SZ159567', 'SZ159570', 'SZ159615', 'SZ159751', 'SZ159792'];
-}
-
-function in_arrayHkMix($strSymbol)
-{
-    return in_array($strSymbol, GetHkMixSymbolArray());
-}
-
 function GetQdiiGoldSymbolArray()
 {
 	return ['SZ160216', 'SZ161815', 'SZ160719', 'SZ161116', 'SZ164701', 'SZ165513'];
@@ -338,6 +351,11 @@ function GetQdiiGoldSymbolArray()
 function QdiiGetUsoSymbolArray()
 {
 	return ['SZ163208', 'SH501018', 'SZ160723', 'SZ161129'];
+}
+
+function in_arrayUso($strSymbol)
+{
+    return in_array($strSymbol, QdiiGetUsoSymbolArray());
 }
 
 function GetLofMixSymbolArray()
@@ -352,11 +370,7 @@ function in_arrayLofMix($strSymbol)
 
 function QdiiMixGetSymbolArray()
 {
-    return ['SH513360', 'SZ159509', 'SZ159529',
-			...GetLofMixSymbolArray(),
-			...GetChinaInternetSymbolArray(),
-			...GetHkMixSymbolArray(),
-			...GetMsciUs50SymbolArray()];
+    return ['SH513360', ...GetLofMixSymbolArray(), ...GetChinaInternetSymbolArray()];
 }
 
 function in_arrayQdiiMix($strSymbol)
@@ -564,9 +578,10 @@ class StockSymbol
     
     function IsSymbolUS()
     {
-        if ($this->IsSymbolA())     return false;
-        if ($this->IsSymbolH())     return false;
-        if ($this->IsSymbolJP())     return false;
+        if ($this->IsSymbolA())		return false;
+        if ($this->IsSymbolH())		return false;
+        if ($this->IsSymbolJP())	return false;
+        if ($this->IsSymbolUK())	return false;
         return true;
     }
     
@@ -580,6 +595,12 @@ class StockSymbol
 	{
 		if ($this->strSuffix === false)		$this->_findSuffix();
 		return ($this->strSuffix == 'T') ? true : false;
+	}
+
+	function IsSymbolUK()
+	{
+		if ($this->strSuffix === false)		$this->_findSuffix();
+		return ($this->strSuffix == 'L') ? true : false;
 	}
 
     function IsSymbolH()
@@ -772,19 +793,11 @@ class StockSymbol
    		return false;
     }
     
-    function IsEastMoneyForex()
+    function IsSinaBTC()
     {
-        switch ($this->strSymbol)
-        {
-        case 'USCNY':
-        case 'EUCNY':
-        case 'JPCNY':
-        case 'HKCNY':
-            return true;
-        }
-        return false;
+    	return strtoupper(StrHasPrefix($this->strSymbol, SINA_BTC_PREFIX)); 
     }
-    
+	
     function IsSinaForex()
     {
     	return strtoupper(StrHasPrefix($this->strSymbol, SINA_FOREX_PREFIX)); 
@@ -799,18 +812,25 @@ class StockSymbol
         }
         return false;
     }
-    
-    function IsSinaForex()
+*/
+
+    function IsEastMoneyForex()
     {
-    	if ($this->IsSinaForex())	return true;
-    	if ($this->IsOldSinaForex())	return true;
-    	return false;
+        switch ($this->strSymbol)
+        {
+        case 'USCNY':
+        case 'EUCNY':
+        case 'JPCNY':
+        case 'HKCNY':
+            return true;
+        }
+        return false;
     }
-*/    
+
     function IsForex()
     {
     	if ($this->IsEastMoneyForex())	return true;
-    	if ($this->IsSinaForex())			return true;
+    	if ($this->IsSinaForex())		return true;
     	return false;
     }
     
@@ -919,7 +939,7 @@ class StockSymbol
         {   // Hongkong market
             return SINA_HK_PREFIX.$strSymbol;    
         }
-        else if ($this->IsSymbolJP())
+        else if ($this->IsSymbolJP() || $this->IsSymbolUK())
         {
             return false;
         }
@@ -1010,7 +1030,7 @@ class StockSymbol
 		{
 			return $this->strOthers.$strHK;	// Hongkong market
 		}
-		else if ($this->IsSymbolJP())
+		else if ($this->IsSymbolJP() || $this->IsSymbolUK())
 		{
 			return $strSymbol;
 		}
@@ -1030,8 +1050,7 @@ class StockSymbol
     	if ($this->IsIndex())			return false;
     	if ($this->IsIndexA())			return false;
         if ($this->IsSymbolJP())        return false;
-//    	if ($this->IsForex())			return false;
-//    	if ($this->IsSinaFuture())	return false;
+        if ($this->IsSymbolUK())        return false;
     	return true;
     }
     
@@ -1060,6 +1079,10 @@ class StockSymbol
    		else if ($this->IsSymbolH() || $this->IsSymbolJP())
    		{	// Hongkong market from 9:00 to 16:10
    			if ($iHourMinute < 900)		return true;
+   		}
+   		else if ($this->IsSymbolUK())
+   		{
+   			if ($iHourMinute < 800)		return true;
    		}
    		else
    		{   // US extended hours trading from 4am to 8pm
@@ -1111,6 +1134,10 @@ class StockSymbol
    		{	// Japan market from 9:00 to 15:30
    			if ($iHourMinute > 1535)				return true;
    		}
+   		else if ($this->IsSymbolUK())
+   		{	// UK market from 8:00 to 16:35
+   			if ($iHourMinute > 1640)				return true;
+   		}
    		else
    		{   // US extended hours trading from 4am to 8pm
    			if ($iHourMinute > 2005)				return true;
@@ -1150,13 +1177,14 @@ class StockSymbol
     {
     	$strEDT = 'America/New_York';
 		$strJP = 'Asia/Tokyo';
+		$strUK = 'Europe/London';
     	
         if ($this->IsSinaFund())							{}
         else if ($this->IsSinaFuture())
         {
         	if ($this->IsSinaFutureUS())					return $strEDT;
         }
-        else if ($this->IsSinaForex())						return $strEDT;
+        else if ($this->IsSinaForex() || $this->IsSinaBTC())	return $strEDT;
         else if ($this->IsEastMoneyForex())					{}
 		else if ($str = $this->IsSinaGlobalIndex())
 		{
@@ -1179,11 +1207,12 @@ class StockSymbol
 				return 'Europe/Zurich';
 
             case 'UKX':
-				return 'Europe/London';
+				return $strUK;
 			}
 		}
         else if ($this->IsSymbolA() || $this->IsSymbolH())	{}
 		else if ($this->IsSymbolJP())						return $strJP;
+		else if ($this->IsSymbolUK())						return $strUK;
         else												return $strEDT;
         return 'Asia/Shanghai';
     }
@@ -1199,6 +1228,7 @@ class StockSymbol
         if ($str = $this->IsSinaFutureUS())		return $str;
         if ($str = $this->IsSinaFutureCN())		return $str;
         if ($str = $this->IsSinaForex())		return $str;
+        if ($str = $this->IsSinaBTC())			return $str;
 		if ($str = $this->IsSinaGlobalIndex())	return $str;
 		return $this->GetSymbol();
     }

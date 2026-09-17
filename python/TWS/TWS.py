@@ -59,8 +59,8 @@ class MyEWrapper(EWrapper):
         self.client = client
         self.palmmicro = None
         self.arMkt = {}
-        self.strCurFuture = '202609'
-        self.strNextFuture = '202612'
+        self.strCurFuture = '202612'
+        self.strNextFuture = '202703'
         self.arOrder = {}
         self.arOrder['SPY'] = GetOrderArray()
         if IsChinaMarketOpen():
@@ -78,13 +78,13 @@ class MyEWrapper(EWrapper):
             self.arOrder['XOP'] = GetOrderArray()
             self.arOrder['MES' + self.strCurFuture] = GetOrderArray()
             self.arOrder['MNQ' + self.strCurFuture] = GetOrderArray()
-            self.arOrder['MCL202610'] = GetOrderArray()
+            self.arOrder['MCL202611'] = GetOrderArray()
             self.arOrder['MGC202612'] = GetOrderArray()
         else:
             #self.arOrder['TLT'] = GetOrderArray([80.90, 84.19, 85.21, 86.40, 86.62, 86.72, 87.59, 89.76, 91.88], 100, 1, 8)
-            self.arOrder['SPX'] = GetOrderArray([5235.75, 6688.72, 7174.22, 7517.21, 7580.98, 7655.05, 7673.76, 7686.67, 7792.36, 7860.21, 8141.69])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0005, 4, -1)
-            self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0094, -1, 8)
+            self.arOrder['SPX'] = GetOrderArray([5235.75, 6688.72, 7184.02, 7227.75, 7539.68, 7546.15, 7603.63, 7642.49, 7659.51, 7772.87, 7851.61, 8141.69])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0091, 3, 5)
+            self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.00191, -1, -1)
             
     def nextValidId(self, orderId: int):
         self.client.StartStreaming(orderId)
@@ -114,8 +114,8 @@ class MyEWrapper(EWrapper):
 
     def __get_sell_symbol(self, strSymbol):
         if strSymbol.startswith('MES'):
-            return 'MES' + self.strNextFuture
-            #return 'MES' + self.strCurFuture
+            #return 'MES' + self.strNextFuture
+            return 'MES' + self.strCurFuture
         else:
             return strSymbol
 

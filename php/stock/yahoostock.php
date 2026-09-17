@@ -252,12 +252,17 @@ function _yahooGetNetValueSymbol($sym, $strSymbol)
    	return BuildYahooNetValueSymbol($strSymbol);
 }
 
-function _checkMarketClose($strDate, $iClose)
+function _checkMarketClose($strDate, $strMarket = '^GSPC')
 {
     $now_ymd = GetNowYMD();
     $iHourMinute = $now_ymd->GetHourMinute();
    	if ($now_ymd->GetYMD() == $strDate)
    	{
+		$iClose = match($strMarket)
+				  {'znb_NKY' => 1555,
+				   'znb_UKX' => 1700,
+				   default => 1655
+				  };
    		if ($iHourMinute < $iClose)
    		{
 			// DebugString($strSymbol.': Market not closed');
@@ -280,7 +285,7 @@ function YahooUpdateNetValue($ref)
 	$strDate = $ref->GetDate();
     if ($net_sql->GetRecord($strStockId, $strDate))		return false;	// already have today's data
 
-	if (_checkMarketClose($strDate, 1655) === false)	return false;	
+	if (_checkMarketClose($strDate) === false)	return false;	
 	
 	/*
     $now_ymd = GetNowYMD();
@@ -315,7 +320,7 @@ function YahooUpdatePrice($ref, $date_ref, $strMarket)
 	$strStockId = $ref->GetStockId();
     if ($his_sql->GetRecord($strStockId, $strDate))		return false;	// already have today's data
 	
-	if (_checkMarketClose($strDate, 1555) === false)	return false;	
+	if (_checkMarketClose($strDate, $strMarket) === false)	return false;	
 
 	if ($strClose = _yahooStockGetDaily($ref->GetYahooSymbol(), $strDate))
 	{

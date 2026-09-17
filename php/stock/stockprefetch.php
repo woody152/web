@@ -96,9 +96,17 @@ function FutureNeedNewFile($strFileName, $iInterval = SECONDS_IN_MIN)
 	$now_ymd = GetNowYMD();
 	if (($iFileTime = $now_ymd->NeedFile($strFileName, $iInterval)) == false)		return false;	// update on every minute
 	
-	if (_isFutureMarketTrading($now_ymd))    												return true;
-    if (_isFutureMarketTrading(new TickYMD($iFileTime)))								return true;
+	if (_isFutureMarketTrading($now_ymd))    										return true;
+    if (_isFutureMarketTrading(new TickYMD($iFileTime)))							return true;
     return _checkBetweenMarketClose($now_ymd, $iFileTime, 23, 7);
+}
+
+function BtcNeedNewFile($strFileName, $iInterval = SECONDS_IN_MIN)
+{
+	$now_ymd = GetNowYMD();
+	if (($iFileTime = $now_ymd->NeedFile($strFileName, $iInterval)) == false)		return false;	// update on every minute
+
+	return true;
 }
 
 function PrefetchSaveSinaData($strFileName, $strData)
@@ -131,6 +139,10 @@ function _prefetchSinaData($arSym)
         {   // forex and future
             if (FutureNeedNewFile($strFileName) == false)    continue;
         }
+        else if ($sym->IsSinaBTC())
+        {
+            if (BtcNeedNewFile($strFileName) == false)    continue;
+        }
         else
         {   // Stock symbol
             if (StockNeedNewQuotes($sym, $strFileName) == false)  continue;
@@ -162,7 +174,7 @@ function PrefetchSinaStockData($arSymbol)
         if ($strSymbol)
         {
             $sym = new StockSymbol($strSymbol);
-            if ($sym->IsSinaFund() || $sym->IsSinaForex())
+            if ($sym->IsSinaFund() || $sym->IsSinaForex() || $sym->IsSinaBTC())
             {
                 $arPrefetch[$strSymbol] = $sym;
             }

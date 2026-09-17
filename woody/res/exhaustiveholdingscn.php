@@ -307,7 +307,8 @@ function _echoExhaustiveHoldingsParagraph($strPage, $strSymbol, $fInput, $iNum, 
 			EchoTableParagraphEnd();
 		}
 
-		$quarter_sql = new QuarterReportSql();
+		//$quarter_sql = new QuarterReportSql();
+		$quarter_sql = new QuarterSimSql();
 		$arExtraHoldings = _getQuarterHoldingsExtra($ref, $quarter_sql);
 		$arExtraColumn = [];
 		foreach ($arExtraHoldings as $strExtraId => $strExtraData)

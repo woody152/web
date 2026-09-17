@@ -281,14 +281,9 @@ function EchoAll()
     if ($ref = $acct->EchoStockGroup())
     {
    		$strSymbol = $ref->GetSymbol();
-        if (in_arrayQdii($strSymbol))			$iDays = 5;
-        else if (in_arrayQdiiMix($strSymbol))
-        {
-        	if (in_arrayHkMix($strSymbol))		$iDays = 3;
-        	else								$iDays = 5;
-        }
-        else if ($strSymbol == 'SZ161226')		$iDays = 3;
-        else									$iDays = 0;
+        if (in_arrayQdii($strSymbol) || in_arrayQdiiMix($strSymbol))		$iDays = 5;
+        else if (in_arrayQdiiHk($strSymbol) || $strSymbol == 'SZ161226')	$iDays = 3;
+        else																$iDays = 0;
         
         if ($iDays > 0)
         {

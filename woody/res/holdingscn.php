@@ -10,15 +10,17 @@ function RefSort($arRef)
 	$arA = [];
     $arH = [];
     $arJP = [];
+    $arUK = [];
     $arUS = [];
     foreach ($arRef as $ref)
     {
     	if ($ref->IsSymbolA())			$arA[] = $ref;
 		else if ($ref->IsSymbolH())     $arH[] = $ref;
 		else if ($ref->IsSymbolJP())    $arJP[] = $ref;
+		else if ($ref->IsSymbolUK())    $arUK[] = $ref;
 		else if ($ref->IsSymbolUS())    $arUS[] = $ref;
 	}
-	return [...RefSortBySymbol($arA), ...RefSortBySymbol($arH), ...RefSortBySymbol($arJP), ...RefSortBySymbol($arUS)];
+	return [...RefSortBySymbol($arA), ...RefSortBySymbol($arH), ...RefSortBySymbol($arJP), ...RefSortBySymbol($arUK), ...RefSortBySymbol($arUS)];
 }
 
 function _echoHoldingItem($ref, $arRatio, $fNetValueChange, $arHistory, $fAdjust)

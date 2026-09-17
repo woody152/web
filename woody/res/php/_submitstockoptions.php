@@ -449,6 +449,10 @@ class _SubmitOptionsAccount extends Account
 			if ($bAdmin)	_updateOptionDailySql(new QuarterReportSql(), $strStockId, $strDate, $strVal);
 			break;
 			
+		case STOCK_OPTION_SIM:
+			if ($bAdmin)	_updateOptionDailySql(new QuarterSimSql(), $strStockId, $strDate, $strVal);
+			break;
+	
 		case STOCK_OPTION_NETVALUE:
 			if ($bAdmin)
 			{

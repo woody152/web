@@ -38,4 +38,10 @@ class QuarterReportSql extends DailyStringSql
     }
 }
 
-?>
+class QuarterSimSql extends DailyStringSql
+{
+    public function __construct() 
+    {
+        parent::__construct('quartersim');
+    }
+}

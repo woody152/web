@@ -118,11 +118,9 @@ function EchoAll()
     if ($ref = $acct->EchoStockGroup())
     {
    		$strSymbol = $ref->GetSymbol();
-        if (in_arrayQdii($strSymbol))
+        if (in_arrayQdii($strSymbol) && in_arrayHoldingsQdii($strSymbol) === false)
         {
-//            $fStart = microtime(true);
             _echoThanousParadoxParagraph($strSymbol, $acct->GetStart(), $acct->GetNum());
-//            DebugString($strSymbol.' Thanous Paradox: '.DebugGetStopWatchDisplay($fStart));
         }
     }
     $acct->EchoLinks();
@@ -144,5 +142,3 @@ function GetTitle()
 }
 
     $acct = new SymbolAccount();
-?>
-

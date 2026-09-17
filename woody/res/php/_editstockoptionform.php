@@ -48,6 +48,11 @@ function _getStockOptionDate($strSubmit, $ref, $strSymbol)
 		if ($strDate = $quarter_sql->GetDateNow($strStockId))		return $strDate;
 	 	return $strYMD;
 
+	case STOCK_OPTION_SIM:
+		$quarter_sql = new QuarterSimSql();
+		if ($strDate = $quarter_sql->GetDateNow($strStockId))		return $strDate;
+	 	return $strYMD;
+
 	case STOCK_OPTION_PREMIUM:
 		$premium_sql = new FuturePremiumSql();
 		if ($strDate = $premium_sql->GetDateNow($strStockId))		return $strDate;
@@ -293,6 +298,11 @@ function _getStockOptionVal($strSubmit, $strLoginId, $ref, $strSymbol, $strDate)
 		if ($strClose = $quarter_sql->GetCloseNow($strStockId))		return $strClose;
 		return '"AAA":"60","BBB":"40"';
 
+	case STOCK_OPTION_SIM:
+		$quarter_sql = new QuarterSimSql();
+		if ($strClose = $quarter_sql->GetCloseNow($strStockId))		return $strClose;
+		return '"AAA":"60","BBB":"40"';
+
 	case STOCK_OPTION_PREMIUM:
 		return _getStockOptionPremium($strStockId, $strDate);
 		
@@ -310,43 +320,46 @@ function _getStockOptionMemo($strSubmit)
 	switch ($strSubmit)
 	{
 	case STOCK_OPTION_ADR:
-		return '输入SYMBOL/0删除对应ADR。';
+		return '输入SYMBOL/0删除对应ADR';
 		
 	case STOCK_OPTION_AH:
-		return '清空输入删除对应H股。';
+		return '清空输入删除对应H股';
 		
 	case STOCK_OPTION_CALIBRATION:
-		return '清空输入删除对应日期'.STOCK_DISP_CALIBRATION.'值。';
+		return '清空输入删除对应日期'.STOCK_DISP_CALIBRATION.'值';
 		
 	case STOCK_OPTION_DIVIDEND:
-		return '清空输入删除对应分红。';
+		return '清空输入删除对应分红';
 		
 	case STOCK_OPTION_EMA:
-		return '股票收盘后的第2天修改才会生效，同时删除以往全部EMA记录。';
+		return '股票收盘后的第2天修改才会生效, 同时删除以往全部EMA记录。';
 
 	case STOCK_OPTION_FUND:
-		return '输入INDEX*0删除对应关系和全部'.CALIBRATION_HISTORY_DISPLAY.'，输入0删除'.STOCK_DISP_POSITION.'。';
+		return '输入INDEX*0删除对应关系和全部'.CALIBRATION_HISTORY_DISPLAY.', 输入0删除'.STOCK_DISP_POSITION.'。';
 
 	case STOCK_OPTION_HA:
-		return '清空输入删除对应A股。';
+		return '清空输入删除对应A股';
 
 	case STOCK_OPTION_HOLDINGS:
 		return '清空输入删除对应'.HOLDINGS_DISPLAY;
 		
 	case STOCK_OPTION_NETVALUE:
-		return '清空输入删除对应日期净值。';
+		return '清空输入删除对应日期净值';
 
 	case STOCK_OPTION_PREMIUM:
 		return '期货升水年化百分比';
 		
 	case STOCK_OPTION_REPORT:
-	 	return '清空输入删除对应日期季报数据。';
+	 	return '清空输入删除对应日期季报数据';
+
+	case STOCK_OPTION_SIM:
+	 	return '清空输入删除对应模拟季报数据';
 
 	case STOCK_OPTION_SHARE_DIFF:
-		return '清空输入删除对应日期新增。';
+		return '清空输入删除对应日期新增';
 		
 	case STOCK_OPTION_SPLIT:
-		return '输入1:10表示10股合1股，10:1表示1股拆10股，0:0删除对应日期数据。';
+		return '输入1:10表示10股合1股, 10:1表示1股拆10股, 0:0删除对应日期数据。';
 	}
 	return '';
 }

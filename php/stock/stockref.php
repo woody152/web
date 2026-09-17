@@ -480,7 +480,7 @@ class StockReference extends StockSymbol
         $this->bHasData = false;
     }
     
-    function LoadSinaForexData()
+    function LoadSinaForexData($bForex = true)
     {
         $this->strExternalLink = GetSinaForexLink($this);
     	$strSymbol = $this->GetSymbol();
@@ -499,7 +499,8 @@ class StockReference extends StockSymbol
         		}
         		
         		$this->strName = $ar[9];
-				$this->_convertDateTimeToUS(end($ar), $ar[0]);
+                $iDate = $bForex ? 17 : 11;
+				$this->_convertDateTimeToUS($ar[$iDate], $ar[0]);
 				$this->strOpen = $ar[5];
 				$this->strHigh = $ar[6];
 				$this->strLow = $ar[7];

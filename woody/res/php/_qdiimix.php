@@ -8,13 +8,26 @@ class _QdiiMixAccount extends FundGroupAccount
 	private $inr_ref = false;
     private $cnh_ref;
 
+	private $btcwti_ref = false;
+
     function Create()
     {
         $strCNH = 'fx_susdcnh';
         $strSymbol = $this->GetName();
-        StockPrefetchExtendedData($strSymbol, $strCNH);
+		$ar = [$strSymbol, $strCNH];
+		if (in_arrayUso($strSymbol))
+		{
+			$strBTCWTI = 'btc_btcwtinp';
+			$ar[] = $strBTCWTI;
+		}
+		else
+		{
+			$strBTCWTI = false;
+		}	
+        StockPrefetchArrayExtendedData($ar);
 
         $this->cnh_ref = new MyStockReference($strCNH);
+		if ($strBTCWTI)	$this->btcwti_ref = new MyStockReference($strBTCWTI);
         $this->ref = new HoldingsReference($strSymbol);
         $this->_updateStockHoldings($strSymbol);
 
@@ -42,8 +55,11 @@ class _QdiiMixAccount extends FundGroupAccount
     	{
 			if ($holding_ref->IsSymbolJP())
 			{
-				// DebugString('JP Symbol: '.$holding_ref->GetSymbol());
 	   			YahooUpdatePrice($holding_ref, $this->ref, 'znb_NKY');
+			}	
+			else if ($holding_ref->IsSymbolUK())
+			{
+	   			YahooUpdatePrice($holding_ref, $this->ref, 'znb_UKX');
 			}	
     	}
 
@@ -81,7 +97,7 @@ class _QdiiMixAccount extends FundGroupAccount
     		$strEstDate = $fund_est_sql->GetDateNow($strStockId);
     		if ($strEstDate == $strNetValueDate)	return;	//
     		$strDate = $ref->GetDate();
-    		if (!in_arrayHkMix($strSymbol))
+    		if (!in_arrayHoldingsQdiiHk($strSymbol))
     		{
     			if ($strEstDate == $strDate)		return;	// A day too early
     		}
@@ -111,6 +127,11 @@ class _QdiiMixAccount extends FundGroupAccount
 	{
 		return $this->inr_ref;
 	}
+
+	function GetBtcWtiRef()
+	{
+		return $this->btcwti_ref;
+	}
 }
 
 function EchoAll()
@@ -134,6 +155,10 @@ function EchoAll()
 	if ($inr_ref = $acct->GetInrRef())
 	{
     	$arForex[] = $inr_ref;
+	}	
+	if ($btcwti_ref = $acct->GetBtcWtiRef())
+	{
+    	$arForex[] = $btcwti_ref;
 	}	
     
 	$bAdmin = $acct->IsAdmin();

@@ -17,7 +17,7 @@ function _echoTransactionTableItem($ref, $record, $bReadOnly, $bAdmin)
    	{
    		if (strlen($strRemark) > 0)
    		{
-			$strRemark = GetOnClickLink(PATH_STOCK.'submittransaction.php?empty='.$strId, '确认清空'.STOCK_DISP_REMARK.'：'.$strRemark.'？', '清空').$strRemark;
+			$strRemark = GetOnClickLink(PATH_STOCK.'submittransaction.php?empty='.$strId, '确认清空'.STOCK_DISP_REMARK.': '.$strRemark.'?', '清空').$strRemark;
 			if (strpos($strRemark, STOCK_DISP_ORDER) !== false)
 			{
 				$net_sql = GetNetValueHistorySql();

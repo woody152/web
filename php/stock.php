@@ -185,6 +185,7 @@ function _addHoldingsSymbol(&$ar, $strSymbol)
     		
     		$holding_sym = new StockSymbol($strHoldingSymbol);
     		if ($holding_sym->IsSymbolH())			$ar[] = 'fx_shkdcny';
+    		if ($holding_sym->IsSymbolJP())			$ar[] = 'fx_sjpycny';
     		else if ($holding_sym->IsSymbolUS())	$ar[] = 'fx_susdcny';
     	}
     }
@@ -306,18 +307,18 @@ function StockGetReference($strSymbol)
 
 function StockGetQdiiReference($strSymbol)
 {
-    if (in_arrayQdii($strSymbol))			return new QdiiReference($strSymbol);
-    else if (in_arrayQdiiHk($strSymbol))	return new QdiiHkReference($strSymbol);
-    else if (in_arrayQdiiJp($strSymbol))	return new QdiiJpReference($strSymbol);
-    else if (in_arrayQdiiEu($strSymbol))	return new QdiiEuReference($strSymbol);
+    if (in_arrayQdii($strSymbol) && in_arrayHoldingsQdii($strSymbol) === false)				return new QdiiReference($strSymbol);
+    else if (in_arrayQdiiHk($strSymbol) && in_arrayHoldingsQdiiHk($strSymbol) === false)	return new QdiiHkReference($strSymbol);
+    else if (in_arrayQdiiJp($strSymbol))													return new QdiiJpReference($strSymbol);
+    else if (in_arrayQdiiEu($strSymbol))													return new QdiiEuReference($strSymbol);
     return false;
 }
 
 function StockGetFundReference($strSymbol)
 {
-	if ($ref = StockGetQdiiReference($strSymbol))									return $ref;
-	else if (in_arrayQdiiMix($strSymbol))											return new HoldingsReference($strSymbol);
-	else if (in_arrayChinaIndex($strSymbol) || in_arrayChinaFuture($strSymbol))		return new FundPairReference($strSymbol);
+	if ($ref = StockGetQdiiReference($strSymbol))																	return $ref;
+	else if (in_arrayQdiiMix($strSymbol) || in_arrayHoldingsQdii($strSymbol) || in_arrayHoldingsQdiiHk($strSymbol))	return new HoldingsReference($strSymbol);
+	else if (in_arrayChinaIndex($strSymbol) || in_arrayChinaFuture($strSymbol))										return new FundPairReference($strSymbol);
 	return new FundReference($strSymbol);
 }
 
@@ -383,7 +384,7 @@ function UseSameDayNetValue($sym)
 {
 	$strSymbol = $sym->GetSymbol();
 	if (in_arrayQdii($strSymbol))			return false;
-	else if (in_arrayQdiiMix($strSymbol))	return in_arrayHkMix($strSymbol);
+	else if (in_arrayQdiiMix($strSymbol))	return false;
 	return true;
 }
 

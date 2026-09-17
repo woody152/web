@@ -92,8 +92,9 @@ class MyStockReference extends MysqlReference
 					$tick_sql = new StockTickSql();
 					$ymd = new TickYMD($tick_sql->ReadInt($strStockId));
 
-					if ($this->IsSymbolJP())	$strTime = "15:30:00";
-					else						$strTime = $ymd->GetHMS();
+					if ($this->IsSymbolJP())		$strTime = "15:30:00";
+					else if ($this->IsSymbolUK())	$strTime = "16:35:00";
+					else							$strTime = $ymd->GetHMS();
 					$this->SetTime($strTime);
 					$this->SetExternalLink($strSymbol);
 					$this->SetHasData();
@@ -135,6 +136,7 @@ class MyStockReference extends MysqlReference
     {
     	if ($this->IsSinaFuture())	        $this->LoadSinaFutureData();
     	else if ($this->IsSinaForex())		$this->LoadSinaForexData();
+    	else if ($this->IsSinaBTC())		$this->LoadSinaForexData(false);
     	else								$this->LoadSinaData();
         $this->bConvertGB2312 = true;     // Sina name is GB2312 coded
     }
