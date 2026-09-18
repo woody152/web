@@ -45,3 +45,19 @@ class QuarterSimSql extends DailyStringSql
         parent::__construct('quartersim');
     }
 }
+
+class HoldingSql extends DailyStringSql
+{
+    public function __construct() 
+    {
+        parent::__construct('holding');
+    }
+}
+
+class HoldingSimSql extends DailyStringSql
+{
+    public function __construct() 
+    {
+        parent::__construct('holdingsim');
+    }
+}

@@ -40,7 +40,7 @@ function __getPosDisplay($ref, $fPos, $arRatio, &$bMatch, $bAdmin)
 				$arJson[$strHolding] = number_format($fRatio * $fPos, 2);
 			}
 			$str = DebugEncode($arJson);
-			return GetOnClickLink(PATH_STOCK.'submitholdings.php?symbol='.$ref->GetSymbol().'&holdings='.urlencode($str), '确认更新持仓'.$str.'和仓位'.$strPos.'？', $strPos);
+			return GetOnClickLink(PATH_STOCK.'submitholdings.php?symbol='.$ref->GetSymbol().'&holdings='.urlencode($str), "确认更新持仓{$str}和仓位{$strPos}?", $strPos);
 		}
 		return $strPos;
 	}

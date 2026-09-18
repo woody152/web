@@ -15,7 +15,14 @@ class _AdminHoldingsAccount extends SymbolAccount
 				DebugString(__CLASS__.'->'.__FUNCTION__.' '.$strHoldings);
 				$strSymbol = $ref->GetSymbol();
 				$ref = new HoldingsReference($strSymbol);
-				if ($strDate = $ref->GetHoldingsDate())		UpdateStockOptionHoldings($strStockId, $strDate, $strHoldings);
+				if ($strDate = $ref->GetHoldingsDate())
+				{
+					UpdateStockOptionHoldings($strStockId, $strDate, $strHoldings);
+					$holding_sql = new HoldingSql();
+					$holding_sql->WriteDaily($strStockId, $strDate, $strHoldings);
+					$holdingsim_sql = new HoldingSimSql();
+					$holdingsim_sql->WriteDaily($strStockId, $strDate, $strHoldings);
+				}
 			}
 	    	if ($strPosition = UrlGetQueryValue('fundposition'))
     		{

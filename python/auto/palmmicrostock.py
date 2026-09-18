@@ -521,15 +521,17 @@ class PalmmicroWrapper(EWrapper):
 		self.client = client
 		if arMapping is not None:
 			self.arSymbols = list(set(s for sublist in arMapping.values() for s in sublist))
-			self.arSymbols.remove('nf_AG0')
-			self.arSymbols.remove('nf_M0')
+			if 'nf_AG0' in self.arSymbols:
+				self.arSymbols.remove('nf_AG0')
+			if 'nf_M0' in self.arSymbols:
+				self.arSymbols.remove('nf_M0')
 			TdxStock.TqDebug(','.join(self.arSymbols))
 			self.arStock = {}
 
 	arFutureDict = {'hf_CL': 'MCL202611',
 					'hf_GC': 'MGC202612',
 					'hf_ES': 'MES202612',
-					'hf_NQ': 'MNQ202609'
+					'hf_NQ': 'MNQ202612'
 				   }
 
 	@classmethod
