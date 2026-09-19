@@ -144,8 +144,8 @@ function EchoFundTradingParagraph($fund, $callback = false)
     $strSymbol = $ref->GetSymbol();
     if (in_arrayXopQdii($strSymbol) || 
 		in_arrayXbiQdii($strSymbol) ||
-		in_arraySpyQdii($strSymbol) ||
-		in_arrayQqqMatch($strSymbol))
+		in_arraySpyMatchQdii($strSymbol) ||
+		in_arrayQqqMatchQdii($strSymbol))
 	{
 		$str .= ' '.GetRotationTradingLink($strSymbol);
 	}	

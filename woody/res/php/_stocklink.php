@@ -33,11 +33,11 @@ function GetCategoryArray($strItem)
         break;
         
     case 'chinainternet':
-        $ar = [...GetChinaInternetSymbolArray(), 'SZ164906'];
+        $ar = [...QdiiMixGetChinaInternetSymbolArray(), 'SZ164906'];
         break;
         
     case 'commodity':
-        $ar = [...ChinaFutureGetSymbolArray(), ...GetQdiiGoldSymbolArray()];
+        $ar = [...ChinaFutureGetSymbolArray(), ...QdiiGetGoldSymbolArray(), ...QdiiMixGetGoldSymbolArray()];
         break;
         
     case 'hangseng':
@@ -62,11 +62,11 @@ function GetCategoryArray($strItem)
         break;
 
     case 'mscius50':
-        $ar = GetMsciUs50SymbolArray();
+        $ar = QdiiGetMsciUs50SymbolArray();
         break;
         
     case 'oilfund':
-    	$ar = [...QdiiGetXopSymbolArray(), ...QdiiGetOilSymbolArray(), ...QdiiGetUsoSymbolArray()];
+    	$ar = [...QdiiGetXopSymbolArray(), ...QdiiGetOilSymbolArray(), ...QdiiGetUsoSymbolArray(), ...QdiiMixGetUsoSymbolArray()];
         break;
         
     case 'overnight':

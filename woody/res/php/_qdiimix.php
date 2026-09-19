@@ -8,6 +8,7 @@ class _QdiiMixAccount extends FundGroupAccount
 	private $inr_ref = false;
     private $cnh_ref;
 
+	private $oil_ref = false;
 	private $btcwti_ref = false;
 
     function Create()
@@ -19,15 +20,19 @@ class _QdiiMixAccount extends FundGroupAccount
 		{
 			$strBTCWTI = 'btc_btcwtinp';
 			$ar[] = $strBTCWTI;
+			$strOIL = 'hf_OIL';
+			$ar[] = $strOIL;
 		}
 		else
 		{
 			$strBTCWTI = false;
+			$strOIL = false;
 		}	
         StockPrefetchArrayExtendedData($ar);
 
         $this->cnh_ref = new MyStockReference($strCNH);
 		if ($strBTCWTI)	$this->btcwti_ref = new MyStockReference($strBTCWTI);
+		if ($strOIL)	$this->oil_ref = new MyStockReference($strOIL);
         $this->ref = new HoldingsReference($strSymbol);
         $this->_updateStockHoldings($strSymbol);
 
@@ -81,7 +86,7 @@ class _QdiiMixAccount extends FundGroupAccount
     	if ($strHoldingsDate == $ref->GetOfficialDate())	return;
     	
     	$bUpdated = false;
-		if (in_arrayLofMix($strSymbol))
+		if (in_arrayLofHoldings($strSymbol))
     	{
         	if ($strNetValueDate != $strHoldingsDate)		
         	{
@@ -132,6 +137,11 @@ class _QdiiMixAccount extends FundGroupAccount
 	{
 		return $this->btcwti_ref;
 	}
+
+	function GetOilRef()
+	{
+		return $this->oil_ref;
+	}
 }
 
 function EchoAll()
@@ -152,14 +162,9 @@ function EchoAll()
     	$arForex[] = $ref->GetHkdcnyRef();
     	$arForex[] = $hkcny_ref;
     }
-	if ($inr_ref = $acct->GetInrRef())
-	{
-    	$arForex[] = $inr_ref;
-	}	
-	if ($btcwti_ref = $acct->GetBtcWtiRef())
-	{
-    	$arForex[] = $btcwti_ref;
-	}	
+	if ($inr_ref = $acct->GetInrRef())			$arForex[] = $inr_ref;
+	if ($btcwti_ref = $acct->GetBtcWtiRef())	$arForex[] = $btcwti_ref;
+	if ($oil_ref = $acct->GetOilRef())			$arForex[] = $oil_ref;
     
 	$bAdmin = $acct->IsAdmin();
 	EchoHoldingsEstParagraph($ref, $bAdmin);

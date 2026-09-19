@@ -109,8 +109,8 @@ class TelegramCallback
 				}
 				else if ($strToken == WECHAT_ROT_KEY)
 				{
-					$str = GetStockDataArray($strText, [...QdiiGetQqqMatchArray(),
-														...QdiiGetSpyMatchArray(),
+					$str = GetStockDataArray($strText, [...QdiiGetQqqMatchSymbolArray(),
+														...QdiiGetSpyMatchSymbolArray(),
 														...QdiiGetXopSymbolArray(),
 														...QdiiGetXbiSymbolArray()]);
 				}

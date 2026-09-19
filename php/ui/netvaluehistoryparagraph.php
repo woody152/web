@@ -158,7 +158,7 @@ function EchoNetValueHistoryParagraph($ref, $csv = false, $iStart = 0, $iNum = T
    		$cny_ref = $fund_ref->GetCnyRef();
    		$est_ref = $fund_ref->GetEstRef();
    	}
-	else if (in_arrayLofMix($strSymbol))
+	else if (in_arrayLofHoldings($strSymbol))
 	{
 		$ref = new HoldingsReference($strSymbol);
 		$cny_ref = $ref->GetCnyRef();

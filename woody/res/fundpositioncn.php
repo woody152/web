@@ -78,7 +78,7 @@ function EchoAll()
     			$cny_ref = $fund->GetCnyRef();
     			$est_ref = $fund->GetEstRef();
     		}
-			else if (in_arrayLofMix($strSymbol))
+			else if (in_arrayLofHoldings($strSymbol))
 			{
 				$fund = new HoldingsReference($strSymbol);
 				$cny_ref = $fund->GetCnyRef();

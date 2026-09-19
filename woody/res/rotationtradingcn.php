@@ -56,10 +56,10 @@ function _echoRotationTradingParagraph($strPage, $arRotationRef, $fEstQuantity, 
 
 function _getRotationSymbolArray($strSymbol)
 {
-    if (in_arrayXopQdii($strSymbol))		return QdiiGetXopSymbolArray();
-	else if (in_arrayXbiQdii($strSymbol))	return QdiiGetXbiSymbolArray();
-	else if (in_arrayQqqMatch($strSymbol))	return QdiiGetQqqMatchArray();
-	else if (in_arraySpyMatch($strSymbol))	return QdiiGetSpyMatchArray();
+    if (in_arrayXopQdii($strSymbol))			return QdiiGetXopSymbolArray();
+	else if (in_arrayXbiQdii($strSymbol))		return QdiiGetXbiSymbolArray();
+	else if (in_arrayQqqMatchQdii($strSymbol))	return QdiiGetQqqMatchSymbolArray();
+	else if (in_arraySpyMatchQdii($strSymbol))	return QdiiGetSpyMatchSymbolArray();
     return false;
 }
 

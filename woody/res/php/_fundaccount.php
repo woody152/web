@@ -162,14 +162,13 @@ function _echoFundAccountData($csv, $ref, $strSymbol, $strStockId, $his_sql, $iD
 
 function _getFundAccountTableColumnArray()
 {
-	return array(new TableColumnDate(),
-				   new TableColumn(STOCK_OPTION_SHARE_DIFF, 110),
-				   new TableColumn('y'.STOCK_DISP_ORDER.'账户', 90),
-				   new TableColumnDate(STOCK_DISP_ORDER),
-				   new TableColumnPrice(),
-				   new TableColumnNetValue(),
-				   new TableColumnPremium('x')
-				   );
+	return [new TableColumnDate(),
+			new TableColumn(STOCK_OPTION_SHARE_DIFF, 110),
+			new TableColumn('y'.STOCK_DISP_ORDER.'账户', 90),
+			new TableColumnDate(STOCK_DISP_ORDER),
+			new TableColumnPrice(),
+			new TableColumnNetValue(),
+			new TableColumnPremium('x')];
 }
 
 function _echoFundAccountParagraph($csv, $ref, $strSymbol, $strStockId, $his_sql, $iDays, $bAdmin)
@@ -305,7 +304,7 @@ function GetMetaDescription()
 	global $acct;
 	
   	$str = $acct->GetStockDisplay().FUND_ACCOUNT_DISPLAY;
-    $str .= '。仅用于美股相关QDII基金，利用A股基金限购的机会测算QDII溢价申购套利的群体规模。知己知彼百战不殆。';
+    $str .= '。仅用于美股相关QDII基金, 利用A股基金限购的机会测算QDII溢价申购套利的群体规模。知己知彼百战不殆。';
     return CheckMetaDescription($str);
 }
 
@@ -316,5 +315,3 @@ function GetTitle()
 }
 
     $acct = new SymbolAccount();
-?>
-

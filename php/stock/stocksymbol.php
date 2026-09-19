@@ -143,24 +143,19 @@ function QdiiGetOilSymbolArray()
     return ['SZ160416', 'SZ162719']; 
 }
 
-function in_arrayOilEtfQdii($strSymbol)
-{
-    return in_array($strSymbol, QdiiGetOilSymbolArray());
-}
-
-function QdiiGetQqqMatchArray()
+function QdiiGetQqqMatchSymbolArray()
 {
     return ['SH513100', 'SH513110', 'SH513390', 'SH513870', 'SZ159501', 'SZ159513', 'SZ159632', 'SZ159659', 'SZ159660', 'SZ159696', 'SZ159941', 'SZ161130']; 
 }
 
-function in_arrayQqqMatch($strSymbol)
+function in_arrayQqqMatchQdii($strSymbol)
 {
-    return in_array($strSymbol, QdiiGetQqqMatchArray());
+    return in_array($strSymbol, QdiiGetQqqMatchSymbolArray());
 }
 
 function QdiiGetQqqSymbolArray()
 {
-    return [...QdiiGetQqqMatchArray(), 'SH513300'];
+    return [...QdiiGetQqqMatchSymbolArray(), 'SH513300'];
 }
 
 function in_arrayQqqQdii($strSymbol)
@@ -168,19 +163,19 @@ function in_arrayQqqQdii($strSymbol)
     return in_array($strSymbol, QdiiGetQqqSymbolArray());
 }
 
-function QdiiGetSpyMatchArray()
+function QdiiGetSpyMatchSymbolArray()
 {
     return ['SH513500', 'SH513650', 'SZ159612', 'SZ161125']; 
 }
 
-function in_arraySpyMatch($strSymbol)
+function in_arraySpyMatchQdii($strSymbol)
 {
-    return in_array($strSymbol, QdiiGetSpyMatchArray());
+    return in_array($strSymbol, QdiiGetSpyMatchSymbolArray());
 }
 
 function QdiiGetSpySymbolArray()
 {
-    return [...QdiiGetSpyMatchArray(), 'SZ159655'];
+    return [...QdiiGetSpyMatchSymbolArray(), 'SZ159655'];
 }
 
 function in_arraySpyQdii($strSymbol)
@@ -208,19 +203,24 @@ function in_arrayXbiQdii($strSymbol)
     return in_array($strSymbol, QdiiGetXbiSymbolArray());
 }
 
-function GetMsciUs50SymbolArray()
+function QdiiGetMsciUs50SymbolArray()
 {
 	return ['SH513850', 'SZ159577'];
 }
 
-function QdiiGetHolingsSymbolArray()
+function QdiiGetEtfHoldingsSymbolArray()
 {
-    return ['SZ159509', 'SZ159529',	...GetMsciUs50SymbolArray()];
+    return ['SZ159509', 'SZ159529',	...QdiiGetMsciUs50SymbolArray()];
+}
+
+function QdiiGetLofHoldingsSymbolArray()
+{
+	return ['SH501312', ...QdiiGetGoldSymbolArray(), ...QdiiGetUsoSymbolArray()];
 }
 
 function in_arrayHoldingsQdii($strSymbol)
 {
-    return in_array($strSymbol, QdiiGetHolingsSymbolArray());
+    return in_array($strSymbol, [...QdiiGetEtfHoldingsSymbolArray(), ...QdiiGetLofHoldingsSymbolArray()]);
 }
 
 function QdiiGetSymbolArray()
@@ -231,7 +231,8 @@ function QdiiGetSymbolArray()
             ...QdiiGetOilSymbolArray(),
             ...QdiiGetQqqSymbolArray(),
             ...QdiiGetSpySymbolArray(),
-			...QdiiGetHolingsSymbolArray()];
+			...QdiiGetEtfHoldingsSymbolArray(),
+			...QdiiGetLofHoldingsSymbolArray()];
 }
 
 function in_arrayQdii($strSymbol)
@@ -338,39 +339,44 @@ function in_arrayQdiiEu($strSymbol)
     return in_array($strSymbol, QdiiEuGetSymbolArray());
 }
 
-function GetChinaInternetSymbolArray()
+function QdiiMixGetChinaInternetSymbolArray()
 {
 	return ['SH513050', 'SH513220', 'SZ159605', 'SZ159607'];
 }
 
-function GetQdiiGoldSymbolArray()
+function QdiiGetGoldSymbolArray()
 {
-	return ['SZ160216', 'SZ161815', 'SZ160719', 'SZ161116', 'SZ164701', 'SZ165513'];
+	return ['SZ160216', 'SZ164701'];
+}
+
+function QdiiMixGetGoldSymbolArray()
+{
+	return ['SZ160719', 'SZ161116', 'SZ165513', 'SZ161815'];
 }
 
 function QdiiGetUsoSymbolArray()
 {
-	return ['SZ163208', 'SH501018', 'SZ160723', 'SZ161129'];
+	return ['SZ163208'];
+}
+
+function QdiiMixGetUsoSymbolArray()
+{
+	return ['SH501018', 'SZ160723', 'SZ161129'];
 }
 
 function in_arrayUso($strSymbol)
 {
-    return in_array($strSymbol, QdiiGetUsoSymbolArray());
+    return in_array($strSymbol, [...QdiiGetUsoSymbolArray(), ...QdiiMixGetUsoSymbolArray()]);
 }
 
-function GetLofMixSymbolArray()
+function QdiiMixGetLofSymbolArray()
 {
-	return ['SH501225', 'SH501312', 'SZ160644', 'SZ164824', ...QdiiGetUsoSymbolArray(), ...GetQdiiGoldSymbolArray()];
-}
-
-function in_arrayLofMix($strSymbol)
-{
-    return in_array($strSymbol, GetLofMixSymbolArray());
+	return ['SH501225', 'SZ160644', 'SZ164824', ...QdiiMixGetUsoSymbolArray(), ...QdiiMixGetGoldSymbolArray()];
 }
 
 function QdiiMixGetSymbolArray()
 {
-    return ['SH513360', ...GetLofMixSymbolArray(), ...GetChinaInternetSymbolArray()];
+    return ['SH513360', ...QdiiMixGetLofSymbolArray(), ...QdiiMixGetChinaInternetSymbolArray()];
 }
 
 function in_arrayQdiiMix($strSymbol)
@@ -394,12 +400,19 @@ function in_arrayAll($strSymbol)
     return in_array($strSymbol, GetAllSymbolArray());
 }
 
+function in_arrayLofHoldings($strSymbol)
+{
+    return in_array($strSymbol, [...QdiiMixGetLofSymbolArray(), ...QdiiGetLofHoldingsSymbolArray()]);
+}
+
 function GetOverNightSymbolArray()
 {
 	return [...QdiiGetXopSymbolArray(),
             'SZ162719',
             ...QdiiGetUsoSymbolArray(),
-            ...GetQdiiGoldSymbolArray(),
+            ...QdiiMixGetUsoSymbolArray(),
+            ...QdiiGetGoldSymbolArray(),
+            ...QdiiMixGetGoldSymbolArray(),
             'SZ161226', 'SZ161125', 'SZ161126', 'SZ161130', 'SZ162415', 'SZ164824', 'SZ164906',
             ...QdiiGetXbiSymbolArray()];
 }
