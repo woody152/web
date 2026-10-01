@@ -63,6 +63,3 @@ class StockTickSql extends IntSql
         parent::__construct('stocktick', 'tick');
     }
 }
-
-
-?>

@@ -54,5 +54,3 @@ class _SecondListingAccount extends Account
 
    	$acct = new _SecondListingAccount();
 	$acct->AdminRun();
-
-?>

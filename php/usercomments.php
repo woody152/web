@@ -7,5 +7,3 @@ function UserComments()
     BlogComments();
 	echo '</td></tr></table>';
 }
-
-?>

@@ -589,12 +589,19 @@ class StockSymbol
     	return false;
     }
     
+	function IsSymbolEU()
+	{
+        if ($this->IsSymbolUK())	return true;
+        if ($this->IsSymbolSW())	return true;
+		return false;
+	}
+
     function IsSymbolUS()
     {
         if ($this->IsSymbolA())		return false;
         if ($this->IsSymbolH())		return false;
         if ($this->IsSymbolJP())	return false;
-        if ($this->IsSymbolUK())	return false;
+        if ($this->IsSymbolEU())	return false;
         return true;
     }
     
@@ -614,6 +621,12 @@ class StockSymbol
 	{
 		if ($this->strSuffix === false)		$this->_findSuffix();
 		return ($this->strSuffix == 'L') ? true : false;
+	}
+
+	function IsSymbolSW()
+	{
+		if ($this->strSuffix === false)		$this->_findSuffix();
+		return ($this->strSuffix == 'SW') ? true : false;
 	}
 
     function IsSymbolH()
@@ -833,6 +846,7 @@ class StockSymbol
         {
         case 'USCNY':
         case 'EUCNY':
+        case 'CHCNY':
         case 'JPCNY':
         case 'HKCNY':
             return true;
@@ -952,7 +966,7 @@ class StockSymbol
         {   // Hongkong market
             return SINA_HK_PREFIX.$strSymbol;    
         }
-        else if ($this->IsSymbolJP() || $this->IsSymbolUK())
+        else if ($this->IsSymbolJP() || $this->IsSymbolEU())
         {
             return false;
         }
@@ -1043,7 +1057,7 @@ class StockSymbol
 		{
 			return $this->strOthers.$strHK;	// Hongkong market
 		}
-		else if ($this->IsSymbolJP() || $this->IsSymbolUK())
+		else if ($this->IsSymbolJP() || $this->IsSymbolEU())
 		{
 			return $strSymbol;
 		}
@@ -1063,7 +1077,7 @@ class StockSymbol
     	if ($this->IsIndex())			return false;
     	if ($this->IsIndexA())			return false;
         if ($this->IsSymbolJP())        return false;
-        if ($this->IsSymbolUK())        return false;
+        if ($this->IsSymbolEU())        return false;
     	return true;
     }
     
@@ -1089,7 +1103,7 @@ class StockSymbol
    		{
    			if ($iHourMinute < 915)		return true;
    		}
-   		else if ($this->IsSymbolH() || $this->IsSymbolJP())
+   		else if ($this->IsSymbolH() || $this->IsSymbolJP() || $this->IsSymbolSW())
    		{	// Hongkong market from 9:00 to 16:10
    			if ($iHourMinute < 900)		return true;
    		}
@@ -1151,6 +1165,10 @@ class StockSymbol
    		{	// UK market from 8:00 to 16:35
    			if ($iHourMinute > 1640)				return true;
    		}
+   		else if ($this->IsSymbolSW())
+   		{	// SW market from 9:00 to 17:35
+   			if ($iHourMinute > 1740)				return true;
+   		}
    		else
    		{   // US extended hours trading from 4am to 8pm
    			if ($iHourMinute > 2005)				return true;
@@ -1191,6 +1209,7 @@ class StockSymbol
     	$strEDT = 'America/New_York';
 		$strJP = 'Asia/Tokyo';
 		$strUK = 'Europe/London';
+		$strSW = 'Europe/Zurich';
     	
         if ($this->IsSinaFund())							{}
         else if ($this->IsSinaFuture())
@@ -1217,7 +1236,7 @@ class StockSymbol
 				return 'Asia/Kolkata';
 
 			case 'SWI20':
-				return 'Europe/Zurich';
+				return $strSW;
 
             case 'UKX':
 				return $strUK;
@@ -1226,6 +1245,7 @@ class StockSymbol
         else if ($this->IsSymbolA() || $this->IsSymbolH())	{}
 		else if ($this->IsSymbolJP())						return $strJP;
 		else if ($this->IsSymbolUK())						return $strUK;
+		else if ($this->IsSymbolSW())						return $strSW;
         else												return $strEDT;
         return 'Asia/Shanghai';
     }

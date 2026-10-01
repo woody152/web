@@ -35,4 +35,3 @@ function EchoBlogComments($bChinese = true)
     VisitorLogin($bChinese);
 }
 
-?>

@@ -59,4 +59,3 @@ function OnePassPrimeNumber($iNum)
 	if ($iNum > 1) 		$aiNum[] = $iNum;
 	return $aiNum;
 }
-

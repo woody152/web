@@ -117,4 +117,3 @@ class _DeleteSymbolAccount extends SymbolAccount
 
    	$acct = new _DeleteSymbolAccount();
 	$acct->AdminRun();
-?>

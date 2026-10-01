@@ -9,7 +9,7 @@ function GetTitle()
 
 function GetMetaDescription()
 {
-	return '跟本网站相关的开发和分析及赚钱的网络资源，家人和朋友们开的公司，自己开发的软件。包括Woody的Web Tool，华宝油气(sz162411)净值计算，IP地址查询等工具。';
+	return '跟本网站相关的开发和分析及赚钱的网络资源, 家人和朋友们开的公司, 自己开发的软件。包括Woody的Web Tool, 华宝油气(sz162411)净值计算, IP地址查询等工具。';
 }
 
 function EchoAll()
@@ -29,13 +29,13 @@ $strAccount
 
 <p>家人和朋友们开的公司：
 <br />受<a href="res/btbondcn.php">Btbond</a>创始人之托在这里展示它的产品。
-<br />娃妈的<a href="res/cateyescn.php">西雅图夜猫眼</a>店，我未来的Borsheim珠宝店。 
+<br />娃妈的<a href="res/cateyescn.php">西雅图夜猫眼</a>店, 我未来的Borsheim珠宝店。 
 </p>
 
 <p>友情链接：
 <br /><a href="https://www.kancaibao.com" target=_blank>看财报</a>
 <br /><a href="https://www.haoetf.com" target=_blank>HaoETF</a>
-<br /><a href="https://hehuan.qzz.io" target=_blank>广益录</a>
+<br /><a href="https://www.9eastray.com" target=_blank>东哥学AI</a>
 </p>
 
 <p>$strImage
@@ -44,4 +44,3 @@ END;
 }
 
 require('../php/ui/_dispcn.php');
-?>

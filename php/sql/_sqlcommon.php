@@ -114,5 +114,3 @@ function _SqlAddLimit($strLimit)
 {
 	return _sqlAddClause('LIMIT', $strLimit);
 }
-
-?>

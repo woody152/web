@@ -25,4 +25,3 @@ function _LayoutBottom($bChinese = true, $bAdsense = true)
 }
 
    	$acct = new TitleAccount();
-?>

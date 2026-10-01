@@ -18,5 +18,3 @@ class _SubmitPhraseAccount extends Account
 	    }
 	}
 }
-
-?>

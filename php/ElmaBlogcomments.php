@@ -4,5 +4,3 @@
 function BlogComments()
 {
 }
-
-?>

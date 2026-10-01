@@ -241,7 +241,7 @@ function DebugGetSymbolFile($strSection, $strSymbol)
 {
     $strPath = DebugGetPath($strSection);
     $str = strtolower($strSymbol);
-    $str = str_replace(array('/', '+', ',', '^', '.', ':', '%'), '_', $str);
+    $str = str_replace(['/', '+', ',', '^', '.', ':', '%'], '_', $str);
     return "$strPath/$str.txt";
 }
 

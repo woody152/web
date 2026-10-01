@@ -11,4 +11,3 @@ function GetQdiiMixRelated($strDigitA)
 }
 
 require('../../php/ui/_dispcn.php');
-?>

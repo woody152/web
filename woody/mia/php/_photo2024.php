@@ -21,5 +21,3 @@ $strFireworks
 $strChineseNewYear
 END;
 }
-
-?>

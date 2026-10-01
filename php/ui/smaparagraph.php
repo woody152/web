@@ -71,7 +71,7 @@ function _getSmaParagraphMemo($his)
 	$strSymbol = $sym->GetSymbol();
 	$bAdmin = DebugIsAdmin();
 
-	if ($sym->IsSymbolJP() || $sym->IsSymbolUK())	$str = GetYahooStockLink($sym);
+	if ($sym->IsSymbolJP() || $sym->IsSymbolEU())	$str = GetYahooStockLink($sym);
 	else if ($sym->IsSymbolUS())					$str = $bAdmin ? GetStockChartsLink($strSymbol) : GetYahooStockLink($sym);
 	else											$str = GetXueqiuLink($sym);		
 

@@ -182,5 +182,3 @@ function MenuSet($arMenus)
         }
     }
 }
-
-?>

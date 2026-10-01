@@ -10,17 +10,17 @@ function RefSort($arRef)
 	$arA = [];
     $arH = [];
     $arJP = [];
-    $arUK = [];
+    $arEU = [];
     $arUS = [];
     foreach ($arRef as $ref)
     {
     	if ($ref->IsSymbolA())			$arA[] = $ref;
 		else if ($ref->IsSymbolH())     $arH[] = $ref;
 		else if ($ref->IsSymbolJP())    $arJP[] = $ref;
-		else if ($ref->IsSymbolUK())    $arUK[] = $ref;
+		else if ($ref->IsSymbolEU())    $arEU[] = $ref;
 		else if ($ref->IsSymbolUS())    $arUS[] = $ref;
 	}
-	return [...RefSortBySymbol($arA), ...RefSortBySymbol($arH), ...RefSortBySymbol($arJP), ...RefSortBySymbol($arUK), ...RefSortBySymbol($arUS)];
+	return [...RefSortBySymbol($arA), ...RefSortBySymbol($arH), ...RefSortBySymbol($arJP), ...RefSortBySymbol($arEU), ...RefSortBySymbol($arUS)];
 }
 
 function _echoHoldingItem($ref, $arRatio, $fNetValueChange, $arHistory, $fAdjust)
@@ -91,16 +91,17 @@ function _echoHoldingParagraph($strPage, $ref, $bAdmin)
 		$arHistory = $ref->GetHoldingDateHistory(GetStockHistorySql());
 		$fAdjustUSD = $ref->GetAdjustUSD();
     	$fAdjustJPY = $ref->GetAdjustJPY();
+    	$fAdjustCHF = $ref->GetAdjustCHF();
 		$fAdjustHKD = $ref->GetAdjustHKD();
 		foreach ($arHoldingRef as $holding_ref)
 		{
-			_echoHoldingItem($holding_ref, $arRatio, $fNetValueChange, $arHistory, RefAdjustForex($holding_ref, $fAdjustHKD, $fAdjustJPY, $fAdjustUSD));
+			_echoHoldingItem($holding_ref, $arRatio, $fNetValueChange, $arHistory, RefAdjustForex($holding_ref, $fAdjustHKD, $fAdjustJPY, $fAdjustCHF, $fAdjustUSD));
 			if ($holding_ref->IsSymbolH())
 			{
 				if ($strAdrSymbol = SqlGetHadrPair($holding_ref->GetSymbol()))	$arAdrhRef[] = new AdrPairReference($strAdrSymbol);	
 			}
 		}
-		_echoHoldingItem(false, $arRatio, $fNetValueChange, $arHistory, RefAdjustForex($ref, $fAdjustHKD, $fAdjustJPY, $fAdjustUSD));
+		_echoHoldingItem(false, $arRatio, $fNetValueChange, $arHistory, RefAdjustForex($ref, $fAdjustHKD, $fAdjustJPY, $fAdjustCHF, $fAdjustUSD));
 		EchoTableParagraphEnd();
 	}
 	EchoAdrhParagraph($arAdrhRef, LayoutUseWide());

@@ -9,5 +9,3 @@ function EchoAll($bChinese)
 $strDisney
 END;
 }
-
-?>

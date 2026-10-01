@@ -329,7 +329,7 @@ function _getStockOptionMemo($strSubmit)
 		return '清空输入删除对应日期'.STOCK_DISP_CALIBRATION.'值';
 		
 	case STOCK_OPTION_DIVIDEND:
-		return '清空输入删除对应分红';
+		return '清空输入删除对应'.STOCK_DISP_DIVIDEND;
 		
 	case STOCK_OPTION_EMA:
 		return '股票收盘后的第2天修改才会生效, 同时删除以往全部EMA记录。';

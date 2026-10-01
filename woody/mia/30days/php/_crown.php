@@ -17,5 +17,3 @@ $strCrownHalf
 $strCrownFull
 END;
 }
-
-?>

@@ -12,6 +12,7 @@ class StockAccount extends TitleAccount
 							['ahhistory',
 							 'calibrationhistory',
 							 'debug',
+							 'editnetvalue',
 							 'editstockgroup',
 							 'editstocktransaction',
 							 'exhaustiveholdings',
@@ -232,4 +233,3 @@ END;
 		$this->EchoMoneyParagraphs([$group], $uscny_ref, $hkcny_ref);
     }
 }    
-

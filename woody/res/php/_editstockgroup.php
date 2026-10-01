@@ -27,4 +27,4 @@ function GetMetaDescription()
 }
 
    	$acct = new StockAccount('edit');
-?>
+

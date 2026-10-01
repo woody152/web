@@ -113,5 +113,3 @@ function determinant($matrix)
     
     return $det;
 }
-
-?>

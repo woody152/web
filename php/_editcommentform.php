@@ -54,5 +54,3 @@ class EditCommentAccount extends CommentAccount
 END;
     }
 }
-
-?>

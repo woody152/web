@@ -318,10 +318,10 @@ function GetEtfNetValueUrl($strSymbol)
 
 function GetChinaMoneyUrl()
 {
-	return 'https://www.chinamoney.com.cn/';
+	return 'https://www.chinamoney.com.cn';
 }
 
 function GetChinaMoneyJsonUrl()
 {
-	return GetChinaMoneyUrl().'r/cms/www/chinamoney/data/fx/ccpr.json';
+	return GetChinaMoneyUrl().'/r/cms/www/chinamoney/data/fx/ccpr.json';
 }

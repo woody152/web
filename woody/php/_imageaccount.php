@@ -46,5 +46,3 @@ class ImageAccount extends TitleAccount
     	return substr($strPage, -$iLen, $iLen);
     }
 }
-
-?>

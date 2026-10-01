@@ -3,8 +3,8 @@ FONT-FAMILY: verdana, arial, sans-serif;
 FONT-SIZE: 14px;
 TEXT-ALIGN: left;
 font-weight: normal;
-noboard;
-nowrap;
+border: none;
+white-space: nowrap;
 }
 
 textarea {

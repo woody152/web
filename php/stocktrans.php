@@ -160,5 +160,3 @@ function UpdateStockGroupItem($strGroupId, $strGroupItemId)
 		mysqli_free_result($result);
 	}
 }
-
-?>

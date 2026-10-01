@@ -11,5 +11,3 @@ $strTsinghuaMotto
 $strZhongShan
 END;
 }
-
-?>

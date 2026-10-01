@@ -2,7 +2,7 @@
 require_once('../php/debug.php');
 require_once('../php/ui/echoelement.php');
 
-define('DISP_TITLE', '429 Too Many Requests');
+const DISP_TITLE = '429 Too Many Requests';
 
 function EchoHead($bChinese = true)
 {
@@ -27,4 +27,3 @@ function EchoHead($bChinese = true)
 </body>
 </html>
 END;
-?>

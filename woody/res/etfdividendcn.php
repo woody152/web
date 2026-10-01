@@ -31,7 +31,7 @@ function _EchoEtfDividendHistoryParagraph($ref, $bAdmin = false)
    	if ($bAdmin)	$str .= ' '.GetOnClickLink(PATH_STOCK.'submitdividend.php?symbol='.$strSymbol, "确认更新{$strSymbol}".ETF_DIVIDEND_DISPLAY.'?', '更新'.ETF_DIVIDEND_DISPLAY);
 	
 	if (EchoTableParagraphBegin([new TableColumnDate(),
-								 new TableColumn(STOCK_OPTION_DIVIDEND),
+								 new TableColumn(STOCK_DISP_DIVIDEND),
 								 new TableColumnPrice(),
 								 new TableColumnPercentage()
 								], "{$strSymbol}etfdividend", $str))

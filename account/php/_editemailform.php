@@ -192,5 +192,3 @@ function EditEmailForm($strSubmit, $strEmail, $bAdmin)
 </form>
 END;
 }
-
-?>

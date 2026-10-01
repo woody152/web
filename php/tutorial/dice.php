@@ -42,5 +42,3 @@ function RobloxDice($iNum, $iTarget)
     
 	return $arDisplay;
 }
-
-?>

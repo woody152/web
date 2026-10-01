@@ -25,7 +25,7 @@ function GetMetaDescription()
 	global $acct;
 	
 	$strPage = UrlGetPage();
-    $str = '本中文页面文件跟/woody/res/php/_submitstockoptions.php和_editstockoptionform.php一起配合, 对'.$acct->GetStockDisplay();
+    $str = '本页面导入和查看原始数据，以及在用户登录和有相应权限的情况下关闭只读和提供编辑功能，对'.$acct->GetStockDisplay();
     $str .= _getEditStockOptionSubmit($strPage);
     return CheckMetaDescription($str);
 }

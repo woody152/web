@@ -29,5 +29,3 @@ class MultiCurrency
         $this->fConvertHKD = $strHKDCNY ? $this->fConvertCNY / floatval($strHKDCNY) : 0.0;
     }
 }
-
-?>

@@ -69,5 +69,3 @@ function SqlDeleteBlogCommentByMemberId($strMemberId)
 {
     return SqlDeleteTableData(TABLE_PAGE_COMMENT, _SqlBuildWhere_member($strMemberId));
 }
-
-?>

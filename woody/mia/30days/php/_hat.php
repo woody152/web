@@ -17,5 +17,3 @@ $strRedWondering
 $strRedLost
 END;
 }
-
-?>

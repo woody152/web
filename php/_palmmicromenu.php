@@ -35,5 +35,3 @@ function PalmmicroMenu($strItem, $bChinese)
     $strCn = $bChinese ? 'cn' : '';
     echo MenuGetLink("/$strItem/index{$strCn}.html", $arMenu[$strItem]);
 }
-
-?>

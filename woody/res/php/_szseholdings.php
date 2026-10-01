@@ -94,5 +94,3 @@ function ReadSzseHoldingsFile($strSymbol, $strStockId, $strDate)
 	}
 	return false;
 }
-
-?>

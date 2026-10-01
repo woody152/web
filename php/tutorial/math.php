@@ -157,5 +157,3 @@ function PearsonChiSquaredTest($arExpected, $arObserved)
 	
 	return $arProbability[$i] + ($arProbability[$i + 1] - $arProbability[$i]) * ($fSum - $arVal[$i]) / ($arVal[$i + 1] - $arVal[$i]);*/
 }
-
-?>

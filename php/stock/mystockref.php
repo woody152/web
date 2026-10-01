@@ -28,9 +28,9 @@ function GetForeignMarketCloseTick($strDate, $strType)
 	switch ($strType)
 	{
 	case 'EU':
-		$arCheck = ['znb_DAX', 'znb_CAC', 'znb_UKX', 'znb_SWI20'];
-		$strTimezone = 'Europe/Berlin';
-		$strCloseTime = '17:30:00';
+		$arCheck = ['znb_SWI20', 'znb_UKX'];
+		$strTimezone = 'Europe/Zurich';
+		$strCloseTime = '17:35:00';
 		break;
 	
 	case 'JP':
@@ -45,14 +45,6 @@ function GetForeignMarketCloseTick($strDate, $strType)
 		$strCloseTime = '16:08:00';
 		break;
 	}
-/*	foreach($arCheck as $strCheck)
-	{
-		if (SqlGetHistoryByDate(SqlGetStockId($strCheck), $strDate) === false)
-		{
-			// DebugString(__FUNCTION__.' no data of '.$strCheck.' on '.$strDate);
-			return false;
-		}
-	}*/
 	if (CheckForeignMarket($strDate, $arCheck) === false)	return false;
 
 	$strOldTimezone = date_default_timezone_get();
@@ -94,6 +86,7 @@ class MyStockReference extends MysqlReference
 
 					if ($this->IsSymbolJP())		$strTime = "15:30:00";
 					else if ($this->IsSymbolUK())	$strTime = "16:35:00";
+					else if ($this->IsSymbolSW())	$strTime = "17:35:00";
 					else							$strTime = $ymd->GetHMS();
 					$this->SetTime($strTime);
 					$this->SetExternalLink($strSymbol);

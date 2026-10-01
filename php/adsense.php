@@ -59,5 +59,3 @@ function AdsenseContent()
 {
 	AdsenseUnit('Content', '3041144501', 300);
 }
-
-?>

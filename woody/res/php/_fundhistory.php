@@ -60,5 +60,3 @@ function GetTitle()
 }
 
     $acct = new SymbolAccount();
-?>
-

@@ -168,5 +168,3 @@ $check_ip = '203.10.99.65';
 $result_custom = isIpInSubnetAuto($check_ip, $subnet_ip, $custom_mask);
 echo "使用掩码 {$custom_mask} 判断，IP {$check_ip} 是否在子网内？ " . ($result_custom ? "是" : "否") . "\n";
 */
-
-?>

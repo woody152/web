@@ -44,4 +44,3 @@ function GetTitle($bChinese = true)
 
    	$acct = new Account();
 	$acct->Auth();
-?>

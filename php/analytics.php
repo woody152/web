@@ -16,5 +16,3 @@ function EchoAnalyticsOptimize()
 
 END;
 }
-
-?>

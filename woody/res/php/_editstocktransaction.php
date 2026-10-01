@@ -20,4 +20,3 @@ function GetTitle()
 }
 
    	$acct = new StockAccount();
-?>

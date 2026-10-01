@@ -48,5 +48,3 @@ class IpIntSql extends IntSql
     	return parent::ReadInt(GetIpId($strIp));
     }
 }
-
-?>

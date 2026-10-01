@@ -64,5 +64,3 @@ class _SubmitProfileAccount extends Account
 		}
 	}
 }
-
-?>

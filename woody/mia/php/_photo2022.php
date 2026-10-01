@@ -43,5 +43,3 @@ $strOnBicycle
 END;
 }
 
-
-?>

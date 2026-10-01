@@ -23,5 +23,3 @@ function ReadSseHoldingsFile($strSymbol, $strStockId)
 	}
 	return false;
 }
-
-?>

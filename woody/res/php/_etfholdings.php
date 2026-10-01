@@ -55,5 +55,3 @@ class _EtfHoldingsFile extends _HoldingsCsvFile
 		return str_replace('/', '.', $strHolding);	// BRK/B -> BRK.B
     }
 }
-
-?>

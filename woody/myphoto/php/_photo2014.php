@@ -11,5 +11,3 @@ function PhotoMiaDad($bChinese = true)
 	$strLink = GetMia30DaysLink($bChinese);
 	return GetPhotoDirParagraph(20141211, 'ImgMiaDad', $bChinese, ($bChinese ? $strLink.'艺术照' : 'Mia '.$strLink));
 }
-
-?>

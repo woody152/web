@@ -185,7 +185,8 @@ function _addHoldingsSymbol(&$ar, $strSymbol)
     		
     		$holding_sym = new StockSymbol($strHoldingSymbol);
     		if ($holding_sym->IsSymbolH())			$ar[] = 'fx_shkdcny';
-    		if ($holding_sym->IsSymbolJP())			$ar[] = 'fx_sjpycny';
+    		else if ($holding_sym->IsSymbolJP())	$ar[] = 'fx_sjpycny';
+    		else if ($holding_sym->IsSymbolSW())	$ar[] = 'fx_schfcny';
     		else if ($holding_sym->IsSymbolUS())	$ar[] = 'fx_susdcny';
     	}
     }
@@ -205,25 +206,42 @@ function _getAllSymbolArray($strSymbol)
         {
         	if ($strEstSymbol = QdiiGetEstSymbol($strSymbol))		
         	{
+	        	$ar[] = 'fx_susdcny';
         		_addFundPairSymbol($ar, $strEstSymbol);
         		_addHoldingsSymbol($ar, $strEstSymbol);
         	}
-        	$ar[] = 'fx_susdcny';
+			else	// if (in_arrayHoldingsQdii($strSymbol))
+			{
+				_addHoldingsSymbol($ar, $strSymbol);
+			}
         }
         else if (in_arrayQdiiHk($strSymbol))
         {
-        	if ($strEstSymbol = QdiiHkGetEstSymbol($strSymbol))		_addFundPairSymbol($ar, $strEstSymbol);
-        	$ar[] = 'fx_shkdcny';
+        	if ($strEstSymbol = QdiiHkGetEstSymbol($strSymbol))
+			{
+	        	$ar[] = 'fx_shkdcny';
+				_addFundPairSymbol($ar, $strEstSymbol);
+			}
+			else	// if (in_arrayHoldingsQdiiHk($strSymbol))
+			{
+				_addHoldingsSymbol($ar, $strSymbol);
+			}
         }
         else if (in_arrayQdiiJp($strSymbol))
         {
-        	if ($strEstSymbol = QdiiJpGetEstSymbol($strSymbol))		_addFundPairSymbol($ar, $strEstSymbol); 
-        	$ar[] = 'fx_sjpycny';
+        	if ($strEstSymbol = QdiiJpGetEstSymbol($strSymbol))
+			{
+	        	$ar[] = 'fx_sjpycny';
+				_addFundPairSymbol($ar, $strEstSymbol); 
+			}
         }
         else if (in_arrayQdiiEu($strSymbol))
         {
-        	if ($strEstSymbol = QdiiEuGetEstSymbol($strSymbol))		_addFundPairSymbol($ar, $strEstSymbol); 
-        	$ar[] = 'fx_seurcny';
+        	if ($strEstSymbol = QdiiEuGetEstSymbol($strSymbol))
+			{
+	        	$ar[] = 'fx_seurcny';
+				_addFundPairSymbol($ar, $strEstSymbol); 
+			}
         }
         else
         {

@@ -114,5 +114,3 @@ class _DeleteSymbolAccount extends SymbolAccount
 	    }
 	}
 }
-
-?>

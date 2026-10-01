@@ -13,5 +13,3 @@ $strNasdaq100
 $strFuturesPremium
 END;
 }
-
-?>

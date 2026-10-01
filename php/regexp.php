@@ -87,5 +87,3 @@ function PregMatchSquareBracket($strPrefix, $str)
     }
     return false;
 }
-
-?>

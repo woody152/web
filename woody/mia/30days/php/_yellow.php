@@ -33,5 +33,3 @@ $strYellowConfused
 $strYellowProtesting
 END;
 }
-
-?>

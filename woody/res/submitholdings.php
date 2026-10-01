@@ -35,4 +35,3 @@ class _AdminHoldingsAccount extends SymbolAccount
 
    	$acct = new _AdminHoldingsAccount();
 	$acct->AdminRun();
-?>

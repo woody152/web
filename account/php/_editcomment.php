@@ -34,4 +34,3 @@ function GetTitle($bChinese = true)
 }
 
    	$acct = new EditCommentAccount();
-?>

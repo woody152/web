@@ -132,5 +132,3 @@ class _SubmitCommentAccount extends EditCommentAccount
 
    	$acct = new _SubmitCommentAccount();
    	$acct->Run();
-
-?>

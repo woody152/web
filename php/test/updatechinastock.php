@@ -276,5 +276,3 @@ class _AdminChinaStockAccount extends TitleAccount
 
    	$acct = new _AdminChinaStockAccount();
 	$acct->AdminRun();
-	
-?>

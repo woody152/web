@@ -19,5 +19,3 @@ $strBlueYawning
 $strBlueGazing
 END;
 }
-
-?>

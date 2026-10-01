@@ -67,5 +67,3 @@ function ReadKraneHoldingsCsvFile($strSymbol, $strStockId, $strDate, $strNetValu
 		}
 	}
 }
-
-?>

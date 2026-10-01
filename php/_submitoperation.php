@@ -19,4 +19,3 @@ class _AdminOperationAccount extends Account
 
    	$acct = new _AdminOperationAccount();
 	$acct->AdminRun();
-?>

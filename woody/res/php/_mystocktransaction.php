@@ -5,6 +5,7 @@ require_once('_idgroup.php');
 function EchoAll()
 {
 	global $acct;
+	/** @var _TransAccount $acct */
 	
     if ($strGroupId = $acct->EchoStockGroup())
     {
@@ -30,6 +31,7 @@ function EchoAll()
 function GetTitle()
 {
 	global $acct;
+	/** @var _TransAccount $acct */
     
    	$str = $acct->GetWhoseGroupDisplay().STOCK_GROUP_DISPLAY;
    	$str .= ($strSymbol = $acct->GetSymbol()) ? $strSymbol : '';
@@ -62,4 +64,3 @@ class _TransAccount extends GroupIdAccount
 }
 
 	$acct = new _TransAccount();
-?>

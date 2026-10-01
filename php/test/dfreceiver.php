@@ -72,4 +72,3 @@ if (file_put_contents($tempFile, $jsonInput) !== false) {
     http_response_code(500);
     echo json_encode(['error' => 'Failed to write file']);
 }
-?>

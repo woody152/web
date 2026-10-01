@@ -94,4 +94,3 @@ END;
 }
 
 require('../../php/ui/_disp.php');
-?>

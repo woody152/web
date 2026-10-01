@@ -31,21 +31,21 @@ define('QUARTER_SIM_DISPLAY', '模拟'.STOCK_DISP_HOLDING);
 
 define('STOCK_OPTION_ADR', '修改H股对应ADR代码');
 define('STOCK_OPTION_AH', '修改A股对应H股代码');
-define('STOCK_OPTION_AMOUNT', '基金申购金额');
+define('STOCK_OPTION_AMOUNT', '设置基金申购金额');
 define('STOCK_OPTION_CALIBRATION', '手工'.STOCK_DISP_CALIBRATION);
 define('STOCK_OPTION_CLOSE', '更新收盘价');
-define('STOCK_OPTION_DIVIDEND', '分红');
+define('STOCK_OPTION_DIVIDEND', '修改'.STOCK_DISP_DIVIDEND);
 define('STOCK_OPTION_EDIT', '修改股票说明');
 define('STOCK_OPTION_EMA', '修改200/50日EMA');
 define('STOCK_OPTION_FUND', '修改对应配对代码和'.STOCK_DISP_POSITION);
 define('STOCK_OPTION_HA', '修改H股对应A股代码');
 define('STOCK_OPTION_HOLDINGS', '修改'.HOLDINGS_DISPLAY);
 define('STOCK_OPTION_NETVALUE', '修改'.STOCK_DISP_NETVALUE);
-define('STOCK_OPTION_PREMIUM', '期货升水');
+define('STOCK_OPTION_PREMIUM', '设置期货升水');
 define('STOCK_OPTION_REPORT', '修改'.QUARTER_REPORT_DISPLAY);
 define('STOCK_OPTION_SIM', '修改'.QUARTER_SIM_DISPLAY);
 define('STOCK_OPTION_SHARE_DIFF', '场内新增(万)');
-define('STOCK_OPTION_SPLIT', '拆股或合股');
+define('STOCK_OPTION_SPLIT', '设置拆股或合股');
 
 function GetStockCategoryArray()
 {
@@ -178,7 +178,7 @@ function GetNetValueCloseLink($strSymbol)
 	return GetStockSymbolLink('netvalueclose', $strSymbol, NETVALUE_CLOSE_DISPLAY);
 }
 
-define('ETF_DIVIDEND_DISPLAY', STOCK_OPTION_DIVIDEND.'数据');
+define('ETF_DIVIDEND_DISPLAY', STOCK_DISP_DIVIDEND.'数据');
 function GetEtfDividendLink($strSymbol)
 {
 	return GetStockSymbolLink('etfdividend', $strSymbol, ETF_DIVIDEND_DISPLAY);

@@ -21,5 +21,3 @@ $strLeopardTired
 $strLeopardHalf
 END;
 }
-
-?>

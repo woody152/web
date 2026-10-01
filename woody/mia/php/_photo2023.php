@@ -28,5 +28,3 @@ $strRhythmicGymnastics
 $strGuiLin
 END;
 }
-
-?>

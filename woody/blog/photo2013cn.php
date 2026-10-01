@@ -10,4 +10,3 @@ END;
 }
 
 require('../../php/ui/_dispcn.php');
-?>

@@ -3,10 +3,9 @@ require('php/_qdii.php');
 
 function GetQdiiRelated($strDigitA)
 {
-	$str = GetHtmlNewLine($strDigitA);
+	$str = GetHtmlNewLine();
 	$str .= GetEFundSoftwareLinks($strDigitA);
 	return $str;
 }
 
 require('../../php/ui/_dispcn.php');
-?>

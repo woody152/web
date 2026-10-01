@@ -66,6 +66,10 @@ class _QdiiMixAccount extends FundGroupAccount
 			{
 	   			YahooUpdatePrice($holding_ref, $this->ref, 'znb_UKX');
 			}	
+			else if ($holding_ref->IsSymbolSW())
+			{
+	   			YahooUpdatePrice($holding_ref, $this->ref, 'znb_SWI20');
+			}	
     	}
 
         GetChinaMoney($this->ref);

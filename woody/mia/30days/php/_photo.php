@@ -224,5 +224,3 @@ function PhotoMiaHandInHand($bChinese = true)
 {
 	return _getPhotoParagraph('IMG_5899.JPG', '手放爸爸妈妈手中', "Hand in mom and dad's hands", $bChinese);
 }
-
-?>

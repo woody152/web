@@ -66,5 +66,3 @@ function StockEditGroupForm($acct, $strSubmit)
     </form>
 END;
 }
-
-?>

@@ -8,4 +8,3 @@ function GetQdiiHkRelated($strDigitA)
 }
 
 require('../../php/ui/_dispcn.php');
-?>

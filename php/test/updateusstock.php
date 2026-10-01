@@ -44,5 +44,3 @@ class _AdminUsStockAccount extends Account
 
    	$acct = new _AdminUsStockAccount();
 	$acct->AdminRun();
-
-?>

@@ -215,4 +215,3 @@ class  INIFile {
 		return;
 	}
 }
-?>

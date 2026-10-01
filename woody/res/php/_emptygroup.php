@@ -67,5 +67,3 @@ class SymbolAccount extends StockAccount
     	return $this->GetStockDisplay().$strDisplay.$this->GetStartNumDisplay();
     }
 }
-
-?>

@@ -9,4 +9,3 @@ function GetQdiiJpRelated($strDigitA)
 }
 
 require('../../php/ui/_dispcn.php');
-?>

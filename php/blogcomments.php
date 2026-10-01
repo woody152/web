@@ -10,4 +10,3 @@ function BlogComments()
 }
 
    	$acct = new EditCommentAccount();
-?>

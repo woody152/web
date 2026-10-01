@@ -8,7 +8,7 @@ function _getPhotoDir()
 	$strDate = $acct->GetQuery();
 	if (IsDigitDate($strDate))
 	{
-		$strDir = 'image/'.$strDate;
+		$strDir = "image/$strDate";
 		if (is_dir($strDir))		return $strDir;
 	}
 	return false;
@@ -27,7 +27,7 @@ function GetTitle($bChinese)
 
 function GetMetaDescription($bChinese)
 {
-	$str = _getPhotoDirYmd($bChinese).($bChinese ? '相片全部显示页面，按文件名a-z排序。每张相片都根据刚好满屏显示调整了大小，未调整文件在原图链接中。' : ' photos all display page, each photo is adjusted to the screen display size');
+	$str = _getPhotoDirYmd($bChinese).($bChinese ? '相片全部显示页面, 按文件名a-z排序。每张相片都根据刚好满屏显示调整了大小, 未调整文件在原图链接中。' : ' photos all display page, each photo is adjusted to the screen display size');
 	return CheckMetaDescription($str);
 }
 
@@ -73,5 +73,3 @@ function EchoAll($bChinese)
 $strAll
 END;
 }
-
-?>

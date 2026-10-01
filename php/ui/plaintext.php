@@ -1,13 +1,13 @@
 <?php
-define('MAX_META_DESCRIPTION', 156);
+const MAX_META_DESCRIPTION = 156;
 
 function _onMetaDescriptionWarning($iLen, $strType, $str)
 {
 	$strNewLine = GetHtmlNewLine();
 
-    $strText = $strType.' Meta Description Warning';
-    $strText .= $strNewLine.'Length='.strval($iLen);
-    $strText .= $strNewLine.$str;
+    $strText = "$strType Meta Description Warning";
+    $strText .= "{$strNewLine}Length=".strval($iLen);
+    $strText .= "{$strNewLine}$str";
 	trigger_error($strText);
 }
 

@@ -8,4 +8,3 @@ function GetQdiiEuRelated($strDigitA)
 }
 
 require('../../php/ui/_dispcn.php');
-?>

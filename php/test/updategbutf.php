@@ -50,5 +50,3 @@ class _AdminGbUtfAccount extends Account
 
    	$acct = new _AdminGbUtfAccount();
 	$acct->AdminRun();
-
-?>

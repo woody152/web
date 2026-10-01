@@ -45,6 +45,10 @@ function GetChinaMoney($ref)
     					_chinaMoneyInsertData('EUCNY', $strDate, $strPrice);
     					break;
     		
+    				case 'CHF/CNY':
+    					_chinaMoneyInsertData('CHCNY', $strDate, $strPrice);
+    					break;
+    		
     				case '100JPY/CNY':
     					_chinaMoneyInsertData('JPCNY', $strDate, $strPrice);
     					break;

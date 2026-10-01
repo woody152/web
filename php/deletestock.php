@@ -24,5 +24,3 @@ function DeleteStock($strStockId)
 	SqlDeleteNetValueHistory($strStockId);
 	SqlDeleteStock($strStockId);
 }
-
-?>

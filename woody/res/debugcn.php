@@ -86,4 +86,3 @@ function GetTitle()
 	$acct = new StockAccount();
 
 require('../../php/ui/_dispcn.php');
-?>

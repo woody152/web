@@ -1,10 +1,11 @@
 <?php
 
-function RefAdjustForex($ref, $fAdjustHKD, $fAdjustJPY, $fAdjustUSD)
+function RefAdjustForex($ref, $fAdjustHKD, $fAdjustJPY, $fAdjustCHF, $fAdjustUSD)
 {
 	if ($ref->IsSymbolA())								$fAdjust = 1.0;
 	else if ($ref->IsSymbolH())							$fAdjust = $fAdjustHKD;
 	else if ($ref->IsSymbolJP())						$fAdjust = $fAdjustJPY;
+	else if ($ref->IsSymbolSW())						$fAdjust = $fAdjustCHF;
 	else if ($ref->IsSymbolUK() || $ref->IsSymbolUS())	$fAdjust = $fAdjustUSD;
 	return $fAdjust;
 }
@@ -22,6 +23,8 @@ class HoldingsReference extends MyStockReference
     var $usdcny_ref = false;
     var $hkcny_ref = false;
     var $hkdcny_ref = false;
+    private $chcny_ref = false;
+    private $chfcny_ref = false;
     private $jpcny_ref = false;
     private $jpycny_ref = false;
     
@@ -45,6 +48,7 @@ class HoldingsReference extends MyStockReference
     private $fRatioHK = false;
     private $fRatioJP = false;
     private $fRatioUK = false;
+    private $fRatioSW = false;
     private $fRatioUS = false;
     
     public function __construct($strSymbol) 
@@ -99,6 +103,12 @@ class HoldingsReference extends MyStockReference
 					else if ($holding_ref->IsSymbolUK())
 					{
 						_add_holdings_ratio($this->fRatioUK, $fRatio);
+					}
+					else if ($holding_ref->IsSymbolSW())
+					{
+						_add_holdings_ratio($this->fRatioSW, $fRatio);
+						if ($this->chcny_ref === false)		$this->chcny_ref = new CnyReference('CHCNY');
+						if ($this->chfcny_ref === false)	$this->chfcny_ref = new MyStockReference('fx_schfcny');
 					}
 					else if ($holding_ref->IsSymbolUS())
 					{
@@ -187,6 +197,8 @@ class HoldingsReference extends MyStockReference
 
 	function GetProportionArray($strDate, $strPrevDate)
     {
+		$fUSCNY = $this->uscny_ref->GetVal($strDate);
+		$fPrevUSCNY = $this->uscny_ref->GetVal($strPrevDate);
 	   	$his_sql = GetStockHistorySql();
 	    $ar = [];
 		foreach ($this->ar_holdings_ref as $ref)
@@ -195,18 +207,23 @@ class HoldingsReference extends MyStockReference
 		    {
 				if ($ref->IsSymbolA())
 				{
-					$fProportion /= $this->uscny_ref->GetVal($strDate);
-					$fProportion *= $this->uscny_ref->GetVal($strPrevDate);
+					$fProportion /= $fUSCNY;
+					$fProportion *= $fPrevUSCNY;
 				}
 				else if ($ref->IsSymbolH())
 				{
-					$fProportion /= $this->uscny_ref->GetVal($strDate) / $this->hkcny_ref->GetVal($strDate);
-					$fProportion *= $this->uscny_ref->GetVal($strPrevDate) / $this->hkcny_ref->GetVal($strPrevDate);
+					$fProportion /= $fUSCNY / $this->hkcny_ref->GetVal($strDate);
+					$fProportion *= $fPrevUSCNY / $this->hkcny_ref->GetVal($strPrevDate);
 				}
 				else if ($ref->IsSymbolJP())
 				{
-					$fProportion /= $this->uscny_ref->GetVal($strDate) / $this->jpcny_ref->GetVal($strDate);
-					$fProportion *= $this->uscny_ref->GetVal($strPrevDate) / $this->jpcny_ref->GetVal($strPrevDate);
+					$fProportion /= $fUSCNY / $this->jpcny_ref->GetVal($strDate);
+					$fProportion *= $fPrevUSCNY / $this->jpcny_ref->GetVal($strPrevDate);
+				}
+				else if ($ref->IsSymbolSW())
+				{
+					$fProportion /= $fUSCNY / $this->chcny_ref->GetVal($strDate);
+					$fProportion *= $fPrevUSCNY / $this->chcny_ref->GetVal($strPrevDate);
 				}
 				$ar[] = $fProportion;
 			}
@@ -231,11 +248,12 @@ class HoldingsReference extends MyStockReference
     function GetHoldingsRatioDisplay()
     {
     	$str = '';
-    	if ($this->fRatioCN !== false)	$str .= 'A股'.number_format($this->fRatioCN).'% ';
-    	if ($this->fRatioHK !== false)	$str .= '港股'.number_format($this->fRatioHK).'% ';
-    	if ($this->fRatioJP !== false)	$str .= '日股'.number_format($this->fRatioJP).'% ';
-    	if ($this->fRatioUK !== false)	$str .= '英股'.number_format($this->fRatioUK).'% ';
-    	if ($this->fRatioUS !== false)	$str .= '美股'.number_format($this->fRatioUS).'% ';
+    	if ($this->fRatioCN !== false)	$str .= '中国'.number_format($this->fRatioCN).'% ';
+    	if ($this->fRatioHK !== false)	$str .= '香港'.number_format($this->fRatioHK).'% ';
+    	if ($this->fRatioJP !== false)	$str .= '日本'.number_format($this->fRatioJP).'% ';
+    	if ($this->fRatioUK !== false)	$str .= '英国'.number_format($this->fRatioUK).'% ';
+    	if ($this->fRatioSW !== false)	$str .= '瑞士'.number_format($this->fRatioSW).'% ';
+    	if ($this->fRatioUS !== false)	$str .= '美国'.number_format($this->fRatioUS).'% ';
     	return rtrim($str, ' ');
     }
     
@@ -281,6 +299,12 @@ class HoldingsReference extends MyStockReference
     	if (($strDate === false) && $this->IsEtfA())	return $this->_adjustToCNY($this->jpcny_ref, $this->jpycny_ref);
 		return $this->_adjustToCNY($this->jpcny_ref, $this->jpycny_ref, $strDate);
     }
+
+    function GetAdjustCHF($strDate = false)
+    {
+    	if (($strDate === false) && $this->IsEtfA())	return $this->_adjustToCNY($this->chcny_ref, $this->chfcny_ref);
+		return $this->_adjustToCNY($this->chcny_ref, $this->chfcny_ref, $strDate);
+    }
     
     function GetAdjustHKD($strDate = false)
     {
@@ -318,6 +342,7 @@ class HoldingsReference extends MyStockReference
 //    	$arStrict = GetSecondaryListingArray();    	
     	$fAdjustHKD = $this->GetAdjustHKD($strDate);
     	$fAdjustJPY = $this->GetAdjustJPY($strDate);
+    	$fAdjustCHF = $this->GetAdjustCHF($strDate);
 		$fAdjustUSD = $this->GetAdjustUSD($strDate);
     	
 		$his_sql = GetStockHistorySql();
@@ -365,7 +390,7 @@ class HoldingsReference extends MyStockReference
 				if ($arHoldingsDateHistory[$strStockId] > MIN_FLOAT_VAL)
 				{
 					$fChange = $fRatio * ($fPrice / $arHoldingsDateHistory[$strStockId]);
-					$fChange /= RefAdjustForex($ref, $fAdjustHKD, $fAdjustJPY, $fAdjustUSD);
+					$fChange /= RefAdjustForex($ref, $fAdjustHKD, $fAdjustJPY, $fAdjustCHF, $fAdjustUSD);
 					$fTotalChange += $fChange;
 				}	
 			}
@@ -373,7 +398,7 @@ class HoldingsReference extends MyStockReference
 		
 		if ($fTotalRatio > MIN_FLOAT_VAL)	$fTotalChange /= $fTotalRatio;
 		$fTotalChange -= 1.0;
-		$fTotalChange *= RefAdjustForex($this, $fAdjustHKD, $fAdjustJPY, $fAdjustUSD);
+		$fTotalChange *= RefAdjustForex($this, $fAdjustHKD, $fAdjustJPY, $fAdjustCHF, $fAdjustUSD);
 		$fTotalChange *= $this->GetPosition();
 		$fNewNetValue = floatval($this->strNetValue) * (1.0 + $fTotalChange);
 		return $fNewNetValue; 

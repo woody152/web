@@ -18,5 +18,3 @@ $strMarriot
 $strVivo
 END;
 }
-
-?>
