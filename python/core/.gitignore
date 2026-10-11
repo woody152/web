@@ -1,0 +1,7 @@
+# Local DB connection config (corresponds to PHP _private.php) - never commit
+_dbprivate.py
+
+# Python artifacts
+__pycache__/
+*.pyc
+.pytest_cache/
