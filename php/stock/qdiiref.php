@@ -21,7 +21,7 @@ function QdiiGetEstArray()
 	$ar = ['SH501300' => 'AGG',
            'SH513290' => 'IBB',
            'SH513400' => '^DJI',
-           'SZ160140' => 'VNQ',		// SCHH
+           'SZ160140' => 'VNQ',		// SCHH, RWR
            'SZ160416' => 'IXC',		// '^SPGOGUP'
            'SZ161126' => 'RSPH',
            'SZ161128' => 'VGT',		// XLK IXN

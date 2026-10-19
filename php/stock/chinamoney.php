@@ -20,10 +20,10 @@ function _chinaMoneyInsertData($strMoney, $strDate, $strPrice)
 function GetChinaMoney($ref)
 {
     if (_chinaMoneyNeedData($ref->GetDate()) == false)			return;
-	if ($ref->GetHourMinute() < 915)							return;	// Data not updated until 9:15
+	if ($ref->GetHourMinute() < 916)							return;	// Data not updated until 9:15
     
 	$ref->SetTimeZone();
-	if ($ar = StockDebugJson(DebugGetChinaMoneyFile(), GetChinaMoneyJsonUrl()))
+	if ($ar = StockDebugJson(DebugGetChinaMoneyFile(), GetChinaMoneyJsonUrl(), 2 * SECONDS_IN_MIN))
 	{
 		$arData = $ar['data'];
     	if ($strDate = _chinaMoneyNeedData(substr($arData['lastDate'], 0, 10)))		// 2018-04-12 9:15

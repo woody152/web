@@ -528,7 +528,7 @@ class PalmmicroWrapper(EWrapper):
 			TdxStock.TqDebug(','.join(self.arSymbols))
 			self.arStock = {}
 
-	arFutureDict = {'hf_CL': 'MCL202611',
+	arFutureDict = {'hf_CL': 'MCL202612',
 					'hf_GC': 'MGC202612',
 					'hf_ES': 'MES202612',
 					'hf_NQ': 'MNQ202612'
