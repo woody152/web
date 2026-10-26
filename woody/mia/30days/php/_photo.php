@@ -2,7 +2,7 @@
 
 function _getPhotoParagraph($strFileName, $strTextCn, $strTextUs = '', $bChinese = true, $strExtra = '')
 {
-	return GetPhotoParagraph('/woody/image/20141211/'.$strFileName, ($bChinese ? $strTextCn : $strTextUs), $bChinese, $strExtra);
+	return GetPhotoParagraph(PATH_WOODY_IMAGE."20141211/$strFileName", ($bChinese ? $strTextCn : $strTextUs), $bChinese, $strExtra);
 }
 
 function PhotoMiaYellowAll($bChinese = true)

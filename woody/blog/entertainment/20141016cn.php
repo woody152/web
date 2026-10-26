@@ -312,13 +312,13 @@ END;
 function Echo20250101($strHead)
 {
 	$strHead = GetHeadElement($strHead);
-	$strTitleImage = ImgAutoQuote(PATH_BLOG_PHOTO.'20250101cover.jpg', '愁边动寒角，夜久意难平。');
+	$strTitleImage = BlogImgAutoQuote('20250101cover.jpg', '愁边动寒角, 夜久意难平。');
 	$str2016 = GetNameLink('2016');
 	$str2023 = GetNameLink('2023');
 	$strUsdInterest = GetBlogLink(20230614);
 	$strFuturesPremium = GetBlogLink(20200424);
 	$strXueqiu = GetXueqiuIdLink('2747564710', '磨刀霍霍向猪羊01');
-	$strImage = ImgAutoQuote(PATH_BLOG_PHOTO.'20250101.jpg', '2024年最终持仓亏损24万人民币');
+	$strImage = BlogImgAutoQuote('20250101.jpg', '2024年最终持仓亏损24万人民币');
 	
 	$strUSDCNH = GetMyStockLink('fx_susdcnh', 'USDCNH');
 	$strList = GetListElement(['@Gamestonk分组合并了2023年底清仓的@CHU分组，然后增加了几十条本年的TLT交易，总体上差不多亏了1万人民币。TLT在2024年下跌了8%，雪球上因为美元降息而做多它亏钱的人应该很多。',
@@ -364,10 +364,10 @@ END;
 function Echo20260101($strHead)
 {
 	$strHead = GetHeadElement($strHead);
-	$strTitleImage = ImgAutoQuote(PATH_BLOG_PHOTO.'10years.jpg', '桃李春风一杯酒，江湖夜雨十年灯。');
+	$strTitleImage = BlogImgAutoQuote('10years.jpg', '桃李春风一杯酒, 江湖夜雨十年灯。');
 	$str2016 = GetNameLink('2016');
 	$strXueqiu = GetXueqiuIdLink('1865006408', '公子是长安');
-	$strImage = ImgAutoQuote(PATH_BLOG_PHOTO.'20260101.jpg', '2025年最终持仓亏损40万人民币');
+	$strImage = BlogImgAutoQuote('20260101.jpg', '2025年最终持仓亏损40万人民币');
 	
 	$str2024 = GetNameLink('2024');
 	$strXLV = GetMyStockLink('XLV');

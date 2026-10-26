@@ -23,6 +23,7 @@ function _inBlackList($strIp)
 		   '61.224.106.123',
 		   '66.90.98.35',
 		   '183.250.189.231',
+		   '192.144.132.128',
 		   '203.10.99.42'];
 	if (in_array($strIp, $ar))	return true;
 	/*foreach ($ar as $str)

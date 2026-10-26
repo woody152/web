@@ -19,7 +19,6 @@ function ImgAutoQuote($strPathName, $strText = '', $bChinese = true)
 	$imgOrg = imagecreatefromjpeg(UrlModifyRootFileName($strPathName));
 	$iWidth = imagesx($imgOrg);
 	$iHeight = imagesy($imgOrg);
-//	DebugString($strPathName.':'.strval($iWidth).'x'.strval($iHeight), true);
 	
 	$iFitHeight = intval($iFit * $iHeight / $iWidth);
 	if ($iFitHeight > $iDisplayHeight)
@@ -39,7 +38,6 @@ function ImgAutoQuote($strPathName, $strText = '', $bChinese = true)
 		$strNewName = substr($strPathName, 0, strlen($strPathName) - 4).'x'.$strFit.GetImgAutoSuffix();
 		$strNewRootName = UrlModifyRootFileName($strNewName); 
 		if (!file_exists($strNewRootName))
-//		if (!file_exists($strNewName))
 		{
 			DebugString('Converting '.$strNewName);
 			$imgNew = imagecreatetruecolor($iFit, $iFitHeight);
@@ -62,9 +60,11 @@ function ImgWoodyHomepage($bChinese = true)
 	return GetImgQuote('/woody/myphoto/2016/becool.jpg', ($bChinese ? '天生会摆酷' : 'Be cool'), $bChinese);
 }
 
+const PATH_WOODY_IMAGE = '/woody/image/';
+
 function ImgWoodyBike($bChinese = true)
 {
-	return GetImgQuote('/woody/image/mybike.jpg', ($bChinese ? '2007年早春，我的宝马。' : 'Early spring of 2007, my precious bike.'), $bChinese);
+	return GetImgQuote(PATH_WOODY_IMAGE.'mybike.jpg', ($bChinese ? '2007年早春, 我的宝马。' : 'Early spring of 2007, my precious bike.'), $bChinese);
 }
 
 function ImgHalfMoonBay($bChinese = true)
@@ -72,7 +72,7 @@ function ImgHalfMoonBay($bChinese = true)
 	return GetImgQuote('/woody/groupphoto/company/20070920.jpg', ($bChinese ? '2007年9月20日王老板王老板、唐丽和我在加州半月湾。' : 'Sep 20, 2007 Dr Wang, Tang Li and me in Half Moon Bay.'), $bChinese);
 }
 
-define('PATH_BLOG_PHOTO', '/woody/blog/photo/');
+const PATH_BLOG_PHOTO = '/woody/blog/photo/';
 function GetWoodyImgQuote($strFileName, $strText, $strTextUs = '', $bChinese = true)
 {
 	return GetImgQuote(PATH_BLOG_PHOTO.$strFileName, ($bChinese ? $strText : $strTextUs), $bChinese);
@@ -106,7 +106,7 @@ function ImgMrFox()
 
 function ImgPhpBest($bChinese = true)
 {
-	return GetWoodyImgQuote('phpisbest.jpg', 'PHP是世界上最好的编程语言！', 'PHP is the best programming language in the world!', $bChinese);
+	return GetWoodyImgQuote('phpisbest.jpg', 'PHP是世界上最好的编程语言!', 'PHP is the best programming language in the world!', $bChinese);
 }
 
 function ImgSantaFe($bChinese = true)
@@ -129,24 +129,34 @@ function ImgTianHeng()
 	return GetWoodyImgQuote('tianheng.jpg', '田横五百壮士');
 }
 
+function WoodyImgAutoQuote($strFileName, $strText, $strTextUs = '', $bChinese = true)
+{
+	return ImgAutoQuote(PATH_WOODY_IMAGE.$strFileName, ($bChinese ? $strText : $strTextUs), $bChinese);
+}
+
+function BlogImgAutoQuote($strFileName, $strText, $strTextUs = '', $bChinese = true)
+{
+	return ImgAutoQuote(PATH_BLOG_PHOTO.$strFileName, ($bChinese ? $strText : $strTextUs), $bChinese);
+}
+
 function ImgBelieveMe($bChinese = true)
 {
-	return ImgAutoQuote(PATH_BLOG_PHOTO.'believe.jpg', ($bChinese ? '至于你信不信，我反正信了。' : 'You believe it or not, I believe it anyway.'), $bChinese);
+	return BlogImgAutoQuote('believe.jpg', '至于你信不信, 我反正信了。', 'You believe it or not, I believe it anyway.', $bChinese);
 }
 
 function ImgFreeFood($bChinese = true)
 {
-	return ImgAutoQuote(PATH_BLOG_PHOTO.'freefood.jpg', ($bChinese ? '又要到饭了兄弟们' : 'I got free food again!'), $bChinese);
+	return BlogImgAutoQuote('freefood.jpg', '又要到饭了兄弟们', 'I got free food again!', $bChinese);
 }
 
 function ImgGoldFinger()
 {
-	return ImgAutoQuote(PATH_BLOG_PHOTO.'goldfinger.jpg', '沙子一袋子，金子一屋子。');
+	return BlogImgAutoQuote('goldfinger.jpg', '沙子一袋子, 金子一屋子。');
 }
 
 function ImgAlwaysWin()
 {
-	return ImgAutoQuote(PATH_BLOG_PHOTO.'linqingxia.jpg', '东方不败林青霞');
+	return BlogImgAutoQuote('linqingxia.jpg', '东方不败林青霞');
 }
 
 function ImgAccountTool($strPage, $bChinese = true)
@@ -191,10 +201,10 @@ function ImgStockGroup($strPage)
 		return ImgGoldFinger();
     	
     case 'hangseng':
-    	return ImgAutoQuote(PATH_BLOG_PHOTO.'luody.jpg', '小河弯弯向南流，流到香江去看一看。');
+    	return BlogImgAutoQuote('luody.jpg', '小河弯弯向南流, 流到香江去看一看。');
 
     case 'hshares':
-    	return ImgAutoQuote(PATH_BLOG_PHOTO.'ChowYunFat.jpg', '英雄本色');
+    	return BlogImgAutoQuote('ChowYunFat.jpg', '英雄本色');
     	
     case 'hstech':
     	return GetWoodyImgQuote('hardlife.jpg', '人生永远都在艰难模式');
@@ -224,7 +234,7 @@ function ImgStockGroup($strPage)
 		return ImgSantaFe();
 		
 	case 'qdiimix':
-		return ImgAutoQuote(PATH_BLOG_PHOTO.'rulai.jpg', '年轻人，我这儿有本秘籍。');
+		return BlogImgAutoQuote('rulai.jpg', '年轻人, 我这儿有本秘籍。');
 
     case 'qqqfund':
     	return ImgLikeDog();
@@ -264,7 +274,7 @@ function GetVideoControl($strPathName, $strText = '', $bChinese = true)
 				$str = GetHtmlElement('<source src="'.$strPathName.'" type="video/mp4">', 'video', array('width' => GetDoubleQuotes(strval($iWidth)), 'height' => GetDoubleQuotes(strval($iHeight)), 'controls' => false, 'poster' => GetDoubleQuotes($strPosterFile)));   
 				$str .= $strNewLine.GetQuoteElement($strText);
 			}
-			return $strNewLine.$str;
+			return "{$strNewLine}$str";
 		}
 	}
 	return '';
@@ -274,5 +284,3 @@ function VidAboutSZ161130($bChinese = true)
 {
 	return GetVideoControl(PATH_BLOG_PHOTO.'sz161130.mp4', ($bChinese ? '关于SZ161130的直播视频回放' : 'SZ161130 live broadcast video playback'), $bChinese);
 }
-
-?>

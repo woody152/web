@@ -15,7 +15,7 @@ class TableColumnCalibration extends TableColumn
 {
 	public function __construct()
 	{
-        parent::__construct(STOCK_DISP_CALIBRATION.'值', 140);
+        parent::__construct(STOCK_DISP_CALIBRATION, 140);
 	}
 }
 

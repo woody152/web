@@ -56,12 +56,12 @@ function GetWechatPay($iType = 0, $bChinese = true)
 	switch ($iType)
 	{
 	case 1:
-		$strRemark = '觉得这个网站有用？可以用微信打赏一块钱给Woody！';
+		$strRemark = '觉得这个网站有用? 可以用微信打赏一块钱给Woody!';
 		$strImage = GetImgElement('/woody/image/wxpay.jpg', '微信打赏一块钱给Woody的二维码');
 		break;
 		
 	case 2:
-		$strRemark = '觉得这个网站有用？可以用微信打赏支持一下！';
+		$strRemark = '觉得这个网站有用? 可以用微信打赏支持一下!';
 		$strImage = GetImgElement(ResizeJpg('/woody/image/wxpay_full.jpg'), $strRemark);
 		break;
 		
@@ -71,7 +71,7 @@ function GetWechatPay($iType = 0, $bChinese = true)
 		break;
 		
 	case 4:
-		$strRemark = '觉得这个网站有用？可以用支付宝打赏支持一下！';
+		$strRemark = '觉得这个网站有用? 可以用支付宝打赏支持一下!';
 		$strImage = GetImgElement(ResizeJpg('/woody/image/alipay_full.jpg'), $strRemark);
 		break;
 	}

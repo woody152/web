@@ -9,9 +9,9 @@ function GetMetaDescription($bChinese)
 function EchoAll($bChinese)
 {
 	$strSZ162411 = GetBlogLink(20150818, $bChinese);
-	$strImgQqq = ImgAutoQuote(PATH_BLOG_PHOTO.'20200915QQQ.jpg', 'Sep 11. Top 10 holdings on QQQ official website.', $bChinese);
+	$strImgQqq = BlogImgAutoQuote('20200915QQQ.jpg', '', 'Sep 11. Top 10 holdings on QQQ official website.', $bChinese);
 	$strGoogle = GetBlogLink(20110509, $bChinese);
-	$strImgMnq = ImgAutoQuote(PATH_BLOG_PHOTO.'20200915MNQ.jpg', 'Sep 14. MNQ quotes displayed on CME official website.', $bChinese);
+	$strImgMnq = BlogImgAutoQuote('20200915MNQ.jpg', '', 'Sep 14. MNQ quotes displayed on CME official website.', $bChinese);
 	$strVideo = VidAboutSZ161130($bChinese);
 
 	EchoBlogDate();

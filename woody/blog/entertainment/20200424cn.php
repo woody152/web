@@ -8,8 +8,8 @@ function GetMetaDescription()
 
 function EchoAll()
 {
-	$strNegOil = ImgAutoQuote(PATH_BLOG_PHOTO.'negoilfuture.jpg', '芝商所负油价截图');
-	$strTankerRate = ImgAutoQuote(PATH_BLOG_PHOTO.'tanker20200417.jpg', '2020年4月17日油轮运价截图');
+	$strNegOil = BlogImgAutoQuote('negoilfuture.jpg', '芝商所负油价截图');
+	$strTankerRate = BlogImgAutoQuote('tanker20200417.jpg', '2020年4月17日油轮运价截图');
 	$strImage = ImgBelieveMe();
 
 	EchoBlogDate();

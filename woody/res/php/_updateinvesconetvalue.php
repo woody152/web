@@ -77,7 +77,7 @@ function UpdateInvescoNetValue($strSymbol)
 
 function UpdateInvescoNetValue($strSymbol)
 {
-	if ($ar = StockDebugJson(DebugGetNetValueFile($strSymbol), GetInvescoNetValueUrl($strSymbol)))
+	if ($ar = StockDebugJson(DebugGetNetValueFile($strSymbol), GetInvescoNetValueUrl($strSymbol), 25 * SECONDS_IN_MIN))
 	{
 		DebugPrint($ar);
 		$net_sql = GetNetValueHistorySql();

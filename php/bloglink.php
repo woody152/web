@@ -157,7 +157,7 @@ function ImgWoody20190128($bChinese = true)
 
 function ImgWorriedWoody($bChinese = true)
 {
-	return ImgAutoQuote('/woody/image/20141121/E55A5341.JPG', $bChinese ? '我们两个都有点发愁' : 'Woody and Mia Lin are both worried!', $bChinese);
+	return WoodyImgAutoQuote('20141121/E55A5341.JPG', '我们两个都有点发愁', 'Woody and Mia Lin are both worried!', $bChinese);
 }
 
 function ImgSnowballCarnival($bChinese = true)
@@ -169,5 +169,5 @@ function ImgCMENQ20230614($bChinese = true)
 {
 	$strDate = '20230614';
 	$strYmd = GetBlogYmd($strDate, $bChinese);
-	return ImgAutoQuote(PATH_BLOG_PHOTO.$strDate.'.jpg', $bChinese ? "{$strYmd}纳斯达克100期货和现货价格比较" : "Nasdaq 100 futures and market price comparison on $strYmd.", $bChinese);
+	return BlogImgAutoQuote("$strDate.jpg", "{$strYmd}纳斯达克100期货和现货价格比较", "Nasdaq 100 futures and market price comparison on $strYmd.", $bChinese);
 }

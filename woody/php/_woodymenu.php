@@ -7,7 +7,7 @@ function GetMyPhotoYears()
 
 function GetMiaPhotoYears()
 {
-	return [2014, 2015, 2016, 2018, 2022, 2023, 2024];
+	return [2014, 2015, 2016, 2018, 2022, 2023, 2024, 2025];
 }
 
 function GetBlogPhotoYears()

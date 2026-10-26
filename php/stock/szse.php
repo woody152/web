@@ -101,7 +101,7 @@ function SzseGetLofShares($ref)
 	$strDate = $ref->GetDate();
 	$strStockId = $ref->GetStockId();
 	if ($sql->GetRecord($strStockId, $strDate))		return;				// Already has today's data
-	if ($ref->GetHourMinute() < 915)				return;				// Data not updated until 9:15
+	if ($ref->GetHourMinute() < 920)				return;				// Data not updated until 9:15
 
 	$strFileName = DebugGetPathName('debugszse.txt');
 	if (StockNeedFile($strFileName) == false)		return;				// pause 1 minute after curl error response

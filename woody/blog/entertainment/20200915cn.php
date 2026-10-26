@@ -12,12 +12,12 @@ function EchoAll()
 	$strSZ162411Blog = GetBlogLink(20150818);
 	$strSZ161130 = GetGroupStockLink('SZ161130', true);
 	$strQqqFund = GetStockCategoryLink('qqqfund');
-	$strImgQqq = ImgAutoQuote(PATH_BLOG_PHOTO.'20200915QQQ.jpg', '9月11日QQQ官网显示的前十大持仓');
+	$strImgQqq = BlogImgAutoQuote('20200915QQQ.jpg', '9月11日QQQ官网显示的前十大持仓');
 	$strGoogle = GetBlogLink(20110509);
-	$strImgMnq = ImgAutoQuote(PATH_BLOG_PHOTO.'20200915MNQ.jpg', '9月14日芝商所官网显示的MNQ行情');
+	$strImgMnq = BlogImgAutoQuote('20200915MNQ.jpg', '9月14日芝商所官网显示的MNQ行情');
 	$strSH513100 = GetGroupStockLink('SH513100');
 	$strSZ159941 = GetGroupStockLink('SZ159941');
-	$strImgNdx = ImgAutoQuote(PATH_BLOG_PHOTO.'20200915NDX.jpg', '9月14日stockchars.com显示的NDX技术分析图');
+	$strImgNdx = BlogImgAutoQuote('20200915NDX.jpg', '9月14日stockchars.com显示的NDX技术分析图');
 	$strAccount161129 = GetFundAccountLink('SZ161129', 235530);
 	$strSZ161129 = GetGroupStockLink('SZ161129', true);
 	$strAccount161130 = GetFundAccountLink('SZ161130', 59882);
