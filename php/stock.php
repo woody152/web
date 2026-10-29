@@ -243,6 +243,14 @@ function _getAllSymbolArray($strSymbol)
 				_addFundPairSymbol($ar, $strEstSymbol); 
 			}
         }
+        else if (in_arrayQdiiBr($strSymbol))
+        {
+        	if ($strEstSymbol = QdiiBrGetEstSymbol($strSymbol))
+			{
+	        	$ar[] = 'fx_sbrlcny';
+				_addFundPairSymbol($ar, $strEstSymbol); 
+			}
+        }
         else
         {
         	if ($strPairSymbol = SqlGetFundPair($strSymbol))		$ar[] = $strPairSymbol;

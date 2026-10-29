@@ -615,6 +615,18 @@ function _echoLinearRegressionRelated()
 END;
 }
 
+function _echoSimpleTestRelated()
+{
+	$strCNY = GetChinaMoneyJsonUrl();
+
+	echo <<< END
+	<p>测试数据:</p>
+	<ol>
+	    <li>人民币中间价: $strCNY</li>
+    </ol>
+END;
+}
+
 function _echoInputRelated($strPage, $bChinese)
 {
     switch ($strPage)
@@ -625,6 +637,10 @@ function _echoInputRelated($strPage, $bChinese)
    		
    	case 'linearregression':
    		if ($bChinese)	_echoLinearRegressionRelated();
+    	break;
+
+	case 'simpletest':
+   		if ($bChinese)	_echoSimpleTestRelated();
     	break;
    	}
 }
@@ -637,10 +653,10 @@ function _echoInputResult($acct, $strPage, $strInput, $bChinese)
     		'commonphrase' => _getCommonPhraseString($strInput, $acct->GetLoginId(), $bChinese),
    			'cramersrule' => _getCramersRuleString($strInput, $bChinese),
     		'dicecaptcha' => _getDiceCaptchaString($strInput, $bChinese),
-    		'simpletest' => _getSimpleTestString($strInput, $bChinese),
     		'ip' => filter_valid_ip($strInput) ? $acct->IpLookupString($strInput, $bChinese) : ($bChinese ? '无效IP地址' : 'Invalid IP Address'),
    			'linearregression' => _getLinearRegressionString($strInput, $bChinese),
     		'primenumber' => _getPrimeNumberString($strInput, $bChinese),
+    		'simpletest' => _getSimpleTestString($strInput, $bChinese),
    			'sinajs' => _getSinaJsString($strInput, $bChinese)
     	   };
     $str .= ImgAccountTool($strPage, $bChinese);

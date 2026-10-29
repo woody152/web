@@ -77,6 +77,12 @@ function QdiiEuGetEstSymbol($strSymbol)
     return false;
 }
 
+function QdiiBrGetEstSymbol($strSymbol)
+{
+	if (in_arrayQdiiBr($strSymbol))		return 'znb_IBOV';
+    return false;
+}
+
 class _QdiiReference extends FundReference
 {
     public function __construct($strSymbol, $strCny)

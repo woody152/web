@@ -339,6 +339,16 @@ function in_arrayQdiiEu($strSymbol)
     return in_array($strSymbol, QdiiEuGetSymbolArray());
 }
 
+function QdiiBrGetSymbolArray()
+{
+    return ['SH520870', 'SZ159100'];
+}
+
+function in_arrayQdiiBr($strSymbol)
+{
+    return in_array($strSymbol, QdiiBrGetSymbolArray());
+}
+
 function QdiiMixGetChinaInternetSymbolArray()
 {
 	return ['SH513050', 'SH513220', 'SZ159605', 'SZ159607'];
