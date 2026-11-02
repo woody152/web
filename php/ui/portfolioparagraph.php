@@ -4,7 +4,7 @@ require_once('stocktable.php');
 function _getPortfolioTestVal($iShares, $strSymbol)
 {
 	$iQuantity = match($strSymbol)
-    			 {'KWEB' => 320,
+    			 {'KWEB' => 720,
 				  'SH600104' => 11500,
 				  'TLT' => 500,
 				  default => 0
