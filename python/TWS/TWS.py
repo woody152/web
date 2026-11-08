@@ -82,8 +82,8 @@ class MyEWrapper(EWrapper):
             self.arOrder['MGC202612'] = GetOrderArray()
         else:
             #self.arOrder['TLT'] = GetOrderArray([80.90, 84.19, 85.21, 86.40, 86.62, 86.72, 87.59, 89.76, 91.88], 100, 1, 8)
-            self.arOrder['SPX'] = GetOrderArray([5302.41, 6778.04, 7273.58, 7317.91, 7607.81, 7701.26, 7715.94, 7737.79, 7867.77, 7923.04, 8253.67])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0045, 4, 5)
+            self.arOrder['SPX'] = GetOrderArray([5496.33, 6881.63, 7328.22, 7433.81, 7538.17, 7621.83, 7672.59, 7911.37, 7921.10, 8266.93])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0037, 1, 3)
             self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0191, -1, -1)
             
     def nextValidId(self, orderId: int):

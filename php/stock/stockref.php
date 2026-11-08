@@ -83,6 +83,12 @@ class StockReference extends StockSymbol
     	if (isset($this->arBidQuantity[$iIndex]))	return $this->arBidQuantity[$iIndex];
     	return false;
     }
+
+    function GetQuantity()
+    {
+        if ($strQuantity = $this->GetBidQuantity())	return $strQuantity;
+		return $this->GetAskQuantity();
+    }
     
     function GetAvailableQuantity($bSell, $iIndex = 0)
     {

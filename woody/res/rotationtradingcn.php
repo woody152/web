@@ -13,23 +13,28 @@ function _echoRotationTradingItem($rotation_ref, $fEstQuantity, $strHedgeSymbol,
    	if ($strQuantity = $stock_ref->GetAvailableQuantity($bRotationSell))
    	{
    		$strPrice = $stock_ref->GetAvailablePrice($bRotationSell);
-		$fPrice = floatval($strPrice);
-   		$ar[] = $stock_ref->GetPriceDisplay($fPrice);
-   		$ar[] = $strQuantity;
+	}
+	else
+	{
+		$strQuantity = $stock_ref->GetQuantity();
+		$strPrice = $stock_ref->GetPrice();
+	}
+	$fPrice = floatval($strPrice);
+   	$ar[] = $stock_ref->GetPriceDisplay($fPrice);
+   	$ar[] = $strQuantity;
 
-		$est_ref = $rotation_ref->GetEstRef();
-		$fHedge = GetStockHedge($strSymbol, $stock_ref->GetStockId(), ($est_ref->GetSymbol() == $strHedgeSymbol) ? false : $strHedgeSymbol);
-		$fHintQuantity = abs(round($fHedge * $fEstQuantity / 100.0) * 100.0);
-		$strHintQuantity = strval($fHintQuantity);
-		if ($fHintQuantity > floatval($strQuantity))	$strHintQuantity = GetFontElement($strHintQuantity);
-		$ar[] = $strHintQuantity;
-		$ar[] = GetNumberDisplay($fHedge, 0);
-		$ar[] = GetNumberDisplay($fEstQuantity, 0);
-		if ($fEst = $rotation_ref->GetEstNetValue())
-		{
-			$ar[] = $stock_ref->GetPercentageDisplay($fEst, $fPrice);
-		}
-   	}
+	$est_ref = $rotation_ref->GetEstRef();
+	$fHedge = GetStockHedge($strSymbol, $stock_ref->GetStockId(), ($est_ref->GetSymbol() == $strHedgeSymbol) ? false : $strHedgeSymbol);
+	$fHintQuantity = abs(round($fHedge * $fEstQuantity / 100.0) * 100.0);
+	$strHintQuantity = strval($fHintQuantity);
+	if ($fHintQuantity > floatval($strQuantity))	$strHintQuantity = GetFontElement($strHintQuantity);
+	$ar[] = $strHintQuantity;
+	$ar[] = GetNumberDisplay($fHedge, 0);
+	$ar[] = GetNumberDisplay($fEstQuantity, 0);
+	if ($fEst = $rotation_ref->GetEstNetValue())
+	{
+		$ar[] = $stock_ref->GetPercentageDisplay($fEst, $fPrice);
+	}
 
 	EchoTableColumn($ar);
 }
