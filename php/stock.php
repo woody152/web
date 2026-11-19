@@ -488,7 +488,7 @@ function StockDebugXml($strPathName, $strUrl, $iInterval = SECONDS_IN_MIN, $arEx
 {
 	if ($str = StockSaveDebugFile($strPathName, $strUrl, $iInterval, $arExtraHeaders, $strFileName))
 	{
-		return simplexml_load_string($str);
+		return @simplexml_load_string($str);
 	}
 	return false;
 }

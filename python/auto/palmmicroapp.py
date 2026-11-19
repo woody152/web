@@ -17,7 +17,7 @@ class PalmmicroApp:
 		self.running = True
 		
 		# 软件版本号
-		self.version = '0.81'
+		self.version = '0.82'
 		
 		# 创建DataFrame
 		self.df = self.create_dataframe()

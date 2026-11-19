@@ -63,8 +63,9 @@ class MyEWrapper(EWrapper):
         self.strNextFuture = '202703'
         self.arOrder = {}
         self.arOrder['SPY'] = GetOrderArray()
+        self.arOrder['KWEB'] = GetOrderArray([20.05, 21.40, 22.32, 23.23, 23.31, 25.22, 25.45, 29.31, 30.84, 41.63], 200, 0, 2)
         if IsChinaMarketOpen():
-            self.arOrder['KWEB'] = GetOrderArray()
+            #self.arOrder['KWEB'] = GetOrderArray()
             self.arOrder['GLD'] = GetOrderArray()
             self.arOrder['GUSH'] = GetOrderArray()
             #self.arOrder['IEO'] = GetOrderArray()
@@ -78,12 +79,12 @@ class MyEWrapper(EWrapper):
             self.arOrder['XOP'] = GetOrderArray()
             self.arOrder['MES' + self.strCurFuture] = GetOrderArray()
             self.arOrder['MNQ' + self.strCurFuture] = GetOrderArray()
-            self.arOrder['MCL202612'] = GetOrderArray()
+            self.arOrder['MCL202701'] = GetOrderArray()
             self.arOrder['MGC202612'] = GetOrderArray()
         else:
-            #self.arOrder['TLT'] = GetOrderArray([80.90, 84.19, 85.21, 86.40, 86.62, 86.72, 87.59, 89.76, 91.88], 100, 1, 8)
-            self.arOrder['SPX'] = GetOrderArray([5496.33, 6881.63, 7328.22, 7433.81, 7538.17, 7621.83, 7672.59, 7911.37, 7921.10, 8266.93])
-            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0037, 1, 3)
+            self.arOrder['TLT'] = GetOrderArray([77.07, 78.94, 79.63, 80.44, 80.91, 82.88, 84.43, 88.47], 100, 1, -1)
+            self.arOrder['SPX'] = GetOrderArray([5496.33, 6881.63, 7250.71, 7410.60, 7477.99, 7553.79, 7856.87, 7912.66, 8266.93])
+            self.arOrder['MES' + self.strCurFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0027, 2, 3)
             self.arOrder['MES' + self.strNextFuture] = AdjustOrderArray(self.arOrder['SPX'], 1.0191, -1, -1)
             
     def nextValidId(self, orderId: int):
