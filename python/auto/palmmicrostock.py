@@ -529,7 +529,7 @@ class PalmmicroWrapper(EWrapper):
 			self.arStock = {}
 
 	arFutureDict = {'hf_CL': 'MCL202701',
-					'hf_GC': 'MGC202612',
+					'hf_GC': 'MGC202702',
 					'hf_ES': 'MES202612',
 					'hf_NQ': 'MNQ202612'
 				   }
